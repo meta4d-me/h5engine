@@ -1,6 +1,10 @@
 
 declare namespace spine_gd3d
 {
+    class Gd3dTexture
+    {
+
+    }
     class spineSkeleton implements gd3d.framework.I2DComponent
     {
         constructor(skeletonData: any)
@@ -14,12 +18,18 @@ declare namespace spine_gd3d
         remove();
         onUpdate: () => void;
         getToCanvasMatrix(mat?: gd3d.math.matrix3x2): gd3d.math.matrix3x2;
+        changeSlotTexture(slotName: string, texture: Gd3dTexture);
     }
     class SpineAssetMgr
     {
         constructor(mgr: gd3d.framework.assetMgr, baseUrl?: string)
-        loadJson(fileUrl: string, cb: () => void)
-        loadTextureAtlas(fileUrl: string, cb: () => void);
+        loadBinary(path: string, success?: (path: string, binary: Uint8Array) => void, error?: (path: string, message: string) => void): void;
+        loadText(path: string, success?: (path: string, text: string) => void, error?: (path: string, message: string) => void): void;
+        loadJson(path: string, success?: (path: string, object: object) => void, error?: (path: string, message: string) => void): void;
+        loadTexture(path: string, success?: (path: string, texture: Gd3dTexture) => void, error?: (path: string, message: string) => void): void;
+        loadTextureAtlas(path: string, success?: (path: string, atlas: any) => void, error?: (path: string, message: string) => void, fileAlias?: {
+            [keyword: string]: string;
+        }): void;
         get(asset: string): any;
     }
 

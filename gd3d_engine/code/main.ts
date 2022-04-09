@@ -106,6 +106,8 @@ class main implements gd3d.framework.IUserCode
             demoList.addBtn("SPINE_动画裁剪", () => new test_spine_clip());
             demoList.addBtn("SPINE_变形约束", () => new test_spine_tank());
             demoList.addBtn("SPINE_转动约束", () => new test_spine_wheelTransform());
+            demoList.addBtn("SPINE_换Region插槽图片", () => new test_spine_change_slot_region_tex());
+            demoList.addBtn("SPINE_换Mesh插槽图片", () => new test_spine_change_slot_mesh_tex());
             return new demoList();
         });
 

@@ -10820,6 +10820,8 @@
         constructor(image, webgl) {
             super(image);
             this._needUpdate = true;
+            this.width = image.width;
+            this.height = image.height;
             this._webgl = webgl;
             const tex = new gd3d.framework.texture();
             var _textureFormat = gd3d.render.TextureFormatEnum.RGBA;
@@ -11108,6 +11110,46 @@
             skeleton.updateWorldTransform();
             this.updateGeometry();
             (_a = this.onUpdate) === null || _a === void 0 ? void 0 : _a.call(this, delta);
+        }
+        changeSlotTexture(slotName, texture) {
+            let slot = this.skeleton.findSlot(slotName);
+            if (slot == null) {
+                console.warn(`changeSlotTexture failed, cannot find slot by name=${slotName}`);
+                return;
+            }
+            let att = slot.attachment;
+            if (att instanceof MeshAttachment) {
+                let region = this.createTextureRegion(texture);
+                att.region = region;
+                att.updateUVs();
+            }
+            else if (att instanceof RegionAttachment) {
+                let region = this.createTextureRegion(texture);
+                att.setRegion(region);
+                att.updateOffset();
+            }
+            else {
+                console.warn("changeSlotTexture failed,unsupported attachment type", att);
+            }
+        }
+        createTextureRegion(texture) {
+            let page = new TextureAtlasPage();
+            page.width = texture.width;
+            page.height = texture.height;
+            page.setTexture(texture);
+            let region = new TextureAtlasRegion();
+            region.page = page;
+            region.width = texture.width;
+            region.height = texture.height;
+            region.originalWidth = texture.width;
+            region.originalHeight = texture.height;
+            region.degrees = 0;
+            region.u = 0;
+            region.v = 0;
+            region.u2 = 1;
+            region.v2 = 1;
+            region.renderObject = region;
+            return region;
         }
         get toTransformMatrix() {
             return this._toTransFormMatrix;
