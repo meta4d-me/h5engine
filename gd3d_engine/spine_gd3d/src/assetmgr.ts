@@ -68,6 +68,8 @@ export class SpineAssetMgr extends AssetManagerBase {
 export class Gd3dTexture extends Texture {
     private _texture: gd3d.framework.texture;
     private _needUpdate: boolean = true;
+    readonly width: number;
+    readonly height: number;
     get texture(): gd3d.framework.texture {
         if (this._needUpdate) {
             this._needUpdate = false;
@@ -89,6 +91,8 @@ export class Gd3dTexture extends Texture {
     private _webgl: WebGLRenderingContext;
     constructor(image: HTMLImageElement, webgl: WebGLRenderingContext) {
         super(image);
+        this.width = image.width;
+        this.height = image.height;
         this._webgl = webgl;
         const tex = new gd3d.framework.texture();
         var _textureFormat = gd3d.render.TextureFormatEnum.RGBA;

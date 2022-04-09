@@ -12,6 +12,8 @@ import { StretchyMan } from "./pages/stretchyMan";
 import { Clip } from "./pages/clip";
 import { Tank } from "./pages/tank";
 import { WheelTransform } from "./pages/wheelTransform";
+import { ChangeSlotMeshAttachment } from "./pages/changeSlotMeshAttachment";
+import { ChangeSlotRegionAttachment } from "./pages/changeSlotRegionAttachment";
 
 export class APP extends React.Component {
     componentDidMount() {
@@ -35,6 +37,8 @@ export class APP extends React.Component {
                         <Link to={"/clip"}><li>动画裁剪</li></Link>
                         <Link to={"/tank"}><li>变形约束</li></Link>
                         <Link to={"/wheel_transform"}><li>转动约束</li></Link>
+                        <Link to={"/change_slot_region"}><li>切换Region插槽图片</li></Link>
+                        <Link to={"/change_slot_mesh"}><li>切换Mesh插槽图片</li></Link>
                     </div>
                 }} />
                 <Switch>
@@ -50,6 +54,9 @@ export class APP extends React.Component {
                     <Route path="/clip" component={Clip} />
                     <Route path="/tank" component={Tank} />
                     <Route path="/wheel_transform" component={WheelTransform} />
+                    <Route path="/change_slot_region" component={ChangeSlotRegionAttachment} />
+                    <Route path="/change_slot_mesh" component={ChangeSlotMeshAttachment} />
+
                 </Switch>
             </Router>
         </div>;

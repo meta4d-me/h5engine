@@ -1,4 +1,4 @@
-import { AnimationState, VertexEffect, SkeletonData, AnimationStateData, SkeletonClipping, Vector2, Color, RegionAttachment, TextureAtlasRegion, MeshAttachment, ClippingAttachment, NumberArrayLike, Skeleton } from "@esotericsoftware/spine-core";
+import { AnimationState, VertexEffect, SkeletonData, AnimationStateData, SkeletonClipping, Vector2, Color, RegionAttachment, TextureAtlasRegion, MeshAttachment, ClippingAttachment, NumberArrayLike, Skeleton, TextureAtlasPage } from "@esotericsoftware/spine-core";
 import { Gd3dTexture } from "./assetMgr";
 import { setting } from "./setting";
 import { ortho, SpineMeshBatcher } from "./spineMeshBatcher";
@@ -43,6 +43,47 @@ export class spineSkeleton implements gd3d.framework.I2DComponent {
         this.onUpdate?.(delta);
     }
     onUpdate: (delta: number) => void
+
+
+    changeSlotTexture(slotName: string, texture: Gd3dTexture) {
+        let slot = this.skeleton.findSlot(slotName);
+        if (slot == null) {
+            console.warn(`changeSlotTexture failed, cannot find slot by name=${slotName}`);
+            return;
+        }
+        let att = slot.attachment;
+        if (att instanceof MeshAttachment) {
+            let region = this.createTextureRegion(texture);
+            att.region = region;
+            att.updateUVs();
+        } else if (att instanceof RegionAttachment) {
+            let region = this.createTextureRegion(texture);
+            att.setRegion(region);
+            att.updateOffset();
+        } else {
+            console.warn("changeSlotTexture failed,unsupported attachment type", att);
+        }
+    }
+
+    private createTextureRegion(texture: Gd3dTexture) {
+        let page = new TextureAtlasPage()
+        page.width = texture.width;
+        page.height = texture.height;
+        page.setTexture(texture);
+        let region = new TextureAtlasRegion()
+        region.page = page
+        region.width = texture.width
+        region.height = texture.height
+        region.originalWidth = texture.width
+        region.originalHeight = texture.height
+        region.degrees = 0;
+        region.u = 0
+        region.v = 0
+        region.u2 = 1
+        region.v2 = 1
+        region.renderObject = region;
+        return region;
+    }
 
     private _toTransFormMatrix = new gd3d.math.matrix3x2([1, 0, 0, -1, 0, 0]);
     get toTransformMatrix() {
