@@ -48,19 +48,24 @@ export class ChangeSlotMeshAttachment extends React.Component {
                 this._comp = comp;
                 //设置播放动画
                 comp.state.setAnimation(0, animation, true);
-                comp.skeleton.setSkinByName("Magic_1_skin");
+                // comp.skeleton.setSkinByName("Magic_1_skin");
                 let spineNode = new gd3d.framework.transform2D;
-                //可用transform2d缩放等
-                // spineNode.localTranslate.x = app.width / 2;
-                // spineNode.localTranslate.y = -app.height / 2;
-                // spineNode.localRotate = 30 * Math.PI / 180;
-                // spineNode.localScale.y = -1;
-                // spineNode.localScale.x = -1;
-
-                spineNode.localTranslate.x = root2d.canvas.pixelWidth / 2;
-                spineNode.localTranslate.y = root2d.canvas.pixelHeight / 2;
+                spineNode.localTranslate.x = root2d.canvas.pixelWidth * 1 / 3;
+                spineNode.localTranslate.y = root2d.canvas.pixelHeight * 1 / 3;
                 spineNode.addComponentDirect(comp);
                 root2d.addChild(spineNode);
+
+
+                let comp2 = new spineSkeleton(skeletonData);
+                //设置播放动画
+                comp2.state.setAnimation(0, animation, true);
+                comp2.skeleton.setSkinByName("Magic_1_skin");
+                let spineNode2 = new gd3d.framework.transform2D;
+                spineNode2.localTranslate.x = root2d.canvas.pixelWidth * 2 / 3;
+                spineNode2.localTranslate.y = root2d.canvas.pixelHeight * 2 / 3;
+                spineNode2.addComponentDirect(comp2);
+                root2d.addChild(spineNode2);
+
             })
 
         this.onclick = () => {
@@ -72,7 +77,7 @@ export class ChangeSlotMeshAttachment extends React.Component {
             let tex = ["head2.png", "head3.png"][this._index];
             assetManager.loadTexture(tex, (path, texture) => {
                 // // this.changeSlotMeshAttachment("face/NFT头像3", texture as Gd3dTexture);
-                this._comp.changeSlotTexture("face/NFT头像3", texture as Gd3dTexture);
+                this._comp.changeSlotTexture("1像素头像", texture as Gd3dTexture);
             })
         }
     }

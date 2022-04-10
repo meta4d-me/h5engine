@@ -53,13 +53,17 @@ export class spineSkeleton implements gd3d.framework.I2DComponent {
         }
         let att = slot.attachment;
         if (att instanceof MeshAttachment) {
+            let copy = att.copy() as MeshAttachment;
             let region = this.createTextureRegion(texture);
-            att.region = region;
-            att.updateUVs();
+            copy.region = region;
+            copy.updateUVs();
+            slot.setAttachment(copy);
         } else if (att instanceof RegionAttachment) {
+            let copy = att.copy() as RegionAttachment;
             let region = this.createTextureRegion(texture);
-            att.setRegion(region);
-            att.updateOffset();
+            copy.setRegion(region);
+            copy.updateOffset();
+            slot.setAttachment(copy);
         } else {
             console.warn("changeSlotTexture failed,unsupported attachment type", att);
         }
