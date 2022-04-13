@@ -19,6 +19,7 @@ declare namespace spine_gd3d
         onUpdate: () => void;
         getToCanvasMatrix(mat?: gd3d.math.matrix3x2): gd3d.math.matrix3x2;
         changeSlotTexture(slotName: string, texture: Gd3dTexture);
+        clearSlot(slotName: string)
     }
     class SpineAssetMgr
     {

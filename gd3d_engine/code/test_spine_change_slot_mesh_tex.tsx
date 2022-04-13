@@ -56,7 +56,17 @@ class test_spine_change_slot_mesh_tex implements IState
         let tex = ["head2.png", "head3.png"][this._index];
         this.assetManager.loadTexture(tex, (path, texture) =>
         {
-            this._comp.changeSlotTexture("face/NFT头像3", texture);
+            this._comp.changeSlotTexture("1像素头像", texture);
+        })
+    }
+
+    private clearSlot = () =>
+    {
+        this._index = (this._index + 1) % 2;
+        let tex = ["head2.png", "head3.png"][this._index];
+        this.assetManager.loadTexture(tex, (path, texture) =>
+        {
+            this._comp.clearSlot("1像素头像");
         })
     }
 
@@ -69,6 +79,7 @@ class test_spine_change_slot_mesh_tex implements IState
             this._comp.state.timeScale = value;
         });
         gui.add(this, "changeSlot")
+        gui.add(this, "clearSlot")
     }
     private speed = 1.0
     update(delta: number) { }
