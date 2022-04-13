@@ -48,7 +48,7 @@ export class ChangeSlotMeshAttachment extends React.Component {
                 this._comp = comp;
                 //设置播放动画
                 comp.state.setAnimation(0, animation, true);
-                // comp.skeleton.setSkinByName("Magic_1_skin");
+                comp.skeleton.setSkinByName("Magic_1_skin");
                 let spineNode = new gd3d.framework.transform2D;
                 spineNode.localTranslate.x = root2d.canvas.pixelWidth * 1 / 3;
                 spineNode.localTranslate.y = root2d.canvas.pixelHeight * 1 / 3;
@@ -83,12 +83,16 @@ export class ChangeSlotMeshAttachment extends React.Component {
     }
 
     private onclick = () => { }
+    private removeIcon = () => {
+        this._comp.clearSlot("1像素头像");
+    }
 
     render(): React.ReactNode {
         return <div>
             <div id="container"></div>
             <div className="ui speed">
                 <Button onClick={() => this.onclick()}>切换</Button>
+                <Button onClick={() => this.removeIcon()}>去掉头像</Button>
             </div>
         </div>
     }

@@ -51,7 +51,12 @@ export class spineSkeleton implements gd3d.framework.I2DComponent {
             console.warn(`changeSlotTexture failed, cannot find slot by name=${slotName}`);
             return;
         }
-        let att = slot.attachment;
+        let att = this.skeleton.getAttachmentByName(slotName, slotName)
+        if (att == null) {
+            console.warn(`changeSlotTexture failed, cannot find attachment by name=${slotName}`);
+            return;
+        }
+        // let att = slot.attachment;
         if (att instanceof MeshAttachment) {
             let copy = att.copy() as MeshAttachment;
             let region = this.createTextureRegion(texture);
@@ -67,6 +72,15 @@ export class spineSkeleton implements gd3d.framework.I2DComponent {
         } else {
             console.warn("changeSlotTexture failed,unsupported attachment type", att);
         }
+    }
+
+    clearSlot(slotName: string) {
+        let slot = this.skeleton.findSlot(slotName)
+        if (slot == null) {
+            console.warn(`clearSlot failed, cannot find slot by name=${slotName}`);
+            return;
+        }
+        slot.setAttachment(null);
     }
 
     private createTextureRegion(texture: Gd3dTexture) {
