@@ -1229,6 +1229,23 @@ var main = (function () {
             demoList.addBtn("cannonPhysics3D", function () { return new PhysicDemo.physic_01(); });
             return new demoList();
         });
+        this.addBtn("SPINE样例==>", function () {
+            demoList.addBtn("SPINE_图集动画", function () { return new test_spine_spriteSheet(); });
+            demoList.addBtn("SPINE_变换图片", function () { return new test_spine_imageChange(); });
+            demoList.addBtn("SPINE_动画混合", function () { return new test_spine_transition(); });
+            demoList.addBtn("SPINE_网格变形", function () { return new test_spine_mesh(); });
+            demoList.addBtn("SPINE_换皮肤", function () { return new test_spine_changeSkin(); });
+            demoList.addBtn("SPINE_反向动力学", function () { return new test_spine_IK(); });
+            demoList.addBtn("SPINE_相加动画混合", function () { return new test_spine_additiveBlending(); });
+            demoList.addBtn("SPINE_路径约束", function () { return new test_spine_vin(); });
+            demoList.addBtn("SPINE_变形人", function () { return new test_spine_stretchyMan(); });
+            demoList.addBtn("SPINE_动画裁剪", function () { return new test_spine_clip(); });
+            demoList.addBtn("SPINE_变形约束", function () { return new test_spine_tank(); });
+            demoList.addBtn("SPINE_转动约束", function () { return new test_spine_wheelTransform(); });
+            demoList.addBtn("SPINE_换Region插槽图片", function () { return new test_spine_change_slot_region_tex(); });
+            demoList.addBtn("SPINE_换Mesh插槽图片", function () { return new test_spine_change_slot_mesh_tex(); });
+            return new demoList();
+        });
         this.addBtn("其他==>", function () {
             demoList.addBtn("test_multipleplayer_anim", function () { return new test_multipleplayer_anim(); });
             demoList.addBtn("test_reload(换装)", function () { return new testReload(); });
@@ -5139,6 +5156,7 @@ var test_UIGuideMask = (function () {
 }());
 var fontjson = "方正粗圆_GBK.font.json";
 var fontpng = "方正粗圆_GBK.TTF.png";
+var emoji = "emoji";
 var test_UI_Component = (function () {
     function test_UI_Component() {
         this.taskmgr = new gd3d.framework.taskMgr();
@@ -5156,6 +5174,7 @@ var test_UI_Component = (function () {
         this.rooto2d = new gd3d.framework.overlay2D();
         this.camera.addOverLay(this.rooto2d);
         this.taskmgr.addTaskCall(this.loadTexture.bind(this));
+        this.taskmgr.addTaskCall(this.loadAtlas.bind(this));
         this.taskmgr.addTaskCall(this.createUI.bind(this));
     };
     test_UI_Component.prototype.createUI = function (astState, state) {
@@ -5181,12 +5200,16 @@ var test_UI_Component = (function () {
         bg_t.setLayoutValue(gd3d.framework.layoutOption.TOP, 60);
         bg_t.setLayoutValue(gd3d.framework.layoutOption.RIGHT, 60);
         bg_t.setLayoutValue(gd3d.framework.layoutOption.BOTTOM, 60);
+        var lableW = 500;
+        var lableH = 40;
+        var lableStartX = 80;
+        var lableStartY = 280;
         var lab_t0 = new gd3d.framework.transform2D;
         lab_t0.name = "我是段文本_lable";
-        lab_t0.width = 800;
-        lab_t0.height = 100;
-        lab_t0.localTranslate.x = 50;
-        lab_t0.localTranslate.y = 280;
+        lab_t0.width = lableW;
+        lab_t0.height = lableH;
+        lab_t0.localTranslate.x = lableStartX;
+        lab_t0.localTranslate.y = lableStartY;
         this.rooto2d.addChild(lab_t0);
         var lab_l0 = lab_t0.addComponent("label");
         test_UI_Component["lab"] = lab_l0;
@@ -5198,10 +5221,10 @@ var test_UI_Component = (function () {
         test_UI_Component["obj"] = this;
         var lab_t = new gd3d.framework.transform2D;
         lab_t.name = "我是段文本_lable";
-        lab_t.width = 800;
-        lab_t.height = 100;
-        lab_t.localTranslate.x = 50;
-        lab_t.localTranslate.y = 300;
+        lab_t.width = lableW;
+        lab_t.height = lableH;
+        lab_t.localTranslate.x = lableStartX;
+        lab_t.localTranslate.y = lableStartY + lableH;
         this.rooto2d.addChild(lab_t);
         var lab_l = lab_t.addComponent("label");
         test_UI_Component["lab"] = lab_l;
@@ -5213,10 +5236,10 @@ var test_UI_Component = (function () {
         test_UI_Component["obj"] = this;
         var lab_t1 = new gd3d.framework.transform2D;
         lab_t1.name = "我是段文本_lable";
-        lab_t1.width = 800;
-        lab_t1.height = 100;
-        lab_t1.localTranslate.x = 50;
-        lab_t1.localTranslate.y = 350;
+        lab_t1.width = lableW;
+        lab_t1.height = lableH;
+        lab_t1.localTranslate.x = lableStartX;
+        lab_t1.localTranslate.y = lableStartY + lableH * 2;
         this.rooto2d.addChild(lab_t1);
         var lab_l1 = lab_t1.addComponent("label");
         test_UI_Component["lab"] = lab_l1;
@@ -5228,10 +5251,10 @@ var test_UI_Component = (function () {
         test_UI_Component["obj"] = this;
         var lab_t2 = new gd3d.framework.transform2D;
         lab_t2.name = "我是段文本_lable";
-        lab_t2.width = 800;
-        lab_t2.height = 100;
-        lab_t2.localTranslate.x = 50;
-        lab_t2.localTranslate.y = 420;
+        lab_t2.width = lableW;
+        lab_t2.height = lableH;
+        lab_t2.localTranslate.x = lableStartX;
+        lab_t2.localTranslate.y = lableStartY + lableH * 3;
         this.rooto2d.addChild(lab_t2);
         var lab_l2 = lab_t2.addComponent("label");
         test_UI_Component["lab"] = lab_l2;
@@ -5242,20 +5265,21 @@ var test_UI_Component = (function () {
         lab_l2.color2 = new gd3d.math.color(1.0, 0.0, 0.0, 1);
         test_UI_Component["obj"] = this;
         var lab_t3 = new gd3d.framework.transform2D;
-        lab_t3.name = "我是段文本_lable";
-        lab_t3.width = 800;
-        lab_t3.height = 100;
-        lab_t3.localTranslate.x = 50;
-        lab_t3.localTranslate.y = 500;
+        lab_t3.name = "lable_richText";
+        lab_t3.width = lableW;
+        lab_t3.height = lableH * 3;
+        lab_t3.localTranslate.x = lableStartX;
+        lab_t3.localTranslate.y = lableStartY + lableH * 4;
         this.rooto2d.addChild(lab_t3);
         var lab_l3 = lab_t3.addComponent("label");
-        test_UI_Component["lab"] = lab_l3;
         lab_l3.font = this.assetMgr.getAssetByName(fontjson);
-        lab_l3.fontsize = 200;
-        lab_l3.text = lab_l3.fontsize + "\u53F7\u5B57\u4F53 Innovation in China \u4E2D\u56FD\u5236\u9020\uFF0C\u6167\u53CA\u5168\u7403 0123456789";
+        lab_l3.fontsize = 30;
+        lab_l3.richText = true;
+        var atlas = gd3d.framework.sceneMgr.app.getAssetMgr().getAssetByName("emoji.atlas.json", "emoji.assetbundle.json");
+        lab_l3.imageTextAtlas = atlas;
+        lab_l3.text = "富文本:<color=#00ff00ff>红色</color> <color=#ff0000ff>绿色</color> \n<i>斜体文本</i> \n图片字符[happy][happy][like][cool][happy]";
         lab_l3.color = new gd3d.math.color(0.0, 0.0, 0.0, 1);
-        lab_l3.color2 = new gd3d.math.color(1.0, 0.0, 0.0, 1);
-        test_UI_Component["obj"] = this;
+        lab_l3.color2 = new gd3d.math.color(0, 0.0, 0.0, 0.5);
         var btn_t = new gd3d.framework.transform2D;
         btn_t.name = "btn_按鈕";
         btn_t.width = 100;
@@ -5407,6 +5431,15 @@ var test_UI_Component = (function () {
                         });
                     }
                 });
+            }
+        });
+    };
+    test_UI_Component.prototype.loadAtlas = function (lastState, state) {
+        var abName = emoji + ".assetbundle.json";
+        var abPath = "newRes/Atlas/" + emoji + "/" + abName;
+        this.assetMgr.load(abPath, gd3d.framework.AssetTypeEnum.Bundle, function (_sta) {
+            if (_sta.isfinish) {
+                state.finish = true;
             }
         });
     };
@@ -7522,6 +7555,1098 @@ var test_softCut = (function () {
         this.taskmgr.move(delta);
     };
     return test_softCut;
+}());
+var test_spine_additiveBlending = (function () {
+    function test_spine_additiveBlending() {
+    }
+    test_spine_additiveBlending.prototype.start = function (app) {
+        var _this = this;
+        var scene = app.getScene();
+        var objCam = new gd3d.framework.transform();
+        scene.addChild(objCam);
+        var camera = objCam.gameObject.addComponent("camera");
+        var root2d = new gd3d.framework.overlay2D();
+        camera.addOverLay(root2d);
+        var assetManager = new spine_gd3d.SpineAssetMgr(app.getAssetMgr(), "./res/spine/");
+        var skeletonFile = "demos.json";
+        var atlasFile = "atlas2.atlas";
+        Promise.all([
+            new Promise(function (resolve, reject) {
+                assetManager.loadJson(skeletonFile, function () { return resolve(); });
+            }),
+            new Promise(function (resolve, reject) {
+                assetManager.loadTextureAtlas(atlasFile, function () { return resolve(); });
+            })
+        ])
+            .then(function () {
+            var atlasLoader = new spine_gd3d.AtlasAttachmentLoader(assetManager.get(atlasFile));
+            var skeletonJson = new spine_gd3d.SkeletonJson(atlasLoader);
+            skeletonJson.scale = 0.4;
+            var skeletonData = skeletonJson.readSkeletonData(assetManager.get(skeletonFile).owl);
+            var comp = new spine_gd3d.spineSkeleton(skeletonData);
+            _this._comp = comp;
+            comp.state.setAnimation(0, "idle", true);
+            comp.state.setAnimation(1, "blink", true);
+            var right = comp.state.setAnimation(2, "left", true);
+            var left = comp.state.setAnimation(3, "right", true);
+            var up = comp.state.setAnimation(4, "up", true);
+            var down = comp.state.setAnimation(5, "down", true);
+            left.mixBlend = spine_gd3d.MixBlend.add;
+            right.mixBlend = spine_gd3d.MixBlend.add;
+            up.mixBlend = spine_gd3d.MixBlend.add;
+            down.mixBlend = spine_gd3d.MixBlend.add;
+            left.alpha = 0;
+            right.alpha = 1;
+            up.alpha = 0;
+            down.alpha = 0;
+            var spineNode = new gd3d.framework.transform2D;
+            spineNode.localTranslate.x = root2d.canvas.pixelWidth / 2;
+            spineNode.localTranslate.y = root2d.canvas.pixelHeight / 2;
+            spineNode.addComponentDirect(comp);
+            root2d.addChild(spineNode);
+            document.addEventListener("mousemove", function (ev) {
+                if (ev.x - app.width / 2 > 0) {
+                    right.alpha = (ev.x - app.width / 2) / (app.width / 2);
+                    left.alpha = 0;
+                }
+                else {
+                    right.alpha = 0;
+                    left.alpha = (app.width / 2 - ev.x) / (app.width / 2);
+                }
+                if (ev.y - app.height / 2 > 0) {
+                    up.alpha = 0;
+                    down.alpha = (ev.y - app.height / 2) / (app.height / 2);
+                }
+                else {
+                    down.alpha = 0;
+                    up.alpha = (app.height / 2 - ev.y) / (app.height / 2);
+                }
+            });
+        });
+    };
+    test_spine_additiveBlending.prototype.update = function (delta) { };
+    return test_spine_additiveBlending;
+}());
+var test_spine_changeSkin = (function () {
+    function test_spine_changeSkin() {
+        var _this = this;
+        this.randomSkin = function () {
+            var skeleton = _this._comp.skeleton;
+            var randomIndex = Math.floor(Math.random() * (skeleton.data.skins.length - 1));
+            var skin = skeleton.data.skins[randomIndex];
+            _this._comp.skeleton.setSkin(skin);
+            _this._comp.skeleton.setSlotsToSetupPose();
+        };
+        this.randomGroupSkin = function () {
+            var skeleton = _this._comp.skeleton;
+            var skins = [];
+            for (var indx in skeleton.data.skins) {
+                var skin_1 = skeleton.data.skins[indx];
+                if (skin_1.name === "default")
+                    continue;
+                skins.push(skin_1);
+            }
+            var newSkin = new spine_gd3d.Skin("random-skin");
+            for (var slotIndex = 0; slotIndex < skeleton.slots.length; slotIndex++) {
+                var skin = skins[(Math.random() * skins.length - 1) | 0];
+                var attachments = skin.attachments[slotIndex];
+                for (var attachmentName in attachments) {
+                    newSkin.setAttachment(slotIndex, attachmentName, attachments[attachmentName]);
+                }
+            }
+            _this._comp.skeleton.setSkin(newSkin);
+            _this._comp.skeleton.setSlotsToSetupPose();
+        };
+        this.speed = 1.0;
+    }
+    test_spine_changeSkin.prototype.start = function (app) {
+        var _this = this;
+        var scene = app.getScene();
+        var objCam = new gd3d.framework.transform();
+        scene.addChild(objCam);
+        var camera = objCam.gameObject.addComponent("camera");
+        var root2d = new gd3d.framework.overlay2D();
+        camera.addOverLay(root2d);
+        var assetManager = new spine_gd3d.SpineAssetMgr(app.getAssetMgr(), "./res/spine/");
+        var skeletonFile = "demos.json";
+        var atlasFile = "heroes.atlas";
+        Promise.all([
+            new Promise(function (resolve, reject) {
+                assetManager.loadJson(skeletonFile, function () { return resolve(); });
+            }),
+            new Promise(function (resolve, reject) {
+                assetManager.loadTextureAtlas(atlasFile, function () { return resolve(); });
+            })
+        ])
+            .then(function () {
+            var atlasLoader = new spine_gd3d.AtlasAttachmentLoader(assetManager.get(atlasFile));
+            var skeletonJson = new spine_gd3d.SkeletonJson(atlasLoader);
+            skeletonJson.scale = 0.4;
+            var skeletonData = skeletonJson.readSkeletonData(assetManager.get(skeletonFile).heroes);
+            var comp = new spine_gd3d.spineSkeleton(skeletonData);
+            _this._comp = comp;
+            comp.skeleton.setSkinByName("Assassin");
+            comp.state.setAnimation(0, "run", true);
+            var spineNode = new gd3d.framework.transform2D;
+            spineNode.localTranslate.x = root2d.canvas.pixelWidth / 2;
+            spineNode.localTranslate.y = root2d.canvas.pixelHeight / 2;
+            spineNode.addComponentDirect(comp);
+            root2d.addChild(spineNode);
+            datGui.init().then(function () { return _this.setGUI(); });
+        });
+    };
+    test_spine_changeSkin.prototype.setGUI = function () {
+        var _this = this;
+        if (!dat)
+            return;
+        var gui = new dat.GUI();
+        gui.add(this, 'speed', 0, 2).onChange(function (value) {
+            _this._comp.state.timeScale = value;
+        });
+        gui.add(this, "randomSkin");
+        gui.add(this, "randomGroupSkin");
+    };
+    test_spine_changeSkin.prototype.update = function (delta) { };
+    return test_spine_changeSkin;
+}());
+var test_spine_change_slot_mesh_tex = (function () {
+    function test_spine_change_slot_mesh_tex() {
+        var _this = this;
+        this._index = 0;
+        this.changeSlot = function () {
+            _this._index = (_this._index + 1) % 2;
+            var tex = ["head2.png", "head3.png"][_this._index];
+            _this.assetManager.loadTexture(tex, function (path, texture) {
+                _this._comp.changeSlotTexture("1像素头像", texture);
+            });
+        };
+        this.clearSlot = function () {
+            _this._index = (_this._index + 1) % 2;
+            var tex = ["head2.png", "head3.png"][_this._index];
+            _this.assetManager.loadTexture(tex, function (path, texture) {
+                _this._comp.clearSlot("1像素头像");
+            });
+        };
+        this.speed = 1.0;
+    }
+    test_spine_change_slot_mesh_tex.prototype.start = function (app) {
+        var _this = this;
+        var scene = app.getScene();
+        var objCam = new gd3d.framework.transform();
+        scene.addChild(objCam);
+        var camera = objCam.gameObject.addComponent("camera");
+        var root2d = new gd3d.framework.overlay2D();
+        camera.addOverLay(root2d);
+        var assetManager = new spine_gd3d.SpineAssetMgr(app.getAssetMgr(), "./res/spine/");
+        this.assetManager = assetManager;
+        var skeletonFile = "robot/skeleton.json";
+        var atlasFile = "robot/skeleton.atlas";
+        var animation = "cha_ObliqueFront_idle";
+        Promise.all([
+            new Promise(function (resolve, reject) {
+                assetManager.loadJson(skeletonFile, function () { return resolve(); });
+            }),
+            new Promise(function (resolve, reject) {
+                assetManager.loadTextureAtlas(atlasFile, function () { return resolve(); });
+            })
+        ])
+            .then(function () {
+            var atlasLoader = new spine_gd3d.AtlasAttachmentLoader(assetManager.get(atlasFile));
+            var skeletonJson = new spine_gd3d.SkeletonJson(atlasLoader);
+            var skeletonData = skeletonJson.readSkeletonData(assetManager.get(skeletonFile));
+            var comp = new spine_gd3d.spineSkeleton(skeletonData);
+            _this._comp = comp;
+            comp.state.setAnimation(0, animation, true);
+            comp.skeleton.setSkinByName("Magic_1_skin");
+            var spineNode = new gd3d.framework.transform2D;
+            spineNode.localTranslate.x = root2d.canvas.pixelWidth / 2;
+            spineNode.localTranslate.y = root2d.canvas.pixelHeight / 2;
+            spineNode.addComponentDirect(comp);
+            root2d.addChild(spineNode);
+            datGui.init().then(function () { return _this.setGUI(); });
+        });
+    };
+    test_spine_change_slot_mesh_tex.prototype.setGUI = function () {
+        var _this = this;
+        if (!dat)
+            return;
+        var gui = new dat.GUI();
+        gui.add(this, 'speed', 0, 2).onChange(function (value) {
+            _this._comp.state.timeScale = value;
+        });
+        gui.add(this, "changeSlot");
+        gui.add(this, "clearSlot");
+    };
+    test_spine_change_slot_mesh_tex.prototype.update = function (delta) { };
+    return test_spine_change_slot_mesh_tex;
+}());
+var test_spine_change_slot_region_tex = (function () {
+    function test_spine_change_slot_region_tex() {
+        var _this = this;
+        this._index = 0;
+        this.changeSlot = function () {
+            _this._index = (_this._index + 1) % 2;
+            var tex = ["head2.png", "head3.png"][_this._index];
+            _this.assetManager.loadTexture(tex, function (path, texture) {
+                _this._comp.changeSlotTexture("gun", texture);
+            });
+        };
+        this.speed = 1.0;
+    }
+    test_spine_change_slot_region_tex.prototype.start = function (app) {
+        var _this = this;
+        var scene = app.getScene();
+        var objCam = new gd3d.framework.transform();
+        scene.addChild(objCam);
+        var camera = objCam.gameObject.addComponent("camera");
+        var root2d = new gd3d.framework.overlay2D();
+        camera.addOverLay(root2d);
+        var assetManager = new spine_gd3d.SpineAssetMgr(app.getAssetMgr(), "./res/spine/");
+        this.assetManager = assetManager;
+        var skeletonFile = "demos.json";
+        var atlasFile = "atlas1.atlas";
+        var animation = "walk";
+        Promise.all([
+            new Promise(function (resolve, reject) {
+                assetManager.loadJson(skeletonFile, function () { return resolve(); });
+            }),
+            new Promise(function (resolve, reject) {
+                assetManager.loadTextureAtlas(atlasFile, function () { return resolve(); });
+            })
+        ])
+            .then(function () {
+            var atlasLoader = new spine_gd3d.AtlasAttachmentLoader(assetManager.get(atlasFile));
+            var skeletonJson = new spine_gd3d.SkeletonJson(atlasLoader);
+            skeletonJson.scale = 0.4;
+            var skeletonData = skeletonJson.readSkeletonData(assetManager.get(skeletonFile).raptor);
+            var comp = new spine_gd3d.spineSkeleton(skeletonData);
+            _this._comp = comp;
+            comp.state.setAnimation(0, animation, true);
+            var spineNode = new gd3d.framework.transform2D;
+            spineNode.localTranslate.x = root2d.canvas.pixelWidth / 2;
+            spineNode.localTranslate.y = root2d.canvas.pixelHeight / 2;
+            spineNode.addComponentDirect(comp);
+            root2d.addChild(spineNode);
+            datGui.init().then(function () { return _this.setGUI(); });
+        });
+    };
+    test_spine_change_slot_region_tex.prototype.setGUI = function () {
+        var _this = this;
+        if (!dat)
+            return;
+        var gui = new dat.GUI();
+        gui.add(this, 'speed', 0, 2).onChange(function (value) {
+            _this._comp.state.timeScale = value;
+        });
+        gui.add(this, "changeSlot");
+    };
+    test_spine_change_slot_region_tex.prototype.update = function (delta) { };
+    return test_spine_change_slot_region_tex;
+}());
+var test_spine_clip = (function () {
+    function test_spine_clip() {
+        this.speed = 1.0;
+    }
+    test_spine_clip.prototype.start = function (app) {
+        var _this = this;
+        var scene = app.getScene();
+        var objCam = new gd3d.framework.transform();
+        scene.addChild(objCam);
+        var camera = objCam.gameObject.addComponent("camera");
+        var root2d = new gd3d.framework.overlay2D();
+        camera.addOverLay(root2d);
+        var assetManager = new spine_gd3d.SpineAssetMgr(app.getAssetMgr(), "./res/spine/");
+        var skeletonFile = "demos.json";
+        var atlasFile = "atlas1.atlas";
+        Promise.all([
+            new Promise(function (resolve, reject) {
+                assetManager.loadJson(skeletonFile, function () { return resolve(); });
+            }),
+            new Promise(function (resolve, reject) {
+                assetManager.loadTextureAtlas(atlasFile, function () { return resolve(); });
+            })
+        ])
+            .then(function () {
+            var atlasLoader = new spine_gd3d.AtlasAttachmentLoader(assetManager.get(atlasFile));
+            var skeletonJson = new spine_gd3d.SkeletonJson(atlasLoader);
+            skeletonJson.scale = 0.4;
+            var skeletonData = skeletonJson.readSkeletonData(assetManager.get(skeletonFile).spineboy);
+            var comp = new spine_gd3d.spineSkeleton(skeletonData);
+            _this._comp = comp;
+            comp.state.setAnimation(0, "portal", true);
+            var spineNode = new gd3d.framework.transform2D;
+            spineNode.localTranslate.x = root2d.canvas.pixelWidth / 2;
+            spineNode.localTranslate.y = root2d.canvas.pixelHeight / 2;
+            spineNode.addComponentDirect(comp);
+            root2d.addChild(spineNode);
+            datGui.init().then(function () { return _this.setGUI(); });
+        });
+    };
+    test_spine_clip.prototype.setGUI = function () {
+        var _this = this;
+        if (!dat)
+            return;
+        var gui = new dat.GUI();
+        gui.add(this, 'speed', 0, 2).onChange(function (value) {
+            _this._comp.state.timeScale = value;
+        });
+    };
+    test_spine_clip.prototype.update = function (delta) { };
+    return test_spine_clip;
+}());
+var test_spine_IK = (function () {
+    function test_spine_IK() {
+        var _this = this;
+        this.controlBones = ["hoverboard controller", "hip controller", "board target", "crosshair"];
+        this._temptMat = new gd3d.math.matrix();
+        this._temptPos = new gd3d.math.vector2();
+        this.bonesPos = {};
+        this.fire = function () {
+            _this._comp.state.setAnimation(3, "aim", true);
+            _this._comp.state.setAnimation(4, "shoot", false);
+            _this._comp.state.addEmptyAnimation(4, 0.5, 0).listener = {
+                complete: function (trackIndex) {
+                    _this._comp.state.setEmptyAnimation(3, 0.2);
+                }
+            };
+        };
+        this.jump = function () {
+            _this._comp.state.setAnimation(2, "jump", false);
+            _this._comp.state.addEmptyAnimation(2, 0.5, 0);
+        };
+        this.speed = 1.0;
+    }
+    test_spine_IK.prototype.start = function (app) {
+        var _this = this;
+        var scene = app.getScene();
+        var objCam = new gd3d.framework.transform();
+        scene.addChild(objCam);
+        var camera = objCam.gameObject.addComponent("camera");
+        var root2d = new gd3d.framework.overlay2D();
+        camera.addOverLay(root2d);
+        var assetManager = new spine_gd3d.SpineAssetMgr(app.getAssetMgr(), "./res/spine/");
+        var skeletonFile = "demos.json";
+        var atlasFile = "atlas1.atlas";
+        Promise.all([
+            new Promise(function (resolve, reject) {
+                assetManager.loadJson(skeletonFile, function () { return resolve(); });
+            }),
+            new Promise(function (resolve, reject) {
+                assetManager.loadTextureAtlas(atlasFile, function () { return resolve(); });
+            })
+        ])
+            .then(function () {
+            var atlasLoader = new spine_gd3d.AtlasAttachmentLoader(assetManager.get(atlasFile));
+            var skeletonJson = new spine_gd3d.SkeletonJson(atlasLoader);
+            skeletonJson.scale = 0.4;
+            var skeletonData = skeletonJson.readSkeletonData(assetManager.get(skeletonFile).spineboy);
+            var comp = new spine_gd3d.spineSkeleton(skeletonData);
+            _this._comp = comp;
+            comp.state.setAnimation(0, "hoverboard", true);
+            var spineNode = new gd3d.framework.transform2D;
+            spineNode.localTranslate.x = root2d.canvas.pixelWidth / 2;
+            spineNode.localTranslate.y = root2d.canvas.pixelHeight / 2;
+            spineNode.addComponentDirect(comp);
+            root2d.addChild(spineNode);
+            datGui.init().then(function () { return _this.setGUI(); });
+            comp.onUpdate = function () {
+                if (!_this._inited) {
+                    _this._inited = true;
+                    var ui = document.getElementById("drawarea");
+                    document.addEventListener("mousemove", function (ev) {
+                        if (_this._chooseBone) {
+                            var boneName = _this._chooseBone.data.name;
+                            var temptPos_1 = new gd3d.math.vector2();
+                            temptPos_1.x = ev.clientX;
+                            temptPos_1.y = ev.clientY;
+                            root2d.calScreenPosToCanvasPos(temptPos_1, temptPos_1);
+                            var toMat = _this._comp.getToCanvasMatrix();
+                            var temptMat_1 = new gd3d.math.matrix3x2();
+                            gd3d.math.matrix3x2Inverse(toMat, temptMat_1);
+                            gd3d.math.matrix3x2TransformVector2(temptMat_1, temptPos_1, temptPos_1);
+                            var tempt = new spine_gd3d.Vector2();
+                            tempt.set(temptPos_1.x, temptPos_1.y);
+                            _this._chooseBone.parent.worldToLocal(tempt);
+                            _this._chooseBone.x = tempt.x;
+                            _this._chooseBone.y = tempt.y;
+                            _this.bonesPos[boneName].boneUI.style.top = ev.clientY + "px";
+                            _this.bonesPos[boneName].boneUI.style.left = ev.clientX + "px";
+                        }
+                    });
+                    document.addEventListener("mouseup", function () { return _this._chooseBone = null; });
+                    var temptMat = _this._comp.getToCanvasMatrix();
+                    var temptPos = new gd3d.math.vector2();
+                    var _loop_1 = function (i) {
+                        var boneName = _this.controlBones[i];
+                        var bone = _this._comp.skeleton.findBone(boneName);
+                        var x = _this._comp.skeleton.x + bone.worldX;
+                        var y = _this._comp.skeleton.y + bone.worldY;
+                        gd3d.math.matrix3x2TransformVector2(temptMat, new gd3d.math.vector2(x, y), temptPos);
+                        root2d.calCanvasPosToScreenPos(temptPos, temptPos);
+                        var screen_x = temptPos.x;
+                        var screen_y = temptPos.y;
+                        var boneUI = document.createElement("div", {});
+                        boneUI.style.position = "absolute";
+                        boneUI.style.width = "10px";
+                        boneUI.style.height = "10px";
+                        boneUI.style.backgroundColor = "blue";
+                        boneUI.style.top = screen_y + "px";
+                        boneUI.style.left = screen_x + "px";
+                        boneUI.addEventListener("mouseenter", function () {
+                            boneUI.style.backgroundColor = "green";
+                        });
+                        boneUI.addEventListener("mouseleave", function () {
+                            boneUI.style.backgroundColor = "blue";
+                        });
+                        boneUI.addEventListener("mousedown", function () {
+                            _this._chooseBone = bone;
+                        });
+                        _this.bonesPos[boneName] = { bone: bone, boneUI: boneUI };
+                        ui.appendChild(boneUI);
+                    };
+                    for (var i = 0; i < _this.controlBones.length; i++) {
+                        _loop_1(i);
+                    }
+                }
+            };
+        });
+    };
+    test_spine_IK.prototype.setGUI = function () {
+        var _this = this;
+        if (!dat)
+            return;
+        var gui = new dat.GUI();
+        gui.add(this, 'speed', 0, 2).onChange(function (value) {
+            _this._comp.state.timeScale = value;
+        });
+        gui.add(this, "fire");
+        gui.add(this, "jump");
+    };
+    test_spine_IK.prototype.update = function (delta) { };
+    return test_spine_IK;
+}());
+var test_spine_imageChange = (function () {
+    function test_spine_imageChange() {
+    }
+    test_spine_imageChange.prototype.start = function (app) {
+        var scene = app.getScene();
+        var objCam = new gd3d.framework.transform();
+        scene.addChild(objCam);
+        var camera = objCam.gameObject.addComponent("camera");
+        var root2d = new gd3d.framework.overlay2D();
+        camera.addOverLay(root2d);
+        var assetManager = new spine_gd3d.SpineAssetMgr(app.getAssetMgr(), "./res/spine/");
+        var skeletonFile = "demos.json";
+        var atlasFile = "atlas1.atlas";
+        var animation = "death";
+        Promise.all([
+            new Promise(function (resolve, reject) {
+                assetManager.loadJson(skeletonFile, function () { return resolve(); });
+            }),
+            new Promise(function (resolve, reject) {
+                assetManager.loadTextureAtlas(atlasFile, function () { return resolve(); });
+            })
+        ])
+            .then(function () {
+            var atlasLoader = new spine_gd3d.AtlasAttachmentLoader(assetManager.get(atlasFile));
+            var skeletonJson = new spine_gd3d.SkeletonJson(atlasLoader);
+            skeletonJson.scale = 0.4;
+            var skeletonData = skeletonJson.readSkeletonData(assetManager.get(skeletonFile).alien);
+            var comp = new spine_gd3d.spineSkeleton(skeletonData);
+            comp.state.setAnimation(0, animation, true);
+            var spineNode = new gd3d.framework.transform2D;
+            spineNode.localTranslate.x = root2d.canvas.pixelWidth / 2;
+            spineNode.localTranslate.y = root2d.canvas.pixelHeight / 2;
+            spineNode.addComponentDirect(comp);
+            root2d.addChild(spineNode);
+        });
+    };
+    test_spine_imageChange.prototype.update = function (delta) { };
+    return test_spine_imageChange;
+}());
+var test_spine_mesh = (function () {
+    function test_spine_mesh() {
+        this.speed = 1.0;
+    }
+    test_spine_mesh.prototype.start = function (app) {
+        var _this = this;
+        var scene = app.getScene();
+        var objCam = new gd3d.framework.transform();
+        scene.addChild(objCam);
+        var camera = objCam.gameObject.addComponent("camera");
+        var root2d = new gd3d.framework.overlay2D();
+        camera.addOverLay(root2d);
+        var assetManager = new spine_gd3d.SpineAssetMgr(app.getAssetMgr(), "./res/spine/");
+        var skeletonFile = "demos.json";
+        var atlasFile = "atlas2.atlas";
+        Promise.all([
+            new Promise(function (resolve, reject) {
+                assetManager.loadJson(skeletonFile, function () { return resolve(); });
+            }),
+            new Promise(function (resolve, reject) {
+                assetManager.loadTextureAtlas(atlasFile, function () { return resolve(); });
+            })
+        ])
+            .then(function () {
+            var atlasLoader = new spine_gd3d.AtlasAttachmentLoader(assetManager.get(atlasFile));
+            var skeletonJson = new spine_gd3d.SkeletonJson(atlasLoader);
+            skeletonJson.scale = 0.4;
+            var skeletonData = skeletonJson.readSkeletonData(assetManager.get(skeletonFile).orangegirl);
+            var comp = new spine_gd3d.spineSkeleton(skeletonData);
+            _this._comp = comp;
+            comp.state.setAnimation(0, "animation", true);
+            var spineNode = new gd3d.framework.transform2D;
+            spineNode.addComponentDirect(comp);
+            spineNode.localTranslate.x = root2d.canvas.pixelWidth / 2;
+            spineNode.localTranslate.y = root2d.canvas.pixelHeight / 2;
+            root2d.addChild(spineNode);
+            datGui.init().then(function () { return _this.setGUI(); });
+        });
+    };
+    test_spine_mesh.prototype.setGUI = function () {
+        var _this = this;
+        if (!dat)
+            return;
+        var gui = new dat.GUI();
+        gui.add(this, 'speed', 0, 2).onChange(function (value) {
+            _this._comp.state.timeScale = value;
+        });
+    };
+    test_spine_mesh.prototype.update = function (delta) { };
+    return test_spine_mesh;
+}());
+var test_spine_spriteSheet = (function () {
+    function test_spine_spriteSheet() {
+        this.speed = 1.0;
+    }
+    test_spine_spriteSheet.prototype.start = function (app) {
+        var _this = this;
+        var scene = app.getScene();
+        var objCam = new gd3d.framework.transform();
+        scene.addChild(objCam);
+        var camera = objCam.gameObject.addComponent("camera");
+        var root2d = new gd3d.framework.overlay2D();
+        camera.addOverLay(root2d);
+        var assetManager = new spine_gd3d.SpineAssetMgr(app.getAssetMgr(), "./res/spine/");
+        var skeletonFile = "demos.json";
+        var atlasFile = "atlas1.atlas";
+        var animation = "walk";
+        Promise.all([
+            new Promise(function (resolve, reject) {
+                assetManager.loadJson(skeletonFile, function () { return resolve(); });
+            }),
+            new Promise(function (resolve, reject) {
+                assetManager.loadTextureAtlas(atlasFile, function () { return resolve(); });
+            })
+        ])
+            .then(function () {
+            var atlasLoader = new spine_gd3d.AtlasAttachmentLoader(assetManager.get(atlasFile));
+            var skeletonJson = new spine_gd3d.SkeletonJson(atlasLoader);
+            skeletonJson.scale = 0.4;
+            var skeletonData = skeletonJson.readSkeletonData(assetManager.get(skeletonFile).raptor);
+            var comp = new spine_gd3d.spineSkeleton(skeletonData);
+            _this._comp = comp;
+            comp.state.setAnimation(0, animation, true);
+            var spineNode = new gd3d.framework.transform2D;
+            spineNode.localTranslate.x = root2d.canvas.pixelWidth / 2;
+            spineNode.localTranslate.y = root2d.canvas.pixelHeight / 2;
+            spineNode.localScale.x = -1;
+            spineNode.addComponentDirect(comp);
+            root2d.addChild(spineNode);
+            datGui.init().then(function () { return _this.setGUI(); });
+        });
+    };
+    test_spine_spriteSheet.prototype.setGUI = function () {
+        var _this = this;
+        if (!dat)
+            return;
+        var gui = new dat.GUI();
+        gui.add(this, 'speed', 0, 2).onChange(function (value) {
+            _this._comp.state.timeScale = value;
+        });
+    };
+    test_spine_spriteSheet.prototype.update = function (delta) { };
+    return test_spine_spriteSheet;
+}());
+var test_spine_stretchyMan = (function () {
+    function test_spine_stretchyMan() {
+        this.controlBones = ["back leg controller", "front leg controller", "back arm controller", "front arm controller", "head controller", "hip controller"];
+        this._temptMat = new gd3d.math.matrix();
+        this._temptPos = new gd3d.math.vector2();
+        this.bonesPos = {};
+    }
+    test_spine_stretchyMan.prototype.start = function (app) {
+        var _this = this;
+        var scene = app.getScene();
+        var objCam = new gd3d.framework.transform();
+        scene.addChild(objCam);
+        var camera = objCam.gameObject.addComponent("camera");
+        var root2d = new gd3d.framework.overlay2D();
+        camera.addOverLay(root2d);
+        var assetManager = new spine_gd3d.SpineAssetMgr(app.getAssetMgr(), "./res/spine/");
+        var skeletonFile = "demos.json";
+        var atlasFile = "atlas2.atlas";
+        Promise.all([
+            new Promise(function (resolve, reject) {
+                assetManager.loadJson(skeletonFile, function () { return resolve(); });
+            }),
+            new Promise(function (resolve, reject) {
+                assetManager.loadTextureAtlas(atlasFile, function () { return resolve(); });
+            })
+        ])
+            .then(function () {
+            var atlasLoader = new spine_gd3d.AtlasAttachmentLoader(assetManager.get(atlasFile));
+            var skeletonJson = new spine_gd3d.SkeletonJson(atlasLoader);
+            skeletonJson.scale = 0.4;
+            var skeletonData = skeletonJson.readSkeletonData(assetManager.get(skeletonFile).stretchyman);
+            var comp = new spine_gd3d.spineSkeleton(skeletonData);
+            _this._comp = comp;
+            comp.state.setAnimation(0, "idle", true);
+            var spineNode = new gd3d.framework.transform2D;
+            spineNode.localTranslate.x = root2d.canvas.pixelWidth / 2;
+            spineNode.localTranslate.y = root2d.canvas.pixelHeight / 2;
+            spineNode.addComponentDirect(comp);
+            root2d.addChild(spineNode);
+            comp.onUpdate = function () {
+                if (!_this._inited) {
+                    _this._inited = true;
+                    var ui = document.getElementById("drawarea");
+                    document.addEventListener("mousemove", function (ev) {
+                        if (_this._chooseBone) {
+                            var boneName = _this._chooseBone.data.name;
+                            var temptPos_2 = new gd3d.math.vector2();
+                            temptPos_2.x = ev.clientX;
+                            temptPos_2.y = ev.clientY;
+                            root2d.calScreenPosToCanvasPos(temptPos_2, temptPos_2);
+                            var toMat = _this._comp.getToCanvasMatrix();
+                            var temptMat = new gd3d.math.matrix3x2();
+                            gd3d.math.matrix3x2Inverse(toMat, temptMat);
+                            gd3d.math.matrix3x2TransformVector2(temptMat, temptPos_2, temptPos_2);
+                            var tempt = new spine_gd3d.Vector2();
+                            tempt.set(temptPos_2.x, temptPos_2.y);
+                            _this._chooseBone.parent.worldToLocal(tempt);
+                            _this._chooseBone.x = tempt.x;
+                            _this._chooseBone.y = tempt.y;
+                            for (var i = 0; i < _this.controlBones.length; i++) {
+                                var boneName_1 = _this.controlBones[i];
+                                var bone = _this._comp.skeleton.findBone(boneName_1);
+                                var x = _this._comp.skeleton.x + bone.worldX;
+                                var y = _this._comp.skeleton.y + bone.worldY;
+                                gd3d.math.matrix3x2TransformVector2(toMat, new gd3d.math.vector2(x, y), temptPos_2);
+                                root2d.calCanvasPosToScreenPos(temptPos_2, temptPos_2);
+                                var screen_x = temptPos_2.x;
+                                var screen_y = temptPos_2.y;
+                                _this.bonesPos[boneName_1].boneUI.style.top = screen_y + "px";
+                                _this.bonesPos[boneName_1].boneUI.style.left = screen_x + "px";
+                            }
+                        }
+                    });
+                    document.addEventListener("mouseup", function () { return _this._chooseBone = null; });
+                    var toCanvasMat = _this._comp.getToCanvasMatrix();
+                    var temptPos = new gd3d.math.vector2();
+                    var _loop_2 = function (i) {
+                        var boneName = _this.controlBones[i];
+                        var bone = _this._comp.skeleton.findBone(boneName);
+                        var x = _this._comp.skeleton.x + bone.worldX;
+                        var y = _this._comp.skeleton.y + bone.worldY;
+                        gd3d.math.matrix3x2TransformVector2(toCanvasMat, new gd3d.math.vector2(x, y), temptPos);
+                        root2d.calCanvasPosToScreenPos(temptPos, temptPos);
+                        var screen_x = temptPos.x;
+                        var screen_y = temptPos.y;
+                        var boneUI = document.createElement("div", {});
+                        boneUI.style.position = "absolute";
+                        boneUI.style.width = "10px";
+                        boneUI.style.height = "10px";
+                        boneUI.style.backgroundColor = "blue";
+                        boneUI.style.top = screen_y + "px";
+                        boneUI.style.left = screen_x + "px";
+                        boneUI.addEventListener("mouseenter", function () {
+                            boneUI.style.backgroundColor = "green";
+                        });
+                        boneUI.addEventListener("mouseleave", function () {
+                            boneUI.style.backgroundColor = "blue";
+                        });
+                        boneUI.addEventListener("mousedown", function () {
+                            _this._chooseBone = bone;
+                        });
+                        _this.bonesPos[boneName] = { bone: bone, boneUI: boneUI };
+                        ui.appendChild(boneUI);
+                    };
+                    for (var i = 0; i < _this.controlBones.length; i++) {
+                        _loop_2(i);
+                    }
+                }
+            };
+        });
+    };
+    test_spine_stretchyMan.prototype.update = function (delta) { };
+    return test_spine_stretchyMan;
+}());
+var test_spine_tank = (function () {
+    function test_spine_tank() {
+        this.speed = 1.0;
+    }
+    test_spine_tank.prototype.start = function (app) {
+        var _this = this;
+        var scene = app.getScene();
+        var objCam = new gd3d.framework.transform();
+        scene.addChild(objCam);
+        var camera = objCam.gameObject.addComponent("camera");
+        var root2d = new gd3d.framework.overlay2D();
+        camera.addOverLay(root2d);
+        var assetManager = new spine_gd3d.SpineAssetMgr(app.getAssetMgr(), "./res/spine/");
+        var skeletonFile = "demos.json";
+        var atlasFile = "atlas2.atlas";
+        Promise.all([
+            new Promise(function (resolve, reject) {
+                assetManager.loadJson(skeletonFile, function () { return resolve(); });
+            }),
+            new Promise(function (resolve, reject) {
+                assetManager.loadTextureAtlas(atlasFile, function () { return resolve(); });
+            })
+        ])
+            .then(function () {
+            var atlasLoader = new spine_gd3d.AtlasAttachmentLoader(assetManager.get(atlasFile));
+            var skeletonJson = new spine_gd3d.SkeletonJson(atlasLoader);
+            skeletonJson.scale = 0.4;
+            var skeletonData = skeletonJson.readSkeletonData(assetManager.get(skeletonFile).tank);
+            var comp = new spine_gd3d.spineSkeleton(skeletonData);
+            _this._comp = comp;
+            comp.state.setAnimation(0, "drive", true);
+            var spineNode = new gd3d.framework.transform2D;
+            spineNode.localTranslate.x = root2d.canvas.pixelWidth / 2;
+            spineNode.localTranslate.y = root2d.canvas.pixelHeight / 2;
+            spineNode.localScale.x = 0.5;
+            spineNode.localScale.y = 0.5;
+            spineNode.addComponentDirect(comp);
+            root2d.addChild(spineNode);
+            datGui.init().then(function () { return _this.setGUI(); });
+        });
+    };
+    test_spine_tank.prototype.setGUI = function () {
+        var _this = this;
+        if (!dat)
+            return;
+        var gui = new dat.GUI();
+        gui.add(this, 'speed', 0, 2).onChange(function (value) {
+            _this._comp.state.timeScale = value;
+        });
+    };
+    test_spine_tank.prototype.update = function (delta) { };
+    return test_spine_tank;
+}());
+var test_spine_transition = (function () {
+    function test_spine_transition() {
+        var _this = this;
+        this.playDie = function () {
+            _this._comp.state.setAnimation(0, "death", false);
+            _this.setAnimations(_this._comp.state);
+        };
+        this.speed = 1.0;
+    }
+    test_spine_transition.prototype.start = function (app) {
+        var _this = this;
+        var scene = app.getScene();
+        var objCam = new gd3d.framework.transform();
+        scene.addChild(objCam);
+        var camera = objCam.gameObject.addComponent("camera");
+        var root2d = new gd3d.framework.overlay2D();
+        camera.addOverLay(root2d);
+        var assetManager = new spine_gd3d.SpineAssetMgr(app.getAssetMgr(), "./res/spine/");
+        var skeletonFile = "demos.json";
+        var atlasFile = "atlas1.atlas";
+        var animation = "walk";
+        Promise.all([
+            new Promise(function (resolve, reject) {
+                assetManager.loadJson(skeletonFile, function () { return resolve(); });
+            }),
+            new Promise(function (resolve, reject) {
+                assetManager.loadTextureAtlas(atlasFile, function () { return resolve(); });
+            })
+        ])
+            .then(function () {
+            var atlasLoader = new spine_gd3d.AtlasAttachmentLoader(assetManager.get(atlasFile));
+            var skeletonJson = new spine_gd3d.SkeletonJson(atlasLoader);
+            skeletonJson.scale = 0.4;
+            var skeletonData = skeletonJson.readSkeletonData(assetManager.get(skeletonFile).spineboy);
+            var comp = new spine_gd3d.spineSkeleton(skeletonData);
+            _this._comp = comp;
+            comp.animData.defaultMix = 0.2;
+            _this.setAnimations(comp.state);
+            var spineNode = new gd3d.framework.transform2D;
+            spineNode.localTranslate.x = root2d.canvas.pixelWidth / 2;
+            spineNode.localTranslate.y = root2d.canvas.pixelHeight / 2;
+            spineNode.addComponentDirect(comp);
+            root2d.addChild(spineNode);
+            datGui.init().then(function () { return _this.setGUI(); });
+        });
+    };
+    test_spine_transition.prototype.setAnimations = function (state) {
+        var _this = this;
+        state.addAnimation(0, "idle", true, 0);
+        state.addAnimation(0, "walk", true, 0);
+        state.addAnimation(0, "jump", false, 0);
+        state.addAnimation(0, "run", true, 0);
+        state.addAnimation(0, "jump", false, 1);
+        state.addAnimation(0, "walk", true, 0).listener = {
+            start: function (trackIndex) {
+                _this.setAnimations(state);
+            }
+        };
+    };
+    test_spine_transition.prototype.setGUI = function () {
+        var _this = this;
+        if (!dat)
+            return;
+        var gui = new dat.GUI();
+        gui.add(this, 'speed', 0, 2).onChange(function (value) {
+            _this._comp.state.timeScale = value;
+        });
+        gui.add(this, 'playDie');
+    };
+    test_spine_transition.prototype.update = function (delta) { };
+    return test_spine_transition;
+}());
+var test_spine_vin = (function () {
+    function test_spine_vin() {
+        this.controlBones = ["base", "vine-control1", "vine-control2", "vine-control3", "vine-control4"];
+        this._temptMat = new gd3d.math.matrix();
+        this._temptPos = new gd3d.math.vector2();
+        this.bonesPos = {};
+    }
+    test_spine_vin.prototype.start = function (app) {
+        var _this = this;
+        var scene = app.getScene();
+        var objCam = new gd3d.framework.transform();
+        scene.addChild(objCam);
+        var camera = objCam.gameObject.addComponent("camera");
+        var root2d = new gd3d.framework.overlay2D();
+        camera.addOverLay(root2d);
+        var assetManager = new spine_gd3d.SpineAssetMgr(app.getAssetMgr(), "./res/spine/");
+        var skeletonFile = "demos.json";
+        var atlasFile = "atlas2.atlas";
+        Promise.all([
+            new Promise(function (resolve, reject) {
+                assetManager.loadJson(skeletonFile, function () { return resolve(); });
+            }),
+            new Promise(function (resolve, reject) {
+                assetManager.loadTextureAtlas(atlasFile, function () { return resolve(); });
+            })
+        ])
+            .then(function () {
+            var atlasLoader = new spine_gd3d.AtlasAttachmentLoader(assetManager.get(atlasFile));
+            var skeletonJson = new spine_gd3d.SkeletonJson(atlasLoader);
+            skeletonJson.scale = 0.4;
+            var skeletonData = skeletonJson.readSkeletonData(assetManager.get(skeletonFile).vine);
+            var comp = new spine_gd3d.spineSkeleton(skeletonData);
+            _this._comp = comp;
+            comp.state.setAnimation(0, "animation", true);
+            var spineNode = new gd3d.framework.transform2D;
+            spineNode.localTranslate.x = root2d.canvas.pixelWidth / 2;
+            spineNode.localTranslate.y = root2d.canvas.pixelHeight / 2;
+            spineNode.addComponentDirect(comp);
+            root2d.addChild(spineNode);
+            comp.onUpdate = function () {
+                if (!_this._inited) {
+                    _this._inited = true;
+                    var ui = document.getElementById("drawarea");
+                    document.addEventListener("mousemove", function (ev) {
+                        if (_this._chooseBone) {
+                            var boneName = _this._chooseBone.data.name;
+                            var temptPos_3 = new gd3d.math.vector2();
+                            temptPos_3.x = ev.clientX;
+                            temptPos_3.y = ev.clientY;
+                            root2d.calScreenPosToCanvasPos(temptPos_3, temptPos_3);
+                            var toMat = _this._comp.getToCanvasMatrix();
+                            var temptMat_2 = new gd3d.math.matrix3x2();
+                            gd3d.math.matrix3x2Inverse(toMat, temptMat_2);
+                            gd3d.math.matrix3x2TransformVector2(temptMat_2, temptPos_3, temptPos_3);
+                            var tempt = new spine_gd3d.Vector2();
+                            tempt.set(temptPos_3.x, temptPos_3.y);
+                            _this._chooseBone.parent.worldToLocal(tempt);
+                            _this._chooseBone.x = tempt.x;
+                            _this._chooseBone.y = tempt.y;
+                            _this.bonesPos[boneName].boneUI.style.top = ev.clientY + "px";
+                            _this.bonesPos[boneName].boneUI.style.left = ev.clientX + "px";
+                        }
+                    });
+                    document.addEventListener("mouseup", function () { return _this._chooseBone = null; });
+                    var temptMat = _this._comp.getToCanvasMatrix();
+                    var temptPos = new gd3d.math.vector2();
+                    var _loop_3 = function (i) {
+                        var boneName = _this.controlBones[i];
+                        var bone = _this._comp.skeleton.findBone(boneName);
+                        var x = _this._comp.skeleton.x + bone.worldX;
+                        var y = _this._comp.skeleton.y + bone.worldY;
+                        gd3d.math.matrix3x2TransformVector2(temptMat, new gd3d.math.vector2(x, y), temptPos);
+                        root2d.calCanvasPosToScreenPos(temptPos, temptPos);
+                        var screen_x = temptPos.x;
+                        var screen_y = temptPos.y;
+                        var boneUI = document.createElement("div", {});
+                        boneUI.style.position = "absolute";
+                        boneUI.style.width = "10px";
+                        boneUI.style.height = "10px";
+                        boneUI.style.backgroundColor = "blue";
+                        boneUI.style.top = screen_y + "px";
+                        boneUI.style.left = screen_x + "px";
+                        boneUI.addEventListener("mouseenter", function () {
+                            boneUI.style.backgroundColor = "green";
+                        });
+                        boneUI.addEventListener("mouseleave", function () {
+                            boneUI.style.backgroundColor = "blue";
+                        });
+                        boneUI.addEventListener("mousedown", function () {
+                            _this._chooseBone = bone;
+                        });
+                        _this.bonesPos[boneName] = { bone: bone, boneUI: boneUI };
+                        ui.appendChild(boneUI);
+                    };
+                    for (var i = 0; i < _this.controlBones.length; i++) {
+                        _loop_3(i);
+                    }
+                }
+            };
+        });
+    };
+    test_spine_vin.prototype.update = function (delta) { };
+    return test_spine_vin;
+}());
+var test_spine_wheelTransform = (function () {
+    function test_spine_wheelTransform() {
+        this.controlBones = ["wheel2overlay", "wheel3overlay", "rotate-handle"];
+        this._temptMat = new gd3d.math.matrix();
+        this._temptPos = new gd3d.math.vector2();
+        this.bonesPos = {};
+    }
+    test_spine_wheelTransform.prototype.start = function (app) {
+        var _this = this;
+        var scene = app.getScene();
+        var objCam = new gd3d.framework.transform();
+        scene.addChild(objCam);
+        var camera = objCam.gameObject.addComponent("camera");
+        var root2d = new gd3d.framework.overlay2D();
+        camera.addOverLay(root2d);
+        var assetManager = new spine_gd3d.SpineAssetMgr(app.getAssetMgr(), "./res/spine/");
+        var skeletonFile = "demos.json";
+        var atlasFile = "atlas2.atlas";
+        Promise.all([
+            new Promise(function (resolve, reject) {
+                assetManager.loadJson(skeletonFile, function () { return resolve(); });
+            }),
+            new Promise(function (resolve, reject) {
+                assetManager.loadTextureAtlas(atlasFile, function () { return resolve(); });
+            })
+        ])
+            .then(function () {
+            var atlasLoader = new spine_gd3d.AtlasAttachmentLoader(assetManager.get(atlasFile));
+            var skeletonJson = new spine_gd3d.SkeletonJson(atlasLoader);
+            skeletonJson.scale = 0.4;
+            var skeletonData = skeletonJson.readSkeletonData(assetManager.get(skeletonFile).transforms);
+            var comp = new spine_gd3d.spineSkeleton(skeletonData);
+            _this._comp = comp;
+            var spineNode = new gd3d.framework.transform2D;
+            spineNode.localTranslate.x = root2d.canvas.pixelWidth / 2;
+            spineNode.localTranslate.y = root2d.canvas.pixelHeight / 2;
+            spineNode.addComponentDirect(comp);
+            root2d.addChild(spineNode);
+            var wheel = _this._comp.skeleton.findBone("wheel1overlay");
+            comp.onUpdate = function () {
+                if (!_this._inited) {
+                    _this._inited = true;
+                    var ui = document.getElementById("drawarea");
+                    var lastAngle_1 = 0;
+                    document.addEventListener("mousemove", function (ev) {
+                        if (_this._chooseBone) {
+                            var bone_1 = _this._chooseBone.data.name;
+                            if (["wheel2overlay", "wheel3overlay"].indexOf(bone_1) >= 0) {
+                                _this.bonesPos[bone_1].boneUI.style.left = ev.clientX + "px";
+                                _this.bonesPos[bone_1].boneUI.style.top = ev.clientY + "px";
+                                var temptPos_4 = new gd3d.math.vector2();
+                                temptPos_4.x = ev.clientX;
+                                temptPos_4.y = ev.clientY;
+                                root2d.calScreenPosToCanvasPos(temptPos_4, temptPos_4);
+                                var toMat = _this._comp.getToCanvasMatrix();
+                                var temptMat_3 = new gd3d.math.matrix3x2();
+                                gd3d.math.matrix3x2Inverse(toMat, temptMat_3);
+                                gd3d.math.matrix3x2TransformVector2(temptMat_3, temptPos_4, temptPos_4);
+                                var tempt = new spine_gd3d.Vector2();
+                                tempt.set(temptPos_4.x, temptPos_4.y);
+                                _this._chooseBone.parent.worldToLocal(tempt);
+                                _this._chooseBone.x = tempt.x;
+                                _this._chooseBone.y = tempt.y;
+                            }
+                            else {
+                                var temptPos_5 = new gd3d.math.vector2();
+                                temptPos_5.x = ev.clientX;
+                                temptPos_5.y = ev.clientY;
+                                root2d.calScreenPosToCanvasPos(temptPos_5, temptPos_5);
+                                var toMat = _this._comp.getToCanvasMatrix();
+                                var temptMat_4 = new gd3d.math.matrix3x2();
+                                gd3d.math.matrix3x2Inverse(toMat, temptMat_4);
+                                gd3d.math.matrix3x2TransformVector2(temptMat_4, temptPos_5, temptPos_5);
+                                var subRes = new gd3d.math.vector2();
+                                gd3d.math.vec2Subtract(temptPos_5, new gd3d.math.vector2(wheel.worldX, wheel.worldY), subRes);
+                                gd3d.math.vec2Normalize(subRes, subRes);
+                                var angle = Math.acos(subRes.x);
+                                if (subRes.y < 0)
+                                    angle = 2 * Math.PI - angle;
+                                var delta = angle - lastAngle_1;
+                                _this._comp.skeleton.findBone("wheel1").rotation += delta * 180 / Math.PI;
+                                lastAngle_1 = angle;
+                            }
+                        }
+                    });
+                    document.addEventListener("mouseup", function () { return _this._chooseBone = null; });
+                    var temptMat_5 = _this._comp.getToCanvasMatrix();
+                    var temptPos_6 = new gd3d.math.vector2();
+                    var _loop_4 = function (i) {
+                        var boneName = _this.controlBones[i];
+                        var bone_2 = _this._comp.skeleton.findBone(boneName);
+                        var x_1 = _this._comp.skeleton.x + bone_2.worldX;
+                        var y_1 = _this._comp.skeleton.y + bone_2.worldY;
+                        gd3d.math.matrix3x2TransformVector2(temptMat_5, new gd3d.math.vector2(x_1, y_1), temptPos_6);
+                        root2d.calCanvasPosToScreenPos(temptPos_6, temptPos_6);
+                        var screen_x_1 = temptPos_6.x;
+                        var screen_y_1 = temptPos_6.y;
+                        var boneUI = document.createElement("div", {});
+                        boneUI.style.position = "absolute";
+                        boneUI.style.width = "10px";
+                        boneUI.style.height = "10px";
+                        boneUI.style.backgroundColor = "blue";
+                        boneUI.style.top = screen_y_1 + "px";
+                        boneUI.style.left = screen_x_1 + "px";
+                        boneUI.addEventListener("mouseenter", function () {
+                            boneUI.style.backgroundColor = "green";
+                        });
+                        boneUI.addEventListener("mouseleave", function () {
+                            boneUI.style.backgroundColor = "blue";
+                        });
+                        boneUI.addEventListener("mousedown", function () {
+                            _this._chooseBone = bone_2;
+                        });
+                        _this.bonesPos[boneName] = { bone: bone_2, boneUI: boneUI };
+                        ui.appendChild(boneUI);
+                    };
+                    for (var i = 0; i < _this.controlBones.length; i++) {
+                        _loop_4(i);
+                    }
+                }
+                var temptMat = _this._comp.getToCanvasMatrix();
+                var temptPos = new gd3d.math.vector2();
+                var bone = _this._comp.skeleton.findBone("rotate-handle");
+                var x = _this._comp.skeleton.x + bone.worldX;
+                var y = _this._comp.skeleton.y + bone.worldY;
+                gd3d.math.matrix3x2TransformVector2(temptMat, new gd3d.math.vector2(x, y), temptPos);
+                root2d.calCanvasPosToScreenPos(temptPos, temptPos);
+                var screen_x = temptPos.x;
+                var screen_y = temptPos.y;
+                _this.bonesPos["rotate-handle"].boneUI.style.left = screen_x + "px";
+                _this.bonesPos["rotate-handle"].boneUI.style.top = screen_y + "px";
+            };
+        });
+    };
+    test_spine_wheelTransform.prototype.update = function (delta) { };
+    return test_spine_wheelTransform;
 }());
 var test_sssss = (function () {
     function test_sssss() {
@@ -9715,12 +10840,12 @@ var test_effect = (function () {
             _this.app.getAssetMgr().savePrefab(_this.tr, name, function (data, resourses) {
                 console.log(data.files);
                 console.log(resourses.length);
-                var _loop_1 = function (key) {
+                var _loop_5 = function (key) {
                     var val = data.files[key];
                     var blob = localSave.Instance.file_str2blob(val);
                     var files = [];
                     var resPath = path + "/resources/";
-                    var _loop_2 = function (i) {
+                    var _loop_6 = function (i) {
                         var resourceUrl = resourses[i];
                         var resourceName = _this.getNameFromURL(resourceUrl);
                         var resourceLength = 0;
@@ -9739,7 +10864,7 @@ var test_effect = (function () {
                         files.push(fileInfo_1);
                     };
                     for (var i = 0; i < resourses.length; i++) {
-                        _loop_2(i);
+                        _loop_6(i);
                     }
                     localSave.Instance.save(resPath + name + ".prefab.json", blob);
                     var fileInfo = { "name": "resources/" + name + ".prefab.json", "length": 100 };
@@ -9749,7 +10874,7 @@ var test_effect = (function () {
                     localSave.Instance.save(path + "/" + name + ".assetbundle.json", assetBundleBlob);
                 };
                 for (var key in data.files) {
-                    _loop_1(key);
+                    _loop_5(key);
                 }
             });
         };
@@ -16522,12 +17647,12 @@ var test_effecteditor = (function () {
             _this.app.getAssetMgr().savePrefab(_this.tr, name, function (data, resourses) {
                 console.log(data.files);
                 console.log(resourses.length);
-                var _loop_3 = function (key) {
+                var _loop_7 = function (key) {
                     var val = data.files[key];
                     var blob = localSave.Instance.file_str2blob(val);
                     var files = [];
                     var resPath = path + "/resources/";
-                    var _loop_4 = function (i) {
+                    var _loop_8 = function (i) {
                         var resourceUrl = resourses[i];
                         var resourceName = _this.getNameFromURL(resourceUrl);
                         var resourceLength = 0;
@@ -16546,7 +17671,7 @@ var test_effecteditor = (function () {
                         files.push(fileInfo_2);
                     };
                     for (var i = 0; i < resourses.length; i++) {
-                        _loop_4(i);
+                        _loop_8(i);
                     }
                     localSave.Instance.save(resPath + name + ".prefab.json", blob);
                     var fileInfo = { "name": "resources/" + name + ".prefab.json", "length": 100 };
@@ -16556,7 +17681,7 @@ var test_effecteditor = (function () {
                     localSave.Instance.save(path + "/" + name + ".assetbundle.json", assetBundleBlob);
                 };
                 for (var key in data.files) {
-                    _loop_3(key);
+                    _loop_7(key);
                 }
             });
         };
