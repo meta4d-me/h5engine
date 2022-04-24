@@ -132,12 +132,19 @@
          * @version gd3d 1.0
          */
         cmap: { [id: string]: charinfo };
+        /** 字体名 */
         fontname: string;
-        pointSize: number;//像素尺寸
-        padding: number;//间隔
-        lineHeight: number;//行高
-        baseline: number;//基线
+        /** 像素尺寸 */
+        pointSize: number;
+        /** 填充间隔 */
+        padding: number;
+        /**行高 */
+        lineHeight: number;
+        /** 基线 */
+        baseline: number;
+        /** 字符容器图的宽度 */
         atlasWidth: number;
+        /** 字符容器图的高度 */
         atlasHeight: number;
 
         /**
@@ -203,19 +210,19 @@
          */
         y: number;
         /**
-         * uv长度
+         * uv宽度
          */
         w: number;//uv长度
         /**
-         * uv长度
+         * uv高度
          */
         h: number;
         /**
-         * 像素
+         * 像素X尺寸
          */
         xSize: number;//像素
         /**
-         * 像素
+         * 像素Y尺寸
          */
         ySize: number;
         /**

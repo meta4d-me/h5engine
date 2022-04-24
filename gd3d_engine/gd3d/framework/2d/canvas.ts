@@ -683,7 +683,7 @@ namespace gd3d.framework {
                 if (!this.isForceLabelTopRender || !("isLabel" in r)) {
                     r.render(this);
                 } else {
-                    canvas.helpLabelArr.push(r);
+                    canvas.helpLabelArr.push(r as any);
                 }
             }
             if (node.children != null) {
