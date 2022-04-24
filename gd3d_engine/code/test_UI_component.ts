@@ -4,17 +4,19 @@ var fontjson = "方正粗圆_GBK.font.json";
 var fontpng = "方正粗圆_GBK.TTF.png";
 // var fontjson = "方正粗圆_GBK_normal.font.json"; // 非sdf的正常位图字体，使用该字体时需要手动到 defshader.ts 中 fscodefontUI 设置为正常位图字体shader
 // var fontpng = "方正粗圆_GBK_normal.TTF.png";
-
+let emoji = "emoji";
 //UI 组件样例
-class test_UI_Component implements IState {
+class test_UI_Component implements IState
+{
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
     camera: gd3d.framework.camera;
     taskmgr: gd3d.framework.taskMgr = new gd3d.framework.taskMgr();
     assetMgr: gd3d.framework.assetMgr;
     rooto2d: gd3d.framework.overlay2D;
-    static temp:gd3d.framework.transform2D;
-    start(app: gd3d.framework.application) {
+    static temp: gd3d.framework.transform2D;
+    start(app: gd3d.framework.application)
+    {
 
         this.app = app;
         this.scene = this.app.getScene();
@@ -35,10 +37,12 @@ class test_UI_Component implements IState {
 
         //任务排队执行系统
         this.taskmgr.addTaskCall(this.loadTexture.bind(this));
+        this.taskmgr.addTaskCall(this.loadAtlas.bind(this));
         this.taskmgr.addTaskCall(this.createUI.bind(this));
     }
 
-    private createUI(astState: gd3d.framework.taskstate, state: gd3d.framework.taskstate) {
+    private createUI(astState: gd3d.framework.taskstate, state: gd3d.framework.taskstate)
+    {
         let atlasComp = this.assetMgr.getAssetByName("comp.atlas.json") as gd3d.framework.atlas;
         let tex_0 = this.assetMgr.getAssetByName("zg03_256.png") as gd3d.framework.texture;
 
@@ -60,18 +64,22 @@ class test_UI_Component implements IState {
         bg_i.imageBorder.r = 10;
         bg_i.imageBorder.b = 10;
         bg_t.layoutState = 0 | gd3d.framework.layoutOption.LEFT | gd3d.framework.layoutOption.RIGHT | gd3d.framework.layoutOption.TOP | gd3d.framework.layoutOption.BOTTOM;
-        bg_t.setLayoutValue(gd3d.framework.layoutOption.LEFT,60);
-        bg_t.setLayoutValue(gd3d.framework.layoutOption.TOP,60);
-        bg_t.setLayoutValue(gd3d.framework.layoutOption.RIGHT,60);
-        bg_t.setLayoutValue(gd3d.framework.layoutOption.BOTTOM,60);
+        bg_t.setLayoutValue(gd3d.framework.layoutOption.LEFT, 60);
+        bg_t.setLayoutValue(gd3d.framework.layoutOption.TOP, 60);
+        bg_t.setLayoutValue(gd3d.framework.layoutOption.RIGHT, 60);
+        bg_t.setLayoutValue(gd3d.framework.layoutOption.BOTTOM, 60);
 
+        let lableW = 500;
+        let lableH = 40;
+        let lableStartX = 80;
+        let lableStartY = 280;
         //文本
         let lab_t0 = new gd3d.framework.transform2D;
         lab_t0.name = "我是段文本_lable";
-        lab_t0.width = 800;
-        lab_t0.height = 100;
-        lab_t0.localTranslate.x = 50;
-        lab_t0.localTranslate.y = 280;
+        lab_t0.width = lableW;
+        lab_t0.height = lableH;
+        lab_t0.localTranslate.x = lableStartX;
+        lab_t0.localTranslate.y = lableStartY;
         this.rooto2d.addChild(lab_t0);
         let lab_l0 = lab_t0.addComponent("label") as gd3d.framework.label;
         test_UI_Component["lab"] = lab_l0;
@@ -79,16 +87,16 @@ class test_UI_Component implements IState {
         lab_l0.fontsize = 12;
         // lab_l.text = "我是段文本\n换行测试";
         lab_l0.text = `${lab_l0.fontsize}号字体 Innovation in China 中国制造，慧及全球 0123456789`;
-        lab_l0.color =new gd3d.math.color(0.0,0.0,0.0,1);
-        lab_l0.color2 = new gd3d.math.color(1.0,0.0,0.0,1);
+        lab_l0.color = new gd3d.math.color(0.0, 0.0, 0.0, 1);
+        lab_l0.color2 = new gd3d.math.color(1.0, 0.0, 0.0, 1);
         test_UI_Component["obj"] = this;
 
         let lab_t = new gd3d.framework.transform2D;
         lab_t.name = "我是段文本_lable";
-        lab_t.width = 800;
-        lab_t.height = 100;
-        lab_t.localTranslate.x = 50;
-        lab_t.localTranslate.y = 300;
+        lab_t.width = lableW;
+        lab_t.height = lableH;
+        lab_t.localTranslate.x = lableStartX;
+        lab_t.localTranslate.y = lableStartY + lableH;
         this.rooto2d.addChild(lab_t);
         let lab_l = lab_t.addComponent("label") as gd3d.framework.label;
         test_UI_Component["lab"] = lab_l;
@@ -96,16 +104,16 @@ class test_UI_Component implements IState {
         lab_l.fontsize = 20;
         // lab_l.text = "我是段文本\n换行测试";
         lab_l.text = `${lab_l.fontsize}号字体 Innovation in China 中国制造，慧及全球 0123456789`;
-        lab_l.color =new gd3d.math.color(0.0,0.0,0.0,1);
-        lab_l.color2 = new gd3d.math.color(1.0,0.0,0.0,1);
+        lab_l.color = new gd3d.math.color(0.0, 0.0, 0.0, 1);
+        lab_l.color2 = new gd3d.math.color(1.0, 0.0, 0.0, 1);
         test_UI_Component["obj"] = this;
-        
+
         let lab_t1 = new gd3d.framework.transform2D;
         lab_t1.name = "我是段文本_lable";
-        lab_t1.width = 800;
-        lab_t1.height = 100;
-        lab_t1.localTranslate.x = 50;
-        lab_t1.localTranslate.y = 350;
+        lab_t1.width = lableW;
+        lab_t1.height = lableH;
+        lab_t1.localTranslate.x = lableStartX;
+        lab_t1.localTranslate.y = lableStartY + lableH * 2;
         this.rooto2d.addChild(lab_t1);
         let lab_l1 = lab_t1.addComponent("label") as gd3d.framework.label;
         test_UI_Component["lab"] = lab_l1;
@@ -113,16 +121,16 @@ class test_UI_Component implements IState {
         lab_l1.fontsize = 30;
         // lab_l1.text = "我是段文本\n换行测试";
         lab_l1.text = `${lab_l1.fontsize}号字体 Innovation in China 中国制造，慧及全球 0123456789`;
-        lab_l1.color =new gd3d.math.color(0.0,0.0,0.0,1);
-        lab_l1.color2 = new gd3d.math.color(1.0,0.0,0.0,1);
+        lab_l1.color = new gd3d.math.color(0.0, 0.0, 0.0, 1);
+        lab_l1.color2 = new gd3d.math.color(1.0, 0.0, 0.0, 1);
         test_UI_Component["obj"] = this;
 
         let lab_t2 = new gd3d.framework.transform2D;
         lab_t2.name = "我是段文本_lable";
-        lab_t2.width = 800;
-        lab_t2.height = 100;
-        lab_t2.localTranslate.x = 50;
-        lab_t2.localTranslate.y = 420;
+        lab_t2.width = lableW;
+        lab_t2.height = lableH;
+        lab_t2.localTranslate.x = lableStartX;
+        lab_t2.localTranslate.y = lableStartY + lableH * 3;
         this.rooto2d.addChild(lab_t2);
         let lab_l2 = lab_t2.addComponent("label") as gd3d.framework.label;
         test_UI_Component["lab"] = lab_l2;
@@ -130,26 +138,28 @@ class test_UI_Component implements IState {
         lab_l2.fontsize = 40;
         // lab_l2.text = "我是段文本\n换行测试";
         lab_l2.text = `${lab_l2.fontsize}号字体 Innovation in China 中国制造，慧及全球 0123456789`;
-        lab_l2.color =new gd3d.math.color(0.0,0.0,0.0,1);
-        lab_l2.color2 = new gd3d.math.color(1.0,0.0,0.0,1);
+        lab_l2.color = new gd3d.math.color(0.0, 0.0, 0.0, 1);
+        lab_l2.color2 = new gd3d.math.color(1.0, 0.0, 0.0, 1);
         test_UI_Component["obj"] = this;
 
+        //富文本
         let lab_t3 = new gd3d.framework.transform2D;
-        lab_t3.name = "我是段文本_lable";
-        lab_t3.width = 800;
-        lab_t3.height = 100;
-        lab_t3.localTranslate.x = 50;
-        lab_t3.localTranslate.y = 500;
+        lab_t3.name = "lable_richText";
+        lab_t3.width = lableW;
+        lab_t3.height = lableH * 3;
+        lab_t3.localTranslate.x = lableStartX;
+        lab_t3.localTranslate.y = lableStartY + lableH * 4;
         this.rooto2d.addChild(lab_t3);
         let lab_l3 = lab_t3.addComponent("label") as gd3d.framework.label;
-        test_UI_Component["lab"] = lab_l3;
         lab_l3.font = this.assetMgr.getAssetByName(fontjson) as gd3d.framework.font;
-        lab_l3.fontsize = 200;
+        lab_l3.fontsize = 30;
         // lab_l2.text = "我是段文本\n换行测试";
-        lab_l3.text = `${lab_l3.fontsize}号字体 Innovation in China 中国制造，慧及全球 0123456789`;
-        lab_l3.color =new gd3d.math.color(0.0,0.0,0.0,1);
-        lab_l3.color2 = new gd3d.math.color(1.0,0.0,0.0,1);
-        test_UI_Component["obj"] = this;
+        lab_l3.richText = true;
+        let atlas = gd3d.framework.sceneMgr.app.getAssetMgr().getAssetByName(`emoji.atlas.json`, `emoji.assetbundle.json`) as gd3d.framework.atlas;
+        lab_l3.imageTextAtlas = atlas;
+        lab_l3.text = "富文本:<color=#00ff00ff>红色</color> <color=#ff0000ff>绿色</color> \n<i>斜体文本</i> \n图片字符[happy][happy][like][cool][happy]";
+        lab_l3.color = new gd3d.math.color(0.0, 0.0, 0.0, 1);
+        lab_l3.color2 = new gd3d.math.color(0, 0.0, 0.0, 0.5);
 
         //按鈕
         let btn_t = new gd3d.framework.transform2D;
@@ -165,7 +175,7 @@ class test_UI_Component implements IState {
         btn_b.targetImage = btn_t.addComponent("image2D") as gd3d.framework.image2D;
         btn_b.targetImage.sprite = atlasComp.sprites["ui_public_button_hits"];
         btn_b.pressedGraphic = atlasComp.sprites["ui_public_button_1"];
-        btn_b.pressedColor = new gd3d.math.color(1,1,1,1);
+        btn_b.pressedColor = new gd3d.math.color(1, 1, 1, 1);
         btn_b.transition = gd3d.framework.TransitionType.SpriteSwap;
 
         //关闭按钮
@@ -184,39 +194,42 @@ class test_UI_Component implements IState {
         close_b.pressedGraphic = atlasComp.sprites["ui_boundary_close"];
         close_b.transition = gd3d.framework.TransitionType.SpriteSwap;
         close_bt.layoutState = 0 | gd3d.framework.layoutOption.RIGHT | gd3d.framework.layoutOption.TOP;
-        close_bt.setLayoutValue(gd3d.framework.layoutOption.RIGHT,5);
-        close_bt.setLayoutValue(gd3d.framework.layoutOption.TOP,3);
-        
+        close_bt.setLayoutValue(gd3d.framework.layoutOption.RIGHT, 5);
+        close_bt.setLayoutValue(gd3d.framework.layoutOption.TOP, 3);
+
         //精灵图 数字
         let nums = "45789";
         let scale = 0.6;
-        let numIconarr:gd3d.framework.image2D[] = [];
-        for(var i =0 ;i<nums.length ;i++){
+        let numIconarr: gd3d.framework.image2D[] = [];
+        for (var i = 0; i < nums.length; i++)
+        {
             let spt_t = new gd3d.framework.transform2D;
             spt_t.width = 32 * scale;
             spt_t.height = 42 * scale;
             spt_t.pivot.x = 0;
             spt_t.pivot.y = 0;
-            spt_t.localTranslate.x =spt_t.width * i + 10;
+            spt_t.localTranslate.x = spt_t.width * i + 10;
             spt_t.localTranslate.y = 120;
             bg_t.addChild(spt_t);
             let spt = spt_t.addComponent("image2D") as gd3d.framework.image2D;
-            spt.sprite = atlasComp.sprites["ui_lianji_"+ nums[i]];
+            spt.sprite = atlasComp.sprites["ui_lianji_" + nums[i]];
             numIconarr.push(spt);
         }
-        
-        btn_b.addListener(gd3d.event.UIEventEnum.PointerClick,()=>{
+
+        btn_b.addListener(gd3d.event.UIEventEnum.PointerClick, () =>
+        {
             let temp = "";
-            for(var i=0;i<nums.length;i++){
+            for (var i = 0; i < nums.length; i++)
+            {
                 let num = Number(nums[i]);
-                num ++;
-                num = num%10;
-                numIconarr[i].sprite = atlasComp.sprites["ui_lianji_"+ num];
+                num++;
+                num = num % 10;
+                numIconarr[i].sprite = atlasComp.sprites["ui_lianji_" + num];
                 numIconarr[i].transform.markDirty();
                 temp += num.toString();
             }
             nums = temp;
-        },this);
+        }, this);
 
 
         //一个输入框
@@ -250,10 +263,10 @@ class test_UI_Component implements IState {
         ipt.TextLabel = text_t.addComponent("label") as gd3d.framework.label;
         ipt.TextLabel.font = this.assetMgr.getAssetByName(fontjson) as gd3d.framework.font;
         ipt.TextLabel.fontsize = 24
-        ipt.TextLabel.color =new gd3d.math.color(1,1,1,1);
+        ipt.TextLabel.color = new gd3d.math.color(1, 1, 1, 1);
         text_t.layoutState = 0 | gd3d.framework.layoutOption.H_CENTER | gd3d.framework.layoutOption.V_CENTER;
-        text_t.setLayoutValue(gd3d.framework.layoutOption.H_CENTER,0);
-        text_t.setLayoutValue(gd3d.framework.layoutOption.V_CENTER,0);
+        text_t.setLayoutValue(gd3d.framework.layoutOption.H_CENTER, 0);
+        text_t.setLayoutValue(gd3d.framework.layoutOption.V_CENTER, 0);
 
         let p_t = new gd3d.framework.transform2D;
         p_t.width = iptFrame_t.width;
@@ -262,11 +275,11 @@ class test_UI_Component implements IState {
         ipt.PlaceholderLabel = p_t.addComponent("label") as gd3d.framework.label;
         ipt.PlaceholderLabel.font = this.assetMgr.getAssetByName(fontjson) as gd3d.framework.font;
         ipt.PlaceholderLabel.fontsize = 24
-        ipt.PlaceholderLabel.color =new gd3d.math.color(0.6,0.6,0.6,1);
+        ipt.PlaceholderLabel.color = new gd3d.math.color(0.6, 0.6, 0.6, 1);
 
         //滑动卷轴框
         let scroll_t = new gd3d.framework.transform2D;
-        scroll_t.width =  160;
+        scroll_t.width = 160;
         scroll_t.height = 200;
         bg_t.addChild(scroll_t);
         scroll_t.localTranslate.x = 160;
@@ -282,16 +295,16 @@ class test_UI_Component implements IState {
         scroll_t.isMask = true;
         scroll_.horizontal = true;
         scroll_.vertical = true;
-        
+
         //raw png
         let raw_t2 = new gd3d.framework.transform2D;
         raw_t2.name = "滑动卷轴框png";
-        raw_t2.width = 300 ;
+        raw_t2.width = 300;
         raw_t2.height = 300;
         let raw_i2 = raw_t2.addComponent("rawImage2D") as gd3d.framework.rawImage2D;
         raw_i2.image = tex_0;
         ct.addChild(raw_t2);
-        
+
 
 
 
@@ -303,8 +316,9 @@ class test_UI_Component implements IState {
 
         this.app.webgl.canvas.addEventListener("keydown", (ev: KeyboardEvent) =>
         {
-            if(ev.keyCode == 81){
-               
+            if (ev.keyCode == 81)
+            {
+
             }
         }, false);
 
@@ -313,18 +327,28 @@ class test_UI_Component implements IState {
         state.finish = true;
     }
 
-    private loadTexture(lastState: gd3d.framework.taskstate, state: gd3d.framework.taskstate) {
+    private loadTexture(lastState: gd3d.framework.taskstate, state: gd3d.framework.taskstate)
+    {
         //加载图片资源
-        this.assetMgr.load("res/comp/comp.json.png", gd3d.framework.AssetTypeEnum.Auto, (s) => {
-            if (s.isfinish) {
-                this.assetMgr.load("res/comp/comp.atlas.json", gd3d.framework.AssetTypeEnum.Auto, (s) => {
-                    if(s.isfinish){
+        this.assetMgr.load("res/comp/comp.json.png", gd3d.framework.AssetTypeEnum.Auto, (s) =>
+        {
+            if (s.isfinish)
+            {
+                this.assetMgr.load("res/comp/comp.atlas.json", gd3d.framework.AssetTypeEnum.Auto, (s) =>
+                {
+                    if (s.isfinish)
+                    {
                         //加载字体资源
-                        this.assetMgr.load("res/fonts/"+fontpng,gd3d.framework.AssetTypeEnum.Auto,(s)=>{
-                            if(s.isfinish){
-                                this.assetMgr.load("res/fonts/"+fontjson,gd3d.framework.AssetTypeEnum.Auto,(s)=>{
-                                    this.assetMgr.load("res/zg03_256.png",gd3d.framework.AssetTypeEnum.Auto,(s)=>{
-                                        if(s.isfinish){
+                        this.assetMgr.load("res/fonts/" + fontpng, gd3d.framework.AssetTypeEnum.Auto, (s) =>
+                        {
+                            if (s.isfinish)
+                            {
+                                this.assetMgr.load("res/fonts/" + fontjson, gd3d.framework.AssetTypeEnum.Auto, (s) =>
+                                {
+                                    this.assetMgr.load("res/zg03_256.png", gd3d.framework.AssetTypeEnum.Auto, (s) =>
+                                    {
+                                        if (s.isfinish)
+                                        {
                                             state.finish = true;
                                         }
                                     });
@@ -337,26 +361,44 @@ class test_UI_Component implements IState {
         });
     }
 
-    update(delta: number) {
+    private loadAtlas(lastState: gd3d.framework.taskstate, state: gd3d.framework.taskstate)
+    {
+
+        let abName = `${emoji}.assetbundle.json`;
+        let abPath = `newRes/Atlas/${emoji}/${abName}`;
+        this.assetMgr.load(abPath, gd3d.framework.AssetTypeEnum.Bundle, (_sta) =>
+        {
+            if (_sta.isfinish)
+            {
+                // let ab = this.assetMgr.getAssetBundle(abName);
+                // let atlas = this.assetMgr.getAssetByName(`${emoji}.atlas.json`,abName);
+                state.finish = true;
+            }
+        });
+    }
+
+    update(delta: number)
+    {
         this.taskmgr.move(delta); //推进task
 
     }
 
 
-    testFun(){
+    testFun()
+    {
         let lab = test_UI_Component["lab"] as gd3d.framework.label;
         let datater = lab["datar"] as number[];
-        let frist = new gd3d.math.vector2(datater[0],datater[1]);
+        let frist = new gd3d.math.vector2(datater[0], datater[1]);
         let endIdx_0 = datater.length - 13;
         let endIdx_1 = datater.length - 12;
-        let end = new gd3d.math.vector2(datater[endIdx_0],datater[endIdx_1]);
+        let end = new gd3d.math.vector2(datater[endIdx_0], datater[endIdx_1]);
 
-        let canvas  =  lab.transform.canvas;
+        let canvas = lab.transform.canvas;
         let temp = new gd3d.math.vector2();
-        
-        canvas.ModelPosToCanvasPos(frist,temp);      
+
+        canvas.ModelPosToCanvasPos(frist, temp);
         console.error(`frist:${temp.toString()}`);
-        canvas.ModelPosToCanvasPos(end,temp);   
+        canvas.ModelPosToCanvasPos(end, temp);
         console.error(`end:${temp.toString()}`);
 
     }

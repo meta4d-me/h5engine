@@ -2756,6 +2756,12 @@ declare namespace gd3d.framework {
         private inputElement;
         private _text;
         private static _isIos;
+        /** 选择区域的开始位置 */
+        get selectionStart(): number;
+        /** 选择区域的结束位置 */
+        get selectionEnd(): number;
+        /** 选择区域的方向 ， forward ：从前往后 backward ：从后往前 */
+        get selectionDirection(): "none" | "forward" | "backward";
         /**
          * @public
          * @language zh_CN
@@ -2764,6 +2770,10 @@ declare namespace gd3d.framework {
          * @version gd3d 1.0
          */
         get text(): string;
+        /**
+         * 清除输入文本
+         */
+        clearText(): void;
         private _charlimit;
         /**
          * @public
@@ -2814,6 +2824,18 @@ declare namespace gd3d.framework {
          */
         get PlaceholderLabel(): label;
         set PlaceholderLabel(placeholderLabel: label);
+        private _cursorTrans;
+        /**
+         * 选择 光标 节点对象
+         */
+        get CursorTrans(): transform2D;
+        set CursorTrans(val: transform2D);
+        private _selectionBG;
+        /**
+         * 选择 字符串背景 节点对象
+         */
+        get SelectionBG(): transform2D;
+        set SelectionBG(val: transform2D);
         /**
          * 刷新布局
          */
@@ -2835,6 +2857,16 @@ declare namespace gd3d.framework {
          */
         private textRefresh;
         private filterContentText;
+        private _lastIsCursorMode;
+        private _twinkleTime;
+        private _twinkleTimeCount;
+        private _lastSStart;
+        private _lastSEnd;
+        private _currStartX;
+        private _currEndX;
+        /** 选择状态刷新 */
+        private selectionRefresh;
+        private getInputTextXPos;
         /**
          * @private
          */
@@ -2887,6 +2919,12 @@ declare namespace gd3d.framework {
      * @version gd3d 1.0
      */
     class label implements IRectRenderer {
+        private static readonly defUIShader;
+        private static readonly defMaskUIShader;
+        private static readonly defImgUIShader;
+        private static readonly defImgMaskUIShader;
+        private static readonly helpOptObj;
+        private static readonly helpColor;
         /** 尝试 动态扩展 字体信息 函数接口 */
         static onTryExpandTexts: (str: string) => void;
         static readonly ClassName: string;
@@ -2914,6 +2952,7 @@ declare namespace gd3d.framework {
         get font(): font;
         set font(font: font);
         private needRefreshFont;
+        private needRefreshAtlas;
         private _fontName;
         private _fontsize;
         /**
@@ -2965,8 +3004,6 @@ declare namespace gd3d.framework {
          * @version gd3d 1.0
          */
         verticalOverflow: boolean;
-        private indexarr;
-        private remainarrx;
         private lastStr;
         /** 检查文字,是否需要 动态添加 */
         private chackText;
@@ -2974,8 +3011,23 @@ declare namespace gd3d.framework {
          * @private
          */
         updateData(_font: gd3d.framework.font): void;
+        /** 更新数据 富文本 模式 */
+        private updateDataRich;
+        /**
+         * 通过 block 设置数据
+         * @param _font
+         * @param blocks
+         */
+        private setDataByBlock;
+        /**获取 图片字符 选项 */
+        private getImgOpt;
+        /** 获取富文本选项 对象 */
+        private getOptObj;
         private data_begin;
+        /** 文本顶点数据 */
         private datar;
+        /** 字符图 顶点数据 */
+        private imgDatar;
         /**
          * @public
          * @language zh_CN
@@ -2996,8 +3048,32 @@ declare namespace gd3d.framework {
          * 描边宽度
          */
         outlineWidth: number;
-        private static readonly defUIShader;
-        private static readonly defMaskUIShader;
+        private _richText;
+        /**
+         * 富文本模式 , 通过特定标签使用。
+         *
+         * 文字颜色             <color=#ffffffff>文本</color>       (已经支持);
+         * 文字斜体             \<i>文本\</i>                       (已经支持);
+         * 图片字符（表情）     [imgName]                           (已经支持);
+         * 文字加粗             \<b>文本\</b>                       (支持中);
+         * 文字加下划线         \<u>文本\</u>                       (支持中);
+         */
+        get richText(): boolean;
+        set richText(val: boolean);
+        private _imageTextAtlasName;
+        private _imageTextAtlas;
+        /**
+         * 图像文字图集
+         * (例如 表情)
+         */
+        get imageTextAtlas(): atlas;
+        set imageTextAtlas(val: atlas);
+        /** 富文本 块列表 */
+        private _richTextBlocks;
+        /** 纯文本默认 块列表 */
+        private _defTextBlocks;
+        /**富文本 脏标记  */
+        private _richDrity;
         private _CustomShaderName;
         /**
          * @public
@@ -3024,18 +3100,27 @@ declare namespace gd3d.framework {
          * @version gd3d 1.0
          */
         getDrawBounds(): math.rect;
+        /** 获取材质 通过 shaderName*/
+        private getMatByShader;
         /**
           * @private
           * ui默认材质
           */
         private _uimat;
         private get uimat();
+        /**
+         * 字符图材质
+         */
+        private _imgUIMat;
+        private get imgUIMat();
         private dirtyData;
         /**
          * @private
          */
         render(canvas: canvas): void;
+        private setMaskData;
         private searchTexture;
+        private searchTextureAtlas;
         private _cacheMaskV4;
         /**
          * @private
@@ -3047,6 +3132,11 @@ declare namespace gd3d.framework {
         private max_y;
         /** 计算drawRect */
         private calcDrawRect;
+        /**
+         * 解析 富文本
+         * @param text
+         */
+        private parseRichText;
         /**
          * @private
          */
@@ -3254,6 +3344,23 @@ declare namespace gd3d.framework {
         /**
          * @private
          */
+        remove(): void;
+    }
+}
+declare namespace gd3d.framework {
+    /**
+     * 富文本版 lable
+     * 支持表情字符，自定义样式段落
+     */
+    class richLabel implements IRectRenderer {
+        render(canvas: canvas): void;
+        updateTran(): void;
+        getMaterial(): material;
+        getDrawBounds(): math.rect;
+        onPlay(): void;
+        start(): void;
+        update(delta: number): void;
+        transform: transform2D;
         remove(): void;
     }
 }
@@ -5401,12 +5508,19 @@ declare namespace gd3d.framework {
         cmap: {
             [id: string]: charinfo;
         };
+        /** 字体名 */
         fontname: string;
+        /** 像素尺寸 */
         pointSize: number;
+        /** 填充间隔 */
         padding: number;
+        /**行高 */
         lineHeight: number;
+        /** 基线 */
         baseline: number;
+        /** 字符容器图的宽度 */
         atlasWidth: number;
+        /** 字符容器图的高度 */
         atlasHeight: number;
         /**
          * @public
@@ -5432,19 +5546,19 @@ declare namespace gd3d.framework {
          */
         y: number;
         /**
-         * uv长度
+         * uv宽度
          */
         w: number;
         /**
-         * uv长度
+         * uv高度
          */
         h: number;
         /**
-         * 像素
+         * 像素X尺寸
          */
         xSize: number;
         /**
-         * 像素
+         * 像素Y尺寸
          */
         ySize: number;
         /**
@@ -22120,6 +22234,7 @@ declare namespace gd3d.render {
      */
     class textureReader {
         constructor(webgl: WebGLRenderingContext, texRGBA: WebGLTexture, width: number, height: number, gray?: boolean);
+        private _isDispose;
         private webgl;
         private _width;
         get width(): number;
@@ -22130,9 +22245,11 @@ declare namespace gd3d.render {
         get data(): Uint8Array;
         private _gray;
         get gray(): boolean;
+        get isDispose(): boolean;
         getPixel(u: number, v: number): any;
         /** 刷新data数据 */
         refresh(texRGBA: WebGLTexture): void;
+        dispose(): void;
     }
     /**
      * @private

@@ -7593,6 +7593,13 @@ var gd3d;
                 this._charlimit = 0;
                 this._lineType = lineType.SingleLine;
                 this._contentType = contentType.None;
+                this._lastIsCursorMode = false;
+                this._twinkleTime = 0.6;
+                this._twinkleTimeCount = 0;
+                this._lastSStart = -1;
+                this._lastSEnd = -1;
+                this._currStartX = 0;
+                this._currEndX = 0;
             }
             inputField_1 = inputField;
             Object.defineProperty(inputField.prototype, "frameImage", {
@@ -7612,6 +7619,36 @@ var gd3d;
                 enumerable: false,
                 configurable: true
             });
+            Object.defineProperty(inputField.prototype, "selectionStart", {
+                /** 选择区域的开始位置 */
+                get: function () {
+                    if (this.inputElement)
+                        return this.inputElement.selectionStart;
+                    return 0;
+                },
+                enumerable: false,
+                configurable: true
+            });
+            Object.defineProperty(inputField.prototype, "selectionEnd", {
+                /** 选择区域的结束位置 */
+                get: function () {
+                    if (this.inputElement)
+                        return this.inputElement.selectionEnd;
+                    return 0;
+                },
+                enumerable: false,
+                configurable: true
+            });
+            Object.defineProperty(inputField.prototype, "selectionDirection", {
+                /** 选择区域的方向 ， forward ：从前往后 backward ：从后往前 */
+                get: function () {
+                    if (this.inputElement)
+                        return this.inputElement.selectionDirection;
+                    return "forward";
+                },
+                enumerable: false,
+                configurable: true
+            });
             Object.defineProperty(inputField.prototype, "text", {
                 /**
                  * @public
@@ -7626,6 +7663,14 @@ var gd3d;
                 enumerable: false,
                 configurable: true
             });
+            /**
+             * 清除输入文本
+             */
+            inputField.prototype.clearText = function () {
+                this._text = "";
+                this.inputElement.value = this._text;
+                this._textLable.text = this._text;
+            };
             Object.defineProperty(inputField.prototype, "characterLimit", {
                 /**
                  * @public
@@ -7705,6 +7750,38 @@ var gd3d;
                     if (placeholderLabel.text == null || placeholderLabel.text == "")
                         placeholderLabel.text = "Enter Text...";
                     this._placeholderLabel = placeholderLabel;
+                },
+                enumerable: false,
+                configurable: true
+            });
+            Object.defineProperty(inputField.prototype, "CursorTrans", {
+                /**
+                 * 选择 光标 节点对象
+                 */
+                get: function () {
+                    return this._cursorTrans;
+                },
+                set: function (val) {
+                    this._cursorTrans = val;
+                    if (val) {
+                        val.visible = false;
+                    }
+                },
+                enumerable: false,
+                configurable: true
+            });
+            Object.defineProperty(inputField.prototype, "SelectionBG", {
+                /**
+                 * 选择 字符串背景 节点对象
+                 */
+                get: function () {
+                    return this._selectionBG;
+                },
+                set: function (val) {
+                    this._selectionBG = val;
+                    if (val) {
+                        val.visible = false;
+                    }
                 },
                 enumerable: false,
                 configurable: true
@@ -7911,12 +7988,111 @@ var gd3d;
                         break;
                 }
             };
+            /** 选择状态刷新 */
+            inputField.prototype.selectionRefresh = function (dt) {
+                var _cNode = this._cursorTrans;
+                var _sbgNode = this._selectionBG;
+                if (!_cNode && !_sbgNode)
+                    return;
+                if (!this.beFocus) {
+                    if (this._selectionBG)
+                        this._selectionBG.visible = false;
+                    if (this._cursorTrans)
+                        this._cursorTrans.visible = false;
+                    this._lastSStart = -1;
+                    this._lastSEnd = -1;
+                    this._lastIsCursorMode = false;
+                    return;
+                }
+                if (!this.inputElement || !this._textLable || !this._textLable.font)
+                    return;
+                var sIdx = this.selectionStart;
+                var eInx = this.selectionEnd;
+                var difLen = sIdx - eInx;
+                var isCursorMode = difLen == 0;
+                var needSwitch = this._lastIsCursorMode != isCursorMode;
+                var selectionDirty = sIdx != this._lastSStart || eInx != this._lastSEnd || needSwitch; //光标有变化
+                this._lastIsCursorMode = isCursorMode;
+                var lpt = gd3d.framework.layoutOption;
+                //switch mode
+                if (needSwitch) {
+                    //hide all 
+                    if (_sbgNode)
+                        _sbgNode.visible = false;
+                    if (_cNode)
+                        _cNode.visible = false;
+                    //visible
+                    if (isCursorMode) {
+                        if (_cNode)
+                            _cNode.visible = true;
+                    }
+                    else {
+                        if (_sbgNode)
+                            _sbgNode.visible = true;
+                    }
+                }
+                //
+                this._lastSStart = sIdx;
+                this._lastSEnd = eInx;
+                //update
+                if (isCursorMode) {
+                    //光标
+                    if (!_cNode)
+                        return;
+                    if (selectionDirty) {
+                        this._twinkleTimeCount = 0;
+                        this._currStartX = this.getInputTextXPos(sIdx);
+                        if (_cNode)
+                            _cNode.visible = true;
+                    }
+                    //光标定时闪烁
+                    this._twinkleTimeCount += dt;
+                    if (this._twinkleTimeCount >= this._twinkleTime) {
+                        _cNode.visible = !_cNode.visible;
+                        this._twinkleTimeCount = 0;
+                    }
+                    //位置刷新
+                    _cNode.setLayoutValue(lpt.LEFT, this._currStartX);
+                    _cNode.markDirty();
+                }
+                else {
+                    if (!_sbgNode)
+                        return;
+                    if (selectionDirty) {
+                        this._twinkleTimeCount = 0;
+                        this._currStartX = this.getInputTextXPos(sIdx);
+                        this._currEndX = this.getInputTextXPos(eInx);
+                    }
+                    var bgW = Math.abs(this._currEndX - this._currStartX);
+                    //位置、宽高 刷新
+                    _sbgNode.setLayoutValue(lpt.LEFT, this._currStartX);
+                    _sbgNode.width = bgW;
+                    _sbgNode.markDirty();
+                }
+            };
+            //获取 输入文本 的坐标的X值
+            inputField.prototype.getInputTextXPos = function (strIndex) {
+                var result = 0;
+                var text = this._textLable.text;
+                var f = this._textLable.font;
+                var rate = this._textLable.fontsize / f.pointSize;
+                //计算字符偏移
+                for (var i = 0, len = strIndex; i < len; i++) {
+                    var c = text[i];
+                    var cInfo = f.cmap[c];
+                    if (!cInfo)
+                        continue;
+                    result += cInfo.xAddvance * rate;
+                }
+                return result;
+            };
             /**
              * @private
              */
             inputField.prototype.update = function (delta) {
                 this.layoutRefresh();
                 this.textRefresh();
+                this.selectionRefresh(delta);
             };
             /**
              * @private
@@ -7996,6 +8172,16 @@ var gd3d;
                 __metadata("design:type", framework.label),
                 __metadata("design:paramtypes", [framework.label])
             ], inputField.prototype, "PlaceholderLabel", null);
+            __decorate([
+                gd3d.reflect.Field("reference", null, "transform2D"),
+                __metadata("design:type", framework.transform2D),
+                __metadata("design:paramtypes", [framework.transform2D])
+            ], inputField.prototype, "CursorTrans", null);
+            __decorate([
+                gd3d.reflect.Field("reference", null, "transform2D"),
+                __metadata("design:type", framework.transform2D),
+                __metadata("design:paramtypes", [framework.transform2D])
+            ], inputField.prototype, "SelectionBG", null);
             inputField = inputField_1 = __decorate([
                 gd3d.reflect.node2DComponent
             ], inputField);
@@ -8053,6 +8239,7 @@ var gd3d;
                 this.isLabel = true;
                 this._text = "";
                 this.needRefreshFont = false;
+                this.needRefreshAtlas = false;
                 this._fontName = "defFont.font.json";
                 this._fontsize = 14;
                 /**
@@ -8095,12 +8282,12 @@ var gd3d;
                  * @version gd3d 1.0
                  */
                 this.verticalOverflow = false;
-                //计算数组
-                this.indexarr = [];
-                this.remainarrx = [];
                 this.lastStr = "";
                 this.data_begin = new gd3d.math.vector2(0, 0);
+                /** 文本顶点数据 */
                 this.datar = [];
+                /** 字符图 顶点数据 */
+                this.imgDatar = [];
                 /**
                  * @public
                  * @language zh_CN
@@ -8121,6 +8308,14 @@ var gd3d;
                  * 描边宽度
                  */
                 this.outlineWidth = 0.75;
+                this._richText = false;
+                this._imageTextAtlasName = "";
+                /** 富文本 块列表 */
+                this._richTextBlocks = [];
+                /** 纯文本默认 块列表 */
+                this._defTextBlocks = [{ text: "", opts: null }];
+                /**富文本 脏标记  */
+                this._richDrity = true;
                 this._CustomShaderName = ""; //自定义UIshader
                 this.dirtyData = true;
                 this.min_x = Number.MAX_VALUE;
@@ -8142,22 +8337,27 @@ var gd3d;
                 },
                 set: function (text) {
                     text = text == null ? "" : text;
+                    var hasChange = text != this._text;
                     this._text = text;
                     //设置缓存长度
-                    this.initdater();
+                    // this.initdater(this._text.length);
                     this.dirtyData = true;
+                    this._richDrity = hasChange;
                 },
                 enumerable: false,
                 configurable: true
             });
-            label.prototype.initdater = function () {
-                var cachelen = 6 * 13 * this._text.length;
-                this.datar.splice(0, this.datar.length);
-                while (this.datar.length < cachelen) { // {pos,color1,uv,color2}
-                    this.datar.push(0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+            label.prototype.initdater = function (textLen, datar) {
+                var size = 6 * 13;
+                var cachelen = size * textLen;
+                //少了补充
+                while (datar.length < cachelen) { // {pos,color1,uv,color2}
+                    datar.push(0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
                 }
-                while (this.datar.length < cachelen) {
-                    this.datar.pop();
+                //多了弹出
+                while (datar.length > cachelen) {
+                    // datar.pop();
+                    datar.splice(datar.length - size, size);
                 }
             };
             Object.defineProperty(label.prototype, "font", {
@@ -8229,220 +8429,565 @@ var gd3d;
             label.prototype.updateData = function (_font) {
                 if (label_1.onTryExpandTexts) {
                     this.chackText(this._text);
-                }
+                } //检查 依赖文本(辅助 自动填充字体)
+                //set data
+                var b = this._defTextBlocks[0];
+                b.text = this._text;
+                this.setDataByBlock(_font, this._defTextBlocks);
+            };
+            // _updateData(_font: gd3d.framework.font)
+            // {
+            //     if (label.onTryExpandTexts) { this.chackText(this._text); } //检查 依赖文本(辅助 自动填充字体)
+            //     // this.dirtyData = false;
+            //     //字符的 label尺寸 与 像素尺寸 的比值。
+            //     let rate = this._fontsize / _font.pointSize;
+            //     //矩阵信息
+            //     let m = this.transform.getWorldMatrix();
+            //     let m11 = m.rawData[0];
+            //     let m12 = m.rawData[2];
+            //     let m21 = m.rawData[1];
+            //     let m22 = m.rawData[3];
+            //     //顶点开始位置
+            //     let bx = this.data_begin.x;
+            //     let by = this.data_begin.y;
+            //     //计算出排列数据
+            //     let txadd = 0;                                  //字符x偏移量
+            //     let tyadd = 0;                                  //字符y偏移量
+            //     let lineEndIndexs: number[] = [];              //每行结束位置的索引列表
+            //     let lineWidths: number[] = [];                 //每行字符宽度之和列表
+            //     let contrast_w = this.horizontalOverflow ? Number.MAX_VALUE : this.transform.width;     //最大宽度限制
+            //     let contrast_h = this.verticalOverflow ? Number.MAX_VALUE : this.transform.height;      //最大高度限制
+            //     let lineHeight = this._fontsize * this.linespace;                                       //一行的高度
+            //     let renderTextCount = 0;
+            //     tyadd += lineHeight;
+            //     let i = 0;
+            //     for (let len = this._text.length; i < len; i++)
+            //     {
+            //         let c = this._text.charAt(i);
+            //         let isNewline = c == `\n`; //换行符
+            //         let cinfo = _font.cmap[c];
+            //         if (!isNewline && cinfo == undefined) { continue; }
+            //         let cWidth = cinfo ? cinfo.xAddvance * rate : 0;                 //字符的宽度
+            //         //需要换行了
+            //         if (isNewline || txadd + cWidth > contrast_w)
+            //         {
+            //             if (tyadd + lineHeight > contrast_h) { break; }             //高度超限制了
+            //             lineEndIndexs.push(i);
+            //             lineWidths.push(this.transform.width - txadd);
+            //             txadd = 0;                                                  //文本x偏移置0
+            //             tyadd += lineHeight;                                        //文本y偏移增加
+            //         }
+            //         if (cinfo)
+            //         {
+            //             txadd += cWidth;                                     //文本x偏移增加
+            //             renderTextCount++;
+            //         }
+            //     }
+            //     //最后的字符存入
+            //     lineEndIndexs.push(i);
+            //     lineWidths.push(this.transform.width - txadd);
+            //     //文本渲染所占高度 和 transfrom节点高度的相差值
+            //     let diffY = this.transform.height - tyadd;
+            //     //相对transfrom X坐标的偏移
+            //     let xadd = 0;
+            //     //相对transfrom Y坐标的偏移
+            //     let yadd = 0;
+            //     if (this.verticalType == VerticalType.Center)               //垂直居中布局
+            //     {
+            //         yadd += diffY / 2;
+            //     }
+            //     else if (this.verticalType == VerticalType.Boom)            //垂直靠下布局
+            //     {
+            //         yadd += diffY;
+            //     }
+            //     //清理缓存
+            //     this.initdater(renderTextCount, this.datar);
+            //     i = 0;
+            //     let rI = 0;
+            //     for (let lineI = 0; lineI < lineEndIndexs.length; lineI++)
+            //     {
+            //         //一行
+            //         xadd = 0;
+            //         if (this.horizontalType == HorizontalType.Center)       //水平居中布局
+            //         {
+            //             xadd += lineWidths[lineI] / 2;
+            //         }
+            //         else if (this.horizontalType == HorizontalType.Right)   //水平靠右布局
+            //         {
+            //             xadd += lineWidths[lineI];
+            //         }
+            //         //遍历一行字符
+            //         for (; i < lineEndIndexs[lineI]; i++)
+            //         {
+            //             let c = this._text.charAt(i);
+            //             let cinfo = _font.cmap[c];
+            //             if (cinfo == undefined) { continue; }
+            //             var cx = xadd + cinfo.xOffset * rate;
+            //             var cy = yadd - cinfo.yOffset * rate + _font.baseline * rate;
+            //             var ch = rate * cinfo.ySize;
+            //             var cw = rate * cinfo.xSize;
+            //             xadd += cinfo.xAddvance * rate;
+            //             var x1 = cx + cw;
+            //             var y1 = cy;
+            //             var x2 = cx;
+            //             var y2 = cy + ch;
+            //             var x3 = cx + cw;
+            //             var y3 = cy + ch;
+            //             //pos
+            //             let _x0 = this.datar[rI * 6 * 13 + 0] = bx + cx * m11 + cy * m12;//x
+            //             let _y0 = this.datar[rI * 6 * 13 + 1] = by + cx * m21 + cy * m22;//y
+            //             let _x1 = this.datar[rI * 6 * 13 + 13 * 1 + 0] = bx + x1 * m11 + y1 * m12;//x
+            //             let _y1 = this.datar[rI * 6 * 13 + 13 * 1 + 1] = by + x1 * m21 + y1 * m22;//y
+            //             let _x2 = this.datar[rI * 6 * 13 + 13 * 2 + 0] = bx + x2 * m11 + y2 * m12;//x
+            //             let _y2 = this.datar[rI * 6 * 13 + 13 * 2 + 1] = by + x2 * m21 + y2 * m22;//y
+            //             this.datar[rI * 6 * 13 + 13 * 3 + 0] = bx + x2 * m11 + y2 * m12;//x
+            //             this.datar[rI * 6 * 13 + 13 * 3 + 1] = by + x2 * m21 + y2 * m22;//y
+            //             this.datar[rI * 6 * 13 + 13 * 4 + 0] = bx + x1 * m11 + y1 * m12;//x
+            //             this.datar[rI * 6 * 13 + 13 * 4 + 1] = by + x1 * m21 + y1 * m22;//y
+            //             let _x3 = this.datar[rI * 6 * 13 + 13 * 5 + 0] = bx + x3 * m11 + y3 * m12;//x
+            //             let _y3 = this.datar[rI * 6 * 13 + 13 * 5 + 1] = by + x3 * m21 + y3 * m22;//y
+            //             //uv
+            //             var u0 = cinfo.x;
+            //             var v0 = cinfo.y;
+            //             var u1 = cinfo.x + cinfo.w;
+            //             var v1 = cinfo.y;
+            //             var u2 = cinfo.x;
+            //             var v2 = cinfo.y + cinfo.h;
+            //             var u3 = cinfo.x + cinfo.w;
+            //             var v3 = cinfo.y + cinfo.h;
+            //             this.datar[rI * 6 * 13 + 7] = u0;
+            //             this.datar[rI * 6 * 13 + 8] = v0;
+            //             this.datar[rI * 6 * 13 + 13 * 1 + 7] = u1;
+            //             this.datar[rI * 6 * 13 + 13 * 1 + 8] = v1;
+            //             this.datar[rI * 6 * 13 + 13 * 2 + 7] = u2;
+            //             this.datar[rI * 6 * 13 + 13 * 2 + 8] = v2;
+            //             this.datar[rI * 6 * 13 + 13 * 3 + 7] = u2;
+            //             this.datar[rI * 6 * 13 + 13 * 3 + 8] = v2;
+            //             this.datar[rI * 6 * 13 + 13 * 4 + 7] = u1;
+            //             this.datar[rI * 6 * 13 + 13 * 4 + 8] = v1;
+            //             this.datar[rI * 6 * 13 + 13 * 5 + 7] = u3;
+            //             this.datar[rI * 6 * 13 + 13 * 5 + 8] = v3;
+            //             //主color
+            //             for (var j = 0; j < 6; j++)
+            //             {
+            //                 this.datar[rI * 6 * 13 + 13 * j + 3] = this.color.r;
+            //                 this.datar[rI * 6 * 13 + 13 * j + 4] = this.color.g;
+            //                 this.datar[rI * 6 * 13 + 13 * j + 5] = this.color.b;
+            //                 this.datar[rI * 6 * 13 + 13 * j + 6] = this.color.a;
+            //                 this.datar[rI * 6 * 13 + 13 * j + 9] = this.color2.r;
+            //                 this.datar[rI * 6 * 13 + 13 * j + 10] = this.color2.g;
+            //                 this.datar[rI * 6 * 13 + 13 * j + 11] = this.color2.b;
+            //                 this.datar[rI * 6 * 13 + 13 * j + 12] = this.color2.a;
+            //             }
+            //             //drawRect 
+            //             this.min_x = Math.min(_x0, _x1, _x2, _x3, this.min_x);
+            //             this.min_y = Math.min(_y0, _y1, _y2, _y3, this.min_y);
+            //             this.max_x = Math.max(_x0, _x1, _x2, _x3, this.max_x);
+            //             this.max_y = Math.max(_y0, _y1, _y2, _y3, this.max_y);
+            //             //有效渲染字符 索引递增
+            //             rI++;
+            //         }
+            //         yadd += lineHeight;
+            //     }
+            //     //debug log
+            //     // console.log(`lable text: 实际填充数 ：${rI} , 容器尺寸 ：${renderTextCount} \r text:${this._text}`);
+            //     this.calcDrawRect();
+            // }
+            /** 更新数据 富文本 模式 */
+            label.prototype.updateDataRich = function (_font) {
+                //检查 依赖文本(辅助 自动填充字体)
                 if (label_1.onTryExpandTexts) {
                     this.chackText(this._text);
                 }
-                this.dirtyData = false;
-                var rate = this._fontsize / _font.pointSize;
+                //set data
+                this.setDataByBlock(_font, this._richTextBlocks);
+            };
+            /**
+             * 通过 block 设置数据
+             * @param _font
+             * @param blocks
+             */
+            label.prototype.setDataByBlock = function (_font, blocks) {
+                //字符的 label尺寸 与 像素尺寸 的比值。
+                var fontSize = this._fontsize;
+                var rate = fontSize / _font.pointSize;
+                var rBaseLine = _font.baseline * rate;
+                var imgSize = fontSize * 0.8;
+                var imgHalfGap = (fontSize - imgSize) / 2;
+                var italicMoveX = fontSize * 0.3;
+                //矩阵信息
                 var m = this.transform.getWorldMatrix();
                 var m11 = m.rawData[0];
                 var m12 = m.rawData[2];
                 var m21 = m.rawData[1];
                 var m22 = m.rawData[3];
+                //顶点开始位置
                 var bx = this.data_begin.x;
                 var by = this.data_begin.y;
+                var atlas = this._imageTextAtlas;
                 //计算出排列数据
-                var txadd = 0;
-                var tyadd = 0;
-                this.indexarr = [];
-                this.remainarrx = [];
-                var remainy = 0;
-                tyadd += this._fontsize * this.linespace;
-                var contrast_w = this.horizontalOverflow ? Number.MAX_VALUE : this.transform.width;
-                var contrast_h = this.verticalOverflow ? Number.MAX_VALUE : this.transform.height;
-                for (var i = 0, len = this._text.length; i < len; i++) {
-                    var c = this._text.charAt(i);
-                    var isNewline = c == "\n"; //换行符
-                    var cinfo = _font.cmap[c];
-                    if (!isNewline && cinfo == undefined) {
+                var txadd = 0; //字符x偏移量
+                var tyadd = 0; //字符y偏移量
+                var lineEndIndexs = []; //每行结束位置的索引列表
+                var lineWidths = []; //每行字符宽度之和列表
+                var contrast_w = this.horizontalOverflow ? Number.MAX_VALUE : this.transform.width; //最大宽度限制
+                var contrast_h = this.verticalOverflow ? Number.MAX_VALUE : this.transform.height; //最大高度限制
+                var lineHeight = fontSize * this.linespace; //一行的高度
+                tyadd += lineHeight;
+                var rI = 0;
+                var imgCharCount = 0;
+                var fullText = "";
+                //筛选能渲染的数据,处理分行
+                for (var i = 0, len = blocks.length; i < len; i++) {
+                    var block = blocks[i];
+                    var text = block.text;
+                    var opts = block.opts;
+                    if (text == null || text.length < 1)
                         continue;
+                    //是否是 字符图
+                    var hasImg = false;
+                    var imgOpt = this.getImgOpt(opts);
+                    if (atlas && imgOpt) {
+                        //图集中是否能找到 该sprite
+                        var sp = atlas.sprites[imgOpt.value];
+                        hasImg = sp != null;
                     }
-                    if (isNewline || txadd + cinfo.xAddvance * rate > contrast_w) {
-                        if (tyadd + this._fontsize * this.linespace > contrast_h) {
-                            break;
+                    var forceBreak_1 = false;
+                    //遍历字符串
+                    for (var j = 0, len1 = text.length; j < len1; j++) {
+                        var hasC = false;
+                        var cWidth = 0;
+                        var c = "";
+                        var isNewline = false;
+                        if (!hasImg) {
+                            c = text.charAt(j);
+                            isNewline = c == "\n"; //换行符
+                            var cinfo = _font.cmap[c];
+                            if (!isNewline && !cinfo) {
+                                continue;
+                            }
+                            if (cinfo) {
+                                cWidth = cinfo.xAddvance * rate; //字符的宽度
+                                hasC = true;
+                            }
                         }
                         else {
-                            this.indexarr.push(i);
-                            this.remainarrx.push(this.transform.width - txadd);
-                            txadd = 0;
-                            tyadd += this._fontsize * this.linespace;
+                            hasC = true;
+                            cWidth = fontSize;
+                            c = "*";
                         }
+                        //需要换行了
+                        if (isNewline || txadd + cWidth > contrast_w) {
+                            if (tyadd + lineHeight > contrast_h) {
+                                forceBreak_1 = true;
+                                break;
+                            } //高度超限制了
+                            lineEndIndexs.push(rI);
+                            lineWidths.push(this.transform.width - txadd);
+                            txadd = 0; //文本x偏移置0
+                            tyadd += lineHeight; //文本y偏移增加
+                        }
+                        if (hasC) {
+                            txadd += cWidth; //文本x偏移增加
+                            fullText += c;
+                            rI++;
+                            if (hasImg) {
+                                imgCharCount++;
+                            }
+                        }
+                        if (hasImg) {
+                            break;
+                        } //是图片跳出当前 block
                     }
-                    if (cinfo)
-                        txadd += cinfo.xAddvance * rate;
+                    if (forceBreak_1) {
+                        break;
+                    } //强制退出
                 }
-                this.indexarr.push(i);
-                this.remainarrx.push(this.transform.width - txadd);
-                remainy = this.transform.height - tyadd;
-                var i = 0;
-                var xadd = 0;
-                var yadd = 0;
+                //最后一行结尾的字符存入
+                lineEndIndexs.push(rI);
+                lineWidths.push(this.transform.width - txadd);
+                //文本渲染所占高度 和 transfrom节点高度的相差值
+                var diffY = this.transform.height - tyadd;
+                var yOffset = 0;
+                //垂直居中布局
                 if (this.verticalType == VerticalType.Center) {
-                    yadd += remainy / 2;
+                    yOffset += diffY / 2;
                 }
+                //垂直靠下布局
                 else if (this.verticalType == VerticalType.Boom) {
-                    yadd += remainy;
+                    yOffset += diffY;
                 }
-                //清理缓存
-                this.initdater();
-                for (var arri = 0; arri < this.indexarr.length; arri++) {
-                    //一行
-                    xadd = 0;
-                    if (this.horizontalType == HorizontalType.Center) {
-                        xadd += this.remainarrx[arri] / 2;
+                //相对transfrom X坐标的偏移
+                var xadd = 0;
+                //相对transfrom Y坐标的偏移
+                var yadd = yOffset;
+                //准备容器
+                this.initdater(fullText.length - imgCharCount, this.datar);
+                if (imgCharCount) {
+                    this.initdater(imgCharCount, this.imgDatar); //字符图 数据容器
+                }
+                //
+                rI = 0;
+                var textI = 0;
+                var imgI = 0;
+                var lineI = lineEndIndexs.shift();
+                var forceBreak = false;
+                var lineCount = 1;
+                //填充顶点数据
+                for (var i = 0, len = blocks.length; i < len; i++) {
+                    var block = blocks[i];
+                    var text = block.text;
+                    var opts = block.opts;
+                    var optObj = label_1.helpOptObj;
+                    this.getOptObj(opts, optObj);
+                    //是图片字符
+                    //color 选项
+                    var color = optObj.color != null ? optObj.color : this.color;
+                    var color2 = void 0;
+                    if (optObj.color) {
+                        color2 = label_1.helpColor;
+                        gd3d.math.colorClone(optObj.color, color2);
+                        color2.a *= 0.5;
                     }
-                    else if (this.horizontalType == HorizontalType.Right) {
-                        xadd += this.remainarrx[arri];
+                    else {
+                        color2 = this.color2;
                     }
-                    for (; i < this.indexarr[arri]; i++) {
-                        var c = this._text.charAt(i);
-                        var cinfo = _font.cmap[c];
-                        if (cinfo == undefined) {
-                            continue;
+                    //粗体
+                    //斜体
+                    var moveX = optObj.i ? italicMoveX : 0;
+                    //下划线
+                    //遍历字符串
+                    for (var j = 0, len1 = text.length; j < len1; j++) {
+                        if (lineI == null) {
+                            forceBreak = true;
+                            break;
                         }
-                        var cx = xadd + cinfo.xOffset * rate;
-                        var cy = yadd - cinfo.yOffset * rate + _font.baseline * rate;
-                        var ch = rate * cinfo.ySize;
-                        var cw = rate * cinfo.xSize;
-                        xadd += cinfo.xAddvance * rate;
-                        var x1 = cx + cw;
-                        var y1 = cy;
-                        var x2 = cx;
-                        var y2 = cy + ch;
-                        var x3 = cx + cw;
-                        var y3 = cy + ch;
-                        var _x0 = this.datar[i * 6 * 13 + 0] = bx + cx * m11 + cy * m12; //x
-                        var _y0 = this.datar[i * 6 * 13 + 1] = by + cx * m21 + cy * m22; //y
-                        var _x1 = this.datar[i * 6 * 13 + 13 * 1 + 0] = bx + x1 * m11 + y1 * m12; //x
-                        var _y1 = this.datar[i * 6 * 13 + 13 * 1 + 1] = by + x1 * m21 + y1 * m22; //y
-                        var _x2 = this.datar[i * 6 * 13 + 13 * 2 + 0] = bx + x2 * m11 + y2 * m12; //x
-                        var _y2 = this.datar[i * 6 * 13 + 13 * 2 + 1] = by + x2 * m21 + y2 * m22; //y
-                        this.datar[i * 6 * 13 + 13 * 3 + 0] = bx + x2 * m11 + y2 * m12; //x
-                        this.datar[i * 6 * 13 + 13 * 3 + 1] = by + x2 * m21 + y2 * m22; //y
-                        this.datar[i * 6 * 13 + 13 * 4 + 0] = bx + x1 * m11 + y1 * m12; //x
-                        this.datar[i * 6 * 13 + 13 * 4 + 1] = by + x1 * m21 + y1 * m22; //y
-                        var _x3 = this.datar[i * 6 * 13 + 13 * 5 + 0] = bx + x3 * m11 + y3 * m12; //x
-                        var _y3 = this.datar[i * 6 * 13 + 13 * 5 + 1] = by + x3 * m21 + y3 * m22; //y
+                        if (rI >= lineI) {
+                            lineI = lineEndIndexs.shift();
+                            if (lineI == null) {
+                                forceBreak = true;
+                                break;
+                            }
+                            //换行了
+                            xadd = 0;
+                            //水平居中布局
+                            if (this.horizontalType == HorizontalType.Center) {
+                                xadd += lineWidths[lineI] / 2;
+                            }
+                            //水平靠右布局
+                            else if (this.horizontalType == HorizontalType.Right) {
+                                xadd += lineWidths[lineI];
+                            }
+                            //y 偏移值
+                            yadd = yOffset + lineHeight * lineCount;
+                            //行数增加
+                            lineCount++;
+                        }
+                        var hasImg = fullText[rI] == "*" && optObj.img;
+                        var _I = 0;
+                        var datar = void 0;
+                        var c = text.charAt(j);
+                        var cinfo = void 0;
+                        if (!hasImg) {
+                            _I = textI;
+                            cinfo = _font.cmap[c];
+                            if (cinfo == undefined) {
+                                continue;
+                            }
+                            //填充字符数据
+                            datar = this.datar;
+                            //pos
+                            var ch = rate * cinfo.ySize;
+                            var cw = rate * cinfo.xSize;
+                            var x0 = xadd + cinfo.xOffset * rate;
+                            var y0 = yadd - cinfo.yOffset * rate + rBaseLine;
+                            //uv
+                            var u0 = cinfo.x;
+                            var v0 = cinfo.y;
+                            var u1 = cinfo.x + cinfo.w;
+                            var v1 = cinfo.y;
+                            var u2 = cinfo.x;
+                            var v2 = cinfo.y + cinfo.h;
+                            var u3 = cinfo.x + cinfo.w;
+                            var v3 = cinfo.y + cinfo.h;
+                            //主color
+                            for (var k = 0; k < 6; k++) {
+                                datar[_I * 6 * 13 + 13 * k + 3] = color.r;
+                                datar[_I * 6 * 13 + 13 * k + 4] = color.g;
+                                datar[_I * 6 * 13 + 13 * k + 5] = color.b;
+                                datar[_I * 6 * 13 + 13 * k + 6] = color.a;
+                                datar[_I * 6 * 13 + 13 * k + 9] = color2.r;
+                                datar[_I * 6 * 13 + 13 * k + 10] = color2.g;
+                                datar[_I * 6 * 13 + 13 * k + 11] = color2.b;
+                                datar[_I * 6 * 13 + 13 * k + 12] = color2.a;
+                            }
+                            //x 偏移增加
+                            xadd += cinfo.xAddvance * rate;
+                        }
+                        else {
+                            _I = imgI;
+                            datar = this.imgDatar;
+                            //填充字符图数据
+                            var sp = atlas.sprites[optObj.img];
+                            //pos
+                            var ch = imgSize;
+                            var cw = imgSize;
+                            var x0 = xadd + imgHalfGap;
+                            var y0 = yadd - imgSize + rBaseLine + imgHalfGap;
+                            //uv
+                            var urange = sp.urange;
+                            var vrange = sp.vrange;
+                            var u0 = urange.x;
+                            var v0 = vrange.x;
+                            var u1 = urange.y;
+                            var v1 = vrange.x;
+                            var u2 = urange.x;
+                            var v2 = vrange.y;
+                            var u3 = urange.y;
+                            var v3 = vrange.y;
+                            //主color
+                            for (var k = 0; k < 6; k++) {
+                                datar[_I * 6 * 13 + 13 * k + 3] = 1;
+                                datar[_I * 6 * 13 + 13 * k + 4] = 1;
+                                datar[_I * 6 * 13 + 13 * k + 5] = 1;
+                                datar[_I * 6 * 13 + 13 * k + 6] = 1;
+                            }
+                            xadd += fontSize;
+                        }
+                        //填充数据
+                        //pos
+                        var x1 = x0 + cw;
+                        var y1 = y0;
+                        var x2 = x0;
+                        var y2 = y0 + ch;
+                        var x3 = x0 + cw;
+                        var y3 = y0 + ch;
+                        var _x0 = datar[_I * 6 * 13 + 0] = bx + (x0 + moveX) * m11 + y0 * m12; //x0
+                        var _y0 = datar[_I * 6 * 13 + 1] = by + x0 * m21 + y0 * m22; //y0
+                        var _x1 = datar[_I * 6 * 13 + 13 * 1 + 0] = bx + (x1 + moveX) * m11 + y1 * m12; //x1
+                        var _y1 = datar[_I * 6 * 13 + 13 * 1 + 1] = by + x1 * m21 + y1 * m22; //y1
+                        var _x2 = datar[_I * 6 * 13 + 13 * 2 + 0] = bx + x2 * m11 + y2 * m12; //x2
+                        var _y2 = datar[_I * 6 * 13 + 13 * 2 + 1] = by + x2 * m21 + y2 * m22; //y2
+                        datar[_I * 6 * 13 + 13 * 3 + 0] = _x2; //x
+                        datar[_I * 6 * 13 + 13 * 3 + 1] = _y2; //y
+                        datar[_I * 6 * 13 + 13 * 4 + 0] = _x1; //x
+                        datar[_I * 6 * 13 + 13 * 4 + 1] = _y1; //y
+                        var _x3 = datar[_I * 6 * 13 + 13 * 5 + 0] = bx + x3 * m11 + y3 * m12; //x3
+                        var _y3 = datar[_I * 6 * 13 + 13 * 5 + 1] = by + x3 * m21 + y3 * m22; //y3
                         //uv
-                        var u0 = cinfo.x;
-                        var v0 = cinfo.y;
-                        var u1 = cinfo.x + cinfo.w;
-                        var v1 = cinfo.y;
-                        var u2 = cinfo.x;
-                        var v2 = cinfo.y + cinfo.h;
-                        var u3 = cinfo.x + cinfo.w;
-                        var v3 = cinfo.y + cinfo.h;
-                        this.datar[i * 6 * 13 + 7] = u0;
-                        this.datar[i * 6 * 13 + 8] = v0;
-                        this.datar[i * 6 * 13 + 13 * 1 + 7] = u1;
-                        this.datar[i * 6 * 13 + 13 * 1 + 8] = v1;
-                        this.datar[i * 6 * 13 + 13 * 2 + 7] = u2;
-                        this.datar[i * 6 * 13 + 13 * 2 + 8] = v2;
-                        this.datar[i * 6 * 13 + 13 * 3 + 7] = u2;
-                        this.datar[i * 6 * 13 + 13 * 3 + 8] = v2;
-                        this.datar[i * 6 * 13 + 13 * 4 + 7] = u1;
-                        this.datar[i * 6 * 13 + 13 * 4 + 8] = v1;
-                        this.datar[i * 6 * 13 + 13 * 5 + 7] = u3;
-                        this.datar[i * 6 * 13 + 13 * 5 + 8] = v3;
-                        //主color
-                        for (var j = 0; j < 6; j++) {
-                            this.datar[i * 6 * 13 + 13 * j + 3] = this.color.r;
-                            this.datar[i * 6 * 13 + 13 * j + 4] = this.color.g;
-                            this.datar[i * 6 * 13 + 13 * j + 5] = this.color.b;
-                            this.datar[i * 6 * 13 + 13 * j + 6] = this.color.a;
-                            this.datar[i * 6 * 13 + 13 * j + 9] = this.color2.r;
-                            this.datar[i * 6 * 13 + 13 * j + 10] = this.color2.g;
-                            this.datar[i * 6 * 13 + 13 * j + 11] = this.color2.b;
-                            this.datar[i * 6 * 13 + 13 * j + 12] = this.color2.a;
-                        }
+                        datar[_I * 6 * 13 + 7] = u0;
+                        datar[_I * 6 * 13 + 8] = v0;
+                        datar[_I * 6 * 13 + 13 * 1 + 7] = u1;
+                        datar[_I * 6 * 13 + 13 * 1 + 8] = v1;
+                        datar[_I * 6 * 13 + 13 * 2 + 7] = u2;
+                        datar[_I * 6 * 13 + 13 * 2 + 8] = v2;
+                        datar[_I * 6 * 13 + 13 * 3 + 7] = u2;
+                        datar[_I * 6 * 13 + 13 * 3 + 8] = v2;
+                        datar[_I * 6 * 13 + 13 * 4 + 7] = u1;
+                        datar[_I * 6 * 13 + 13 * 4 + 8] = v1;
+                        datar[_I * 6 * 13 + 13 * 5 + 7] = u3;
+                        datar[_I * 6 * 13 + 13 * 5 + 8] = v3;
                         //drawRect 
                         this.min_x = Math.min(_x0, _x1, _x2, _x3, this.min_x);
                         this.min_y = Math.min(_y0, _y1, _y2, _y3, this.min_y);
                         this.max_x = Math.max(_x0, _x1, _x2, _x3, this.max_x);
                         this.max_y = Math.max(_y0, _y1, _y2, _y3, this.max_y);
+                        //有效渲染字符 索引递增
+                        rI++;
+                        if (!hasImg) {
+                            textI++;
+                        }
+                        else {
+                            imgI++;
+                            break; //是图片字符 跳出该block
+                        }
                     }
-                    yadd += this._fontsize * this.linespace;
+                    if (forceBreak)
+                        break;
                 }
+                //debug log
+                // console.log(`lable text: 实际填充数 ：${rI} , 容器尺寸 ：${fullText.length} \r text:${fullText}`);
                 this.calcDrawRect();
-                //for (var i = 0; i < this._text.length; i++)
-                //{
-                //    let c = this._text.charAt(i);
-                //    let cinfo = _font.cmap[c];
-                //    if (cinfo == undefined)
-                //    {
-                //        continue;
-                //    }
-                //    if (xadd + cinfo.xAddvance * rate > this.transform.width)
-                //    {
-                //        if (yadd + this._fontsize * this.linespace > this.transform.height)
-                //        {
-                //            break;
-                //        }
-                //        else
-                //        {
-                //            xadd = 0;
-                //            yadd += this._fontsize * this.linespace;
-                //        }
-                //    }
-                //    var cx = xadd + cinfo.xOffset * rate;
-                //    var cy = yadd - cinfo.yOffset * rate + _font.baseline * rate;
-                //    var ch = rate * cinfo.ySize;
-                //    var cw = rate * cinfo.xSize;
-                //    xadd += cinfo.xAddvance * rate;
-                //    var x1 = cx + cw;
-                //    var y1 = cy;
-                //    var x2 = cx;
-                //    var y2 = cy + ch;
-                //    var x3 = cx + cw;
-                //    var y3 = cy + ch;
-                //    this.datar[i * 6 * 13 + 0] = bx + cx * m11 + cy * m12;//x
-                //    this.datar[i * 6 * 13 + 1] = by + cx * m21 + cy * m22;//y
-                //    this.datar[i * 6 * 13 + 13 * 1 + 0] = bx + x1 * m11 + y1 * m12;//x
-                //    this.datar[i * 6 * 13 + 13 * 1 + 1] = by + x1 * m21 + y1 * m22;//y
-                //    this.datar[i * 6 * 13 + 13 * 2 + 0] = bx + x2 * m11 + y2 * m12;//x
-                //    this.datar[i * 6 * 13 + 13 * 2 + 1] = by + x2 * m21 + y2 * m22;//y
-                //    this.datar[i * 6 * 13 + 13 * 3 + 0] = bx + x2 * m11 + y2 * m12;//x
-                //    this.datar[i * 6 * 13 + 13 * 3 + 1] = by + x2 * m21 + y2 * m22;//y
-                //    this.datar[i * 6 * 13 + 13 * 4 + 0] = bx + x1 * m11 + y1 * m12;//x
-                //    this.datar[i * 6 * 13 + 13 * 4 + 1] = by + x1 * m21 + y1 * m22;//y
-                //    this.datar[i * 6 * 13 + 13 * 5 + 0] = bx + x3 * m11 + y3 * m12;//x
-                //    this.datar[i * 6 * 13 + 13 * 5 + 1] = by + x3 * m21 + y3 * m22;//y
-                //    //uv
-                //    var u0 = cinfo.x;
-                //    var v0 = cinfo.y;
-                //    var u1 = cinfo.x + cinfo.w;
-                //    var v1 = cinfo.y;
-                //    var u2 = cinfo.x;
-                //    var v2 = cinfo.y + cinfo.h;
-                //    var u3 = cinfo.x + cinfo.w;
-                //    var v3 = cinfo.y + cinfo.h;
-                //    this.datar[i * 6 * 13 + 7] = u0;
-                //    this.datar[i * 6 * 13 + 8] = v0;
-                //    this.datar[i * 6 * 13 + 13 * 1 + 7] = u1;
-                //    this.datar[i * 6 * 13 + 13 * 1 + 8] = v1;
-                //    this.datar[i * 6 * 13 + 13 * 2 + 7] = u2;
-                //    this.datar[i * 6 * 13 + 13 * 2 + 8] = v2;
-                //    this.datar[i * 6 * 13 + 13 * 3 + 7] = u2;
-                //    this.datar[i * 6 * 13 + 13 * 3 + 8] = v2;
-                //    this.datar[i * 6 * 13 + 13 * 4 + 7] = u1;
-                //    this.datar[i * 6 * 13 + 13 * 4 + 8] = v1;
-                //    this.datar[i * 6 * 13 + 13 * 5 + 7] = u3;
-                //    this.datar[i * 6 * 13 + 13 * 5 + 8] = v3;
-                //    //主color
-                //    for (var j = 0; j < 6; j++)
-                //    {
-                //        this.datar[i * 6 * 13 + 13 * j + 3] = this.color.r;
-                //        this.datar[i * 6 * 13 + 13 * j + 4] = this.color.g;
-                //        this.datar[i * 6 * 13 + 13 * j + 5] = this.color.b;
-                //        this.datar[i * 6 * 13 + 13 * j + 6] = this.color.a;
-                //        this.datar[i * 6 * 13 + 13 * j + 9] = this.color2.r;
-                //        this.datar[i * 6 * 13 + 13 * j + 10] = this.color2.g;
-                //        this.datar[i * 6 * 13 + 13 * j + 11] = this.color2.b;
-                //        this.datar[i * 6 * 13 + 13 * j + 12] = this.color2.a;
-                //    }
-                //}
             };
+            /**获取 图片字符 选项 */
+            label.prototype.getImgOpt = function (opts) {
+                if (opts == null)
+                    return;
+                for (var i = 0, len = opts.length; i < len; i++) {
+                    var val = opts[i];
+                    if (val && val.getType() == RichOptType.Image)
+                        return val;
+                }
+            };
+            /** 获取富文本选项 对象 */
+            label.prototype.getOptObj = function (opts, out) {
+                out.i = false;
+                out.b = false;
+                out.u = false;
+                if (out.color) {
+                    gd3d.math.pool.delete_color(out.color);
+                    out.color = null;
+                }
+                out.img = "";
+                if (!opts)
+                    return;
+                opts.forEach(function (val) {
+                    if (val) {
+                        switch (val.getType()) {
+                            case RichOptType.Italic:
+                                out.i = true;
+                                break;
+                            case RichOptType.Color:
+                                var c = val.value;
+                                out.color = gd3d.math.pool.new_color(c.r, c.g, c.b, c.a);
+                                break;
+                            case RichOptType.Image:
+                                out.img = val.value;
+                                break;
+                            case RichOptType.Bold:
+                                out.b = true;
+                                break;
+                            case RichOptType.Underline:
+                                out.u = true;
+                                break;
+                        }
+                    }
+                });
+                return out;
+            };
+            Object.defineProperty(label.prototype, "richText", {
+                /**
+                 * 富文本模式 , 通过特定标签使用。
+                 *
+                 * 文字颜色             <color=#ffffffff>文本</color>       (已经支持);
+                 * 文字斜体             \<i>文本\</i>                       (已经支持);
+                 * 图片字符（表情）     [imgName]                           (已经支持);
+                 * 文字加粗             \<b>文本\</b>                       (支持中);
+                 * 文字加下划线         \<u>文本\</u>                       (支持中);
+                 */
+                get: function () { return this._richText; },
+                set: function (val) { this._richText = val; },
+                enumerable: false,
+                configurable: true
+            });
+            Object.defineProperty(label.prototype, "imageTextAtlas", {
+                /**
+                 * 图像文字图集
+                 * (例如 表情)
+                 */
+                get: function () { return this._imageTextAtlas; },
+                set: function (val) {
+                    if (val == this._imageTextAtlas)
+                        return;
+                    this._imageTextAtlas = val;
+                    if (this._imageTextAtlas) {
+                        this._imageTextAtlasName = this._imageTextAtlas.getName();
+                    }
+                    this.needRefreshAtlas = true;
+                },
+                enumerable: false,
+                configurable: true
+            });
             /**
              * @public
              * @language zh_CN
@@ -8480,41 +9025,72 @@ var gd3d;
                 }
                 return this._darwRect;
             };
+            /** 获取材质 通过 shaderName*/
+            label.prototype.getMatByShader = function (oldMat, _tex, cShaderName, defMaskSh, defSh, newMatCB) {
+                var transform = this.transform;
+                var assetmgr = framework.sceneMgr.app.getAssetMgr();
+                var pMask = transform.parentIsMask;
+                var mat = oldMat;
+                var rectTag = "";
+                var uiTag = "_ui";
+                if (pMask) {
+                    //when parentIsMask,can't multiplexing material , can be multiplexing when parent equal
+                    var rId = transform.maskRectId;
+                    rectTag = "mask(" + rId + ")";
+                }
+                var matName = _tex.getName() + uiTag + rectTag;
+                if (!mat || mat.getName() != matName) {
+                    if (mat)
+                        mat.unuse();
+                    mat = assetmgr.getAssetByName(matName);
+                    if (mat)
+                        mat.use();
+                }
+                if (!mat) {
+                    mat = new framework.material(matName);
+                    var sh = assetmgr.getShader(cShaderName);
+                    sh = sh ? sh : assetmgr.getShader(pMask ? defMaskSh : defSh);
+                    mat.setShader(sh);
+                    mat.use();
+                    if (newMatCB)
+                        newMatCB();
+                    // this.needRefreshFont = true;
+                }
+                return mat;
+            };
             Object.defineProperty(label.prototype, "uimat", {
                 get: function () {
-                    var assetmgr = this.transform.canvas.assetmgr;
+                    var _this = this;
+                    var assetmgr = framework.sceneMgr.app.getAssetMgr();
                     if (!assetmgr)
                         return this._uimat;
                     this.searchTexture();
-                    if (this.font && this.font.texture) {
-                        var pMask = this.transform.parentIsMask;
-                        var mat = this._uimat;
-                        var rectTag = "";
-                        var uiTag = "_ui";
-                        if (pMask) {
-                            //when parentIsMask,can't multiplexing material , can be multiplexing when parent equal
-                            var rId = this.transform.maskRectId;
-                            rectTag = "mask(" + rId + ")";
-                        }
-                        var matName = this.font.texture.getName() + uiTag + rectTag;
-                        if (!mat || mat.getName() != matName) {
-                            if (mat)
-                                mat.unuse();
-                            mat = assetmgr.getAssetByName(matName);
-                            if (mat)
-                                mat.use();
-                        }
-                        if (!mat) {
-                            mat = new framework.material(matName);
-                            var sh = assetmgr.getShader(this._CustomShaderName);
-                            sh = sh ? sh : assetmgr.getShader(pMask ? label_1.defMaskUIShader : label_1.defUIShader);
-                            mat.setShader(sh);
-                            mat.use();
-                            this.needRefreshFont = true;
-                        }
-                        this._uimat = mat;
-                    }
+                    if (!this.font || !this.font.texture)
+                        return this._uimat;
+                    //获取材质
+                    this._uimat = this.getMatByShader(this._uimat, this.font.texture, this._CustomShaderName, label_1.defMaskUIShader, label_1.defUIShader, function () {
+                        //材质资源对象 刷新了
+                        _this.needRefreshFont = true;
+                    });
                     return this._uimat;
+                },
+                enumerable: false,
+                configurable: true
+            });
+            Object.defineProperty(label.prototype, "imgUIMat", {
+                get: function () {
+                    var _this = this;
+                    var assetmgr = framework.sceneMgr.app.getAssetMgr();
+                    if (!assetmgr)
+                        return this._imgUIMat;
+                    this.searchTextureAtlas();
+                    if (!this._imageTextAtlas || !this._imageTextAtlas.texture)
+                        return this._imgUIMat;
+                    this._imgUIMat = this.getMatByShader(this._imgUIMat, this._imageTextAtlas.texture, "", label_1.defImgMaskUIShader, label_1.defImgUIShader, function () {
+                        //材质资源对象 刷新了
+                        _this.needRefreshAtlas = true;
+                    });
+                    return this._imgUIMat;
                 },
                 enumerable: false,
                 configurable: true
@@ -8528,7 +9104,15 @@ var gd3d;
                     return;
                 if (!this._font)
                     return;
-                if (this.dirtyData == true) {
+                if (this._richText) {
+                    if (this._richDrity) {
+                        //富文本模式
+                        this.parseRichText(this.text);
+                        this.updateDataRich(this._font);
+                        this._richDrity = false;
+                    }
+                }
+                else if (this.dirtyData) {
                     this.updateData(this._font);
                     this.dirtyData = false;
                 }
@@ -8537,23 +9121,15 @@ var gd3d;
                     img = this._font.texture;
                 }
                 if (img) {
-                    var needRMask = false;
+                    var forceRMask_1 = false;
                     if (this.needRefreshFont) {
                         mat.setTexture("_MainTex", img);
                         this.needRefreshFont = false;
-                        needRMask = true;
+                        forceRMask_1 = true;
                     }
                     if (this.transform.parentIsMask) {
-                        if (this._cacheMaskV4 == null)
-                            this._cacheMaskV4 = new gd3d.math.vector4();
-                        var rect = this.transform.maskRect;
-                        if (this._cacheMaskV4.x != rect.x || this._cacheMaskV4.y != rect.y || this._cacheMaskV4.w != rect.w || this._cacheMaskV4.z != rect.h || needRMask) {
-                            this._cacheMaskV4.x = rect.x;
-                            this._cacheMaskV4.y = rect.y;
-                            this._cacheMaskV4.z = rect.w;
-                            this._cacheMaskV4.w = rect.h;
-                            mat.setVector4("_maskRect", this._cacheMaskV4);
-                        }
+                        //mask uniform 上传
+                        this.setMaskData(mat, forceRMask_1);
                     }
                     else {
                         mat.setFloat("_outlineWidth", this.outlineWidth);
@@ -8561,24 +9137,77 @@ var gd3d;
                     if (this.datar.length != 0)
                         canvas.pushRawData(mat, this.datar);
                 }
+                if (!this._richText || !this.imgDatar || this.imgDatar.length < 1)
+                    return;
+                //字符图绘制
+                var imgMat = this.imgUIMat;
+                if (!imgMat)
+                    return;
+                var _img;
+                if (this._imageTextAtlas) {
+                    _img = this._imageTextAtlas.texture;
+                }
+                if (!_img)
+                    return;
+                var forceRMask = false;
+                if (this.needRefreshAtlas) {
+                    imgMat.setTexture("_MainTex", _img);
+                    this.needRefreshAtlas = false;
+                    forceRMask = true;
+                }
+                if (this.transform.parentIsMask) {
+                    //mask uniform 上传
+                    this.setMaskData(imgMat, forceRMask);
+                }
+                //提交 字符图顶点数据
+                if (this.imgDatar.length > 0) {
+                    canvas.pushRawData(imgMat, this.imgDatar);
+                }
+            };
+            label.prototype.setMaskData = function (mat, needRMask) {
+                //mask uniform 上传
+                if (this._cacheMaskV4 == null)
+                    this._cacheMaskV4 = new gd3d.math.vector4();
+                var rect = this.transform.maskRect;
+                if (this._cacheMaskV4.x != rect.x || this._cacheMaskV4.y != rect.y || this._cacheMaskV4.w != rect.w || this._cacheMaskV4.z != rect.h || needRMask) {
+                    this._cacheMaskV4.x = rect.x;
+                    this._cacheMaskV4.y = rect.y;
+                    this._cacheMaskV4.z = rect.w;
+                    this._cacheMaskV4.w = rect.h;
+                    mat.setVector4("_maskRect", this._cacheMaskV4);
+                }
             };
             //资源管理器中寻找 指定的贴图资源
             label.prototype.searchTexture = function () {
-                if (this._font)
-                    return;
-                var assetmgr = this.transform.canvas.assetmgr;
-                var resName = this._fontName;
-                var abname = resName.replace(".font.json", ".assetbundle.json");
-                var temp = assetmgr.getAssetByName(resName, abname);
-                if (!temp) {
-                    resName = this._fontName + ".font.json";
-                    temp = assetmgr.getAssetByName(resName, abname);
+                //font  不存在，但有名字，在资源管理器中搜索
+                if (!this._font && this._fontName) {
+                    //字体
+                    var assetmgr = framework.sceneMgr.app.getAssetMgr();
+                    var resName = this._fontName;
+                    var abname = resName.replace(".font.json", ".assetbundle.json");
+                    var temp = assetmgr.getAssetByName(resName, abname);
+                    if (!temp) {
+                        resName = this._fontName + ".font.json";
+                        temp = assetmgr.getAssetByName(resName, abname);
+                    }
+                    if (temp != null) {
+                        var tfont = assetmgr.getAssetByName(resName, abname);
+                        if (tfont) {
+                            this.font = tfont;
+                            this.needRefreshFont = true;
+                        }
+                    }
                 }
-                if (temp != null) {
-                    var tfont = assetmgr.getAssetByName(resName, abname);
-                    if (tfont) {
-                        this.font = tfont;
-                        this.needRefreshFont = true;
+            };
+            label.prototype.searchTextureAtlas = function () {
+                //字符图集
+                if (!this._imageTextAtlas && this._imageTextAtlasName) {
+                    var assetmgr = framework.sceneMgr.app.getAssetMgr();
+                    var atlasName = this._imageTextAtlasName;
+                    var abname = atlasName.replace(".atlas.json", ".assetbundle.json");
+                    var temp = assetmgr.getAssetByName(atlasName, abname);
+                    if (temp) {
+                        this.imageTextAtlas = temp;
                     }
                 }
             };
@@ -8593,6 +9222,7 @@ var gd3d;
                 this.data_begin.y = l * m.rawData[1] + t * m.rawData[3] + m.rawData[5];
                 //只把左上角算出来
                 this.dirtyData = true;
+                this._richDrity = true;
             };
             /** 计算drawRect */
             label.prototype.calcDrawRect = function () {
@@ -8620,6 +9250,125 @@ var gd3d;
                 gd3d.poolv2_del(maxPos);
             };
             /**
+             * 解析 富文本
+             * @param text
+             */
+            label.prototype.parseRichText = function (text) {
+                //Color <color=#ffffffff></color>   文字颜色
+                //Bold <b>text</b>                  文字加粗
+                //Underline <u>text</u>             文字加下划线
+                //Italic <u>text</u>                文字斜体
+                //Image [imgName]                   图片字符（表情）
+                //遍历字符串
+                var len = text.length;
+                var xmlStart = false;
+                var imgStart = false;
+                var strStack = [];
+                var optStack = [];
+                var blockDatas = this._richTextBlocks;
+                blockDatas.length = 0;
+                var genBlockFun = function () {
+                    var str = strStack.shift();
+                    //没有数据跳过
+                    if (!str || str.length < 1)
+                        return;
+                    var opts = optStack.length > 0 ? optStack.concat() : null;
+                    blockDatas.push({ text: str, opts: opts });
+                };
+                for (var i = 0; i < len; i++) {
+                    var char = text[i];
+                    if (char == "<") {
+                        genBlockFun();
+                        xmlStart = true;
+                    }
+                    else if (char == "[") {
+                        genBlockFun();
+                        imgStart = true;
+                    }
+                    if (strStack.length < 1)
+                        strStack.push("");
+                    strStack[strStack.length - 1] += char;
+                    if (char == ">" && xmlStart) {
+                        xmlStart = false;
+                        // let xmlStr = strStack.pop();
+                        var xmlStr = strStack[strStack.length - 1];
+                        var isValid = false;
+                        //判断 标签是开始 还是结束
+                        if (xmlStr[1] == "/") {
+                            var endOpt = optStack[optStack.length - 1];
+                            //选项确认有效
+                            switch (xmlStr) {
+                                case "</color>":
+                                    isValid = endOpt.getType() == RichOptType.Color;
+                                    break;
+                                case "</i>":
+                                    isValid = endOpt.getType() == RichOptType.Italic;
+                                    break;
+                                case "</b>":
+                                    isValid = endOpt.getType() == RichOptType.Bold;
+                                    break;
+                                case "</u>":
+                                    isValid = endOpt.getType() == RichOptType.Underline;
+                                    break;
+                            }
+                            if (isValid) {
+                                optStack.pop();
+                            } //结束标记 弹栈
+                        }
+                        else {
+                            //判断 标签类型
+                            switch (xmlStr) {
+                                case "<i>":
+                                    isValid = true;
+                                    optStack.push(new richOptItalic());
+                                    break;
+                                case "<b>":
+                                    isValid = true;
+                                    optStack.push(new richOptBold());
+                                    break;
+                                case "<u>":
+                                    isValid = true;
+                                    optStack.push(new richOptUnderline());
+                                    break;
+                                default:
+                                    if (xmlStr.indexOf("color") == -1)
+                                        continue;
+                                    var _sIdx = xmlStr.indexOf("#");
+                                    if (_sIdx == -1)
+                                        continue;
+                                    var colorVal = xmlStr.substring(_sIdx + 1, xmlStr.length - 1);
+                                    var vLen = colorVal.length;
+                                    if (vLen != 8 && vLen != 6)
+                                        continue;
+                                    var r = Number("0x" + colorVal.substring(0, 2));
+                                    var g = Number("0x" + colorVal.substring(2, 4));
+                                    var b = Number("0x" + colorVal.substring(4, 6));
+                                    var a = vLen == 6 ? 1 : Number("0x" + colorVal.substring(6, 8));
+                                    if (isNaN(r) || isNaN(g) || isNaN(b) || isNaN(a))
+                                        continue;
+                                    optStack.push(new richOptColor(new gd3d.math.color(r / 255, g / 255, b / 255, a / 255)));
+                                    isValid = true;
+                                    break;
+                            }
+                        }
+                        if (isValid) {
+                            strStack.pop();
+                        } //选项有效 弹栈
+                    }
+                    else if (char == "]" && imgStart) {
+                        var str = strStack.pop();
+                        var imgStr = str.substring(1, str.length - 1);
+                        var imgOpt = new richOptImage(imgStr);
+                        blockDatas.push({ text: str, opts: [imgOpt] });
+                        imgStart = false;
+                    }
+                }
+                //最后的数据
+                while (strStack.length > 0) {
+                    genBlockFun();
+                }
+            };
+            /**
              * @private
              */
             label.prototype.start = function () {
@@ -8637,18 +9386,27 @@ var gd3d;
             label.prototype.remove = function () {
                 if (this._font)
                     this._font.unuse();
+                if (this._imageTextAtlas)
+                    this._imageTextAtlas.unuse();
                 if (this._uimat)
                     this._uimat.unuse();
-                this.indexarr.length = 0;
-                this.remainarrx.length = 0;
+                if (this._imgUIMat)
+                    this._imgUIMat.unuse();
                 this.datar.length = 0;
+                this.imgDatar.length = 0;
+                this._richTextBlocks.length = 0;
+                this._defTextBlocks.length = 0;
                 this.transform = null;
                 this._cacheMaskV4 = null;
             };
             var label_1;
-            label.ClassName = "label";
             label.defUIShader = "shader/defuifont";
             label.defMaskUIShader = "shader/defmaskfont";
+            label.defImgUIShader = "shader/defui";
+            label.defImgMaskUIShader = "shader/defmaskui";
+            label.helpOptObj = {};
+            label.helpColor = new gd3d.math.color();
+            label.ClassName = "label";
             __decorate([
                 gd3d.reflect.Field("string"),
                 __metadata("design:type", String),
@@ -8697,6 +9455,15 @@ var gd3d;
                 gd3d.reflect.Field("number"),
                 __metadata("design:type", Object)
             ], label.prototype, "outlineWidth", void 0);
+            __decorate([
+                gd3d.reflect.Field("boolean"),
+                __metadata("design:type", Boolean),
+                __metadata("design:paramtypes", [Boolean])
+            ], label.prototype, "richText", null);
+            __decorate([
+                gd3d.reflect.Field("string"),
+                __metadata("design:type", Object)
+            ], label.prototype, "_imageTextAtlasName", void 0);
             label = label_1 = __decorate([
                 gd3d.reflect.node2DComponent,
                 gd3d.reflect.nodeRender
@@ -8730,6 +9497,72 @@ var gd3d;
             VerticalType[VerticalType["Top"] = 1] = "Top";
             VerticalType[VerticalType["Boom"] = 2] = "Boom";
         })(VerticalType = framework.VerticalType || (framework.VerticalType = {}));
+        /** 富文本类型 */
+        var RichOptType;
+        (function (RichOptType) {
+            /** 颜色 */
+            RichOptType[RichOptType["Color"] = 0] = "Color";
+            /** 下划线 */
+            RichOptType[RichOptType["Underline"] = 1] = "Underline";
+            /** 字体加粗 */
+            RichOptType[RichOptType["Bold"] = 2] = "Bold";
+            /** 字体斜体 */
+            RichOptType[RichOptType["Italic"] = 3] = "Italic";
+            /** 图片 */
+            RichOptType[RichOptType["Image"] = 4] = "Image";
+        })(RichOptType || (RichOptType = {}));
+        /**
+         * 富文本选项 颜色
+         */
+        var richOptColor = /** @class */ (function () {
+            function richOptColor(_c) {
+                this.value = new gd3d.math.color();
+                gd3d.math.colorClone(_c, this.value);
+            }
+            richOptColor.prototype.getType = function () { return RichOptType.Color; };
+            return richOptColor;
+        }());
+        /**
+         * 富文本选项 下划线
+         */
+        var richOptUnderline = /** @class */ (function () {
+            function richOptUnderline() {
+                this.value = true;
+            }
+            richOptUnderline.prototype.getType = function () { return RichOptType.Underline; };
+            return richOptUnderline;
+        }());
+        /**
+         * 富文本选项 加粗
+         */
+        var richOptBold = /** @class */ (function () {
+            function richOptBold() {
+                this.value = true;
+            }
+            richOptBold.prototype.getType = function () { return RichOptType.Bold; };
+            return richOptBold;
+        }());
+        /**
+         * 富文本选项 斜体
+         */
+        var richOptItalic = /** @class */ (function () {
+            function richOptItalic() {
+                this.value = true;
+            }
+            richOptItalic.prototype.getType = function () { return RichOptType.Italic; };
+            return richOptItalic;
+        }());
+        /**
+         * 富文本选项 加粗
+         */
+        var richOptImage = /** @class */ (function () {
+            function richOptImage(imgSrc) {
+                this.value = imgSrc;
+            }
+            richOptImage.prototype.getType = function () { return RichOptType.Image; };
+            return richOptImage;
+        }());
+        ;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 /// <reference path="../../../io/reflect.ts" />
@@ -9194,6 +10027,52 @@ var gd3d;
             return rawImage2D;
         }());
         framework.rawImage2D = rawImage2D;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+/// <reference path="../../../io/reflect.ts" />
+var gd3d;
+/// <reference path="../../../io/reflect.ts" />
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        /**
+         * 富文本版 lable
+         * 支持表情字符，自定义样式段落
+         */
+        var richLabel = /** @class */ (function () {
+            function richLabel() {
+            }
+            richLabel.prototype.render = function (canvas) {
+                throw new Error("Method not implemented.");
+            };
+            richLabel.prototype.updateTran = function () {
+                throw new Error("Method not implemented.");
+            };
+            richLabel.prototype.getMaterial = function () {
+                throw new Error("Method not implemented.");
+            };
+            richLabel.prototype.getDrawBounds = function () {
+                throw new Error("Method not implemented.");
+            };
+            richLabel.prototype.onPlay = function () {
+                throw new Error("Method not implemented.");
+            };
+            richLabel.prototype.start = function () {
+                throw new Error("Method not implemented.");
+            };
+            richLabel.prototype.update = function (delta) {
+                throw new Error("Method not implemented.");
+            };
+            richLabel.prototype.remove = function () {
+                throw new Error("Method not implemented.");
+            };
+            richLabel = __decorate([
+                gd3d.reflect.node2DComponent,
+                gd3d.reflect.nodeRender
+            ], richLabel);
+            return richLabel;
+        }());
+        framework.richLabel = richLabel;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 /// <reference path="../../../io/reflect.ts" />
@@ -68689,6 +69568,7 @@ var gd3d;
         var textureReader = /** @class */ (function () {
             function textureReader(webgl, texRGBA, width, height, gray) {
                 if (gray === void 0) { gray = false; }
+                this._isDispose = false;
                 this._gray = gray;
                 this._width = width;
                 this._height = height;
@@ -68725,6 +69605,11 @@ var gd3d;
                 enumerable: false,
                 configurable: true
             });
+            Object.defineProperty(textureReader.prototype, "isDispose", {
+                get: function () { return this._isDispose; },
+                enumerable: false,
+                configurable: true
+            });
             textureReader.prototype.getPixel = function (u, v) {
                 var x = (u * this._width) | 0;
                 var y = (v * this._height) | 0;
@@ -68758,6 +69643,11 @@ var gd3d;
                         this._grayData[i] = this._data[i * 4]; //now only rad pass
                     }
                 }
+            };
+            textureReader.prototype.dispose = function () {
+                this.webgl = null;
+                this._data = null;
+                this._grayData = null;
             };
             return textureReader;
         }());
@@ -68797,6 +69687,8 @@ var gd3d;
                 webgl.texParameteri(webgl.TEXTURE_2D, webgl.TEXTURE_MIN_FILTER, webgl.LINEAR);
                 webgl.texImage2D(webgl.TEXTURE_2D, 0, webgl.RGBA, width, height, 0, webgl.RGBA, webgl.UNSIGNED_BYTE, null);
                 webgl.framebufferTexture2D(webgl.FRAMEBUFFER, webgl.COLOR_ATTACHMENT0, webgl.TEXTURE_2D, this.texture, 0);
+                //set unUse state
+                glRenderTarget.useNull(webgl);
             }
             glRenderTarget.prototype.use = function (webgl) {
                 webgl.bindFramebuffer(webgl.FRAMEBUFFER, this.fbo);
