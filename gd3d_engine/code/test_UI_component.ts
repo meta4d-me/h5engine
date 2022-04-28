@@ -45,6 +45,8 @@ class test_UI_Component implements IState
     {
         let atlasComp = this.assetMgr.getAssetByName("comp.atlas.json") as gd3d.framework.atlas;
         let tex_0 = this.assetMgr.getAssetByName("zg03_256.png") as gd3d.framework.texture;
+        let emojiAtlas = gd3d.framework.sceneMgr.app.getAssetMgr().getAssetByName(`emoji.atlas.json`, `emoji.assetbundle.json`) as gd3d.framework.atlas;
+
 
         //9宫格拉伸底图
         let bg_t = new gd3d.framework.transform2D;
@@ -69,6 +71,7 @@ class test_UI_Component implements IState
         bg_t.setLayoutValue(gd3d.framework.layoutOption.RIGHT, 60);
         bg_t.setLayoutValue(gd3d.framework.layoutOption.BOTTOM, 60);
 
+        let _font = this.assetMgr.getAssetByName(fontjson) as gd3d.framework.font;
         let lableW = 500;
         let lableH = 40;
         let lableStartX = 80;
@@ -83,7 +86,7 @@ class test_UI_Component implements IState
         this.rooto2d.addChild(lab_t0);
         let lab_l0 = lab_t0.addComponent("label") as gd3d.framework.label;
         test_UI_Component["lab"] = lab_l0;
-        lab_l0.font = this.assetMgr.getAssetByName(fontjson) as gd3d.framework.font;
+        lab_l0.font = _font;
         lab_l0.fontsize = 12;
         // lab_l.text = "我是段文本\n换行测试";
         lab_l0.text = `${lab_l0.fontsize}号字体 Innovation in China 中国制造，慧及全球 0123456789`;
@@ -100,7 +103,7 @@ class test_UI_Component implements IState
         this.rooto2d.addChild(lab_t);
         let lab_l = lab_t.addComponent("label") as gd3d.framework.label;
         test_UI_Component["lab"] = lab_l;
-        lab_l.font = this.assetMgr.getAssetByName(fontjson) as gd3d.framework.font;
+        lab_l.font = _font;
         lab_l.fontsize = 20;
         // lab_l.text = "我是段文本\n换行测试";
         lab_l.text = `${lab_l.fontsize}号字体 Innovation in China 中国制造，慧及全球 0123456789`;
@@ -117,7 +120,7 @@ class test_UI_Component implements IState
         this.rooto2d.addChild(lab_t1);
         let lab_l1 = lab_t1.addComponent("label") as gd3d.framework.label;
         test_UI_Component["lab"] = lab_l1;
-        lab_l1.font = this.assetMgr.getAssetByName(fontjson) as gd3d.framework.font;
+        lab_l1.font = _font;
         lab_l1.fontsize = 30;
         // lab_l1.text = "我是段文本\n换行测试";
         lab_l1.text = `${lab_l1.fontsize}号字体 Innovation in China 中国制造，慧及全球 0123456789`;
@@ -134,7 +137,7 @@ class test_UI_Component implements IState
         this.rooto2d.addChild(lab_t2);
         let lab_l2 = lab_t2.addComponent("label") as gd3d.framework.label;
         test_UI_Component["lab"] = lab_l2;
-        lab_l2.font = this.assetMgr.getAssetByName(fontjson) as gd3d.framework.font;
+        lab_l2.font = _font;
         lab_l2.fontsize = 40;
         // lab_l2.text = "我是段文本\n换行测试";
         lab_l2.text = `${lab_l2.fontsize}号字体 Innovation in China 中国制造，慧及全球 0123456789`;
@@ -151,12 +154,11 @@ class test_UI_Component implements IState
         lab_t3.localTranslate.y = lableStartY + lableH * 4;
         this.rooto2d.addChild(lab_t3);
         let lab_l3 = lab_t3.addComponent("label") as gd3d.framework.label;
-        lab_l3.font = this.assetMgr.getAssetByName(fontjson) as gd3d.framework.font;
+        lab_l3.font = _font;
         lab_l3.fontsize = 30;
         // lab_l2.text = "我是段文本\n换行测试";
         lab_l3.richText = true;
-        let atlas = gd3d.framework.sceneMgr.app.getAssetMgr().getAssetByName(`emoji.atlas.json`, `emoji.assetbundle.json`) as gd3d.framework.atlas;
-        lab_l3.imageTextAtlas = atlas;
+        lab_l3.imageTextAtlas = emojiAtlas;
         lab_l3.text = "富文本:<color=#00ff00ff>红色</color> <color=#ff0000ff>绿色</color> \n<i>斜体文本</i> \n图片字符[happy][happy][like][cool][happy]";
         lab_l3.color = new gd3d.math.color(0.0, 0.0, 0.0, 1);
         lab_l3.color2 = new gd3d.math.color(0, 0.0, 0.0, 0.5);
@@ -239,10 +241,14 @@ class test_UI_Component implements IState
         iptFrame_t.pivot.x = 0;
         iptFrame_t.pivot.y = 0;
         iptFrame_t.localTranslate.x = 10;
-        iptFrame_t.localTranslate.y = 160;
+        iptFrame_t.localTranslate.y = 180;
         bg_t.addChild(iptFrame_t);
         let ipt = iptFrame_t.addComponent("inputField") as gd3d.framework.inputField;
-        ipt.LineType = gd3d.framework.lineType.MultiLine;
+        ipt.LineType = gd3d.framework.lineType.SingleLine;                              //单行输入
+        ipt.onTextSubmit = (t) =>
+        {
+            console.log(`提交文本:${t}`);
+        }
 
         let img_t = new gd3d.framework.transform2D;
         img_t.width = iptFrame_t.width;
@@ -261,7 +267,7 @@ class test_UI_Component implements IState
         text_t.height = iptFrame_t.height;
         iptFrame_t.addChild(text_t);
         ipt.TextLabel = text_t.addComponent("label") as gd3d.framework.label;
-        ipt.TextLabel.font = this.assetMgr.getAssetByName(fontjson) as gd3d.framework.font;
+        ipt.TextLabel.font = _font;
         ipt.TextLabel.fontsize = 24
         ipt.TextLabel.color = new gd3d.math.color(1, 1, 1, 1);
         text_t.layoutState = 0 | gd3d.framework.layoutOption.H_CENTER | gd3d.framework.layoutOption.V_CENTER;
@@ -273,16 +279,44 @@ class test_UI_Component implements IState
         p_t.height = iptFrame_t.height;
         iptFrame_t.addChild(p_t);
         ipt.PlaceholderLabel = p_t.addComponent("label") as gd3d.framework.label;
-        ipt.PlaceholderLabel.font = this.assetMgr.getAssetByName(fontjson) as gd3d.framework.font;
+        ipt.PlaceholderLabel.text = "SingleLine Enter text...";
+        ipt.PlaceholderLabel.font = _font;
         ipt.PlaceholderLabel.fontsize = 24
         ipt.PlaceholderLabel.color = new gd3d.math.color(0.6, 0.6, 0.6, 1);
 
+        gd3d["he"] = ipt;
+
+        //多行输入框
+        let ipt_mul_t = gd3d.framework.TransformUtil.Create2DPrimitive(gd3d.framework.Primitive2DType.InputField);
+        bg_t.addChild(ipt_mul_t);
+        ipt_mul_t.width = 300;
+        ipt_mul_t.height = 120;
+        ipt_mul_t.localTranslate.x = 160;
+        ipt_mul_t.localTranslate.y = 40;
+        let ipt_mul = ipt_mul_t.getComponent("inputField") as gd3d.framework.inputField;
+        // ipt_mul.LineType = gd3d.framework.lineType.MultiLine;                                        //设置多行输入
+        ipt_mul.LineType = gd3d.framework.lineType.MultiLine_NewLine;                                   //设置多行输入 ，回车换行
+        ipt_mul.PlaceholderLabel.text = "MultiLine Enter text...";                                      //占位文本设置
+        ipt_mul.text = `多行文本输入框\n<color=#ff00aa>支持</color><color=#00ffaa><i>富文本</i></color>: [happy][cool][like]`;
+        //监听 文本提交回调
+        ipt_mul.onTextSubmit = (t) =>
+        {
+            console.log(`提交文本:${t}`);
+        }
+        gd3d.math.colorSet(ipt_mul.frameImage.color, 0.9, 0.9, 0.9, 1);
+        //lable set font 
+        let ls = ipt_mul_t.getComponentsInChildren("label") as gd3d.framework.label[];
+        ls.forEach((l) => { l.font = _font; });
+        ipt_mul.TextLabel.richText = true;                  //让 textLable 使用富文本
+        ipt_mul.TextLabel.imageTextAtlas = emojiAtlas;      //设置 textLable 富文本中的图片字符
+
+
         //滑动卷轴框
         let scroll_t = new gd3d.framework.transform2D;
-        scroll_t.width = 160;
-        scroll_t.height = 200;
+        scroll_t.width = 200;
+        scroll_t.height = 130;
         bg_t.addChild(scroll_t);
-        scroll_t.localTranslate.x = 160;
+        scroll_t.localTranslate.x = 500;
         scroll_t.localTranslate.y = 30;
         let scroll_ = scroll_t.addComponent("scrollRect") as gd3d.framework.scrollRect;
         let ct = new gd3d.framework.transform2D;
@@ -296,7 +330,7 @@ class test_UI_Component implements IState
         scroll_.horizontal = true;
         scroll_.vertical = true;
 
-        //raw png
+        //卷轴框 raw png
         let raw_t2 = new gd3d.framework.transform2D;
         raw_t2.name = "滑动卷轴框png";
         raw_t2.width = 300;
@@ -305,11 +339,18 @@ class test_UI_Component implements IState
         raw_i2.image = tex_0;
         ct.addChild(raw_t2);
 
-
-
+        //卷轴框 label
+        let s_l_t = gd3d.framework.TransformUtil.Create2DPrimitive(gd3d.framework.Primitive2DType.Label);
+        s_l_t.width = 180;
+        let s_l = s_l_t.getComponent("label") as gd3d.framework.label;
+        s_l.font = _font;
+        s_l.fontsize = 40;
+        s_l.verticalOverflow = true;
+        s_l.verticalType = gd3d.framework.VerticalType.Top;
+        s_l.text = "scrollRect \ntry drag \nto move";
+        ct.addChild(s_l_t);
 
         test_UI_Component.temp = iptFrame_t;
-
 
         //key dwon test
         let inputMgr = this.app.getInputMgr();

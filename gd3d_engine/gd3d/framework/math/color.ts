@@ -1,5 +1,13 @@
 ﻿namespace gd3d.math
 {
+    export function colorSet(out: color, r: number, g: number, b: number, a: number)
+    {
+        out.r = r;
+        out.g = g;
+        out.b = b;
+        out.a = a;
+    }
+
     export function colorSet_White(out: color)
     {
         out.r = 1;
@@ -21,7 +29,7 @@
         out.b = 0.5;
         out.a = 1;
     }
-    
+
     export function colorMultiply(srca: color, srcb: color, out: color)
     {
         out.r = srca.r * srcb.r;
@@ -62,6 +70,31 @@
         // out.r = Math.floor(out.r);
         // out.g = Math.floor(out.g);
         // out.b = Math.floor(out.b);
+    }
+
+    /**
+     * 颜色转成 CSS 格式
+     * @param src 
+     * @param hasAlpha 是否包含Alpha
+     * @returns like #ffffffff
+     */
+    export function colorToCSS(src: color, hasAlpha = true): string
+    {
+        let r = (src.r * 255).toString(16);
+        let g = (src.r * 255).toString(16);
+        let b = (src.r * 255).toString(16);
+        if (r.length == 1) r += "0";
+        if (g.length == 1) g += "0";
+        if (b.length == 1) b += "0";
+        if (hasAlpha)
+        {
+            let a = (src.r * 255).toString(16);
+            if (a.length == 1) a += "0";
+            return `#${r}${g}${b}${a}`;
+        } else
+        {
+            return `#${r}${g}${b}`;
+        }
     }
 
 }
