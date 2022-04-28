@@ -28,6 +28,12 @@ namespace gd3d.framework
         /**字段 用于快速判断实例是否是label */
         readonly isLabel = true;
 
+        /** 当需渲染字符被 加入排列时 的回调*/
+        public onAddRendererText: (x: number, y: number) => void;
+
+        /** 有图片字符需要渲染 */
+        private _hasImageChar: boolean = false;
+
         private _text: string = "";
         /**
          * @public
@@ -536,6 +542,7 @@ namespace gd3d.framework
                 this.initdater(imgCharCount, this.imgDatar);    //字符图 数据容器
             }
             //
+            this._hasImageChar = false;
             rI = 0;
             let textI = 0;
             let imgI = 0;
@@ -591,12 +598,12 @@ namespace gd3d.framework
                     let hasImg = fullText[rI] == "*" && optObj.img;
                     let _I = 0;
                     let datar: number[];
-                    let c = text.charAt(j);
-                    let cinfo: charinfo;
+                    let c: string;
                     if (!hasImg)
                     {
                         _I = textI;
-                        cinfo = _font.cmap[c];
+                        c = text.charAt(j);
+                        let cinfo = _font.cmap[c];
                         if (cinfo == undefined) { continue; }
                         //填充字符数据
                         datar = this.datar;
@@ -634,6 +641,8 @@ namespace gd3d.framework
                         xadd += cinfo.xAddvance * rate;
                     } else
                     {
+                        this._hasImageChar = true;
+                        c = fullText[rI];
                         _I = imgI;
                         datar = this.imgDatar;
                         //填充字符图数据
@@ -711,6 +720,9 @@ namespace gd3d.framework
                     this.min_y = Math.min(_y0, _y1, _y2, _y3, this.min_y);
                     this.max_x = Math.max(_x0, _x1, _x2, _x3, this.max_x);
                     this.max_y = Math.max(_y0, _y1, _y2, _y3, this.max_y);
+
+                    //字符加入渲染队列
+                    if (this.onAddRendererText) this.onAddRendererText(x3, y3);
 
                     //有效渲染字符 索引递增
                     rI++;
@@ -1041,7 +1053,7 @@ namespace gd3d.framework
                     canvas.pushRawData(mat, this.datar);
             }
 
-            if (!this._richText || !this.imgDatar || this.imgDatar.length < 1) return;
+            if (!this._hasImageChar || !this._richText || !this.imgDatar || this.imgDatar.length < 1) return;
             //字符图绘制
             let imgMat = this.imgUIMat;
             if (!imgMat) return;
@@ -1237,13 +1249,16 @@ namespace gd3d.framework
                     if (xmlStr[1] == "/")
                     {
                         let endOpt = optStack[optStack.length - 1];
-                        //选项确认有效
-                        switch (xmlStr)
+                        if (endOpt)
                         {
-                            case "</color>": isValid = endOpt.getType() == RichOptType.Color; break;
-                            case "</i>": isValid = endOpt.getType() == RichOptType.Italic; break;
-                            case "</b>": isValid = endOpt.getType() == RichOptType.Bold; break;
-                            case "</u>": isValid = endOpt.getType() == RichOptType.Underline; break;
+                            //选项确认有效
+                            switch (xmlStr)
+                            {
+                                case "</color>": isValid = endOpt.getType() == RichOptType.Color; break;
+                                case "</i>": isValid = endOpt.getType() == RichOptType.Italic; break;
+                                case "</b>": isValid = endOpt.getType() == RichOptType.Bold; break;
+                                case "</u>": isValid = endOpt.getType() == RichOptType.Underline; break;
+                            }
                         }
                         if (isValid) { optStack.pop(); }//结束标记 弹栈
                     } else
@@ -1264,7 +1279,7 @@ namespace gd3d.framework
                                 let r = Number(`0x${colorVal.substring(0, 2)}`);
                                 let g = Number(`0x${colorVal.substring(2, 4)}`);
                                 let b = Number(`0x${colorVal.substring(4, 6)}`);
-                                let a = vLen == 6 ? 1 : Number(`0x${colorVal.substring(6, 8)}`);
+                                let a = vLen == 6 ? this.color.a * 255 : Number(`0x${colorVal.substring(6, 8)}`);
                                 if (isNaN(r) || isNaN(g) || isNaN(b) || isNaN(a)) continue;
                                 optStack.push(new richOptColor(new gd3d.math.color(r / 255, g / 255, b / 255, a / 255)));
                                 isValid = true;
@@ -1334,6 +1349,7 @@ namespace gd3d.framework
             this._defTextBlocks.length = 0;
             this.transform = null;
             this._cacheMaskV4 = null;
+            this.onAddRendererText = null;
         }
     }
 

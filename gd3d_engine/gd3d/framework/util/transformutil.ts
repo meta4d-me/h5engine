@@ -27,33 +27,41 @@ namespace gd3d.framework
      */
     export enum Primitive2DType
     {
+        /** 原始图片渲染器 */
         RawImage2D,
+        /** 多功能图片渲染器（sprite） */
         Image2D,
+        /** 文本渲染器 */
         Label,
-        Button
+        /** 按钮 */
+        Button,
+        /** 输入框 */
+        InputField
     }
 
     /**
      * 判断 函数对象代码实现内容是否是空的
      * @param fun 
      */
-    export function functionIsEmpty(fun : Function){
-        if(!fun) true; 
-        let funStr = fun.toString().replace(/\s/g,"");
+    export function functionIsEmpty(fun: Function)
+    {
+        if (!fun) true;
+        let funStr = fun.toString().replace(/\s/g, "");
         let idx = funStr.indexOf("{");
         let idx_1 = funStr.indexOf("}");
-        if(idx == -1 || idx_1 == -1) return true;
-        return (idx_1 - idx ) <= 1;
+        if (idx == -1 || idx_1 == -1) return true;
+        return (idx_1 - idx) <= 1;
     }
 
     /**
      * 获取实例对象的类名字符串
      * @param obj 对象实例
      */
-    export function getClassName(obj:Object){
-        if(!obj) return "";
+    export function getClassName(obj: Object)
+    {
+        if (!obj) return "";
         let constructor = Object.getPrototypeOf(obj).constructor;
-        if(!constructor) return "";
+        if (!constructor) return "";
         return constructor.name;
     }
 
@@ -75,8 +83,12 @@ namespace gd3d.framework
          * @param app application的实例
          * @version gd3d 1.0
          */
-        static CreatePrimitive(type: PrimitiveType, app: application): transform
+        static CreatePrimitive(type: PrimitiveType, app: application = null): transform
         {
+            if (!app)
+            {
+                app = sceneMgr.app;
+            }
             let objName = (PrimitiveType[type] as string);
 
             let trans = new transform();
@@ -100,18 +112,18 @@ namespace gd3d.framework
          * @param app application的实例
          * @version gd3d 1.0
          */
-        static Create2DPrimitive(type: Primitive2DType, app: application): transform2D
+        static Create2DPrimitive(type: Primitive2DType, app: application = null): transform2D
         {
+            if (!app)
+            {
+                app = sceneMgr.app;
+            }
             // let enumObj = EnumUtil.getEnumObjByType("gd3d.framework.Primitive2DType");
             let objName = (Primitive2DType[type] as string);
             let componentName = StringUtil.firstCharToLowerCase(objName);
 
-            let t2d = new transform2D();
-            t2d.name = objName;
+            let t2d = this.make2DNode(objName);
             let i2dComp = t2d.addComponent(componentName);
-
-            t2d.pivot.x = 0;
-            t2d.pivot.y = 0;
 
             switch (type)
             {
@@ -127,8 +139,25 @@ namespace gd3d.framework
                 case Primitive2DType.Button:
                     TransformUtil.create2D_button(i2dComp as button, app);
                     break;
+                case Primitive2DType.InputField:
+                    TransformUtil.create2D_InputField(i2dComp as inputField, app);
+                    break;
             }
             return t2d;
+        }
+
+        private static make2DNode(name: string, parent: transform2D = null, lOpt: layoutOption = 0, w: number = 100, h: number = 100, px: number = 0, py: number = 0)
+        {
+            let node: transform2D = new transform2D();
+            node.name = name;
+            node.width = w;
+            node.height = h;
+            node.layoutState = lOpt;
+            node.pivot.x = px;
+            node.pivot.y = py;
+            if (parent) parent.addChild(node);
+
+            return node;
         }
 
         private static create2D_rawImage(img: rawImage2D, app: application)
@@ -150,29 +179,28 @@ namespace gd3d.framework
             label.transform.width = 150;
             label.transform.height = 50;
             label.text = "label";
-            label.fontsize = 25;
+            label.fontsize = 24;
             label.color = new gd3d.math.color(1, 0, 0, 1);
-            let _font = app.getAssetMgr().getAssetByName("STXINGKA.font.json");
-            if (_font == null)
-            {
-                app.getAssetMgr().load("res/STXINGKA.TTF.png", gd3d.framework.AssetTypeEnum.Auto, (s) =>
-                {
-                    if (s.isfinish)
-                    {
-                        app.getAssetMgr().load("res/resources/STXINGKA.font.json", gd3d.framework.AssetTypeEnum.Auto, (s1) =>
-                        {
-                            label.font = app.getAssetMgr().getAssetByName("STXINGKA.font.json") as gd3d.framework.font;
-                            label.transform.markDirty();
-                        });
-                    }
-                });
-            }
-            else
-            {
-                label.font = _font as gd3d.framework.font;;
-                label.transform.markDirty();
-            }
-
+            // let _font = app.getAssetMgr().getAssetByName("STXINGKA.font.json");
+            // if (_font == null)
+            // {
+            //     app.getAssetMgr().load("res/STXINGKA.TTF.png", gd3d.framework.AssetTypeEnum.Auto, (s) =>
+            //     {
+            //         if (s.isfinish)
+            //         {
+            //             app.getAssetMgr().load("res/resources/STXINGKA.font.json", gd3d.framework.AssetTypeEnum.Auto, (s1) =>
+            //             {
+            //                 label.font = app.getAssetMgr().getAssetByName("STXINGKA.font.json") as gd3d.framework.font;
+            //                 label.transform.markDirty();
+            //             });
+            //         }
+            //     });
+            // }
+            // else
+            // {
+            //     label.font = _font as gd3d.framework.font;;
+            //     label.transform.markDirty();
+            // }
         }
 
         private static create2D_button(btn: button, app: application)
@@ -185,40 +213,78 @@ namespace gd3d.framework
             btn.targetImage = img;
             btn.transition = gd3d.framework.TransitionType.ColorTint;//颜色变换
 
-            var lab = new gd3d.framework.transform2D();
-            lab.name = "label";
-            lab.width = 150;
-            lab.height = 50;
-            lab.pivot.x = 0;
-            lab.pivot.y = 0;
+            // var lab = new gd3d.framework.transform2D();
+            var lab = this.make2DNode("label", btn.transform, 0, 150, 50);
             lab.localTranslate.y = -10;
             var label = lab.addComponent("label") as gd3d.framework.label;
             label.text = "button";
             label.fontsize = 25;
             label.color = new gd3d.math.color(1, 0, 0, 1);
-            btn.transform.addChild(lab);
 
 
-            let _font = app.getAssetMgr().getAssetByName("STXINGKA.font.json");
-            if (_font == null)
-            {
-                app.getAssetMgr().load("res/STXINGKA.TTF.png", gd3d.framework.AssetTypeEnum.Auto, (s) =>
-                {
-                    if (s.isfinish)
-                    {
-                        app.getAssetMgr().load("res/resources/STXINGKA.font.json", gd3d.framework.AssetTypeEnum.Auto, (s1) =>
-                        {
-                            label.font = app.getAssetMgr().getAssetByName("STXINGKA.font.json") as gd3d.framework.font;
-                            btn.transform.markDirty();
-                        });
-                    }
-                });
-            }
-            else
-            {
-                label.font = _font as gd3d.framework.font;;
-                btn.transform.markDirty();
-            }
+            // let _font = app.getAssetMgr().getAssetByName("STXINGKA.font.json");
+            // if (_font == null)
+            // {
+            //     app.getAssetMgr().load("res/STXINGKA.TTF.png", gd3d.framework.AssetTypeEnum.Auto, (s) =>
+            //     {
+            //         if (s.isfinish)
+            //         {
+            //             app.getAssetMgr().load("res/resources/STXINGKA.font.json", gd3d.framework.AssetTypeEnum.Auto, (s1) =>
+            //             {
+            //                 label.font = app.getAssetMgr().getAssetByName("STXINGKA.font.json") as gd3d.framework.font;
+            //                 btn.transform.markDirty();
+            //             });
+            //         }
+            //     });
+            // }
+            // else
+            // {
+            //     label.font = _font as gd3d.framework.font;;
+            //     btn.transform.markDirty();
+            // }
         }
+
+        private static create2D_InputField(ipt: inputField, app: application)
+        {
+            let assetMgr = app.getAssetMgr();
+            let opt = layoutOption;
+            let tOpt = opt.TOP | opt.RIGHT | opt.BOTTOM | opt.LEFT;
+            //设置节点
+            let node = ipt.transform;
+            node.width = 160;
+            node.height = 30;
+            node.isMask = true;
+
+            //添加 背景图
+            let bg_t = this.make2DNode("frameImage", node, tOpt);
+            let bg_img = bg_t.addComponent("image2D") as image2D;
+            bg_img.sprite = assetMgr.getDefaultSprite("white_sprite");
+
+            let fSize = 24;
+            //添加 Text lable
+            let text_t = this.make2DNode("Text", node, tOpt);
+            let text_l = text_t.addComponent("label") as label;
+            text_l.verticalType = gd3d.framework.VerticalType.Top;
+            text_l.horizontalType = gd3d.framework.HorizontalType.Left;
+            text_l.fontsize = fSize;
+            math.colorSet(text_l.color, 0, 0, 0, 1);
+            math.colorSet(text_l.color2, 0, 0, 0, 0.5);
+
+            //添加 占位文本 label
+            let placeholder_t = this.make2DNode("Placeholder", node, tOpt);
+            let placeholder_l = placeholder_t.addComponent("label") as label;
+            placeholder_l.verticalType = gd3d.framework.VerticalType.Top;
+            placeholder_l.horizontalType = gd3d.framework.HorizontalType.Left;
+            placeholder_l.fontsize = fSize;
+            math.colorSet(placeholder_l.color, 0.6, 0.6, 0.6, 1);
+            math.colorSet(placeholder_l.color2, 0.6, 0.6, 0.6, 0.5);
+
+            //组合
+            ipt.TextLabel = text_l;
+            ipt.PlaceholderLabel = placeholder_l;
+            ipt.frameImage = bg_img;
+            node.markDirty();
+        }
+
     }
 }
