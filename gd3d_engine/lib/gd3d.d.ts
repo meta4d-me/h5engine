@@ -3041,6 +3041,7 @@ declare namespace gd3d.framework {
         /** 获取富文本选项 对象 */
         private getOptObj;
         private data_begin;
+        private _lastBegin;
         /** 文本顶点数据 */
         private datar;
         /** 字符图 顶点数据 */

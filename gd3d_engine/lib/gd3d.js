@@ -8318,6 +8318,7 @@ var gd3d;
                 this.verticalOverflow = false;
                 this.lastStr = "";
                 this.data_begin = new gd3d.math.vector2(0, 0);
+                this._lastBegin = new gd3d.math.vector2(0, 0);
                 /** 文本顶点数据 */
                 this.datar = [];
                 /** 字符图 顶点数据 */
@@ -8766,8 +8767,10 @@ var gd3d;
                 var textI = 0;
                 var imgI = 0;
                 var lineI = lineEndIndexs.shift();
+                var lineWidth = lineWidths.shift();
                 var forceBreak = false;
-                var lineCount = 1;
+                var toNewLine = true;
+                var lineCount = 0;
                 //填充顶点数据
                 for (var i = 0, len = blocks.length; i < len; i++) {
                     var block = blocks[i];
@@ -8799,24 +8802,29 @@ var gd3d;
                         }
                         if (rI >= lineI) {
                             lineI = lineEndIndexs.shift();
-                            if (lineI == null) {
+                            lineWidth = lineWidths.shift();
+                            if (lineI == null || lineWidth == null) {
                                 forceBreak = true;
                                 break;
                             }
+                            toNewLine = true;
+                        }
+                        if (toNewLine) {
                             //换行了
                             xadd = 0;
                             //水平居中布局
                             if (this.horizontalType == HorizontalType.Center) {
-                                xadd += lineWidths[lineI] / 2;
+                                xadd += lineWidth / 2;
                             }
                             //水平靠右布局
                             else if (this.horizontalType == HorizontalType.Right) {
-                                xadd += lineWidths[lineI];
+                                xadd += lineWidth;
                             }
                             //y 偏移值
                             yadd = yOffset + lineHeight * lineCount;
                             //行数增加
                             lineCount++;
+                            toNewLine = false;
                         }
                         var hasImg = fullText[rI] == "*" && optObj.img;
                         var _I = 0;
@@ -8870,7 +8878,7 @@ var gd3d;
                             var ch = imgSize;
                             var cw = imgSize;
                             var x0 = xadd + imgHalfGap;
-                            var y0 = yadd - imgSize + rBaseLine + imgHalfGap;
+                            var y0 = yadd + imgHalfGap;
                             //uv
                             var urange = sp.urange;
                             var vrange = sp.vrange;
@@ -9258,11 +9266,16 @@ var gd3d;
                 var m = this.transform.getWorldMatrix();
                 var l = -this.transform.pivot.x * this.transform.width;
                 var t = -this.transform.pivot.y * this.transform.height;
-                this.data_begin.x = l * m.rawData[0] + t * m.rawData[2] + m.rawData[4];
-                this.data_begin.y = l * m.rawData[1] + t * m.rawData[3] + m.rawData[5];
-                //只把左上角算出来
-                this.dirtyData = true;
-                this._richDrity = true;
+                var _b = this._lastBegin;
+                var d_b = this.data_begin;
+                d_b.x = l * m.rawData[0] + t * m.rawData[2] + m.rawData[4];
+                d_b.y = l * m.rawData[1] + t * m.rawData[3] + m.rawData[5];
+                //data_begin 有变化需要dirty
+                if (!gd3d.math.vec2Equal(_b, d_b, 0.00001)) {
+                    this.dirtyData = true;
+                    this._richDrity = true;
+                }
+                gd3d.math.vec2Clone(d_b, _b);
             };
             /** 计算drawRect */
             label.prototype.calcDrawRect = function () {
@@ -9441,6 +9454,8 @@ var gd3d;
                 this.transform = null;
                 this._cacheMaskV4 = null;
                 this.onAddRendererText = null;
+                this.data_begin = null;
+                this._lastBegin = null;
             };
             var label_1;
             label.defUIShader = "shader/defuifont";
