@@ -625,7 +625,7 @@ namespace gd3d.framework {
                         var ch = imgSize;
                         var cw = imgSize;
                         var x0 = xadd + imgHalfGap;
-                        var y0 = yadd - imgSize + rBaseLine + imgHalfGap;
+                        var y0 = yadd + imgHalfGap;
 
                         //uv
                         let urange = sp.urange;
