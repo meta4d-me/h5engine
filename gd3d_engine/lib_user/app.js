@@ -4535,7 +4535,7 @@ var HDR_sample = (function () {
         var objCam = new gd3d.framework.transform();
         scene.addChild(objCam);
         var cam = objCam.gameObject.addComponent("camera");
-        cam.near = 0.01;
+        cam.near = 0.1;
         cam.far = 1000;
         objCam.localTranslate = new gd3d.math.vector3(0, 15, -15);
         objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
@@ -4637,17 +4637,17 @@ var HDR_sample = (function () {
                         };
                         [mainLight, secondaryLight, tertiaryLight].map(function (light) {
                             var lightObj = new gd3d.framework.transform();
-                            lightObj.name = "Light";
-                            _this.scene.addChild(lightObj);
+                            lightObj.name = "Light" + light.name;
                             var mlight = lightObj.gameObject.addComponent("light");
                             mlight.type = gd3d.framework.LightTypeEnum.Direction;
-                            gd3d.math.quatFromEulerAngles(light.alpha, light.beta, 0, lightObj.localRotate);
+                            gd3d.math.quatFromEulerAngles(-light.alpha, -light.beta, 0, lightObj.localRotate);
                             mlight.intensity = light.intensity;
                             var rgb = hexToRgb(light.color).map(function (x) { return x / 255; });
                             mlight.color.r = rgb[0];
                             mlight.color.g = rgb[1];
                             mlight.color.b = rgb[2];
                             lightObj.markDirty();
+                            _this.scene.addChild(lightObj);
                         });
                         return [2];
                 }

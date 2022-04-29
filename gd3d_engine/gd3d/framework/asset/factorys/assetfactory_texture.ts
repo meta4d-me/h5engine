@@ -58,7 +58,7 @@ namespace gd3d.framework
             var _textureFormat = render.TextureFormatEnum.RGBA;//这里需要确定格式
             var t2d = new gd3d.render.glTexture2D(assetmgr.webgl, _textureFormat);
             if(_tex){
-                t2d.uploadImage(_tex, false, true, true, true, true, true); // TODO:
+                t2d.uploadImage(_tex, false, true, true, true); // TODO:
                 // t2d.uploadImage(_tex, false, true, true, false);
             }else{
                 console.warn(`_tex load fail !`);

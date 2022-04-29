@@ -5658,6 +5658,7 @@ declare namespace gd3d.framework {
          * @version gd3d 1.0
          */
         set realName(name: string);
+        hexToRgb: (hex: any) => any;
         buffers: bin[];
         load(mgr: assetMgr, ctx: WebGLRenderingContext, folder: string, brdf: texture, env: texture, irrSH: texture, exposure?: any, specFactor?: number, irrFactor?: number, uvChecker?: texture): Promise<transform>;
     }

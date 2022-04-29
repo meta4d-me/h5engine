@@ -68,7 +68,7 @@ class HDR_sample implements IState
         const objCam = new gd3d.framework.transform();
         scene.addChild(objCam);
         const cam = objCam.gameObject.addComponent("camera") as gd3d.framework.camera;
-        cam.near = 0.01;
+        cam.near = 0.1;
         cam.far = 1000;
         // cam.fov = Math.PI * 0.3;
 
@@ -168,17 +168,17 @@ class HDR_sample implements IState
 
             [mainLight, secondaryLight, tertiaryLight].map(light => {
                 const lightObj = new gd3d.framework.transform();
-                lightObj.name = "Light";
-                this.scene.addChild(lightObj);
+                lightObj.name = "Light" + light.name;
                 const mlight = lightObj.gameObject.addComponent("light") as gd3d.framework.light;
                 mlight.type = gd3d.framework.LightTypeEnum.Direction;
-                gd3d.math.quatFromEulerAngles(light.alpha, light.beta, 0, lightObj.localRotate);
+                gd3d.math.quatFromEulerAngles(-light.alpha, -light.beta, 0, lightObj.localRotate);
                 mlight.intensity = light.intensity;
                 const rgb = hexToRgb(light.color).map(x => x / 255);
                 mlight.color.r = rgb[0];
                 mlight.color.g = rgb[1];
                 mlight.color.b = rgb[2];
                 lightObj.markDirty();
+                this.scene.addChild(lightObj);
             });
 
         })();

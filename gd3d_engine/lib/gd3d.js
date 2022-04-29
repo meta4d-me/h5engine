@@ -18405,8 +18405,8 @@ var gd3d;
                 var _textureFormat = gd3d.render.TextureFormatEnum.RGBA; //这里需要确定格式
                 var t2d = new gd3d.render.glTexture2D(assetmgr.webgl, _textureFormat);
                 if (_tex) {
-                    console.log('fuck');
-                    t2d.uploadImage(_tex, false, true, true, true, true, true);
+                    t2d.uploadImage(_tex, false, true, true, true); // TODO:
+                    // t2d.uploadImage(_tex, false, true, true, false);
                 }
                 else {
                     console.warn("_tex load fail !");
@@ -19684,6 +19684,7 @@ var gd3d;
                  * @version gd3d 1.0
                  */
                 this.defaultAsset = false;
+                this.hexToRgb = function (hex) { return hex === null || hex === void 0 ? void 0 : hex.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i, function (m, r, g, b) { return '#' + r + r + g + g + b + b; }).substring(1).match(/.{2}/g).map(function (x) { return parseInt(x, 16); }); };
                 if (!assetName) {
                     assetName = "json_" + this.getGUID();
                 }
@@ -19811,9 +19812,12 @@ var gd3d;
                                 textures = _p.sent();
                                 extrasCfg = (_e = (_d = this.data.extras) === null || _d === void 0 ? void 0 : _d.clayViewerConfig) === null || _e === void 0 ? void 0 : _e.materials;
                                 materials = (_f = this.data.materials) === null || _f === void 0 ? void 0 : _f.map(function (m) {
-                                    var _a, _b;
+                                    var _a, _b, _c, _d, _e, _f, _g;
                                     var mat = new framework.material(m.name);
-                                    var matCfg = extrasCfg === null || extrasCfg === void 0 ? void 0 : extrasCfg.filter(function (e) { return e.name === m.name; });
+                                    var matCfg;
+                                    var cfgs = extrasCfg === null || extrasCfg === void 0 ? void 0 : extrasCfg.filter(function (e) { return e.name === m.name; });
+                                    if (cfgs.length > 0)
+                                        matCfg = cfgs[0];
                                     mat.setShader(mgr.getShader("pbr.shader.json"));
                                     if (brdf) {
                                         mat.setTexture('brdf', brdf);
@@ -19838,15 +19842,20 @@ var gd3d;
                                     }
                                     mat.setFloat("specularIntensity", specFactor);
                                     mat.setFloat("diffuseIntensity", irrFactor);
-                                    debugger;
+                                    mat.setFloatv('CustomBasecolor', new Float32Array((_a = _this.hexToRgb(matCfg === null || matCfg === void 0 ? void 0 : matCfg.color)) !== null && _a !== void 0 ? _a : (_b = m.pbrMetallicRoughness) === null || _b === void 0 ? void 0 : _b.baseColorFactor));
+                                    mat.setFloat('CustomMetallic', (_c = matCfg === null || matCfg === void 0 ? void 0 : matCfg.metalness) !== null && _c !== void 0 ? _c : (_d = m.pbrMetallicRoughness) === null || _d === void 0 ? void 0 : _d.metallicFactor);
+                                    mat.setFloat('CustomRoughness', (_e = matCfg === null || matCfg === void 0 ? void 0 : matCfg.roughness) !== null && _e !== void 0 ? _e : (_f = m.pbrMetallicRoughness) === null || _f === void 0 ? void 0 : _f.roughnessFactor);
+                                    // console.log(matCfg.name);
+                                    // console.table({...m.pbrMetallicRoughness});
+                                    // console.table(matCfg);
                                     // if (matCfg && matCfg.length > 0) {
                                     // mat.setFloatv("uvRepeat", new Float32Array([matCfg[0]?.uvRepeat[0] ?? 1, matCfg[0]?.uvRepeat[1] ?? 1]));
-                                    mat.setFloat("uvRepeat", (_b = (_a = matCfg[0]) === null || _a === void 0 ? void 0 : _a.uvRepeat[0]) !== null && _b !== void 0 ? _b : 1);
+                                    mat.setFloat("uvRepeat", (_g = matCfg === null || matCfg === void 0 ? void 0 : matCfg.uvRepeat[0]) !== null && _g !== void 0 ? _g : 1);
                                     // } else {
                                     // mat.setFloat("uvRepeat", 1);
                                     // }
                                     if (m.pbrMetallicRoughness) {
-                                        var _c = m.pbrMetallicRoughness, baseColorFactor = _c.baseColorFactor, baseColorTexture = _c.baseColorTexture, metallicFactor = _c.metallicFactor, roughnessFactor = _c.roughnessFactor, metallicRoughnessTexture = _c.metallicRoughnessTexture;
+                                        var _h = m.pbrMetallicRoughness, baseColorFactor = _h.baseColorFactor, baseColorTexture = _h.baseColorTexture, metallicFactor = _h.metallicFactor, roughnessFactor = _h.roughnessFactor, metallicRoughnessTexture = _h.metallicRoughnessTexture;
                                         if (baseColorTexture) {
                                             mat.setTexture("uv_Basecolor", uvChecker !== null && uvChecker !== void 0 ? uvChecker : textures[baseColorTexture.index]);
                                         }

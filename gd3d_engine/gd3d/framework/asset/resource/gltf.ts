@@ -125,6 +125,12 @@ namespace gd3d.framework
             this._realName = name;
         }
 
+        hexToRgb = hex =>
+            hex?.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i
+                , (m, r, g, b) => '#' + r + r + g + g + b + b)
+                .substring(1).match(/.{2}/g)
+                .map(x => parseInt(x, 16));
+
         buffers: bin[];
         async load(mgr: assetMgr, ctx: WebGLRenderingContext, folder: string, brdf: texture, env: texture, irrSH: texture, exposure?, specFactor = 1, irrFactor = 1, uvChecker?: texture) {
             const load = ( uri ) => new Promise((res) => {
@@ -141,7 +147,9 @@ namespace gd3d.framework
             const extrasCfg = this.data.extras?.clayViewerConfig?.materials as any[];
             const materials = this.data.materials?.map(m => {
                 const mat = new material(m.name);
-                const matCfg = extrasCfg?.filter(e => e.name === m.name);
+                let matCfg;
+                let cfgs = extrasCfg?.filter(e => e.name === m.name);
+                if (cfgs.length > 0) matCfg = cfgs[0];
                 mat.setShader(mgr.getShader("pbr.shader.json"));
                 if (brdf) {
                     mat.setTexture('brdf', brdf);
@@ -167,10 +175,15 @@ namespace gd3d.framework
                 }
                 mat.setFloat("specularIntensity", specFactor);
                 mat.setFloat("diffuseIntensity", irrFactor);
-                debugger
+                mat.setFloatv('CustomBasecolor', new Float32Array(this.hexToRgb(matCfg?.color) ?? m.pbrMetallicRoughness?.baseColorFactor));
+                mat.setFloat('CustomMetallic', matCfg?.metalness ?? m.pbrMetallicRoughness?.metallicFactor);
+                mat.setFloat('CustomRoughness', matCfg?.roughness ?? m.pbrMetallicRoughness?.roughnessFactor);
+                // console.log(matCfg.name);
+                // console.table({...m.pbrMetallicRoughness});
+                // console.table(matCfg);
                 // if (matCfg && matCfg.length > 0) {
                     // mat.setFloatv("uvRepeat", new Float32Array([matCfg[0]?.uvRepeat[0] ?? 1, matCfg[0]?.uvRepeat[1] ?? 1]));
-                    mat.setFloat("uvRepeat", matCfg[0]?.uvRepeat[0] ?? 1);
+                mat.setFloat("uvRepeat", matCfg?.uvRepeat[0] ?? 1);
                 // } else {
                     // mat.setFloat("uvRepeat", 1);
                 // }
