@@ -18405,7 +18405,8 @@ var gd3d;
                 var _textureFormat = gd3d.render.TextureFormatEnum.RGBA; //这里需要确定格式
                 var t2d = new gd3d.render.glTexture2D(assetmgr.webgl, _textureFormat);
                 if (_tex) {
-                    t2d.uploadImage(_tex, false, true, true, false);
+                    console.log('fuck');
+                    t2d.uploadImage(_tex, false, true, true, true, true, true);
                 }
                 else {
                     console.warn("_tex load fail !");
@@ -19773,46 +19774,56 @@ var gd3d;
                 enumerable: false,
                 configurable: true
             });
-            gltf.prototype.load = function (mgr, ctx, folder, brdf, env, exposure, uvChecker) {
-                var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
+            gltf.prototype.load = function (mgr, ctx, folder, brdf, env, irrSH, exposure, specFactor, irrFactor, uvChecker) {
+                var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
+                if (specFactor === void 0) { specFactor = 1; }
+                if (irrFactor === void 0) { irrFactor = 1; }
                 return __awaiter(this, void 0, void 0, function () {
-                    var load, _l, images, textures, materials, views, accessors, meshes, nodes, defaltScene, scene, parseNode, roots;
+                    var load, _o, images, textures, extrasCfg, materials, views, accessors, meshes, nodes, defaltScene, scene, parseNode, roots;
                     var _this = this;
-                    return __generator(this, function (_m) {
-                        switch (_m.label) {
+                    return __generator(this, function (_p) {
+                        switch (_p.label) {
                             case 0:
                                 load = function (uri) { return new Promise(function (res) {
                                     mgr.load(folder + uri, framework.AssetTypeEnum.Auto, function () {
                                         res(mgr.getAssetByName(uri.split('/').pop()));
                                     });
                                 }); };
-                                _l = this;
+                                _o = this;
                                 return [4 /*yield*/, Promise.all((_a = this.data.buffers) === null || _a === void 0 ? void 0 : _a.map(function (_a) {
                                         var uri = _a.uri;
                                         return load(uri);
                                     }))];
                             case 1:
-                                _l.buffers = _m.sent();
+                                _o.buffers = _p.sent();
                                 return [4 /*yield*/, Promise.all((_b = this.data.images) === null || _b === void 0 ? void 0 : _b.map(function (_a) {
                                         var uri = _a.uri;
                                         return load(uri);
                                     }))];
                             case 2:
-                                images = _m.sent();
+                                images = _p.sent();
                                 return [4 /*yield*/, Promise.all((_c = this.data.textures) === null || _c === void 0 ? void 0 : _c.map(function (_a) {
                                         var sampler = _a.sampler, source = _a.source;
                                         var tex = images[source]; // TODO:
                                         return tex;
                                     }))];
                             case 3:
-                                textures = _m.sent();
-                                materials = (_d = this.data.materials) === null || _d === void 0 ? void 0 : _d.map(function (m) {
+                                textures = _p.sent();
+                                extrasCfg = (_e = (_d = this.data.extras) === null || _d === void 0 ? void 0 : _d.clayViewerConfig) === null || _e === void 0 ? void 0 : _e.materials;
+                                materials = (_f = this.data.materials) === null || _f === void 0 ? void 0 : _f.map(function (m) {
+                                    var _a, _b;
                                     var mat = new framework.material(m.name);
+                                    var matCfg = extrasCfg === null || extrasCfg === void 0 ? void 0 : extrasCfg.filter(function (e) { return e.name === m.name; });
                                     mat.setShader(mgr.getShader("pbr.shader.json"));
                                     if (brdf) {
                                         mat.setTexture('brdf', brdf);
                                     }
-                                    mat.setCubeTexture('u_env', env);
+                                    if (env) {
+                                        mat.setCubeTexture('u_env', env);
+                                    }
+                                    if (irrSH) {
+                                        mat.setCubeTexture('u_diffuse', irrSH);
+                                    }
                                     if (m.normalTexture) {
                                         mat.setTexture("uv_MetallicRoughness", textures[m.normalTexture.index]);
                                     }
@@ -19825,8 +19836,17 @@ var gd3d;
                                     if (exposure != null) {
                                         mat.setFloat("u_Exposure", exposure);
                                     }
+                                    mat.setFloat("specularIntensity", specFactor);
+                                    mat.setFloat("diffuseIntensity", irrFactor);
+                                    debugger;
+                                    // if (matCfg && matCfg.length > 0) {
+                                    // mat.setFloatv("uvRepeat", new Float32Array([matCfg[0]?.uvRepeat[0] ?? 1, matCfg[0]?.uvRepeat[1] ?? 1]));
+                                    mat.setFloat("uvRepeat", (_b = (_a = matCfg[0]) === null || _a === void 0 ? void 0 : _a.uvRepeat[0]) !== null && _b !== void 0 ? _b : 1);
+                                    // } else {
+                                    // mat.setFloat("uvRepeat", 1);
+                                    // }
                                     if (m.pbrMetallicRoughness) {
-                                        var _a = m.pbrMetallicRoughness, baseColorFactor = _a.baseColorFactor, baseColorTexture = _a.baseColorTexture, metallicFactor = _a.metallicFactor, roughnessFactor = _a.roughnessFactor, metallicRoughnessTexture = _a.metallicRoughnessTexture;
+                                        var _c = m.pbrMetallicRoughness, baseColorFactor = _c.baseColorFactor, baseColorTexture = _c.baseColorTexture, metallicFactor = _c.metallicFactor, roughnessFactor = _c.roughnessFactor, metallicRoughnessTexture = _c.metallicRoughnessTexture;
                                         if (baseColorTexture) {
                                             mat.setTexture("uv_Basecolor", uvChecker !== null && uvChecker !== void 0 ? uvChecker : textures[baseColorTexture.index]);
                                         }
@@ -19839,19 +19859,19 @@ var gd3d;
                                     }
                                     return mat;
                                 });
-                                views = (_e = this.data.bufferViews) === null || _e === void 0 ? void 0 : _e.map(function (_a) {
+                                views = (_g = this.data.bufferViews) === null || _g === void 0 ? void 0 : _g.map(function (_a) {
                                     var _b = _a.buffer, buffer = _b === void 0 ? 0 : _b, _c = _a.byteOffset, byteOffset = _c === void 0 ? 0 : _c, _d = _a.byteLength, byteLength = _d === void 0 ? 0 : _d, _e = _a.byteStride, byteStride = _e === void 0 ? 0 : _e;
                                     // return {byteStride ,dv: new DataView(this.buffers[buffer].data, byteOffset, byteLength)};
                                     return { byteOffset: byteOffset, byteLength: byteLength, byteStride: byteStride, rawBuffer: _this.buffers[buffer].data };
                                 });
-                                accessors = (_g = (_f = this.data) === null || _f === void 0 ? void 0 : _f.accessors) === null || _g === void 0 ? void 0 : _g.map(function (acc) {
+                                accessors = (_j = (_h = this.data) === null || _h === void 0 ? void 0 : _h.accessors) === null || _j === void 0 ? void 0 : _j.map(function (acc) {
                                     return __assign(__assign({}, acc), { bufferView: views[acc.bufferView] });
                                 });
-                                meshes = (_h = this.data.meshes) === null || _h === void 0 ? void 0 : _h.map(function (_a) {
+                                meshes = (_k = this.data.meshes) === null || _k === void 0 ? void 0 : _k.map(function (_a) {
                                     var name = _a.name, primitives = _a.primitives;
                                     return primitives.map(function (_a) {
-                                        var _b, _c, _d, _e;
-                                        var _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z;
+                                        var _b, _c, _d, _e, _f;
+                                        var _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1, _2, _3, _4, _5;
                                         var attributes = _a.attributes, indices = _a.indices, material = _a.material;
                                         var mf = new framework.mesh(folder + name);
                                         var mdata = mf.data = new gd3d.render.meshData();
@@ -19865,23 +19885,26 @@ var gd3d;
                                             attr[k] = new Accessor(accessors[attributes[k]], k);
                                         }
                                         var vcount = attr.POSITION.count;
-                                        var bs = +((_g = (_f = attr.POSITION) === null || _f === void 0 ? void 0 : _f.size) !== null && _g !== void 0 ? _g : 0)
-                                            + ((_j = (_h = attr.NORMAL) === null || _h === void 0 ? void 0 : _h.size) !== null && _j !== void 0 ? _j : 0)
+                                        var bs = +((_h = (_g = attr.POSITION) === null || _g === void 0 ? void 0 : _g.size) !== null && _h !== void 0 ? _h : 0)
+                                            + ((_k = (_j = attr.NORMAL) === null || _j === void 0 ? void 0 : _j.size) !== null && _k !== void 0 ? _k : 0)
                                             // + (attr.COLOR?.size ?? 0)
-                                            + (((_k = attr.TANGENT) === null || _k === void 0 ? void 0 : _k.size) ? 3 : 0) // 引擎里的Tangent是vec3，而不是vec4
-                                            + ((_m = (_l = attr.TEXCOORD_0) === null || _l === void 0 ? void 0 : _l.size) !== null && _m !== void 0 ? _m : 0);
+                                            + (((_l = attr.TANGENT) === null || _l === void 0 ? void 0 : _l.size) ? 3 : 0) // 引擎里的Tangent是vec3，而不是vec4
+                                            + ((_o = (_m = attr.TEXCOORD_0) === null || _m === void 0 ? void 0 : _m.size) !== null && _o !== void 0 ? _o : 0)
+                                            + ((_q = (_p = attr.TEXCOORD_1) === null || _p === void 0 ? void 0 : _p.size) !== null && _q !== void 0 ? _q : 0);
                                         var vbo = new Float32Array(vcount * bs);
                                         mf.glMesh = new gd3d.render.glMesh();
                                         var vf;
-                                        if ((_o = attr.POSITION) === null || _o === void 0 ? void 0 : _o.size)
+                                        if ((_r = attr.POSITION) === null || _r === void 0 ? void 0 : _r.size)
                                             vf |= gd3d.render.VertexFormatMask.Position;
-                                        if ((_p = attr.NORMAL) === null || _p === void 0 ? void 0 : _p.size)
+                                        if ((_s = attr.NORMAL) === null || _s === void 0 ? void 0 : _s.size)
                                             vf |= gd3d.render.VertexFormatMask.Normal;
                                         // | gd3d.render.VertexFormatMask.Color
-                                        if ((_q = attr.TANGENT) === null || _q === void 0 ? void 0 : _q.size)
+                                        if ((_t = attr.TANGENT) === null || _t === void 0 ? void 0 : _t.size)
                                             vf |= gd3d.render.VertexFormatMask.Tangent;
-                                        if ((_r = attr.TEXCOORD_0) === null || _r === void 0 ? void 0 : _r.size)
+                                        if ((_u = attr.TEXCOORD_0) === null || _u === void 0 ? void 0 : _u.size)
                                             vf |= gd3d.render.VertexFormatMask.UV0;
+                                        if ((_v = attr.TEXCOORD_1) === null || _v === void 0 ? void 0 : _v.size)
+                                            vf |= gd3d.render.VertexFormatMask.UV1;
                                         // | gd3d.render.VertexFormatMask.BlendIndex4
                                         // | gd3d.render.VertexFormatMask.BlendWeight4;
                                         mf.glMesh.initBuffer(ctx, vf, vcount, gd3d.render.MeshTypeEnum.Dynamic);
@@ -19889,36 +19912,46 @@ var gd3d;
                                         var ebo = eboAcc.data;
                                         mdata.trisindex = Array.from(ebo);
                                         for (var i = 0; i < vcount; i++) {
-                                            var uvFliped = void 0;
-                                            if (((_s = attr.TEXCOORD_0) === null || _s === void 0 ? void 0 : _s.size) != null) {
-                                                uvFliped = __spreadArrays(attr.TEXCOORD_0.data[i]);
-                                                uvFliped[1] = uvFliped[1] * -1 + 1;
-                                                uv1[i] = new ((_b = gd3d.math.vector2).bind.apply(_b, __spreadArrays([void 0], uvFliped)))();
+                                            var uvFliped0 = void 0;
+                                            if (((_w = attr.TEXCOORD_0) === null || _w === void 0 ? void 0 : _w.size) != null) {
+                                                uvFliped0 = __spreadArrays(attr.TEXCOORD_0.data[i]);
+                                                uvFliped0[1] = uvFliped0[1] * -1 + 1;
+                                                uv1[i] = new ((_b = gd3d.math.vector2).bind.apply(_b, __spreadArrays([void 0], uvFliped0)))();
                                             }
-                                            if (((_t = attr.POSITION) === null || _t === void 0 ? void 0 : _t.size) != null)
-                                                vert[i] = new ((_c = gd3d.math.vector3).bind.apply(_c, __spreadArrays([void 0], attr.POSITION.data[i])))();
-                                            if (((_u = attr.NORMAL) === null || _u === void 0 ? void 0 : _u.size) != null)
-                                                normal[i] = new ((_d = gd3d.math.vector3).bind.apply(_d, __spreadArrays([void 0], attr.NORMAL.data[i])))();
-                                            if (((_v = attr.TANGENT) === null || _v === void 0 ? void 0 : _v.size) != null)
-                                                tangent[i] = new ((_e = gd3d.math.vector3).bind.apply(_e, __spreadArrays([void 0], attr.TANGENT.data[i])))();
+                                            var uvFliped1 = void 0;
+                                            if (((_x = attr.TEXCOORD_1) === null || _x === void 0 ? void 0 : _x.size) != null) {
+                                                uvFliped1 = __spreadArrays(attr.TEXCOORD_1.data[i]);
+                                                uvFliped1[1] = uvFliped1[1] * -1 + 1;
+                                                uv1[i] = new ((_c = gd3d.math.vector2).bind.apply(_c, __spreadArrays([void 0], uvFliped1)))();
+                                            }
+                                            if (((_y = attr.POSITION) === null || _y === void 0 ? void 0 : _y.size) != null)
+                                                vert[i] = new ((_d = gd3d.math.vector3).bind.apply(_d, __spreadArrays([void 0], attr.POSITION.data[i])))();
+                                            if (((_z = attr.NORMAL) === null || _z === void 0 ? void 0 : _z.size) != null)
+                                                normal[i] = new ((_e = gd3d.math.vector3).bind.apply(_e, __spreadArrays([void 0], attr.NORMAL.data[i])))();
+                                            if (((_0 = attr.TANGENT) === null || _0 === void 0 ? void 0 : _0.size) != null)
+                                                tangent[i] = new ((_f = gd3d.math.vector3).bind.apply(_f, __spreadArrays([void 0], attr.TANGENT.data[i])))();
                                             var cur = vbo.subarray(i * bs); // offset
                                             var bit = 0;
-                                            if (((_w = attr.POSITION) === null || _w === void 0 ? void 0 : _w.size) != null) {
+                                            if (((_1 = attr.POSITION) === null || _1 === void 0 ? void 0 : _1.size) != null) {
                                                 var position = cur.subarray(bit, bit += 3);
                                                 position.set(attr.POSITION.data[i]);
                                             }
                                             // const color = cur.subarray(3, 7);
-                                            if (((_x = attr.NORMAL) === null || _x === void 0 ? void 0 : _x.size) != null) {
+                                            if (((_2 = attr.NORMAL) === null || _2 === void 0 ? void 0 : _2.size) != null) {
                                                 var n = cur.subarray(bit, bit += 3);
                                                 n.set(attr.NORMAL.data[i]);
                                             }
-                                            if (((_y = attr.TANGENT) === null || _y === void 0 ? void 0 : _y.size) != null) {
+                                            if (((_3 = attr.TANGENT) === null || _3 === void 0 ? void 0 : _3.size) != null) {
                                                 var tan = cur.subarray(bit, bit += 3);
                                                 tan.set(attr.TANGENT.data[i].slice(0, 3));
                                             }
-                                            if (((_z = attr.TEXCOORD_0) === null || _z === void 0 ? void 0 : _z.size) != null) {
+                                            if (((_4 = attr.TEXCOORD_0) === null || _4 === void 0 ? void 0 : _4.size) != null) {
                                                 var uv = cur.subarray(bit, bit += 2);
-                                                uv.set(uvFliped);
+                                                uv.set(uvFliped0);
+                                            }
+                                            if (((_5 = attr.TEXCOORD_1) === null || _5 === void 0 ? void 0 : _5.size) != null) {
+                                                var uv = cur.subarray(bit, bit += 2);
+                                                uv.set(uvFliped1);
                                             }
                                             // const tangent = cur.subarray(7, 9);
                                             // colors[i] = new gd3d.math.vector4();
@@ -19938,7 +19971,7 @@ var gd3d;
                                         return { m: mf, mat: materials[material] };
                                     });
                                 });
-                                nodes = (_j = this.data.nodes) === null || _j === void 0 ? void 0 : _j.map(function (_a) {
+                                nodes = (_l = this.data.nodes) === null || _l === void 0 ? void 0 : _l.map(function (_a) {
                                     var name = _a.name, mesh = _a.mesh, matrix = _a.matrix, rotation = _a.rotation, scale = _a.scale, translation = _a.translation, skin = _a.skin, camera = _a.camera, children = _a.children;
                                     var n = new gd3d.framework.transform();
                                     n.name = name;
@@ -19977,7 +20010,7 @@ var gd3d;
                                     }
                                     return { n: n, children: children };
                                 });
-                                defaltScene = (_k = this.data.scene) !== null && _k !== void 0 ? _k : 0;
+                                defaltScene = (_m = this.data.scene) !== null && _m !== void 0 ? _m : 0;
                                 scene = new gd3d.framework.transform();
                                 parseNode = function (i) {
                                     var _a = nodes[i], n = _a.n, children = _a.children;

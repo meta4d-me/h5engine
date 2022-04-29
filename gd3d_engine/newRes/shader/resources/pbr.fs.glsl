@@ -9,13 +9,25 @@ precision mediump float;
 #define PI          3.141592653589
 #define GAMMA 2.2
 
-uniform vec4 light_1;
-uniform vec4 light_2;
+// uniform vec4 light_1;
+// uniform vec4 light_2;
+
+uniform float diffuseIntensity;
+uniform float specularIntensity;
+uniform float uvRepeat;
+
+uniform lowp float glstate_lightcount;
+// uniform lowp vec4 glstate_vec4_lightposs[8];
+uniform lowp vec4 glstate_vec4_lightdirs[8];
+// uniform lowp float glstate_float_spotangelcoss[8];
+uniform lowp vec4 glstate_vec4_lightcolors[8];
+// uniform lowp float glstate_float_lightrange[8];
+uniform lowp float glstate_float_lightintensity[8];
 
 uniform samplerCube u_env;      // IBL
-uniform sampler2D u_diffuse;  // diffuse
+uniform samplerCube u_diffuse;  // diffuse
 uniform float u_Exposure;
-uniform sampler2D brdf;       // BRDF LUT
+// uniform sampler2D brdf;       // BRDF LUT
 uniform vec4 glstate_eyepos;
 
 // PBR 材质贴图
@@ -135,14 +147,14 @@ st_core init() {
     st_core temp;
 
     // PBR Material
-    temp.diffuse = (sRGBtoLINEAR(texture2D(uv_Basecolor, xlv_TEXCOORD0)) * CustomBasecolor);
+    temp.diffuse = (sRGBtoLINEAR(texture2D(uv_Basecolor, xlv_TEXCOORD0 * uvRepeat)) * CustomBasecolor);
 
-    vec3 rm = texture2D(uv_MetallicRoughness, xlv_TEXCOORD0).rgb;
+    vec3 rm = texture2D(uv_MetallicRoughness, xlv_TEXCOORD0 * uvRepeat).rgb;
     temp.roughness = clamp(rm.g, 0.04, 1.0) * CustomRoughness;
     temp.alphaRoughness = temp.roughness * temp.roughness;
     temp.metallic = clamp(rm.b, 0.0, 1.0) * CustomMetallic;
 
-    // vec4 AO = sRGBtoLINEAR(texture2D(uv_AO, xlv_TEXCOORD0));
+    // vec4 AO = sRGBtoLINEAR(texture2D(uv_AO, xlv_TEXCOORD0 * uvRepeat));
 
     vec3 f0 = vec3(0.04);
     temp.f0 = mix(f0, temp.diffuse.xyz, temp.metallic);
@@ -151,8 +163,8 @@ st_core init() {
     // temp.diffuse/=PI;
 
     temp.V = normalize(glstate_eyepos.xyz - v_pos);
-    // mat3 TBN = cotangent_frame(temp.N, temp.V, xlv_TEXCOORD0);
-    vec3 normalAddation = texture2D(uv_Normal, xlv_TEXCOORD0).rgb * 2. - 1.;
+    // mat3 TBN = cotangent_frame(temp.N, temp.V, xlv_TEXCOORD0 * uvRepeat);
+    vec3 normalAddation = texture2D(uv_Normal, xlv_TEXCOORD0 * uvRepeat).rgb * 2. - 1.;
     temp.N = normalize(TBN * normalAddation);
 
     temp.NoV = clamp(abs(dot(temp.N, temp.V)), 0.001, 1.0);
@@ -189,24 +201,31 @@ void main() {
     vec3 finalColor;
 
     // vec2 envBRDF    = texture2D(brdf, vec2(clamp(c.NoV, 0.0, 0.9999999), clamp(1.0-c.Roughness, 0.0, 0.9999999))).rg;
-
-    finalColor += lightBRDF(light_1.xyz, c) * vec3(0.6, 0.4, 0.6) * 3.0;
-    finalColor += lightBRDF(light_2.xyz - v_pos, c) * vec3(0.6, 0.6, 0.4);
+    int lightCount = int(min(3., glstate_lightcount));
+    if (lightCount > 0) {
+        for (int i = 0; i < 8; i++) {
+            if (i >= lightCount) break;
+            finalColor += lightBRDF(glstate_vec4_lightdirs[i].xyz, c) * glstate_vec4_lightcolors[i].rgb * glstate_float_lightintensity[i];
+        }
+    }
+    // finalColor += lightBRDF(light_1.xyz, c) * vec3(0.6, 0.4, 0.6) * 3.0;
+    // finalColor += lightBRDF(light_2.xyz - v_pos, c) * vec3(0.6, 0.6, 0.4);
     // finalColor += ((1.0 - F) * (1.0 - c.Metallic) * c.Basecolor.rgb + indirectSpecular) * c.AO.rgb; // IBL+PBR
 
     // vec3 brdf = sRGBtoLINEAR(texture2D(brdf, clamp(vec2(c.NoV, 1. - c.roughness), vec2(0), vec2(1)))).rgb;
     vec2 brdf = DFGApprox(c.NoV, c.roughness);
     vec3 IBLColor = decoRGBE(textureCubeLodEXT(u_env, c.R, lod));
     vec3 IBLspecular = 1.0 * IBLColor * (c.f0 * brdf.x + brdf.y);
-    finalColor += IBLspecular;
+    finalColor += IBLspecular * specularIntensity;
+    finalColor += c.diffuse.rgb * decoRGBE(textureCubeLodEXT(u_diffuse, c.R, lod)) * diffuseIntensity;
 
-    // finalColor += sRGBtoLINEAR(texture2D(uv_Emissive, xlv_TEXCOORD0)).rgb;
+    // finalColor += sRGBtoLINEAR(texture2D(uv_Emissive, xlv_TEXCOORD0 * uvRepeat)).rgb;
 
 #ifdef FOG
     finalColor.xyz = mix(glstate_fog_color.rgb, finalColor.rgb, factor);
 #endif
 
-    finalColor *= u_Exposure * texture2D(uv_AO, xlv_TEXCOORD0).r;
+    finalColor *= u_Exposure * texture2D(uv_AO, xlv_TEXCOORD0 * uvRepeat).r;
 
     gl_FragColor = vec4(toneMapACES(finalColor), c.diffuse.a);
 }

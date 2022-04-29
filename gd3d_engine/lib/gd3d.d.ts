@@ -5659,7 +5659,7 @@ declare namespace gd3d.framework {
          */
         set realName(name: string);
         buffers: bin[];
-        load(mgr: assetMgr, ctx: WebGLRenderingContext, folder: string, brdf: texture, env: texture, exposure?: any, uvChecker?: texture): Promise<transform>;
+        load(mgr: assetMgr, ctx: WebGLRenderingContext, folder: string, brdf: texture, env: texture, irrSH: texture, exposure?: any, specFactor?: number, irrFactor?: number, uvChecker?: texture): Promise<transform>;
     }
     class Accessor {
         static types: {

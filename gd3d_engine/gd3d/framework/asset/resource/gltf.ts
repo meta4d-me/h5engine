@@ -126,7 +126,7 @@ namespace gd3d.framework
         }
 
         buffers: bin[];
-        async load(mgr: assetMgr, ctx: WebGLRenderingContext, folder: string, brdf: texture, env: texture, exposure?, uvChecker?: texture) {
+        async load(mgr: assetMgr, ctx: WebGLRenderingContext, folder: string, brdf: texture, env: texture, irrSH: texture, exposure?, specFactor = 1, irrFactor = 1, uvChecker?: texture) {
             const load = ( uri ) => new Promise((res) => {
                 mgr.load(folder + uri, AssetTypeEnum.Auto, () => {
                     res(mgr.getAssetByName(uri.split('/').pop()));
@@ -138,13 +138,20 @@ namespace gd3d.framework
                 const tex = images[source] as texture; // TODO:
                 return tex;
             }));
+            const extrasCfg = this.data.extras?.clayViewerConfig?.materials as any[];
             const materials = this.data.materials?.map(m => {
                 const mat = new material(m.name);
+                const matCfg = extrasCfg?.filter(e => e.name === m.name);
                 mat.setShader(mgr.getShader("pbr.shader.json"));
                 if (brdf) {
                     mat.setTexture('brdf', brdf);
                 }
-                mat.setCubeTexture('u_env', env);
+                if (env) {
+                    mat.setCubeTexture('u_env', env);
+                }
+                if (irrSH) {
+                    mat.setCubeTexture('u_diffuse', irrSH);
+                }
                 if (m.normalTexture) {
                     mat.setTexture("uv_MetallicRoughness", textures[m.normalTexture.index]);
                 }
@@ -158,6 +165,16 @@ namespace gd3d.framework
                 if (exposure != null) {
                     mat.setFloat("u_Exposure", exposure);
                 }
+                mat.setFloat("specularIntensity", specFactor);
+                mat.setFloat("diffuseIntensity", irrFactor);
+                debugger
+                // if (matCfg && matCfg.length > 0) {
+                    // mat.setFloatv("uvRepeat", new Float32Array([matCfg[0]?.uvRepeat[0] ?? 1, matCfg[0]?.uvRepeat[1] ?? 1]));
+                    mat.setFloat("uvRepeat", matCfg[0]?.uvRepeat[0] ?? 1);
+                // } else {
+                    // mat.setFloat("uvRepeat", 1);
+                // }
+
                 if (m.pbrMetallicRoughness) {
                     const { baseColorFactor, baseColorTexture, metallicFactor, roughnessFactor, metallicRoughnessTexture } = m.pbrMetallicRoughness;
                     if (baseColorTexture) {
@@ -204,7 +221,8 @@ namespace gd3d.framework
                         + (attr.NORMAL?.size ?? 0)
                         // + (attr.COLOR?.size ?? 0)
                         + (attr.TANGENT?.size ? 3 : 0) // 引擎里的Tangent是vec3，而不是vec4
-                        + (attr.TEXCOORD_0?.size ?? 0);
+                        + (attr.TEXCOORD_0?.size ?? 0)
+                        + (attr.TEXCOORD_1?.size ?? 0);
                     const vbo = new Float32Array(vcount * bs);
 
                     mf.glMesh = new gd3d.render.glMesh();
@@ -218,6 +236,8 @@ namespace gd3d.framework
                         vf |= gd3d.render.VertexFormatMask.Tangent;
                     if (attr.TEXCOORD_0?.size)
                         vf |= gd3d.render.VertexFormatMask.UV0;
+                    if (attr.TEXCOORD_1?.size)
+                        vf |= gd3d.render.VertexFormatMask.UV1;
                         // | gd3d.render.VertexFormatMask.BlendIndex4
                         // | gd3d.render.VertexFormatMask.BlendWeight4;
                     mf.glMesh.initBuffer(ctx, vf, vcount, gd3d.render.MeshTypeEnum.Dynamic);
@@ -227,11 +247,18 @@ namespace gd3d.framework
                     mdata.trisindex = Array.from(ebo);
 
                     for(let i = 0; i < vcount; i++) {
-                        let uvFliped;
+                        let uvFliped0;
                         if (attr.TEXCOORD_0?.size != null) {
-                            uvFliped = [...attr.TEXCOORD_0.data[i]];
-                            uvFliped[1] = uvFliped[1] * -1 + 1;
-                            uv1[i] = new gd3d.math.vector2(...uvFliped);
+                            uvFliped0 = [...attr.TEXCOORD_0.data[i]];
+                            uvFliped0[1] = uvFliped0[1] * -1 + 1;
+                            uv1[i] = new gd3d.math.vector2(...uvFliped0);
+                        }
+
+                        let uvFliped1;
+                        if (attr.TEXCOORD_1?.size != null) {
+                            uvFliped1 = [...attr.TEXCOORD_1.data[i]];
+                            uvFliped1[1] = uvFliped1[1] * -1 + 1;
+                            uv1[i] = new gd3d.math.vector2(...uvFliped1);
                         }
 
                         if (attr.POSITION?.size != null)
@@ -263,7 +290,12 @@ namespace gd3d.framework
 
                         if (attr.TEXCOORD_0?.size != null) {
                             const uv = cur.subarray(bit, bit += 2);
-                            uv.set(uvFliped);
+                            uv.set(uvFliped0);
+                        }
+
+                        if (attr.TEXCOORD_1?.size != null) {
+                            const uv = cur.subarray(bit, bit += 2);
+                            uv.set(uvFliped1);
                         }
 
                         // const tangent = cur.subarray(7, 9);

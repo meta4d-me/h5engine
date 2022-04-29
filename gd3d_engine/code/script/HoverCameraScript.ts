@@ -112,8 +112,8 @@ namespace gd3d.framework{
             if(!this._mouseDown)    return ;
             let moveX = this.inputMgr.point.x - this._lastMouseX;
             let moveY = this.inputMgr.point.y - this._lastMouseY;
-            if (moveX <= 2 && moveX >= -2) moveX = 0;
-            if (moveY <= 2 && moveY >= -2) moveY = 0;
+            // if (moveX <= 2 && moveX >= -2) moveX = 0;
+            // if (moveY <= 2 && moveY >= -1) moveY = 0;
             if (this.inputMgr.isPressed(0)) {
 
                 this.panAngle += moveX * 0.5;
