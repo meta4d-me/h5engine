@@ -19816,7 +19816,7 @@ var gd3d;
                                     var mat = new framework.material(m.name);
                                     var matCfg;
                                     var cfgs = extrasCfg === null || extrasCfg === void 0 ? void 0 : extrasCfg.filter(function (e) { return e.name === m.name; });
-                                    if (cfgs.length > 0)
+                                    if ((cfgs === null || cfgs === void 0 ? void 0 : cfgs.length) > 0)
                                         matCfg = cfgs[0];
                                     mat.setShader(mgr.getShader("pbr.shader.json"));
                                     if (brdf) {

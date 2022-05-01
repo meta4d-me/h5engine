@@ -149,7 +149,7 @@ namespace gd3d.framework
                 const mat = new material(m.name);
                 let matCfg;
                 let cfgs = extrasCfg?.filter(e => e.name === m.name);
-                if (cfgs.length > 0) matCfg = cfgs[0];
+                if (cfgs?.length > 0) matCfg = cfgs[0];
                 mat.setShader(mgr.getShader("pbr.shader.json"));
                 if (brdf) {
                     mat.setTexture('brdf', brdf);
