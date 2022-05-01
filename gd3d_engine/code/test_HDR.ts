@@ -131,12 +131,12 @@ class HDR_sample implements IState
                 //     scale: 20,
                 //     cb: root => {}
                 // },
-                {
-                    gltfFolder: 'res/pbrRes/model/',
-                    file: 'demo.gltf',
-                    scale: 2,
-                    cb: (root) => root.localTranslate.x += 0,
-                },
+                // {
+                //     gltfFolder: 'res/pbrRes/model/',
+                //     file: 'demo.gltf',
+                //     scale: 2,
+                //     cb: (root) => root.localTranslate.x += 0,
+                // },
                 // {
                 //     gltfFolder: 'res/pbrRes/BoomBoxWithAxes/glTF/',
                 //     file: 'BoomBoxWithAxes.gltf',
