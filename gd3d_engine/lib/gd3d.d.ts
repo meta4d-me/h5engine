@@ -2254,7 +2254,10 @@ declare namespace gd3d.framework {
         private lastParentPivot;
         private lastPivot;
         private refreshLayout;
-        private getLayValue;
+        /** 获取Layout 的坐标系值 */
+        private getLayCoordinateValue;
+        /** 设置Layout 的坐标系值 */
+        private setLayCoordinateValue;
         /**
          * @public
          * @language zh_CN
@@ -2279,6 +2282,11 @@ declare namespace gd3d.framework {
          * @version gd3d 1.0
          */
         clone(): transform2D;
+        /**
+         * 设置 节点的本地位置（会处理layout选项）
+         * @param pos
+         */
+        setLocalPosition(pos: math.vector2): void;
     }
     class t2dInfo {
         pivot: math.vector2;
@@ -2733,6 +2741,7 @@ declare namespace gd3d.framework {
     class inputField implements I2DComponent, I2DPointListener {
         static readonly ClassName: string;
         private static readonly helpV2;
+        private static _isIos;
         /**
          * @public
          * @language zh_CN
@@ -2755,7 +2764,9 @@ declare namespace gd3d.framework {
         private beFocus;
         private inputElement;
         private _text;
-        private static _isIos;
+        private _lastAddRTextFID;
+        /** 用户 按回车键时提交 回调函数 */
+        onTextSubmit: (text: string) => void;
         /** 选择区域的开始位置 */
         get selectionStart(): number;
         /** 选择区域的结束位置 */
@@ -2770,6 +2781,7 @@ declare namespace gd3d.framework {
          * @version gd3d 1.0
          */
         get text(): string;
+        set text(val: string);
         /**
          * 清除输入文本
          */
@@ -2793,7 +2805,7 @@ declare namespace gd3d.framework {
          * @version gd3d 1.0
          */
         get LineType(): lineType;
-        set LineType(lineType: lineType);
+        set LineType(_lineType: lineType);
         private _contentType;
         /**
         * @public
@@ -2802,8 +2814,8 @@ declare namespace gd3d.framework {
         * 文本内容格式
         * @version gd3d 1.0
         */
-        get ContentType(): number;
-        set ContentType(contentType: number);
+        get ContentType(): contentType;
+        set ContentType(contentType: contentType);
         private _textLable;
         /**
          * @public
@@ -2824,22 +2836,18 @@ declare namespace gd3d.framework {
          */
         get PlaceholderLabel(): label;
         set PlaceholderLabel(placeholderLabel: label);
-        private _cursorTrans;
-        /**
-         * 选择 光标 节点对象
-         */
-        get CursorTrans(): transform2D;
-        set CursorTrans(val: transform2D);
-        private _selectionBG;
-        /**
-         * 选择 字符串背景 节点对象
-         */
-        get SelectionBG(): transform2D;
-        set SelectionBG(val: transform2D);
         /**
          * 刷新布局
          */
         private layoutRefresh;
+        /**设置 通用 样式 */
+        private setStyleEle;
+        private createInputEle;
+        private createTextAreaEle;
+        /** 初始化 html 元素 */
+        private initEle;
+        private updateEleStyle;
+        private removeEle;
         /**
          * @private
          */
@@ -2856,17 +2864,6 @@ declare namespace gd3d.framework {
          * 输入文本刷新
          */
         private textRefresh;
-        private filterContentText;
-        private _lastIsCursorMode;
-        private _twinkleTime;
-        private _twinkleTimeCount;
-        private _lastSStart;
-        private _lastSEnd;
-        private _currStartX;
-        private _currEndX;
-        /** 选择状态刷新 */
-        private selectionRefresh;
-        private getInputTextXPos;
         /**
          * @private
          */
@@ -2880,6 +2877,10 @@ declare namespace gd3d.framework {
          */
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
         private setFocus;
+        /** 显示 标签 */
+        private showLable;
+        /** 显示 html组件 */
+        private showEle;
     }
     /**
      * @public
@@ -2889,8 +2890,12 @@ declare namespace gd3d.framework {
      * @version gd3d 1.0
      */
     enum lineType {
+        /** 单行模式 */
         SingleLine = 0,
-        MultiLine = 1
+        /** 多行模式 */
+        MultiLine = 1,
+        /** 多行模式 (输入回车键换行处理)*/
+        MultiLine_NewLine = 2
     }
     /**
      * @language zh_CN
@@ -2900,13 +2905,21 @@ declare namespace gd3d.framework {
      */
     enum contentType {
         None = 0,
+        /** 数字*/
         Number = 1,
+        /** 字母 */
         Word = 2,
+        /** 下划线 */
         Underline = 4,
+        /**中文字符 */
         ChineseCharacter = 8,
+        /**没有中文字符 */
         NoneChineseCharacter = 16,
+        /**邮件 */
         Email = 32,
+        /**密码 */
         PassWord = 64,
+        /** 自定义 */
         Custom = 128
     }
 }
@@ -2930,6 +2943,10 @@ declare namespace gd3d.framework {
         static readonly ClassName: string;
         /**字段 用于快速判断实例是否是label */
         readonly isLabel = true;
+        /** 当需渲染字符被 加入排列时 的回调*/
+        onAddRendererText: (x: number, y: number) => void;
+        /** 有图片字符需要渲染 */
+        private _hasImageChar;
         private _text;
         /**
          * @public
@@ -3024,6 +3041,7 @@ declare namespace gd3d.framework {
         /** 获取富文本选项 对象 */
         private getOptObj;
         private data_begin;
+        private _lastBegin;
         /** 文本顶点数据 */
         private datar;
         /** 字符图 顶点数据 */
@@ -12562,6 +12580,7 @@ declare namespace gd3d.math {
     var defaultRotationOrder: RotationOrder;
 }
 declare namespace gd3d.math {
+    function colorSet(out: color, r: number, g: number, b: number, a: number): void;
     function colorSet_White(out: color): void;
     function colorSet_Black(out: color): void;
     function colorSet_Gray(out: color): void;
@@ -12569,6 +12588,13 @@ declare namespace gd3d.math {
     function scaleToRef(src: color, scale: number, out: color): void;
     function colorClone(src: color, out: color): void;
     function colorLerp(srca: color, srcb: color, t: number, out: color): void;
+    /**
+     * 颜色转成 CSS 格式
+     * @param src
+     * @param hasAlpha 是否包含Alpha
+     * @returns like #ffffffff
+     */
+    function colorToCSS(src: color, hasAlpha?: boolean): string;
 }
 declare namespace gd3d.math {
     function calPlaneLineIntersectPoint(planeVector: vector3, planePoint: vector3, lineVector: vector3, linePoint: vector3, out: vector3): void;
@@ -20228,10 +20254,16 @@ declare namespace gd3d.framework {
      * @version gd3d 1.0
      */
     enum Primitive2DType {
+        /** 原始图片渲染器 */
         RawImage2D = 0,
+        /** 多功能图片渲染器（sprite） */
         Image2D = 1,
+        /** 文本渲染器 */
         Label = 2,
-        Button = 3
+        /** 按钮 */
+        Button = 3,
+        /** 输入框 */
+        InputField = 4
     }
     /**
      * 判断 函数对象代码实现内容是否是空的
@@ -20260,7 +20292,7 @@ declare namespace gd3d.framework {
          * @param app application的实例
          * @version gd3d 1.0
          */
-        static CreatePrimitive(type: PrimitiveType, app: application): transform;
+        static CreatePrimitive(type: PrimitiveType, app?: application): transform;
         /**
          * @public
          * @language zh_CN
@@ -20270,11 +20302,13 @@ declare namespace gd3d.framework {
          * @param app application的实例
          * @version gd3d 1.0
          */
-        static Create2DPrimitive(type: Primitive2DType, app: application): transform2D;
+        static Create2DPrimitive(type: Primitive2DType, app?: application): transform2D;
+        private static make2DNode;
         private static create2D_rawImage;
         private static create2D_image2D;
         private static create2D_label;
         private static create2D_button;
+        private static create2D_InputField;
     }
 }
 declare namespace gd3d.framework {

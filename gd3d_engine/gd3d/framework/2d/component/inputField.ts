@@ -1,6 +1,7 @@
 /// <reference path="../../../io/reflect.ts" />
 
-namespace gd3d.framework {
+namespace gd3d.framework
+{
     /**
      * @public
      * @language zh_CN
@@ -9,9 +10,11 @@ namespace gd3d.framework {
      * @version gd3d 1.0
      */
     @reflect.node2DComponent
-    export class inputField implements I2DComponent, I2DPointListener {
+    export class inputField implements I2DComponent, I2DPointListener
+    {
         static readonly ClassName: string = "inputField";
         private static readonly helpV2: gd3d.math.vector2 = new gd3d.math.vector2();
+        private static _isIos: boolean;
 
         /**
          * @public
@@ -31,33 +34,41 @@ namespace gd3d.framework {
          * @version gd3d 1.0
          */
         @gd3d.reflect.Field("reference", null, "image2D")
-        get frameImage() {
+        get frameImage()
+        {
             return this._frameImage;
         }
-        set frameImage(frameImg: image2D) {
+        set frameImage(frameImg: image2D)
+        {
             this._frameImage = frameImg;
         }
 
         private customRegexStr: string = "";
         private beFocus: boolean = false;
-        private inputElement: HTMLInputElement;
+        private inputElement: HTMLInputElement | HTMLTextAreaElement;
         private _text: string = "";
-        private static _isIos: boolean;
+        private _lastAddRTextFID = 0;
+
+        /** 用户 按回车键时提交 回调函数 */
+        public onTextSubmit: (text: string) => void;
 
         /** 选择区域的开始位置 */
-        get selectionStart() {
+        get selectionStart()
+        {
             if (this.inputElement) return this.inputElement.selectionStart;
             return 0;
         }
 
         /** 选择区域的结束位置 */
-        get selectionEnd() {
+        get selectionEnd()
+        {
             if (this.inputElement) return this.inputElement.selectionEnd;
             return 0;
         }
 
         /** 选择区域的方向 ， forward ：从前往后 backward ：从后往前 */
-        get selectionDirection() {
+        get selectionDirection()
+        {
             if (this.inputElement) return this.inputElement.selectionDirection;
             return "forward";
         }
@@ -69,14 +80,31 @@ namespace gd3d.framework {
          * 文字内容
          * @version gd3d 1.0
          */
-        get text(): string {
+        get text(): string
+        {
             return this._text;
+        }
+        set text(val: string)
+        {
+            if (val == this._text) return;
+            val = val == null ? "" : val;
+            this._text = val;
+            if (this.inputElement) this.inputElement.value = val;
+            if (this._textLable) this._textLable.text = val;
+            if (this.beFocus)
+            {
+                this.showEle();
+            } else
+            {
+                this.showLable();
+            }
         }
 
         /**
          * 清除输入文本
          */
-        public clearText() {
+        public clearText()
+        {
             this._text = "";
             this.inputElement.value = this._text;
             this._textLable.text = this._text;
@@ -92,7 +120,8 @@ namespace gd3d.framework {
          */
         @gd3d.reflect.Field("number")
         get characterLimit() { return this._charlimit; }
-        set characterLimit(charlimit: number) {
+        set characterLimit(charlimit: number)
+        {
             this._charlimit = parseInt(`${charlimit}`);
             this._charlimit = isNaN(this._charlimit) || this._charlimit < 0 ? 0 : this._charlimit;
         }
@@ -107,8 +136,19 @@ namespace gd3d.framework {
          */
         @gd3d.reflect.Field("number")
         get LineType() { return this._lineType; }
-        set LineType(lineType: lineType) {
-            this._lineType = lineType;
+        set LineType(_lineType: lineType)
+        {
+            if (this._lineType == _lineType) return;
+            let newIsSin = _lineType == lineType.SingleLine;
+            let oldIsSin = this._lineType == lineType.SingleLine;
+            this._lineType = _lineType;
+            if (newIsSin != oldIsSin && this.inputElement)
+            {
+                let oldVal = this.inputElement.value;
+                this.removeEle();
+                this.initEle();
+                this.inputElement.value = oldVal;
+            }
         }
 
         private _contentType: number = contentType.None;
@@ -121,7 +161,8 @@ namespace gd3d.framework {
         */
         @gd3d.reflect.Field("number")
         get ContentType() { return this._contentType; }
-        set ContentType(contentType: number) {
+        set ContentType(contentType: contentType)
+        {
             this._contentType = contentType;
         }
 
@@ -134,12 +175,14 @@ namespace gd3d.framework {
          * @version gd3d 1.0
          */
         @gd3d.reflect.Field("reference", null, "label")
-        get TextLabel(): label {
-
+        get TextLabel(): label
+        {
             return this._textLable;
         }
-        set TextLabel(textLabel: label) {
-            textLabel.text = this._text;
+        set TextLabel(textLabel: label)
+        {
+            if (textLabel == this._textLable) return;
+            if (textLabel) { textLabel.text = this._text; }
             this._textLable = textLabel;
         }
 
@@ -152,113 +195,206 @@ namespace gd3d.framework {
          * @version gd3d 1.0
          */
         @gd3d.reflect.Field("reference", null, "label")
-        get PlaceholderLabel(): label {
-
+        get PlaceholderLabel(): label
+        {
             return this._placeholderLabel;
         }
-        set PlaceholderLabel(placeholderLabel: label) {
+        set PlaceholderLabel(placeholderLabel: label)
+        {
+            if (placeholderLabel == this._placeholderLabel) return;
+
             if (placeholderLabel.text == null || placeholderLabel.text == "")
                 placeholderLabel.text = "Enter Text...";
             this._placeholderLabel = placeholderLabel;
         }
 
-        private _cursorTrans: transform2D;
-        /**
-         * 选择 光标 节点对象
-         */
-        @gd3d.reflect.Field("reference", null, "transform2D")
-        get CursorTrans(): transform2D {
-            return this._cursorTrans;
-        }
-        set CursorTrans(val: transform2D) {
-            this._cursorTrans = val;
-            if (val) { val.visible = false; }
-        }
-
-        private _selectionBG: transform2D;
-        /**
-         * 选择 字符串背景 节点对象
-         */
-        @gd3d.reflect.Field("reference", null, "transform2D")
-        get SelectionBG(): transform2D {
-            return this._selectionBG;
-        }
-        set SelectionBG(val: transform2D) {
-            this._selectionBG = val;
-            if (val) { val.visible = false; }
-        }
-
         /**
          * 刷新布局
          */
-        private layoutRefresh() {
+        private layoutRefresh()
+        {
             this.inputElmLayout();
 
-            if (this._placeholderLabel) {
+            if (this._placeholderLabel)
+            {
                 if (this._placeholderLabel.transform.width != this.transform.width)
                     this._placeholderLabel.transform.width = this.transform.width;
                 if (this._placeholderLabel.transform.height != this.transform.height)
                     this._placeholderLabel.transform.height = this.transform.height;
             }
-            if (this._textLable) {
+            if (this._textLable)
+            {
                 if (this._textLable.transform.width != this.transform.width)
                     this._textLable.transform.width = this.transform.width;
                 if (this._textLable.transform.height != this.transform.height)
                     this._textLable.transform.height = this.transform.height;
+
+                // //溢出模式设置
+                // let isSingleLine = this._lineType == lineType.SingleLine;
+                // this._textLable.verticalOverflow = !isSingleLine;
+                // this._textLable.horizontalOverflow = isSingleLine;
+            }
+        }
+
+        /**设置 通用 样式 */
+        private setStyleEle(Ele: HTMLElement)
+        {
+            Ele.style.outline = "medium";
+            Ele.style.background = "transparent";
+            Ele.style.border = "0";
+            Ele.style.padding = "0";
+            Ele.style.display = "none"
+        }
+
+        private createInputEle()
+        {
+            this.inputElement = <HTMLInputElement>document.createElement("Input");
+            let inpEle = this.inputElement;
+            this.setStyleEle(inpEle);
+            inpEle.type = "text";
+            inpEle.style["-moz-appearance"] = 'textfield';
+        }
+
+        private createTextAreaEle()
+        {
+            this.inputElement = <HTMLTextAreaElement>document.createElement("textarea");
+            let inpEle = this.inputElement;
+            this.setStyleEle(inpEle);
+            inpEle.style.resize = "none";
+            inpEle.style.overflowY = 'scroll';   //Y 轴滚动条
+            // inpEle.style.scrollbarGutter = "stable";
+        }
+
+        /** 初始化 html 元素 */
+        private initEle()
+        {
+            //ios fix thing
+            this.ckIsIos();
+
+            //create Ele
+            if (this._lineType == lineType.SingleLine)
+            {
+                this.createInputEle();
+            } else
+            {
+                this.createTextAreaEle();
             }
 
+            let inpEle = this.inputElement;
+            //attchNode
+            inpEle.tabIndex = 0;
+            inpEle.value = this._text;
+            // inpEle.autofocus = true;
+            if (this.transform.canvas.scene)
+            {
+                let htmlCanv = <HTMLCanvasElement>this.transform.canvas.scene.webgl.canvas;
+                if (htmlCanv)
+                    htmlCanv.parentElement.appendChild(inpEle);
+            }
+
+            //reg event
+            inpEle.onblur = (e) =>
+            {
+                this.beFocus = false;
+            }
+
+            inpEle.onfocus = (e) =>
+            {
+                this.beFocus = true;
+            }
+
+            inpEle.onkeydown = (ev: KeyboardEvent) =>
+            {
+                if (ev.code == "Enter")
+                {
+                    let needSubmit = this._lineType != lineType.MultiLine_NewLine;
+                    if (ev.ctrlKey) needSubmit = true; //ctr + Enter = 强制提交
+                    if (needSubmit)
+                    {
+                        inpEle.blur();
+                        if (this.onTextSubmit) this.onTextSubmit(this._text);
+                    }
+                }
+                // console.error(`code:${ev.code}`);
+            }
+
+            // inpEle.addEventListener('compositionstart', () => { console.log("compositionstart") });
+            // inpEle.addEventListener('compositionend', () => { console.log("compositionend") });
+            // inpEle.addEventListener('input', () => { console.log("input") });
+            // inpEle.addEventListener('keydown', () => { console.log("keydown") });
+            // inpEle.addEventListener('touchstart', () => { console.log("touchstart") });
+
+            this.inputElmLayout();
+        }
+
+        private updateEleStyle()
+        {
+            let inpEle = this.inputElement;
+            if (!inpEle) return;
+            //
+            if (this._textLable)
+            {
+                let fontSize = this._textLable.fontsize / window.devicePixelRatio;
+                inpEle.style.fontSize = `${fontSize}px`;
+                let cssColor = math.colorToCSS(this._textLable.color, false);
+                inpEle.style.color = cssColor;
+                // let _font = this._textLable.font;
+                // inpEle.style.fontFamily = 
+                switch (this._textLable.horizontalType)
+                {
+                    case HorizontalType.Left: inpEle.style.textAlign = "left"; break;
+                    case HorizontalType.Center: inpEle.style.textAlign = "center"; break;
+                    case HorizontalType.Right: inpEle.style.textAlign = "right"; break;
+                }
+            }
+
+            let placeholderStr = "Enter Text...";
+            if (this._placeholderLabel) placeholderStr = this._placeholderLabel.text;
+
+            inpEle.placeholder = placeholderStr;
+        }
+
+        private removeEle()
+        {
+            let inpEle = this.inputElement;
+            if (!inpEle) return;
+            inpEle.onfocus = null;
+            inpEle.onclick = null;
+            inpEle.onblur = null;
+            inpEle.disabled = false;
+            inpEle.value = "";
+            inpEle.style.display = "none";
+            if (inpEle.parentElement)
+                inpEle.parentElement.removeChild(inpEle);
+            this.inputElement = null;
         }
 
         /**
          * @private
          */
-        start() {
-            //ios fix thing
-            this.ckIsIos();
-
-            this.inputElement = <HTMLInputElement>document.createElement("Input");
-            this.inputElement.style.opacity = "0";
-            this.inputElement.style.display = "none";
-            this.inputElement.tabIndex = 0;
-            this.inputElement.autofocus = true;
-            if (this.transform.canvas.scene) {
-                let htmlCanv = <HTMLCanvasElement>this.transform.canvas.scene.webgl.canvas;
-                if (htmlCanv)
-                    htmlCanv.parentElement.appendChild(this.inputElement);
-            }
-
-            if (inputField._isIos) {
-                this.inputElement.onclick = () => {
-                    // console.error(`onclick : ${this.transform.insId.getInsID()} , ${this.inputElement.value}`);
-                    this.inputElement.blur();
-                    this.inputElement.focus();
-                }
-            }
-
-            this.inputElement.onblur = (e) => {
-                this.beFocus = false;
-            }
-
-            this.inputElement.onfocus = (e) => {
-                this.beFocus = true;
-            }
-
-            this.inputElmLayout();
+        start()
+        {
+            this.initEle();
         }
 
-        private ckIsIos() {
+        private ckIsIos()
+        {
             //ios 有保护 , focus 必须在 dom 事件帧触发。
-            if (inputField._isIos == null) {
-                if (navigator && navigator.userAgent) {
+            if (inputField._isIos == null)
+            {
+                if (navigator && navigator.userAgent)
+                {
                     let u = navigator.userAgent;
                     inputField._isIos = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
-                } else {
+                } else
+                {
                     inputField._isIos = false;
                 }
             }
         }
 
-        onPlay() {
+        onPlay()
+        {
 
         }
 
@@ -266,7 +402,8 @@ namespace gd3d.framework {
         * @private
         * inputElement 位置、宽高刷新
         */
-        private inputElmLayout() {
+        private inputElmLayout()
+        {
             if (this.inputElement == null) return;
             let pos = this.transform.getWorldTranslate();
             let cssStyle: CSSStyleDeclaration = this.inputElement.style;
@@ -278,7 +415,7 @@ namespace gd3d.framework {
             if (realX + "px" == cssStyle.left && realY + "px" == cssStyle.top && w + "px" == cssStyle.width && h + "px" == cssStyle.height)
                 return;
 
-            let scale = this.transform.canvas.scene.app.canvasClientHeight / this.transform.canvas.pixelHeight;
+            let scale = sceneMgr.app.canvasClientHeight / this.transform.canvas.pixelHeight;
             cssStyle.position = "absolute";
             cssStyle.left = realX * scale + "px";
             cssStyle.top = realY * scale + "px";
@@ -291,275 +428,158 @@ namespace gd3d.framework {
          * @private
          * 输入文本刷新
          */
-        private textRefresh() {
+        private textRefresh()
+        {
             if (!this.beFocus || !this._textLable || !this._placeholderLabel || !this.inputElement || this._text == this.inputElement.value) return;
 
-            if (this._charlimit > 0 && this.inputElement.value.length >= this._charlimit) {
+            if (this._charlimit > 0 && this.inputElement.value.length >= this._charlimit)
+            {
                 if (this.inputElement.value != this._text)
-                    if (this.inputElement.value.length > this._text.length) {
+                    if (this.inputElement.value.length > this._text.length)
+                    {
                         this.inputElement.value = this._text;
-                    } else {
+                    } else
+                    {
                         this._text = this.inputElement.value;
                     }
                 return;
             }
 
             this._text = this.inputElement.value;
-            if (this._contentType == contentType.Custom) {
+            if (this._contentType == contentType.Custom)
+            {
                 if (this.customRegexStr != null && this.customRegexStr != "")
                     this._text = this._text.replace(this.customRegexStr, '');
-            } else {
-                if (this._contentType == contentType.None) {
+            } else
+            {
+                if (this._contentType == contentType.None)
+                {
 
                 }
                 //英文字母，数字，汉字，下划线
-                else if ((this._contentType & contentType.Number) && (this._contentType & contentType.Word) && (this._contentType & contentType.ChineseCharacter) && (this._contentType & contentType.Underline)) {
+                else if ((this._contentType & contentType.Number) && (this._contentType & contentType.Word) && (this._contentType & contentType.ChineseCharacter) && (this._contentType & contentType.Underline))
+                {
                     this._text = this._text.replace(/^[\u4E00-\u9FA5a-zA-Z0-9_]{3,20}$/ig, '');
                 }
                 //英文字母，数字，下划线
-                else if ((this._contentType & contentType.Number) && (this._contentType & contentType.Word) && (this._contentType & contentType.Underline)) {
+                else if ((this._contentType & contentType.Number) && (this._contentType & contentType.Word) && (this._contentType & contentType.Underline))
+                {
                     this._text = this._text.replace(/[^\w\.\/]/ig, '');
                 }
                 //数字，字符
-                else if ((this._contentType & contentType.Number) && (this._contentType & contentType.Word)) {
+                else if ((this._contentType & contentType.Number) && (this._contentType & contentType.Word))
+                {
                     this._text = this._text.replace(/[^(A-Za-z0-9)]/ig, '');
                 }
                 //汉字，字符
-                else if ((this._contentType & contentType.ChineseCharacter) && (this._contentType & contentType.Word)) {
+                else if ((this._contentType & contentType.ChineseCharacter) && (this._contentType & contentType.Word))
+                {
                     this._text = this._text.replace(/[^(A-Za-z\u4E00-\u9FA5)]/ig, '');
                 }
                 //数字
-                else if (this._contentType == contentType.Number) {
+                else if (this._contentType == contentType.Number)
+                {
                     this._text = this._text.replace(/\D+/g, '');
                 }
                 //汉字
-                else if (this._contentType == contentType.ChineseCharacter) {
+                else if (this._contentType == contentType.ChineseCharacter)
+                {
                     this._text = this._text.replace(/[^\u4E00-\u9FA5]/g, '');
                 }
 
             }
+
+            //记录过滤 后的text
             this.inputElement.value = this._text;
-            if (this._textLable) {
+            if (this._textLable)
+            {
                 this._textLable.text = this._text;
-                this.filterContentText();
             }
-
-            if (this._text == "") {
-                this._placeholderLabel.transform.visible = true;
-                this._textLable.transform.visible = false;
-            } else {
-                this._placeholderLabel.transform.visible = false;
-                this._textLable.transform.visible = true;
-            }
-        }
-
-        private filterContentText() {
-            if (!this._textLable || this._text == null) return;
-            let lab = this._textLable;
-            let rate = lab.fontsize / lab.font.pointSize;
-            let font = lab.font;
-            let addw = 0;
-            let addh = 0;
-            let str = "";
-            switch (this._lineType) {
-                case lineType.SingleLine:
-                    for (var i = lab.text.length - 1; i >= 0; i--) {
-                        let c = lab.text.charAt(i);
-                        let cinfo = font.cmap[c];
-                        if (!cinfo) {
-                            console.warn(`can't find character "${c}" in ${font.getName()} Font`);
-                            continue;
-                        }
-                        addw += cinfo.xAddvance * rate;
-
-                        if (addw > lab.transform.width) {
-                            lab.text = str;
-                            break;
-                        }
-                        str = lab.text[i] + str;
-                    }
-
-                    break;
-                case lineType.MultiLine:
-                    let fristline = true;
-                    addh += lab.fontsize * lab.linespace;
-                    for (var i = lab.text.length - 1; i >= 0; i--) {
-                        let c = lab.text.charAt(i);
-                        let cinfo = font.cmap[c];
-                        if (!cinfo) {
-                            console.warn(`can't find character "${c}" in ${font.getName()} Font`);
-                            continue;
-                        }
-                        addw += cinfo.xAddvance * rate;
-
-                        if (addw > lab.transform.width) {
-                            addw = 0;
-                            fristline = false;
-                            addh += lab.fontsize * lab.linespace;
-                        }
-                        if (!fristline && addh > lab.transform.height) {
-                            lab.text = str;
-                            break;
-                        }
-                        str = lab.text[i] + str;
-                    }
-                    break;
-            }
-
-        }
-
-        private _lastIsCursorMode: boolean = false;
-        private _twinkleTime: number = 0.6;
-        private _twinkleTimeCount: number = 0;
-        private _lastSStart: number = -1;
-        private _lastSEnd: number = -1;
-        private _currStartX: number = 0;
-        private _currEndX: number = 0;
-        /** 选择状态刷新 */
-        private selectionRefresh(dt: number) {
-            let _cNode = this._cursorTrans;
-            let _sbgNode = this._selectionBG;
-            if (!_cNode && !_sbgNode) return;
-
-            if (!this.beFocus) {
-                if (this._selectionBG) this._selectionBG.visible = false;
-                if (this._cursorTrans) this._cursorTrans.visible = false;
-                this._lastSStart = -1;
-                this._lastSEnd = -1;
-                this._lastIsCursorMode = false;
-                return;
-            }
-            if (!this.inputElement || !this._textLable || !this._textLable.font) return;
-            let sIdx = this.selectionStart;
-            let eInx = this.selectionEnd;
-            let difLen = sIdx - eInx;
-            let isCursorMode = difLen == 0;
-            let needSwitch = this._lastIsCursorMode != isCursorMode;
-            let selectionDirty = sIdx != this._lastSStart || eInx != this._lastSEnd || needSwitch; //光标有变化
-            this._lastIsCursorMode = isCursorMode;
-            let lpt = gd3d.framework.layoutOption;
-            //switch mode
-            if (needSwitch) {
-                //hide all 
-                if (_sbgNode) _sbgNode.visible = false;
-                if (_cNode) _cNode.visible = false;
-                //visible
-                if (isCursorMode) {
-                    if (_cNode) _cNode.visible = true;
-                } else {
-                    if (_sbgNode) _sbgNode.visible = true;
-                }
-            }
-
-            //
-            this._lastSStart = sIdx;
-            this._lastSEnd = eInx;
-
-            //update
-            if (isCursorMode) {
-                //光标
-                if (!_cNode) return;
-                if (selectionDirty) {
-                    this._twinkleTimeCount = 0;
-                    this._currStartX = this.getInputTextXPos(sIdx);
-                    if (_cNode) _cNode.visible = true;
-                }
-
-                //光标定时闪烁
-                this._twinkleTimeCount += dt;
-                if (this._twinkleTimeCount >= this._twinkleTime) {
-                    _cNode.visible = !_cNode.visible;
-                    this._twinkleTimeCount = 0;
-                }
-                //位置刷新
-                _cNode.setLayoutValue(lpt.LEFT, this._currStartX);
-                _cNode.markDirty();
-            } else {
-                if (!_sbgNode) return;
-                if (selectionDirty) {
-                    this._twinkleTimeCount = 0;
-                    this._currStartX = this.getInputTextXPos(sIdx);
-                    this._currEndX = this.getInputTextXPos(eInx);
-                }
-                let bgW = Math.abs(this._currEndX - this._currStartX);
-
-                //位置、宽高 刷新
-                _sbgNode.setLayoutValue(lpt.LEFT, this._currStartX);
-                _sbgNode.width = bgW;
-                _sbgNode.markDirty();
-            }
-        }
-
-        //获取 输入文本 的坐标的X值
-        private getInputTextXPos(strIndex: number): number {
-            let result = 0;
-            let text = this._textLable.text;
-            let f = this._textLable.font;
-            var rate = this._textLable.fontsize / f.pointSize;
-            //计算字符偏移
-            for (let i = 0, len = strIndex; i < len; i++) {
-                let c = text[i];
-                let cInfo = f.cmap[c];
-                if (!cInfo) continue;
-                result += cInfo.xAddvance * rate;
-            }
-
-            return result;
         }
 
         /**
          * @private
          */
-        update(delta: number) {
+        update(delta: number)
+        {
             this.layoutRefresh();
             this.textRefresh();
-            this.selectionRefresh(delta);
         }
 
         /**
          * @private
          */
-        remove() {
+        remove()
+        {
+            if (this._textLable) this._textLable.onAddRendererText = null;
             this._placeholderLabel = null;
             this._textLable = null;
             this.transform = null;
             this._frameImage = null;
-            if (this.inputElement) {
-                this.inputElement.onfocus = null;
-                this.inputElement.onclick = null;
-                this.inputElement.onblur = null;
-                this.inputElement.disabled = false;
-                this.inputElement.value = "";
-                this.inputElement.style.display = "none";
-                if (this.inputElement.parentElement)
-                    this.inputElement.parentElement.removeChild(this.inputElement);
-                this.inputElement = null;
-            }
+            this.removeEle();
         }
 
         /**
          * @private
          */
-        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean) {
+        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean)
+        {
             // if(this._isIos) return;
-            if (oncap == false) {
+            if (oncap == false)
+            {
                 if (ev.type != event.PointEventEnum.PointDown) return;
                 var b = this.transform.ContainsCanvasPoint(new math.vector2(ev.x, ev.y));
                 this.setFocus(b);
             }
         }
 
-        private setFocus(isFocus: boolean) {
-            if (isFocus) {
-                this.inputElement.style.display = "";
-                if (!this.beFocus) {
+        private setFocus(isFocus: boolean)
+        {
+            if (isFocus)
+            {
+                this.showEle();
+                if (!this.beFocus)
+                {
                     this.inputElement.focus();
                 }
             }
-            else {
+            else
+            {
                 if (this.beFocus) this.inputElement.blur();
-                this.inputElement.style.display = "none";
+                this.showLable();
             }
+        }
+
+        /** 显示 标签 */
+        private showLable()
+        {
+            if (this.inputElement) this.inputElement.style.display = "none";
+
+            if (this._textLable)
+            {
+                this._textLable.transform.visible = false;
+                if (this._placeholderLabel) this._placeholderLabel.transform.visible = false;
+
+                if (this._textLable.text != "")
+                {
+                    this._textLable.transform.visible = true;
+                } else
+                {
+                    if (this._placeholderLabel) this._placeholderLabel.transform.visible = true;
+                }
+            }
+        }
+
+        /** 显示 html组件 */
+        private showEle()
+        {
+            //更新
+            this.updateEleStyle();
+
+            if (this.inputElement) this.inputElement.style.display = "";   //显示html元素对象
+
+            if (this._textLable) this._textLable.transform.visible = false;
+            if (this._placeholderLabel) this._placeholderLabel.transform.visible = false;
         }
     }
 
@@ -570,9 +590,14 @@ namespace gd3d.framework {
      * 文本行显示方式
      * @version gd3d 1.0
      */
-    export enum lineType {
+    export enum lineType
+    {
+        /** 单行模式 */
         SingleLine,
+        /** 多行模式 */
         MultiLine,
+        /** 多行模式 (输入回车键换行处理)*/
+        MultiLine_NewLine,
     }
 
     /**
@@ -581,15 +606,24 @@ namespace gd3d.framework {
      * 文本内容类型
      * @version gd3d 1.0
      */
-    export enum contentType {
+    export enum contentType
+    {
         None = 0,
-        Number = 1,//数字
-        Word = 2,//字母
-        Underline = 4,//下划线
-        ChineseCharacter = 8,//中文字符
-        NoneChineseCharacter = 16,//没有中文字符
-        Email = 32,//邮件
-        PassWord = 64,//密码
-        Custom = 128,//自定义
+        /** 数字*/
+        Number = 1,
+        /** 字母 */
+        Word = 2,
+        /** 下划线 */
+        Underline = 4,
+        /**中文字符 */
+        ChineseCharacter = 8,
+        /**没有中文字符 */
+        NoneChineseCharacter = 16,
+        /**邮件 */
+        Email = 32,
+        /**密码 */
+        PassWord = 64,
+        /** 自定义 */
+        Custom = 128,
     }
 }

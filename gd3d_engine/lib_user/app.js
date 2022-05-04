@@ -5180,6 +5180,7 @@ var test_UI_Component = (function () {
     test_UI_Component.prototype.createUI = function (astState, state) {
         var atlasComp = this.assetMgr.getAssetByName("comp.atlas.json");
         var tex_0 = this.assetMgr.getAssetByName("zg03_256.png");
+        var emojiAtlas = gd3d.framework.sceneMgr.app.getAssetMgr().getAssetByName("emoji.atlas.json", "emoji.assetbundle.json");
         var bg_t = new gd3d.framework.transform2D;
         bg_t.name = "框底图";
         bg_t.width = 800;
@@ -5200,6 +5201,7 @@ var test_UI_Component = (function () {
         bg_t.setLayoutValue(gd3d.framework.layoutOption.TOP, 60);
         bg_t.setLayoutValue(gd3d.framework.layoutOption.RIGHT, 60);
         bg_t.setLayoutValue(gd3d.framework.layoutOption.BOTTOM, 60);
+        var _font = this.assetMgr.getAssetByName(fontjson);
         var lableW = 500;
         var lableH = 40;
         var lableStartX = 80;
@@ -5213,7 +5215,7 @@ var test_UI_Component = (function () {
         this.rooto2d.addChild(lab_t0);
         var lab_l0 = lab_t0.addComponent("label");
         test_UI_Component["lab"] = lab_l0;
-        lab_l0.font = this.assetMgr.getAssetByName(fontjson);
+        lab_l0.font = _font;
         lab_l0.fontsize = 12;
         lab_l0.text = lab_l0.fontsize + "\u53F7\u5B57\u4F53 Innovation in China \u4E2D\u56FD\u5236\u9020\uFF0C\u6167\u53CA\u5168\u7403 0123456789";
         lab_l0.color = new gd3d.math.color(0.0, 0.0, 0.0, 1);
@@ -5228,7 +5230,7 @@ var test_UI_Component = (function () {
         this.rooto2d.addChild(lab_t);
         var lab_l = lab_t.addComponent("label");
         test_UI_Component["lab"] = lab_l;
-        lab_l.font = this.assetMgr.getAssetByName(fontjson);
+        lab_l.font = _font;
         lab_l.fontsize = 20;
         lab_l.text = lab_l.fontsize + "\u53F7\u5B57\u4F53 Innovation in China \u4E2D\u56FD\u5236\u9020\uFF0C\u6167\u53CA\u5168\u7403 0123456789";
         lab_l.color = new gd3d.math.color(0.0, 0.0, 0.0, 1);
@@ -5243,7 +5245,7 @@ var test_UI_Component = (function () {
         this.rooto2d.addChild(lab_t1);
         var lab_l1 = lab_t1.addComponent("label");
         test_UI_Component["lab"] = lab_l1;
-        lab_l1.font = this.assetMgr.getAssetByName(fontjson);
+        lab_l1.font = _font;
         lab_l1.fontsize = 30;
         lab_l1.text = lab_l1.fontsize + "\u53F7\u5B57\u4F53 Innovation in China \u4E2D\u56FD\u5236\u9020\uFF0C\u6167\u53CA\u5168\u7403 0123456789";
         lab_l1.color = new gd3d.math.color(0.0, 0.0, 0.0, 1);
@@ -5258,7 +5260,7 @@ var test_UI_Component = (function () {
         this.rooto2d.addChild(lab_t2);
         var lab_l2 = lab_t2.addComponent("label");
         test_UI_Component["lab"] = lab_l2;
-        lab_l2.font = this.assetMgr.getAssetByName(fontjson);
+        lab_l2.font = _font;
         lab_l2.fontsize = 40;
         lab_l2.text = lab_l2.fontsize + "\u53F7\u5B57\u4F53 Innovation in China \u4E2D\u56FD\u5236\u9020\uFF0C\u6167\u53CA\u5168\u7403 0123456789";
         lab_l2.color = new gd3d.math.color(0.0, 0.0, 0.0, 1);
@@ -5272,11 +5274,10 @@ var test_UI_Component = (function () {
         lab_t3.localTranslate.y = lableStartY + lableH * 4;
         this.rooto2d.addChild(lab_t3);
         var lab_l3 = lab_t3.addComponent("label");
-        lab_l3.font = this.assetMgr.getAssetByName(fontjson);
+        lab_l3.font = _font;
         lab_l3.fontsize = 30;
         lab_l3.richText = true;
-        var atlas = gd3d.framework.sceneMgr.app.getAssetMgr().getAssetByName("emoji.atlas.json", "emoji.assetbundle.json");
-        lab_l3.imageTextAtlas = atlas;
+        lab_l3.imageTextAtlas = emojiAtlas;
         lab_l3.text = "富文本:<color=#00ff00ff>红色</color> <color=#ff0000ff>绿色</color> \n<i>斜体文本</i> \n图片字符[happy][happy][like][cool][happy]";
         lab_l3.color = new gd3d.math.color(0.0, 0.0, 0.0, 1);
         lab_l3.color2 = new gd3d.math.color(0, 0.0, 0.0, 0.5);
@@ -5346,10 +5347,13 @@ var test_UI_Component = (function () {
         iptFrame_t.pivot.x = 0;
         iptFrame_t.pivot.y = 0;
         iptFrame_t.localTranslate.x = 10;
-        iptFrame_t.localTranslate.y = 160;
+        iptFrame_t.localTranslate.y = 180;
         bg_t.addChild(iptFrame_t);
         var ipt = iptFrame_t.addComponent("inputField");
-        ipt.LineType = gd3d.framework.lineType.MultiLine;
+        ipt.LineType = gd3d.framework.lineType.SingleLine;
+        ipt.onTextSubmit = function (t) {
+            console.log("\u63D0\u4EA4\u6587\u672C:" + t);
+        };
         var img_t = new gd3d.framework.transform2D;
         img_t.width = iptFrame_t.width;
         img_t.height = iptFrame_t.height;
@@ -5366,7 +5370,7 @@ var test_UI_Component = (function () {
         text_t.height = iptFrame_t.height;
         iptFrame_t.addChild(text_t);
         ipt.TextLabel = text_t.addComponent("label");
-        ipt.TextLabel.font = this.assetMgr.getAssetByName(fontjson);
+        ipt.TextLabel.font = _font;
         ipt.TextLabel.fontsize = 24;
         ipt.TextLabel.color = new gd3d.math.color(1, 1, 1, 1);
         text_t.layoutState = 0 | gd3d.framework.layoutOption.H_CENTER | gd3d.framework.layoutOption.V_CENTER;
@@ -5377,14 +5381,34 @@ var test_UI_Component = (function () {
         p_t.height = iptFrame_t.height;
         iptFrame_t.addChild(p_t);
         ipt.PlaceholderLabel = p_t.addComponent("label");
-        ipt.PlaceholderLabel.font = this.assetMgr.getAssetByName(fontjson);
+        ipt.PlaceholderLabel.text = "SingleLine Enter text...";
+        ipt.PlaceholderLabel.font = _font;
         ipt.PlaceholderLabel.fontsize = 24;
         ipt.PlaceholderLabel.color = new gd3d.math.color(0.6, 0.6, 0.6, 1);
+        gd3d["he"] = ipt;
+        var ipt_mul_t = gd3d.framework.TransformUtil.Create2DPrimitive(gd3d.framework.Primitive2DType.InputField);
+        bg_t.addChild(ipt_mul_t);
+        ipt_mul_t.width = 300;
+        ipt_mul_t.height = 120;
+        ipt_mul_t.localTranslate.x = 160;
+        ipt_mul_t.localTranslate.y = 40;
+        var ipt_mul = ipt_mul_t.getComponent("inputField");
+        ipt_mul.LineType = gd3d.framework.lineType.MultiLine_NewLine;
+        ipt_mul.PlaceholderLabel.text = "MultiLine Enter text...";
+        ipt_mul.text = "\u591A\u884C\u6587\u672C\u8F93\u5165\u6846\n<color=#ff00aa>\u652F\u6301</color><color=#00ffaa><i>\u5BCC\u6587\u672C</i></color>: [happy][cool][like]";
+        ipt_mul.onTextSubmit = function (t) {
+            console.log("\u63D0\u4EA4\u6587\u672C:" + t);
+        };
+        gd3d.math.colorSet(ipt_mul.frameImage.color, 0.9, 0.9, 0.9, 1);
+        var ls = ipt_mul_t.getComponentsInChildren("label");
+        ls.forEach(function (l) { l.font = _font; });
+        ipt_mul.TextLabel.richText = true;
+        ipt_mul.TextLabel.imageTextAtlas = emojiAtlas;
         var scroll_t = new gd3d.framework.transform2D;
-        scroll_t.width = 160;
-        scroll_t.height = 200;
+        scroll_t.width = 200;
+        scroll_t.height = 130;
         bg_t.addChild(scroll_t);
-        scroll_t.localTranslate.x = 160;
+        scroll_t.localTranslate.x = 500;
         scroll_t.localTranslate.y = 30;
         var scroll_ = scroll_t.addComponent("scrollRect");
         var ct = new gd3d.framework.transform2D;
@@ -5404,6 +5428,15 @@ var test_UI_Component = (function () {
         var raw_i2 = raw_t2.addComponent("rawImage2D");
         raw_i2.image = tex_0;
         ct.addChild(raw_t2);
+        var s_l_t = gd3d.framework.TransformUtil.Create2DPrimitive(gd3d.framework.Primitive2DType.Label);
+        s_l_t.width = 180;
+        var s_l = s_l_t.getComponent("label");
+        s_l.font = _font;
+        s_l.fontsize = 40;
+        s_l.verticalOverflow = true;
+        s_l.verticalType = gd3d.framework.VerticalType.Top;
+        s_l.text = "scrollRect \ntry drag \nto move";
+        ct.addChild(s_l_t);
         test_UI_Component.temp = iptFrame_t;
         var inputMgr = this.app.getInputMgr();
         this.app.webgl.canvas.addEventListener("keydown", function (ev) {

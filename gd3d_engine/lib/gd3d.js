@@ -5534,27 +5534,27 @@ var gd3d;
                 if (state != 0) {
                     if (state & layoutOption.LEFT) {
                         if (state & layoutOption.RIGHT) {
-                            this.width = parent.width - this.getLayValue(layoutOption.LEFT) - this.getLayValue(layoutOption.RIGHT);
+                            this.width = parent.width - this.getLayCoordinateValue(layoutOption.LEFT) - this.getLayCoordinateValue(layoutOption.RIGHT);
                         }
-                        this.localTranslate.x = this.getLayValue(layoutOption.LEFT) - parent.pivot.x * parent.width + this.pivot.x * this.width;
+                        this.localTranslate.x = this.getLayCoordinateValue(layoutOption.LEFT) - parent.pivot.x * parent.width + this.pivot.x * this.width;
                     }
                     else if (state & layoutOption.RIGHT) {
-                        this.localTranslate.x = parent.width - this.width - this.getLayValue(layoutOption.RIGHT) - parent.pivot.x * parent.width + this.pivot.x * this.width;
+                        this.localTranslate.x = parent.width - this.width - this.getLayCoordinateValue(layoutOption.RIGHT) - parent.pivot.x * parent.width + this.pivot.x * this.width;
                     }
                     if (state & layoutOption.H_CENTER) {
-                        this.localTranslate.x = (parent.width - this.width) / 2 + this.getLayValue(layoutOption.H_CENTER) - parent.pivot.x * parent.width + this.pivot.x * this.width;
+                        this.localTranslate.x = (parent.width - this.width) / 2 + this.getLayCoordinateValue(layoutOption.H_CENTER) - parent.pivot.x * parent.width + this.pivot.x * this.width;
                     }
                     if (state & layoutOption.TOP) {
                         if (state & layoutOption.BOTTOM) {
-                            this.height = parent.height - this.getLayValue(layoutOption.TOP) - this.getLayValue(layoutOption.BOTTOM);
+                            this.height = parent.height - this.getLayCoordinateValue(layoutOption.TOP) - this.getLayCoordinateValue(layoutOption.BOTTOM);
                         }
-                        this.localTranslate.y = this.getLayValue(layoutOption.TOP) - parent.pivot.y * parent.height + this.pivot.y * this.height;
+                        this.localTranslate.y = this.getLayCoordinateValue(layoutOption.TOP) - parent.pivot.y * parent.height + this.pivot.y * this.height;
                     }
                     else if (state & layoutOption.BOTTOM) {
-                        this.localTranslate.y = parent.height - this.height - this.getLayValue(layoutOption.BOTTOM) - parent.pivot.y * parent.height + this.pivot.y * this.height;
+                        this.localTranslate.y = parent.height - this.height - this.getLayCoordinateValue(layoutOption.BOTTOM) - parent.pivot.y * parent.height + this.pivot.y * this.height;
                     }
                     if (state & layoutOption.V_CENTER) {
-                        this.localTranslate.y = (parent.height - this.height) / 2 + this.getLayValue(layoutOption.V_CENTER) - parent.pivot.y * parent.height + this.pivot.y * this.height;
+                        this.localTranslate.y = (parent.height - this.height) / 2 + this.getLayCoordinateValue(layoutOption.V_CENTER) - parent.pivot.y * parent.height + this.pivot.y * this.height;
                     }
                     //布局调整 后刷新 matrix
                     gd3d.math.matrix3x2MakeTransformRTS(this.localTranslate, this.localScale, this.localRotate, this.localMatrix);
@@ -5569,7 +5569,8 @@ var gd3d;
                 this.lastPivot.x = this.pivot.x;
                 this.lastPivot.y = this.pivot.y;
             };
-            transform2D.prototype.getLayValue = function (option) {
+            /** 获取Layout 的坐标系值 */
+            transform2D.prototype.getLayCoordinateValue = function (option) {
                 if (this.layoutValueMap[option] == undefined)
                     this.layoutValueMap[option] = 0;
                 var value = 0;
@@ -5593,6 +5594,34 @@ var gd3d;
                     value = this.layoutValueMap[option];
                 }
                 return value;
+            };
+            /** 设置Layout 的坐标系值 */
+            transform2D.prototype.setLayCoordinateValue = function (option, value) {
+                if (isNaN(option) || isNaN(value) || option == undefined || value == undefined)
+                    return;
+                var _v = value;
+                if (this._layoutPercentState & option) {
+                    if (this._parent) {
+                        switch (option) {
+                            case layoutOption.LEFT:
+                            case layoutOption.H_CENTER:
+                            case layoutOption.RIGHT:
+                                _v = value / this._parent.width * 100;
+                                break;
+                            case layoutOption.TOP:
+                            case layoutOption.V_CENTER:
+                            case layoutOption.BOTTOM:
+                                _v = value / this._parent.height * 100;
+                                break;
+                        }
+                    }
+                }
+                //save value
+                if (this.layoutValueMap[option] == undefined || _v != this.layoutValueMap[option]) {
+                    this.layoutDirty = true;
+                    this.markDirty();
+                    this.layoutValueMap[option] = _v;
+                }
             };
             /**
              * @public
@@ -5636,6 +5665,58 @@ var gd3d;
              */
             transform2D.prototype.clone = function () {
                 return gd3d.io.cloneObj(this);
+            };
+            /**
+             * 设置 节点的本地位置（会处理layout选项）
+             * @param pos
+             */
+            transform2D.prototype.setLocalPosition = function (pos) {
+                var state = this._layoutState | this._layoutPercentState;
+                var lPos = this.localTranslate;
+                var x = pos.x;
+                var y = pos.y;
+                var parent = this.parent;
+                if (state == 0 || !parent) {
+                    if (lPos.x != x || lPos.y != y)
+                        this.markDirty();
+                    lPos.x = x;
+                    lPos.y = y;
+                }
+                //layout 模式处理
+                if (!parent)
+                    return;
+                //x
+                if (state & layoutOption.LEFT) {
+                    var l = x;
+                    if (state & layoutOption.RIGHT) {
+                        var r = -x;
+                        this.setLayCoordinateValue(layoutOption.RIGHT, r);
+                    }
+                    this.setLayCoordinateValue(layoutOption.LEFT, l);
+                }
+                else if (state & layoutOption.RIGHT) {
+                    this.setLayCoordinateValue(layoutOption.RIGHT, -x);
+                }
+                if (state & layoutOption.H_CENTER) {
+                    var difHalf = (parent.width - this.width) / 2;
+                    this.setLayCoordinateValue(layoutOption.H_CENTER, x - difHalf);
+                }
+                //y
+                if (state & layoutOption.TOP) {
+                    var t = y;
+                    if (state & layoutOption.BOTTOM) {
+                        var b = -y;
+                        this.setLayCoordinateValue(layoutOption.BOTTOM, b);
+                    }
+                    this.setLayCoordinateValue(layoutOption.TOP, t);
+                }
+                else if (state & layoutOption.BOTTOM) {
+                    this.setLayCoordinateValue(layoutOption.BOTTOM, -y);
+                }
+                if (state & layoutOption.V_CENTER) {
+                    var difHalf = (parent.height - this.height) / 2;
+                    this.setLayCoordinateValue(layoutOption.V_CENTER, y - difHalf);
+                }
             };
             var transform2D_1;
             transform2D.ClassName = "transform2D";
@@ -7590,16 +7671,10 @@ var gd3d;
                 this.customRegexStr = "";
                 this.beFocus = false;
                 this._text = "";
+                this._lastAddRTextFID = 0;
                 this._charlimit = 0;
                 this._lineType = lineType.SingleLine;
                 this._contentType = contentType.None;
-                this._lastIsCursorMode = false;
-                this._twinkleTime = 0.6;
-                this._twinkleTimeCount = 0;
-                this._lastSStart = -1;
-                this._lastSEnd = -1;
-                this._currStartX = 0;
-                this._currEndX = 0;
             }
             inputField_1 = inputField;
             Object.defineProperty(inputField.prototype, "frameImage", {
@@ -7660,6 +7735,22 @@ var gd3d;
                 get: function () {
                     return this._text;
                 },
+                set: function (val) {
+                    if (val == this._text)
+                        return;
+                    val = val == null ? "" : val;
+                    this._text = val;
+                    if (this.inputElement)
+                        this.inputElement.value = val;
+                    if (this._textLable)
+                        this._textLable.text = val;
+                    if (this.beFocus) {
+                        this.showEle();
+                    }
+                    else {
+                        this.showLable();
+                    }
+                },
                 enumerable: false,
                 configurable: true
             });
@@ -7696,8 +7787,18 @@ var gd3d;
                  * @version gd3d 1.0
                  */
                 get: function () { return this._lineType; },
-                set: function (lineType) {
-                    this._lineType = lineType;
+                set: function (_lineType) {
+                    if (this._lineType == _lineType)
+                        return;
+                    var newIsSin = _lineType == lineType.SingleLine;
+                    var oldIsSin = this._lineType == lineType.SingleLine;
+                    this._lineType = _lineType;
+                    if (newIsSin != oldIsSin && this.inputElement) {
+                        var oldVal = this.inputElement.value;
+                        this.removeEle();
+                        this.initEle();
+                        this.inputElement.value = oldVal;
+                    }
                 },
                 enumerable: false,
                 configurable: true
@@ -7729,7 +7830,11 @@ var gd3d;
                     return this._textLable;
                 },
                 set: function (textLabel) {
-                    textLabel.text = this._text;
+                    if (textLabel == this._textLable)
+                        return;
+                    if (textLabel) {
+                        textLabel.text = this._text;
+                    }
                     this._textLable = textLabel;
                 },
                 enumerable: false,
@@ -7747,41 +7852,11 @@ var gd3d;
                     return this._placeholderLabel;
                 },
                 set: function (placeholderLabel) {
+                    if (placeholderLabel == this._placeholderLabel)
+                        return;
                     if (placeholderLabel.text == null || placeholderLabel.text == "")
                         placeholderLabel.text = "Enter Text...";
                     this._placeholderLabel = placeholderLabel;
-                },
-                enumerable: false,
-                configurable: true
-            });
-            Object.defineProperty(inputField.prototype, "CursorTrans", {
-                /**
-                 * 选择 光标 节点对象
-                 */
-                get: function () {
-                    return this._cursorTrans;
-                },
-                set: function (val) {
-                    this._cursorTrans = val;
-                    if (val) {
-                        val.visible = false;
-                    }
-                },
-                enumerable: false,
-                configurable: true
-            });
-            Object.defineProperty(inputField.prototype, "SelectionBG", {
-                /**
-                 * 选择 字符串背景 节点对象
-                 */
-                get: function () {
-                    return this._selectionBG;
-                },
-                set: function (val) {
-                    this._selectionBG = val;
-                    if (val) {
-                        val.visible = false;
-                    }
                 },
                 enumerable: false,
                 configurable: true
@@ -7802,39 +7877,132 @@ var gd3d;
                         this._textLable.transform.width = this.transform.width;
                     if (this._textLable.transform.height != this.transform.height)
                         this._textLable.transform.height = this.transform.height;
+                    // //溢出模式设置
+                    // let isSingleLine = this._lineType == lineType.SingleLine;
+                    // this._textLable.verticalOverflow = !isSingleLine;
+                    // this._textLable.horizontalOverflow = isSingleLine;
                 }
+            };
+            /**设置 通用 样式 */
+            inputField.prototype.setStyleEle = function (Ele) {
+                Ele.style.outline = "medium";
+                Ele.style.background = "transparent";
+                Ele.style.border = "0";
+                Ele.style.padding = "0";
+                Ele.style.display = "none";
+            };
+            inputField.prototype.createInputEle = function () {
+                this.inputElement = document.createElement("Input");
+                var inpEle = this.inputElement;
+                this.setStyleEle(inpEle);
+                inpEle.type = "text";
+                inpEle.style["-moz-appearance"] = 'textfield';
+            };
+            inputField.prototype.createTextAreaEle = function () {
+                this.inputElement = document.createElement("textarea");
+                var inpEle = this.inputElement;
+                this.setStyleEle(inpEle);
+                inpEle.style.resize = "none";
+                inpEle.style.overflowY = 'scroll'; //Y 轴滚动条
+                // inpEle.style.scrollbarGutter = "stable";
+            };
+            /** 初始化 html 元素 */
+            inputField.prototype.initEle = function () {
+                var _this = this;
+                //ios fix thing
+                this.ckIsIos();
+                //create Ele
+                if (this._lineType == lineType.SingleLine) {
+                    this.createInputEle();
+                }
+                else {
+                    this.createTextAreaEle();
+                }
+                var inpEle = this.inputElement;
+                //attchNode
+                inpEle.tabIndex = 0;
+                inpEle.value = this._text;
+                // inpEle.autofocus = true;
+                if (this.transform.canvas.scene) {
+                    var htmlCanv = this.transform.canvas.scene.webgl.canvas;
+                    if (htmlCanv)
+                        htmlCanv.parentElement.appendChild(inpEle);
+                }
+                //reg event
+                inpEle.onblur = function (e) {
+                    _this.beFocus = false;
+                };
+                inpEle.onfocus = function (e) {
+                    _this.beFocus = true;
+                };
+                inpEle.onkeydown = function (ev) {
+                    if (ev.code == "Enter") {
+                        var needSubmit = _this._lineType != lineType.MultiLine_NewLine;
+                        if (ev.ctrlKey)
+                            needSubmit = true; //ctr + Enter = 强制提交
+                        if (needSubmit) {
+                            inpEle.blur();
+                            if (_this.onTextSubmit)
+                                _this.onTextSubmit(_this._text);
+                        }
+                    }
+                    // console.error(`code:${ev.code}`);
+                };
+                // inpEle.addEventListener('compositionstart', () => { console.log("compositionstart") });
+                // inpEle.addEventListener('compositionend', () => { console.log("compositionend") });
+                // inpEle.addEventListener('input', () => { console.log("input") });
+                // inpEle.addEventListener('keydown', () => { console.log("keydown") });
+                // inpEle.addEventListener('touchstart', () => { console.log("touchstart") });
+                this.inputElmLayout();
+            };
+            inputField.prototype.updateEleStyle = function () {
+                var inpEle = this.inputElement;
+                if (!inpEle)
+                    return;
+                //
+                if (this._textLable) {
+                    var fontSize = this._textLable.fontsize / window.devicePixelRatio;
+                    inpEle.style.fontSize = fontSize + "px";
+                    var cssColor = gd3d.math.colorToCSS(this._textLable.color, false);
+                    inpEle.style.color = cssColor;
+                    // let _font = this._textLable.font;
+                    // inpEle.style.fontFamily = 
+                    switch (this._textLable.horizontalType) {
+                        case framework.HorizontalType.Left:
+                            inpEle.style.textAlign = "left";
+                            break;
+                        case framework.HorizontalType.Center:
+                            inpEle.style.textAlign = "center";
+                            break;
+                        case framework.HorizontalType.Right:
+                            inpEle.style.textAlign = "right";
+                            break;
+                    }
+                }
+                var placeholderStr = "Enter Text...";
+                if (this._placeholderLabel)
+                    placeholderStr = this._placeholderLabel.text;
+                inpEle.placeholder = placeholderStr;
+            };
+            inputField.prototype.removeEle = function () {
+                var inpEle = this.inputElement;
+                if (!inpEle)
+                    return;
+                inpEle.onfocus = null;
+                inpEle.onclick = null;
+                inpEle.onblur = null;
+                inpEle.disabled = false;
+                inpEle.value = "";
+                inpEle.style.display = "none";
+                if (inpEle.parentElement)
+                    inpEle.parentElement.removeChild(inpEle);
+                this.inputElement = null;
             };
             /**
              * @private
              */
             inputField.prototype.start = function () {
-                var _this = this;
-                //ios fix thing
-                this.ckIsIos();
-                this.inputElement = document.createElement("Input");
-                this.inputElement.style.opacity = "0";
-                this.inputElement.style.display = "none";
-                this.inputElement.tabIndex = 0;
-                this.inputElement.autofocus = true;
-                if (this.transform.canvas.scene) {
-                    var htmlCanv = this.transform.canvas.scene.webgl.canvas;
-                    if (htmlCanv)
-                        htmlCanv.parentElement.appendChild(this.inputElement);
-                }
-                if (inputField_1._isIos) {
-                    this.inputElement.onclick = function () {
-                        // console.error(`onclick : ${this.transform.insId.getInsID()} , ${this.inputElement.value}`);
-                        _this.inputElement.blur();
-                        _this.inputElement.focus();
-                    };
-                }
-                this.inputElement.onblur = function (e) {
-                    _this.beFocus = false;
-                };
-                this.inputElement.onfocus = function (e) {
-                    _this.beFocus = true;
-                };
-                this.inputElmLayout();
+                this.initEle();
             };
             inputField.prototype.ckIsIos = function () {
                 //ios 有保护 , focus 必须在 dom 事件帧触发。
@@ -7866,7 +8034,7 @@ var gd3d;
                 var realY = pos.y - p.y * h;
                 if (realX + "px" == cssStyle.left && realY + "px" == cssStyle.top && w + "px" == cssStyle.width && h + "px" == cssStyle.height)
                     return;
-                var scale = this.transform.canvas.scene.app.canvasClientHeight / this.transform.canvas.pixelHeight;
+                var scale = framework.sceneMgr.app.canvasClientHeight / this.transform.canvas.pixelHeight;
                 cssStyle.position = "absolute";
                 cssStyle.left = realX * scale + "px";
                 cssStyle.top = realY * scale + "px";
@@ -7923,168 +8091,11 @@ var gd3d;
                         this._text = this._text.replace(/[^\u4E00-\u9FA5]/g, '');
                     }
                 }
+                //记录过滤 后的text
                 this.inputElement.value = this._text;
                 if (this._textLable) {
                     this._textLable.text = this._text;
-                    this.filterContentText();
                 }
-                if (this._text == "") {
-                    this._placeholderLabel.transform.visible = true;
-                    this._textLable.transform.visible = false;
-                }
-                else {
-                    this._placeholderLabel.transform.visible = false;
-                    this._textLable.transform.visible = true;
-                }
-            };
-            inputField.prototype.filterContentText = function () {
-                if (!this._textLable || this._text == null)
-                    return;
-                var lab = this._textLable;
-                var rate = lab.fontsize / lab.font.pointSize;
-                var font = lab.font;
-                var addw = 0;
-                var addh = 0;
-                var str = "";
-                switch (this._lineType) {
-                    case lineType.SingleLine:
-                        for (var i = lab.text.length - 1; i >= 0; i--) {
-                            var c = lab.text.charAt(i);
-                            var cinfo = font.cmap[c];
-                            if (!cinfo) {
-                                console.warn("can't find character \"" + c + "\" in " + font.getName() + " Font");
-                                continue;
-                            }
-                            addw += cinfo.xAddvance * rate;
-                            if (addw > lab.transform.width) {
-                                lab.text = str;
-                                break;
-                            }
-                            str = lab.text[i] + str;
-                        }
-                        break;
-                    case lineType.MultiLine:
-                        var fristline = true;
-                        addh += lab.fontsize * lab.linespace;
-                        for (var i = lab.text.length - 1; i >= 0; i--) {
-                            var c = lab.text.charAt(i);
-                            var cinfo = font.cmap[c];
-                            if (!cinfo) {
-                                console.warn("can't find character \"" + c + "\" in " + font.getName() + " Font");
-                                continue;
-                            }
-                            addw += cinfo.xAddvance * rate;
-                            if (addw > lab.transform.width) {
-                                addw = 0;
-                                fristline = false;
-                                addh += lab.fontsize * lab.linespace;
-                            }
-                            if (!fristline && addh > lab.transform.height) {
-                                lab.text = str;
-                                break;
-                            }
-                            str = lab.text[i] + str;
-                        }
-                        break;
-                }
-            };
-            /** 选择状态刷新 */
-            inputField.prototype.selectionRefresh = function (dt) {
-                var _cNode = this._cursorTrans;
-                var _sbgNode = this._selectionBG;
-                if (!_cNode && !_sbgNode)
-                    return;
-                if (!this.beFocus) {
-                    if (this._selectionBG)
-                        this._selectionBG.visible = false;
-                    if (this._cursorTrans)
-                        this._cursorTrans.visible = false;
-                    this._lastSStart = -1;
-                    this._lastSEnd = -1;
-                    this._lastIsCursorMode = false;
-                    return;
-                }
-                if (!this.inputElement || !this._textLable || !this._textLable.font)
-                    return;
-                var sIdx = this.selectionStart;
-                var eInx = this.selectionEnd;
-                var difLen = sIdx - eInx;
-                var isCursorMode = difLen == 0;
-                var needSwitch = this._lastIsCursorMode != isCursorMode;
-                var selectionDirty = sIdx != this._lastSStart || eInx != this._lastSEnd || needSwitch; //光标有变化
-                this._lastIsCursorMode = isCursorMode;
-                var lpt = gd3d.framework.layoutOption;
-                //switch mode
-                if (needSwitch) {
-                    //hide all 
-                    if (_sbgNode)
-                        _sbgNode.visible = false;
-                    if (_cNode)
-                        _cNode.visible = false;
-                    //visible
-                    if (isCursorMode) {
-                        if (_cNode)
-                            _cNode.visible = true;
-                    }
-                    else {
-                        if (_sbgNode)
-                            _sbgNode.visible = true;
-                    }
-                }
-                //
-                this._lastSStart = sIdx;
-                this._lastSEnd = eInx;
-                //update
-                if (isCursorMode) {
-                    //光标
-                    if (!_cNode)
-                        return;
-                    if (selectionDirty) {
-                        this._twinkleTimeCount = 0;
-                        this._currStartX = this.getInputTextXPos(sIdx);
-                        if (_cNode)
-                            _cNode.visible = true;
-                    }
-                    //光标定时闪烁
-                    this._twinkleTimeCount += dt;
-                    if (this._twinkleTimeCount >= this._twinkleTime) {
-                        _cNode.visible = !_cNode.visible;
-                        this._twinkleTimeCount = 0;
-                    }
-                    //位置刷新
-                    _cNode.setLayoutValue(lpt.LEFT, this._currStartX);
-                    _cNode.markDirty();
-                }
-                else {
-                    if (!_sbgNode)
-                        return;
-                    if (selectionDirty) {
-                        this._twinkleTimeCount = 0;
-                        this._currStartX = this.getInputTextXPos(sIdx);
-                        this._currEndX = this.getInputTextXPos(eInx);
-                    }
-                    var bgW = Math.abs(this._currEndX - this._currStartX);
-                    //位置、宽高 刷新
-                    _sbgNode.setLayoutValue(lpt.LEFT, this._currStartX);
-                    _sbgNode.width = bgW;
-                    _sbgNode.markDirty();
-                }
-            };
-            //获取 输入文本 的坐标的X值
-            inputField.prototype.getInputTextXPos = function (strIndex) {
-                var result = 0;
-                var text = this._textLable.text;
-                var f = this._textLable.font;
-                var rate = this._textLable.fontsize / f.pointSize;
-                //计算字符偏移
-                for (var i = 0, len = strIndex; i < len; i++) {
-                    var c = text[i];
-                    var cInfo = f.cmap[c];
-                    if (!cInfo)
-                        continue;
-                    result += cInfo.xAddvance * rate;
-                }
-                return result;
             };
             /**
              * @private
@@ -8092,27 +8103,18 @@ var gd3d;
             inputField.prototype.update = function (delta) {
                 this.layoutRefresh();
                 this.textRefresh();
-                this.selectionRefresh(delta);
             };
             /**
              * @private
              */
             inputField.prototype.remove = function () {
+                if (this._textLable)
+                    this._textLable.onAddRendererText = null;
                 this._placeholderLabel = null;
                 this._textLable = null;
                 this.transform = null;
                 this._frameImage = null;
-                if (this.inputElement) {
-                    this.inputElement.onfocus = null;
-                    this.inputElement.onclick = null;
-                    this.inputElement.onblur = null;
-                    this.inputElement.disabled = false;
-                    this.inputElement.value = "";
-                    this.inputElement.style.display = "none";
-                    if (this.inputElement.parentElement)
-                        this.inputElement.parentElement.removeChild(this.inputElement);
-                    this.inputElement = null;
-                }
+                this.removeEle();
             };
             /**
              * @private
@@ -8128,7 +8130,7 @@ var gd3d;
             };
             inputField.prototype.setFocus = function (isFocus) {
                 if (isFocus) {
-                    this.inputElement.style.display = "";
+                    this.showEle();
                     if (!this.beFocus) {
                         this.inputElement.focus();
                     }
@@ -8136,8 +8138,36 @@ var gd3d;
                 else {
                     if (this.beFocus)
                         this.inputElement.blur();
-                    this.inputElement.style.display = "none";
+                    this.showLable();
                 }
+            };
+            /** 显示 标签 */
+            inputField.prototype.showLable = function () {
+                if (this.inputElement)
+                    this.inputElement.style.display = "none";
+                if (this._textLable) {
+                    this._textLable.transform.visible = false;
+                    if (this._placeholderLabel)
+                        this._placeholderLabel.transform.visible = false;
+                    if (this._textLable.text != "") {
+                        this._textLable.transform.visible = true;
+                    }
+                    else {
+                        if (this._placeholderLabel)
+                            this._placeholderLabel.transform.visible = true;
+                    }
+                }
+            };
+            /** 显示 html组件 */
+            inputField.prototype.showEle = function () {
+                //更新
+                this.updateEleStyle();
+                if (this.inputElement)
+                    this.inputElement.style.display = ""; //显示html元素对象
+                if (this._textLable)
+                    this._textLable.transform.visible = false;
+                if (this._placeholderLabel)
+                    this._placeholderLabel.transform.visible = false;
             };
             var inputField_1;
             inputField.ClassName = "inputField";
@@ -8172,16 +8202,6 @@ var gd3d;
                 __metadata("design:type", framework.label),
                 __metadata("design:paramtypes", [framework.label])
             ], inputField.prototype, "PlaceholderLabel", null);
-            __decorate([
-                gd3d.reflect.Field("reference", null, "transform2D"),
-                __metadata("design:type", framework.transform2D),
-                __metadata("design:paramtypes", [framework.transform2D])
-            ], inputField.prototype, "CursorTrans", null);
-            __decorate([
-                gd3d.reflect.Field("reference", null, "transform2D"),
-                __metadata("design:type", framework.transform2D),
-                __metadata("design:paramtypes", [framework.transform2D])
-            ], inputField.prototype, "SelectionBG", null);
             inputField = inputField_1 = __decorate([
                 gd3d.reflect.node2DComponent
             ], inputField);
@@ -8197,8 +8217,12 @@ var gd3d;
          */
         var lineType;
         (function (lineType) {
+            /** 单行模式 */
             lineType[lineType["SingleLine"] = 0] = "SingleLine";
+            /** 多行模式 */
             lineType[lineType["MultiLine"] = 1] = "MultiLine";
+            /** 多行模式 (输入回车键换行处理)*/
+            lineType[lineType["MultiLine_NewLine"] = 2] = "MultiLine_NewLine";
         })(lineType = framework.lineType || (framework.lineType = {}));
         /**
          * @language zh_CN
@@ -8209,13 +8233,21 @@ var gd3d;
         var contentType;
         (function (contentType) {
             contentType[contentType["None"] = 0] = "None";
+            /** 数字*/
             contentType[contentType["Number"] = 1] = "Number";
+            /** 字母 */
             contentType[contentType["Word"] = 2] = "Word";
+            /** 下划线 */
             contentType[contentType["Underline"] = 4] = "Underline";
+            /**中文字符 */
             contentType[contentType["ChineseCharacter"] = 8] = "ChineseCharacter";
+            /**没有中文字符 */
             contentType[contentType["NoneChineseCharacter"] = 16] = "NoneChineseCharacter";
+            /**邮件 */
             contentType[contentType["Email"] = 32] = "Email";
+            /**密码 */
             contentType[contentType["PassWord"] = 64] = "PassWord";
+            /** 自定义 */
             contentType[contentType["Custom"] = 128] = "Custom";
         })(contentType = framework.contentType || (framework.contentType = {}));
     })(framework = gd3d.framework || (gd3d.framework = {}));
@@ -8237,6 +8269,8 @@ var gd3d;
             function label() {
                 /**字段 用于快速判断实例是否是label */
                 this.isLabel = true;
+                /** 有图片字符需要渲染 */
+                this._hasImageChar = false;
                 this._text = "";
                 this.needRefreshFont = false;
                 this.needRefreshAtlas = false;
@@ -8284,6 +8318,7 @@ var gd3d;
                 this.verticalOverflow = false;
                 this.lastStr = "";
                 this.data_begin = new gd3d.math.vector2(0, 0);
+                this._lastBegin = new gd3d.math.vector2(0, 0);
                 /** 文本顶点数据 */
                 this.datar = [];
                 /** 字符图 顶点数据 */
@@ -8727,12 +8762,15 @@ var gd3d;
                     this.initdater(imgCharCount, this.imgDatar); //字符图 数据容器
                 }
                 //
+                this._hasImageChar = false;
                 rI = 0;
                 var textI = 0;
                 var imgI = 0;
                 var lineI = lineEndIndexs.shift();
+                var lineWidth = lineWidths.shift();
                 var forceBreak = false;
-                var lineCount = 1;
+                var toNewLine = true;
+                var lineCount = 0;
                 //填充顶点数据
                 for (var i = 0, len = blocks.length; i < len; i++) {
                     var block = blocks[i];
@@ -8764,33 +8802,38 @@ var gd3d;
                         }
                         if (rI >= lineI) {
                             lineI = lineEndIndexs.shift();
-                            if (lineI == null) {
+                            lineWidth = lineWidths.shift();
+                            if (lineI == null || lineWidth == null) {
                                 forceBreak = true;
                                 break;
                             }
+                            toNewLine = true;
+                        }
+                        if (toNewLine) {
                             //换行了
                             xadd = 0;
                             //水平居中布局
                             if (this.horizontalType == HorizontalType.Center) {
-                                xadd += lineWidths[lineI] / 2;
+                                xadd += lineWidth / 2;
                             }
                             //水平靠右布局
                             else if (this.horizontalType == HorizontalType.Right) {
-                                xadd += lineWidths[lineI];
+                                xadd += lineWidth;
                             }
                             //y 偏移值
                             yadd = yOffset + lineHeight * lineCount;
                             //行数增加
                             lineCount++;
+                            toNewLine = false;
                         }
                         var hasImg = fullText[rI] == "*" && optObj.img;
                         var _I = 0;
                         var datar = void 0;
-                        var c = text.charAt(j);
-                        var cinfo = void 0;
+                        var c = void 0;
                         if (!hasImg) {
                             _I = textI;
-                            cinfo = _font.cmap[c];
+                            c = text.charAt(j);
+                            var cinfo = _font.cmap[c];
                             if (cinfo == undefined) {
                                 continue;
                             }
@@ -8825,6 +8868,8 @@ var gd3d;
                             xadd += cinfo.xAddvance * rate;
                         }
                         else {
+                            this._hasImageChar = true;
+                            c = fullText[rI];
                             _I = imgI;
                             datar = this.imgDatar;
                             //填充字符图数据
@@ -8833,7 +8878,7 @@ var gd3d;
                             var ch = imgSize;
                             var cw = imgSize;
                             var x0 = xadd + imgHalfGap;
-                            var y0 = yadd - imgSize + rBaseLine + imgHalfGap;
+                            var y0 = yadd + imgHalfGap;
                             //uv
                             var urange = sp.urange;
                             var vrange = sp.vrange;
@@ -8892,6 +8937,9 @@ var gd3d;
                         this.min_y = Math.min(_y0, _y1, _y2, _y3, this.min_y);
                         this.max_x = Math.max(_x0, _x1, _x2, _x3, this.max_x);
                         this.max_y = Math.max(_y0, _y1, _y2, _y3, this.max_y);
+                        //字符加入渲染队列
+                        if (this.onAddRendererText)
+                            this.onAddRendererText(x3, y3);
                         //有效渲染字符 索引递增
                         rI++;
                         if (!hasImg) {
@@ -9137,7 +9185,7 @@ var gd3d;
                     if (this.datar.length != 0)
                         canvas.pushRawData(mat, this.datar);
                 }
-                if (!this._richText || !this.imgDatar || this.imgDatar.length < 1)
+                if (!this._hasImageChar || !this._richText || !this.imgDatar || this.imgDatar.length < 1)
                     return;
                 //字符图绘制
                 var imgMat = this.imgUIMat;
@@ -9218,11 +9266,16 @@ var gd3d;
                 var m = this.transform.getWorldMatrix();
                 var l = -this.transform.pivot.x * this.transform.width;
                 var t = -this.transform.pivot.y * this.transform.height;
-                this.data_begin.x = l * m.rawData[0] + t * m.rawData[2] + m.rawData[4];
-                this.data_begin.y = l * m.rawData[1] + t * m.rawData[3] + m.rawData[5];
-                //只把左上角算出来
-                this.dirtyData = true;
-                this._richDrity = true;
+                var _b = this._lastBegin;
+                var d_b = this.data_begin;
+                d_b.x = l * m.rawData[0] + t * m.rawData[2] + m.rawData[4];
+                d_b.y = l * m.rawData[1] + t * m.rawData[3] + m.rawData[5];
+                //data_begin 有变化需要dirty
+                if (!gd3d.math.vec2Equal(_b, d_b, 0.00001)) {
+                    this.dirtyData = true;
+                    this._richDrity = true;
+                }
+                gd3d.math.vec2Clone(d_b, _b);
             };
             /** 计算drawRect */
             label.prototype.calcDrawRect = function () {
@@ -9296,20 +9349,22 @@ var gd3d;
                         //判断 标签是开始 还是结束
                         if (xmlStr[1] == "/") {
                             var endOpt = optStack[optStack.length - 1];
-                            //选项确认有效
-                            switch (xmlStr) {
-                                case "</color>":
-                                    isValid = endOpt.getType() == RichOptType.Color;
-                                    break;
-                                case "</i>":
-                                    isValid = endOpt.getType() == RichOptType.Italic;
-                                    break;
-                                case "</b>":
-                                    isValid = endOpt.getType() == RichOptType.Bold;
-                                    break;
-                                case "</u>":
-                                    isValid = endOpt.getType() == RichOptType.Underline;
-                                    break;
+                            if (endOpt) {
+                                //选项确认有效
+                                switch (xmlStr) {
+                                    case "</color>":
+                                        isValid = endOpt.getType() == RichOptType.Color;
+                                        break;
+                                    case "</i>":
+                                        isValid = endOpt.getType() == RichOptType.Italic;
+                                        break;
+                                    case "</b>":
+                                        isValid = endOpt.getType() == RichOptType.Bold;
+                                        break;
+                                    case "</u>":
+                                        isValid = endOpt.getType() == RichOptType.Underline;
+                                        break;
+                                }
                             }
                             if (isValid) {
                                 optStack.pop();
@@ -9343,7 +9398,7 @@ var gd3d;
                                     var r = Number("0x" + colorVal.substring(0, 2));
                                     var g = Number("0x" + colorVal.substring(2, 4));
                                     var b = Number("0x" + colorVal.substring(4, 6));
-                                    var a = vLen == 6 ? 1 : Number("0x" + colorVal.substring(6, 8));
+                                    var a = vLen == 6 ? this.color.a * 255 : Number("0x" + colorVal.substring(6, 8));
                                     if (isNaN(r) || isNaN(g) || isNaN(b) || isNaN(a))
                                         continue;
                                     optStack.push(new richOptColor(new gd3d.math.color(r / 255, g / 255, b / 255, a / 255)));
@@ -9398,6 +9453,9 @@ var gd3d;
                 this._defTextBlocks.length = 0;
                 this.transform = null;
                 this._cacheMaskV4 = null;
+                this.onAddRendererText = null;
+                this.data_begin = null;
+                this._lastBegin = null;
             };
             var label_1;
             label.defUIShader = "shader/defuifont";
@@ -42523,6 +42581,13 @@ var gd3d;
 (function (gd3d) {
     var math;
     (function (math) {
+        function colorSet(out, r, g, b, a) {
+            out.r = r;
+            out.g = g;
+            out.b = b;
+            out.a = a;
+        }
+        math.colorSet = colorSet;
         function colorSet_White(out) {
             out.r = 1;
             out.g = 1;
@@ -42581,6 +42646,34 @@ var gd3d;
             // out.b = Math.floor(out.b);
         }
         math.colorLerp = colorLerp;
+        /**
+         * 颜色转成 CSS 格式
+         * @param src
+         * @param hasAlpha 是否包含Alpha
+         * @returns like #ffffffff
+         */
+        function colorToCSS(src, hasAlpha) {
+            if (hasAlpha === void 0) { hasAlpha = true; }
+            var r = (src.r * 255).toString(16);
+            var g = (src.r * 255).toString(16);
+            var b = (src.r * 255).toString(16);
+            if (r.length == 1)
+                r += "0";
+            if (g.length == 1)
+                g += "0";
+            if (b.length == 1)
+                b += "0";
+            if (hasAlpha) {
+                var a = (src.r * 255).toString(16);
+                if (a.length == 1)
+                    a += "0";
+                return "#" + r + g + b + a;
+            }
+            else {
+                return "#" + r + g + b;
+            }
+        }
+        math.colorToCSS = colorToCSS;
     })(math = gd3d.math || (gd3d.math = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -63778,10 +63871,16 @@ var gd3d;
          */
         var Primitive2DType;
         (function (Primitive2DType) {
+            /** 原始图片渲染器 */
             Primitive2DType[Primitive2DType["RawImage2D"] = 0] = "RawImage2D";
+            /** 多功能图片渲染器（sprite） */
             Primitive2DType[Primitive2DType["Image2D"] = 1] = "Image2D";
+            /** 文本渲染器 */
             Primitive2DType[Primitive2DType["Label"] = 2] = "Label";
+            /** 按钮 */
             Primitive2DType[Primitive2DType["Button"] = 3] = "Button";
+            /** 输入框 */
+            Primitive2DType[Primitive2DType["InputField"] = 4] = "InputField";
         })(Primitive2DType = framework.Primitive2DType || (framework.Primitive2DType = {}));
         /**
          * 判断 函数对象代码实现内容是否是空的
@@ -63831,6 +63930,10 @@ var gd3d;
              * @version gd3d 1.0
              */
             TransformUtil.CreatePrimitive = function (type, app) {
+                if (app === void 0) { app = null; }
+                if (!app) {
+                    app = framework.sceneMgr.app;
+                }
                 var objName = PrimitiveType[type];
                 var trans = new framework.transform();
                 trans.name = objName;
@@ -63853,14 +63956,15 @@ var gd3d;
              * @version gd3d 1.0
              */
             TransformUtil.Create2DPrimitive = function (type, app) {
+                if (app === void 0) { app = null; }
+                if (!app) {
+                    app = framework.sceneMgr.app;
+                }
                 // let enumObj = EnumUtil.getEnumObjByType("gd3d.framework.Primitive2DType");
                 var objName = Primitive2DType[type];
                 var componentName = framework.StringUtil.firstCharToLowerCase(objName);
-                var t2d = new framework.transform2D();
-                t2d.name = objName;
+                var t2d = this.make2DNode(objName);
                 var i2dComp = t2d.addComponent(componentName);
-                t2d.pivot.x = 0;
-                t2d.pivot.y = 0;
                 switch (type) {
                     case Primitive2DType.RawImage2D:
                         TransformUtil.create2D_rawImage(i2dComp, app);
@@ -63874,8 +63978,29 @@ var gd3d;
                     case Primitive2DType.Button:
                         TransformUtil.create2D_button(i2dComp, app);
                         break;
+                    case Primitive2DType.InputField:
+                        TransformUtil.create2D_InputField(i2dComp, app);
+                        break;
                 }
                 return t2d;
+            };
+            TransformUtil.make2DNode = function (name, parent, lOpt, w, h, px, py) {
+                if (parent === void 0) { parent = null; }
+                if (lOpt === void 0) { lOpt = 0; }
+                if (w === void 0) { w = 100; }
+                if (h === void 0) { h = 100; }
+                if (px === void 0) { px = 0; }
+                if (py === void 0) { py = 0; }
+                var node = new framework.transform2D();
+                node.name = name;
+                node.width = w;
+                node.height = h;
+                node.layoutState = lOpt;
+                node.pivot.x = px;
+                node.pivot.y = py;
+                if (parent)
+                    parent.addChild(node);
+                return node;
             };
             TransformUtil.create2D_rawImage = function (img, app) {
                 img.transform.width = 100;
@@ -63891,24 +64016,28 @@ var gd3d;
                 label.transform.width = 150;
                 label.transform.height = 50;
                 label.text = "label";
-                label.fontsize = 25;
+                label.fontsize = 24;
                 label.color = new gd3d.math.color(1, 0, 0, 1);
-                var _font = app.getAssetMgr().getAssetByName("STXINGKA.font.json");
-                if (_font == null) {
-                    app.getAssetMgr().load("res/STXINGKA.TTF.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                        if (s.isfinish) {
-                            app.getAssetMgr().load("res/resources/STXINGKA.font.json", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
-                                label.font = app.getAssetMgr().getAssetByName("STXINGKA.font.json");
-                                label.transform.markDirty();
-                            });
-                        }
-                    });
-                }
-                else {
-                    label.font = _font;
-                    ;
-                    label.transform.markDirty();
-                }
+                // let _font = app.getAssetMgr().getAssetByName("STXINGKA.font.json");
+                // if (_font == null)
+                // {
+                //     app.getAssetMgr().load("res/STXINGKA.TTF.png", gd3d.framework.AssetTypeEnum.Auto, (s) =>
+                //     {
+                //         if (s.isfinish)
+                //         {
+                //             app.getAssetMgr().load("res/resources/STXINGKA.font.json", gd3d.framework.AssetTypeEnum.Auto, (s1) =>
+                //             {
+                //                 label.font = app.getAssetMgr().getAssetByName("STXINGKA.font.json") as gd3d.framework.font;
+                //                 label.transform.markDirty();
+                //             });
+                //         }
+                //     });
+                // }
+                // else
+                // {
+                //     label.font = _font as gd3d.framework.font;;
+                //     label.transform.markDirty();
+                // }
             };
             TransformUtil.create2D_button = function (btn, app) {
                 btn.transform.width = 150;
@@ -63918,34 +64047,69 @@ var gd3d;
                 img.imageType = gd3d.framework.ImageType.Sliced;
                 btn.targetImage = img;
                 btn.transition = gd3d.framework.TransitionType.ColorTint; //颜色变换
-                var lab = new gd3d.framework.transform2D();
-                lab.name = "label";
-                lab.width = 150;
-                lab.height = 50;
-                lab.pivot.x = 0;
-                lab.pivot.y = 0;
+                // var lab = new gd3d.framework.transform2D();
+                var lab = this.make2DNode("label", btn.transform, 0, 150, 50);
                 lab.localTranslate.y = -10;
                 var label = lab.addComponent("label");
                 label.text = "button";
                 label.fontsize = 25;
                 label.color = new gd3d.math.color(1, 0, 0, 1);
-                btn.transform.addChild(lab);
-                var _font = app.getAssetMgr().getAssetByName("STXINGKA.font.json");
-                if (_font == null) {
-                    app.getAssetMgr().load("res/STXINGKA.TTF.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                        if (s.isfinish) {
-                            app.getAssetMgr().load("res/resources/STXINGKA.font.json", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
-                                label.font = app.getAssetMgr().getAssetByName("STXINGKA.font.json");
-                                btn.transform.markDirty();
-                            });
-                        }
-                    });
-                }
-                else {
-                    label.font = _font;
-                    ;
-                    btn.transform.markDirty();
-                }
+                // let _font = app.getAssetMgr().getAssetByName("STXINGKA.font.json");
+                // if (_font == null)
+                // {
+                //     app.getAssetMgr().load("res/STXINGKA.TTF.png", gd3d.framework.AssetTypeEnum.Auto, (s) =>
+                //     {
+                //         if (s.isfinish)
+                //         {
+                //             app.getAssetMgr().load("res/resources/STXINGKA.font.json", gd3d.framework.AssetTypeEnum.Auto, (s1) =>
+                //             {
+                //                 label.font = app.getAssetMgr().getAssetByName("STXINGKA.font.json") as gd3d.framework.font;
+                //                 btn.transform.markDirty();
+                //             });
+                //         }
+                //     });
+                // }
+                // else
+                // {
+                //     label.font = _font as gd3d.framework.font;;
+                //     btn.transform.markDirty();
+                // }
+            };
+            TransformUtil.create2D_InputField = function (ipt, app) {
+                var assetMgr = app.getAssetMgr();
+                var opt = framework.layoutOption;
+                var tOpt = opt.TOP | opt.RIGHT | opt.BOTTOM | opt.LEFT;
+                //设置节点
+                var node = ipt.transform;
+                node.width = 160;
+                node.height = 30;
+                node.isMask = true;
+                //添加 背景图
+                var bg_t = this.make2DNode("frameImage", node, tOpt);
+                var bg_img = bg_t.addComponent("image2D");
+                bg_img.sprite = assetMgr.getDefaultSprite("white_sprite");
+                var fSize = 24;
+                //添加 Text lable
+                var text_t = this.make2DNode("Text", node, tOpt);
+                var text_l = text_t.addComponent("label");
+                text_l.verticalType = gd3d.framework.VerticalType.Top;
+                text_l.horizontalType = gd3d.framework.HorizontalType.Left;
+                text_l.fontsize = fSize;
+                gd3d.math.colorSet(text_l.color, 0, 0, 0, 1);
+                gd3d.math.colorSet(text_l.color2, 0, 0, 0, 0.5);
+                //添加 占位文本 label
+                var placeholder_t = this.make2DNode("Placeholder", node, tOpt);
+                var placeholder_l = placeholder_t.addComponent("label");
+                placeholder_l.verticalType = gd3d.framework.VerticalType.Top;
+                placeholder_l.horizontalType = gd3d.framework.HorizontalType.Left;
+                placeholder_l.fontsize = fSize;
+                gd3d.math.colorSet(placeholder_l.color, 0.6, 0.6, 0.6, 1);
+                gd3d.math.colorSet(placeholder_l.color2, 0.6, 0.6, 0.6, 0.5);
+                //组合
+                ipt.TextLabel = text_l;
+                ipt.PlaceholderLabel = placeholder_l;
+                ipt.frameImage = bg_img;
+                node.markDirty();
             };
             return TransformUtil;
         }());

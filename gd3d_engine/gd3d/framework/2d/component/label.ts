@@ -1,7 +1,6 @@
 ﻿/// <reference path="../../../io/reflect.ts" />
 
-namespace gd3d.framework
-{
+namespace gd3d.framework {
     /**
      * @public
      * @language zh_CN
@@ -11,8 +10,7 @@ namespace gd3d.framework
      */
     @reflect.node2DComponent
     @reflect.nodeRender
-    export class label implements IRectRenderer
-    {
+    export class label implements IRectRenderer {
 
         private static readonly defUIShader = `shader/defuifont`;
         private static readonly defMaskUIShader = `shader/defmaskfont`;
@@ -28,6 +26,12 @@ namespace gd3d.framework
         /**字段 用于快速判断实例是否是label */
         readonly isLabel = true;
 
+        /** 当需渲染字符被 加入排列时 的回调*/
+        public onAddRendererText: (x: number, y: number) => void;
+
+        /** 有图片字符需要渲染 */
+        private _hasImageChar: boolean = false;
+
         private _text: string = "";
         /**
          * @public
@@ -37,12 +41,10 @@ namespace gd3d.framework
          * @version gd3d 1.0
          */
         @gd3d.reflect.Field("string")
-        get text(): string
-        {
+        get text(): string {
             return this._text;
         }
-        set text(text: string)
-        {
+        set text(text: string) {
             text = text == null ? "" : text;
             let hasChange = text != this._text;
             this._text = text;
@@ -52,13 +54,11 @@ namespace gd3d.framework
             this._richDrity = hasChange;
         }
 
-        private initdater(textLen: number, datar: number[])
-        {
+        private initdater(textLen: number, datar: number[]) {
             let size = 6 * 13;
             let cachelen = size * textLen;
             //少了补充
-            while (datar.length < cachelen)
-            {   // {pos,color1,uv,color2}
+            while (datar.length < cachelen) {   // {pos,color1,uv,color2}
                 datar.push(
                     0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1,
                     0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1,
@@ -69,8 +69,7 @@ namespace gd3d.framework
                 );
             }
             //多了弹出
-            while (datar.length > cachelen)
-            {
+            while (datar.length > cachelen) {
                 // datar.pop();
                 datar.splice(datar.length - size, size);
             }
@@ -84,26 +83,21 @@ namespace gd3d.framework
          * 字体
          * @version gd3d 1.0
          */
-        get font()
-        {
+        get font() {
             return this._font;
         }
-        set font(font: font)
-        {
+        set font(font: font) {
             if (font == this._font) return;
 
             this.needRefreshFont = true;
-            if (this._font)
-            {
+            if (this._font) {
                 this._font.unuse();
             }
             this._font = font;
-            if (font)
-            {
+            if (font) {
                 this._font.use();
                 this._fontName = this._font.getName();
-            } else
-            {
+            } else {
                 this._fontName = "";
             }
         }
@@ -121,12 +115,10 @@ namespace gd3d.framework
          * @version gd3d 1.0
          */
         @gd3d.reflect.Field("number")
-        get fontsize()
-        {
+        get fontsize() {
             return this._fontsize;
         }
-        set fontsize(size: number)
-        {
+        set fontsize(size: number) {
             this._fontsize = size;
         }
 
@@ -183,13 +175,11 @@ namespace gd3d.framework
 
         private lastStr: string = "";
         /** 检查文字,是否需要 动态添加 */
-        private chackText(str: string)
-        {
+        private chackText(str: string) {
             let _font = this.font;
             if (!_font || !str || str == this.lastStr) return;
             let missingStr: string = "";
-            for (var i = 0, len = this._text.length; i < len; i++)
-            {
+            for (var i = 0, len = this._text.length; i < len; i++) {
                 let c = this._text.charAt(i);
                 if (_font.cmap[c]) continue;
                 missingStr += c;
@@ -203,8 +193,7 @@ namespace gd3d.framework
         /**
          * @private
          */
-        updateData(_font: gd3d.framework.font)
-        {
+        updateData(_font: gd3d.framework.font) {
             if (label.onTryExpandTexts) { this.chackText(this._text); } //检查 依赖文本(辅助 自动填充字体)
             //set data
             let b = this._defTextBlocks[0];
@@ -395,8 +384,7 @@ namespace gd3d.framework
         // }
 
         /** 更新数据 富文本 模式 */
-        private updateDataRich(_font: gd3d.framework.font)
-        {
+        private updateDataRich(_font: gd3d.framework.font) {
             //检查 依赖文本(辅助 自动填充字体)
             if (label.onTryExpandTexts) { this.chackText(this._text); }
 
@@ -409,8 +397,7 @@ namespace gd3d.framework
          * @param _font 
          * @param blocks 
          */
-        private setDataByBlock(_font: font, blocks: IBlock[])
-        {
+        private setDataByBlock(_font: font, blocks: IBlock[]) {
             //字符的 label尺寸 与 像素尺寸 的比值。
             let fontSize = this._fontsize;
             let rate = fontSize / _font.pointSize;
@@ -444,8 +431,7 @@ namespace gd3d.framework
 
             let fullText = "";
             //筛选能渲染的数据,处理分行
-            for (let i = 0, len = blocks.length; i < len; i++)
-            {
+            for (let i = 0, len = blocks.length; i < len; i++) {
                 let block = blocks[i];
                 let text = block.text;
                 let opts = block.opts;
@@ -454,8 +440,7 @@ namespace gd3d.framework
                 //是否是 字符图
                 let hasImg = false;
                 let imgOpt = this.getImgOpt(opts);
-                if (atlas && imgOpt)
-                {
+                if (atlas && imgOpt) {
                     //图集中是否能找到 该sprite
                     let sp = atlas.sprites[imgOpt.value];
                     hasImg = sp != null;
@@ -463,33 +448,28 @@ namespace gd3d.framework
 
                 let forceBreak = false;
                 //遍历字符串
-                for (let j = 0, len1 = text.length; j < len1; j++)
-                {
+                for (let j = 0, len1 = text.length; j < len1; j++) {
                     let hasC = false;
                     let cWidth = 0;
                     let c = "";
                     let isNewline = false;
-                    if (!hasImg)
-                    {
+                    if (!hasImg) {
                         c = text.charAt(j);
                         isNewline = c == `\n`; //换行符
                         let cinfo = _font.cmap[c];
                         if (!isNewline && !cinfo) { continue; }
-                        if (cinfo)
-                        {
+                        if (cinfo) {
                             cWidth = cinfo.xAddvance * rate;                            //字符的宽度
                             hasC = true;
                         }
-                    } else
-                    {
+                    } else {
                         hasC = true;
                         cWidth = fontSize;
                         c = "*";
                     }
 
                     //需要换行了
-                    if (isNewline || txadd + cWidth > contrast_w)
-                    {
+                    if (isNewline || txadd + cWidth > contrast_w) {
                         if (tyadd + lineHeight > contrast_h) { forceBreak = true; break; }             //高度超限制了
 
                         lineEndIndexs.push(rI);
@@ -498,8 +478,7 @@ namespace gd3d.framework
                         tyadd += lineHeight;                                        //文本y偏移增加
                     }
 
-                    if (hasC)
-                    {
+                    if (hasC) {
                         txadd += cWidth;                                            //文本x偏移增加
                         fullText += c;
                         rI++;
@@ -531,20 +510,21 @@ namespace gd3d.framework
 
             //准备容器
             this.initdater(fullText.length - imgCharCount, this.datar);
-            if (imgCharCount)
-            {
+            if (imgCharCount) {
                 this.initdater(imgCharCount, this.imgDatar);    //字符图 数据容器
             }
             //
+            this._hasImageChar = false;
             rI = 0;
             let textI = 0;
             let imgI = 0;
             let lineI = lineEndIndexs.shift();
+            let lineWidth = lineWidths.shift();
             let forceBreak = false;
-            let lineCount = 1;
+            let toNewLine = true;
+            let lineCount = 0;
             //填充顶点数据
-            for (let i = 0, len = blocks.length; i < len; i++)
-            {
+            for (let i = 0, len = blocks.length; i < len; i++) {
                 let block = blocks[i];
                 let text = block.text;
                 let opts = block.opts;
@@ -554,13 +534,11 @@ namespace gd3d.framework
                 //color 选项
                 let color = optObj.color != null ? optObj.color : this.color;
                 let color2: math.color;
-                if (optObj.color)
-                {
+                if (optObj.color) {
                     color2 = label.helpColor;
                     math.colorClone(optObj.color, color2);
                     color2.a *= 0.5;
-                } else
-                {
+                } else {
                     color2 = this.color2;
                 }
                 //粗体
@@ -569,34 +547,38 @@ namespace gd3d.framework
                 //下划线
 
                 //遍历字符串
-                for (let j = 0, len1 = text.length; j < len1; j++)
-                {
+                for (let j = 0, len1 = text.length; j < len1; j++) {
                     if (lineI == null) { forceBreak = true; break; }
-                    if (rI >= lineI)
-                    {
+
+                    if (rI >= lineI) {
                         lineI = lineEndIndexs.shift();
-                        if (lineI == null) { forceBreak = true; break; }
+                        lineWidth = lineWidths.shift();
+                        if (lineI == null || lineWidth == null) { forceBreak = true; break; }
+                        toNewLine = true;
+                    }
+
+                    if (toNewLine) {
                         //换行了
                         xadd = 0;
                         //水平居中布局
-                        if (this.horizontalType == HorizontalType.Center) { xadd += lineWidths[lineI] / 2; }
+                        if (this.horizontalType == HorizontalType.Center) { xadd += lineWidth / 2; }
                         //水平靠右布局
-                        else if (this.horizontalType == HorizontalType.Right) { xadd += lineWidths[lineI]; }
+                        else if (this.horizontalType == HorizontalType.Right) { xadd += lineWidth; }
                         //y 偏移值
                         yadd = yOffset + lineHeight * lineCount;
                         //行数增加
                         lineCount++;
+                        toNewLine = false;
                     }
 
                     let hasImg = fullText[rI] == "*" && optObj.img;
                     let _I = 0;
                     let datar: number[];
-                    let c = text.charAt(j);
-                    let cinfo: charinfo;
-                    if (!hasImg)
-                    {
+                    let c: string;
+                    if (!hasImg) {
                         _I = textI;
-                        cinfo = _font.cmap[c];
+                        c = text.charAt(j);
+                        let cinfo = _font.cmap[c];
                         if (cinfo == undefined) { continue; }
                         //填充字符数据
                         datar = this.datar;
@@ -617,8 +599,7 @@ namespace gd3d.framework
                         var v3 = cinfo.y + cinfo.h;
 
                         //主color
-                        for (let k = 0; k < 6; k++)
-                        {
+                        for (let k = 0; k < 6; k++) {
                             datar[_I * 6 * 13 + 13 * k + 3] = color.r;
                             datar[_I * 6 * 13 + 13 * k + 4] = color.g;
                             datar[_I * 6 * 13 + 13 * k + 5] = color.b;
@@ -632,8 +613,9 @@ namespace gd3d.framework
 
                         //x 偏移增加
                         xadd += cinfo.xAddvance * rate;
-                    } else
-                    {
+                    } else {
+                        this._hasImageChar = true;
+                        c = fullText[rI];
                         _I = imgI;
                         datar = this.imgDatar;
                         //填充字符图数据
@@ -643,7 +625,7 @@ namespace gd3d.framework
                         var ch = imgSize;
                         var cw = imgSize;
                         var x0 = xadd + imgHalfGap;
-                        var y0 = yadd - imgSize + rBaseLine + imgHalfGap;
+                        var y0 = yadd + imgHalfGap;
 
                         //uv
                         let urange = sp.urange;
@@ -659,8 +641,7 @@ namespace gd3d.framework
                         var v3 = vrange.y;
 
                         //主color
-                        for (let k = 0; k < 6; k++)
-                        {
+                        for (let k = 0; k < 6; k++) {
                             datar[_I * 6 * 13 + 13 * k + 3] = 1;
                             datar[_I * 6 * 13 + 13 * k + 4] = 1;
                             datar[_I * 6 * 13 + 13 * k + 5] = 1;
@@ -712,13 +693,14 @@ namespace gd3d.framework
                     this.max_x = Math.max(_x0, _x1, _x2, _x3, this.max_x);
                     this.max_y = Math.max(_y0, _y1, _y2, _y3, this.max_y);
 
+                    //字符加入渲染队列
+                    if (this.onAddRendererText) this.onAddRendererText(x3, y3);
+
                     //有效渲染字符 索引递增
                     rI++;
-                    if (!hasImg)
-                    {
+                    if (!hasImg) {
                         textI++;
-                    } else
-                    {
+                    } else {
                         imgI++;
                         break;  //是图片字符 跳出该block
                     }
@@ -734,35 +716,28 @@ namespace gd3d.framework
         }
 
         /**获取 图片字符 选项 */
-        private getImgOpt(opts: IRichTextOpt[])
-        {
+        private getImgOpt(opts: IRichTextOpt[]) {
             if (opts == null) return;
-            for (let i = 0, len = opts.length; i < len; i++)
-            {
+            for (let i = 0, len = opts.length; i < len; i++) {
                 let val = opts[i];
                 if (val && val.getType() == RichOptType.Image) return val;
             }
         }
 
         /** 获取富文本选项 对象 */
-        private getOptObj(opts: IRichTextOpt[], out: { i: boolean, b: boolean, u: boolean, color: math.color, img: string })
-        {
+        private getOptObj(opts: IRichTextOpt[], out: { i: boolean, b: boolean, u: boolean, color: math.color, img: string }) {
             out.i = false;
             out.b = false;
             out.u = false;
-            if (out.color)
-            {
+            if (out.color) {
                 math.pool.delete_color(out.color);
                 out.color = null;
             }
             out.img = "";
             if (!opts) return;
-            opts.forEach((val) =>
-            {
-                if (val)
-                {
-                    switch (val.getType())
-                    {
+            opts.forEach((val) => {
+                if (val) {
+                    switch (val.getType()) {
                         case RichOptType.Italic: out.i = true; break;
                         case RichOptType.Color:
                             let c = val.value as math.color;
@@ -779,6 +754,7 @@ namespace gd3d.framework
         }
 
         private data_begin: math.vector2 = new math.vector2(0, 0);
+        private _lastBegin: math.vector2 = new math.vector2(0, 0);
         /** 文本顶点数据 */
         private datar: number[] = [];
         /** 字符图 顶点数据 */
@@ -836,12 +812,10 @@ namespace gd3d.framework
          * (例如 表情)
          */
         public get imageTextAtlas() { return this._imageTextAtlas; }
-        public set imageTextAtlas(val: atlas)
-        {
+        public set imageTextAtlas(val: atlas) {
             if (val == this._imageTextAtlas) return;
             this._imageTextAtlas = val;
-            if (this._imageTextAtlas)
-            {
+            if (this._imageTextAtlas) {
                 this._imageTextAtlasName = this._imageTextAtlas.getName();
             }
             this.needRefreshAtlas = true;
@@ -863,8 +837,7 @@ namespace gd3d.framework
          * 设置rander Shader名字
          * @version gd3d 1.0
          */
-        setShaderByName(shaderName: string)
-        {
+        setShaderByName(shaderName: string) {
             this._CustomShaderName = shaderName;
         }
 
@@ -875,10 +848,8 @@ namespace gd3d.framework
          * 获取rander 的材质
          * @version gd3d 1.0
          */
-        getMaterial()
-        {
-            if (!this._uimat)
-            {
+        getMaterial() {
+            if (!this._uimat) {
                 return this.uimat;
             }
             return this._uimat;
@@ -893,10 +864,8 @@ namespace gd3d.framework
          * 获取渲染绘制矩形边界
          * @version gd3d 1.0
          */
-        getDrawBounds()
-        {
-            if (!this._darwRect)
-            {
+        getDrawBounds() {
+            if (!this._darwRect) {
                 this._darwRect = new math.rect();
                 this.calcDrawRect();
             }
@@ -904,29 +873,25 @@ namespace gd3d.framework
         }
 
         /** 获取材质 通过 shaderName*/
-        private getMatByShader(oldMat: material, _tex: texture, cShaderName: string, defMaskSh: string, defSh: string, newMatCB?: Function)
-        {
+        private getMatByShader(oldMat: material, _tex: texture, cShaderName: string, defMaskSh: string, defSh: string, newMatCB?: Function) {
             let transform = this.transform;
             let assetmgr = sceneMgr.app.getAssetMgr();
             let pMask = transform.parentIsMask;
             let mat = oldMat;
             let rectTag = "";
             let uiTag = "_ui";
-            if (pMask)
-            {
+            if (pMask) {
                 //when parentIsMask,can't multiplexing material , can be multiplexing when parent equal
                 let rId = transform.maskRectId;
                 rectTag = `mask(${rId})`;
             }
             let matName = _tex.getName() + uiTag + rectTag;
-            if (!mat || mat.getName() != matName)
-            {
+            if (!mat || mat.getName() != matName) {
                 if (mat) mat.unuse();
                 mat = assetmgr.getAssetByName(matName) as gd3d.framework.material;
                 if (mat) mat.use();
             }
-            if (!mat)
-            {
+            if (!mat) {
                 mat = new material(matName);
                 let sh = assetmgr.getShader(cShaderName);
                 sh = sh ? sh : assetmgr.getShader(pMask ? defMaskSh : defSh);
@@ -944,8 +909,7 @@ namespace gd3d.framework
           * ui默认材质
           */
         private _uimat: material;
-        private get uimat()
-        {
+        private get uimat() {
             let assetmgr = sceneMgr.app.getAssetMgr();
             if (!assetmgr) return this._uimat;
 
@@ -954,11 +918,10 @@ namespace gd3d.framework
             if (!this.font || !this.font.texture) return this._uimat;
             //获取材质
             this._uimat = this.getMatByShader(this._uimat, this.font.texture,
-                this._CustomShaderName, label.defMaskUIShader, label.defUIShader, () =>
-            {
-                //材质资源对象 刷新了
-                this.needRefreshFont = true;
-            });
+                this._CustomShaderName, label.defMaskUIShader, label.defUIShader, () => {
+                    //材质资源对象 刷新了
+                    this.needRefreshFont = true;
+                });
 
             return this._uimat;
         }
@@ -967,8 +930,7 @@ namespace gd3d.framework
          * 字符图材质
          */
         private _imgUIMat: material;
-        private get imgUIMat()
-        {
+        private get imgUIMat() {
             let assetmgr = sceneMgr.app.getAssetMgr();
             if (!assetmgr) return this._imgUIMat;
 
@@ -976,11 +938,10 @@ namespace gd3d.framework
 
             if (!this._imageTextAtlas || !this._imageTextAtlas.texture) return this._imgUIMat;
             this._imgUIMat = this.getMatByShader(this._imgUIMat, this._imageTextAtlas.texture,
-                "", label.defImgMaskUIShader, label.defImgUIShader, () =>
-            {
-                //材质资源对象 刷新了
-                this.needRefreshAtlas = true;
-            });
+                "", label.defImgMaskUIShader, label.defImgUIShader, () => {
+                    //材质资源对象 刷新了
+                    this.needRefreshAtlas = true;
+                });
 
             return this._imgUIMat;
         }
@@ -991,49 +952,40 @@ namespace gd3d.framework
         /**
          * @private
          */
-        render(canvas: canvas)
-        {
+        render(canvas: canvas) {
             let mat = this.uimat;
             if (!mat) return;
 
             if (!this._font) return;
-            if (this._richText)
-            {
-                if (this._richDrity)
-                {
+            if (this._richText) {
+                if (this._richDrity) {
                     //富文本模式
                     this.parseRichText(this.text);
                     this.updateDataRich(this._font);
                     this._richDrity = false;
                 }
-            } else if (this.dirtyData)
-            {
+            } else if (this.dirtyData) {
                 this.updateData(this._font);
                 this.dirtyData = false;
             }
 
             let img;
-            if (this._font)
-            {
+            if (this._font) {
                 img = this._font.texture;
             }
 
-            if (img)
-            {
+            if (img) {
                 let forceRMask = false;
-                if (this.needRefreshFont)
-                {
+                if (this.needRefreshFont) {
                     mat.setTexture("_MainTex", img);
                     this.needRefreshFont = false;
                     forceRMask = true;
                 }
 
-                if (this.transform.parentIsMask)
-                {
+                if (this.transform.parentIsMask) {
                     //mask uniform 上传
                     this.setMaskData(mat, forceRMask);
-                } else
-                {
+                } else {
                     mat.setFloat("_outlineWidth", this.outlineWidth);
                 }
 
@@ -1041,7 +993,7 @@ namespace gd3d.framework
                     canvas.pushRawData(mat, this.datar);
             }
 
-            if (!this._richText || !this.imgDatar || this.imgDatar.length < 1) return;
+            if (!this._hasImageChar || !this._richText || !this.imgDatar || this.imgDatar.length < 1) return;
             //字符图绘制
             let imgMat = this.imgUIMat;
             if (!imgMat) return;
@@ -1051,59 +1003,49 @@ namespace gd3d.framework
 
             if (!_img) return;
             let forceRMask = false;
-            if (this.needRefreshAtlas)
-            {
+            if (this.needRefreshAtlas) {
                 imgMat.setTexture("_MainTex", _img);
                 this.needRefreshAtlas = false;
                 forceRMask = true;
             }
 
-            if (this.transform.parentIsMask)
-            {
+            if (this.transform.parentIsMask) {
                 //mask uniform 上传
                 this.setMaskData(imgMat, forceRMask);
             }
 
             //提交 字符图顶点数据
-            if (this.imgDatar.length > 0)
-            {
+            if (this.imgDatar.length > 0) {
                 canvas.pushRawData(imgMat, this.imgDatar);
             }
         }
 
-        private setMaskData(mat: material, needRMask: boolean)
-        {
+        private setMaskData(mat: material, needRMask: boolean) {
             //mask uniform 上传
             if (this._cacheMaskV4 == null) this._cacheMaskV4 = new math.vector4();
             let rect = this.transform.maskRect;
-            if (this._cacheMaskV4.x != rect.x || this._cacheMaskV4.y != rect.y || this._cacheMaskV4.w != rect.w || this._cacheMaskV4.z != rect.h || needRMask)
-            {
+            if (this._cacheMaskV4.x != rect.x || this._cacheMaskV4.y != rect.y || this._cacheMaskV4.w != rect.w || this._cacheMaskV4.z != rect.h || needRMask) {
                 this._cacheMaskV4.x = rect.x; this._cacheMaskV4.y = rect.y; this._cacheMaskV4.z = rect.w; this._cacheMaskV4.w = rect.h;
                 mat.setVector4("_maskRect", this._cacheMaskV4);
             }
         }
 
         //资源管理器中寻找 指定的贴图资源
-        private searchTexture()
-        {
+        private searchTexture() {
             //font  不存在，但有名字，在资源管理器中搜索
-            if (!this._font && this._fontName)
-            {
+            if (!this._font && this._fontName) {
                 //字体
                 let assetmgr = sceneMgr.app.getAssetMgr();
                 let resName = this._fontName;
                 let abname = resName.replace(".font.json", ".assetbundle.json");
                 let temp = assetmgr.getAssetByName(resName, abname);
-                if (!temp)
-                {
+                if (!temp) {
                     resName = `${this._fontName}.font.json`
                     temp = assetmgr.getAssetByName(resName, abname);
                 }
-                if (temp != null)
-                {
+                if (temp != null) {
                     let tfont = assetmgr.getAssetByName(resName, abname) as gd3d.framework.font;
-                    if (tfont)
-                    {
+                    if (tfont) {
                         this.font = tfont;
                         this.needRefreshFont = true;
                     }
@@ -1113,17 +1055,14 @@ namespace gd3d.framework
 
         }
 
-        private searchTextureAtlas()
-        {
+        private searchTextureAtlas() {
             //字符图集
-            if (!this._imageTextAtlas && this._imageTextAtlasName)
-            {
+            if (!this._imageTextAtlas && this._imageTextAtlasName) {
                 let assetmgr = sceneMgr.app.getAssetMgr();
                 let atlasName = this._imageTextAtlasName;
                 let abname = atlasName.replace(".atlas.json", ".assetbundle.json");
                 let temp = assetmgr.getAssetByName(atlasName, abname) as atlas;
-                if (temp)
-                {
+                if (temp) {
                     this.imageTextAtlas = temp;
                 }
             }
@@ -1134,17 +1073,22 @@ namespace gd3d.framework
         /**
          * @private
          */
-        updateTran()
-        {
+        updateTran() {
             var m = this.transform.getWorldMatrix();
 
             var l = -this.transform.pivot.x * this.transform.width;
             var t = -this.transform.pivot.y * this.transform.height;
-            this.data_begin.x = l * m.rawData[0] + t * m.rawData[2] + m.rawData[4];
-            this.data_begin.y = l * m.rawData[1] + t * m.rawData[3] + m.rawData[5];
-            //只把左上角算出来
-            this.dirtyData = true;
-            this._richDrity = true;
+            let _b = this._lastBegin;
+            let d_b = this.data_begin;
+            d_b.x = l * m.rawData[0] + t * m.rawData[2] + m.rawData[4];
+            d_b.y = l * m.rawData[1] + t * m.rawData[3] + m.rawData[5];
+            //data_begin 有变化需要dirty
+            if (!math.vec2Equal(_b, d_b, 0.00001)) {
+                this.dirtyData = true;
+                this._richDrity = true;
+            }
+
+            gd3d.math.vec2Clone(d_b, _b);
         }
 
         private min_x: number = Number.MAX_VALUE;
@@ -1152,8 +1096,7 @@ namespace gd3d.framework
         private min_y: number = Number.MAX_VALUE;
         private max_y: number = Number.MAX_VALUE * -1;
         /** 计算drawRect */
-        private calcDrawRect()
-        {
+        private calcDrawRect() {
             if (!this._darwRect) return;
             //drawBounds (y 轴反向)
             let canvas = this.transform.canvas;
@@ -1185,8 +1128,7 @@ namespace gd3d.framework
          * 解析 富文本
          * @param text 
          */
-        private parseRichText(text: string)
-        {
+        private parseRichText(text: string) {
             //Color <color=#ffffffff></color>   文字颜色
             //Bold <b>text</b>                  文字加粗
             //Underline <u>text</u>             文字加下划线
@@ -1202,24 +1144,20 @@ namespace gd3d.framework
             let blockDatas: { text: string, opts: IRichTextOpt[] }[] = this._richTextBlocks;
             blockDatas.length = 0;
 
-            let genBlockFun = () =>
-            {
+            let genBlockFun = () => {
                 let str = strStack.shift();
                 //没有数据跳过
                 if (!str || str.length < 1) return;
                 let opts = optStack.length > 0 ? optStack.concat() : null;
                 blockDatas.push({ text: str, opts: opts });
             };
-            for (let i = 0; i < len; i++)
-            {
+            for (let i = 0; i < len; i++) {
                 let char = text[i];
 
-                if (char == "<")
-                {
+                if (char == "<") {
                     genBlockFun();
                     xmlStart = true;
-                } else if (char == "[")
-                {
+                } else if (char == "[") {
                     genBlockFun();
                     imgStart = true;
                 }
@@ -1227,30 +1165,27 @@ namespace gd3d.framework
                 if (strStack.length < 1) strStack.push("");
                 strStack[strStack.length - 1] += char;
 
-                if (char == ">" && xmlStart)
-                {
+                if (char == ">" && xmlStart) {
                     xmlStart = false;
                     // let xmlStr = strStack.pop();
                     let xmlStr = strStack[strStack.length - 1];
                     let isValid = false;
                     //判断 标签是开始 还是结束
-                    if (xmlStr[1] == "/")
-                    {
+                    if (xmlStr[1] == "/") {
                         let endOpt = optStack[optStack.length - 1];
-                        //选项确认有效
-                        switch (xmlStr)
-                        {
-                            case "</color>": isValid = endOpt.getType() == RichOptType.Color; break;
-                            case "</i>": isValid = endOpt.getType() == RichOptType.Italic; break;
-                            case "</b>": isValid = endOpt.getType() == RichOptType.Bold; break;
-                            case "</u>": isValid = endOpt.getType() == RichOptType.Underline; break;
+                        if (endOpt) {
+                            //选项确认有效
+                            switch (xmlStr) {
+                                case "</color>": isValid = endOpt.getType() == RichOptType.Color; break;
+                                case "</i>": isValid = endOpt.getType() == RichOptType.Italic; break;
+                                case "</b>": isValid = endOpt.getType() == RichOptType.Bold; break;
+                                case "</u>": isValid = endOpt.getType() == RichOptType.Underline; break;
+                            }
                         }
                         if (isValid) { optStack.pop(); }//结束标记 弹栈
-                    } else
-                    {
+                    } else {
                         //判断 标签类型
-                        switch (xmlStr)
-                        {
+                        switch (xmlStr) {
                             case "<i>": isValid = true; optStack.push(new richOptItalic()); break;
                             case "<b>": isValid = true; optStack.push(new richOptBold()); break;
                             case "<u>": isValid = true; optStack.push(new richOptUnderline()); break;
@@ -1264,7 +1199,7 @@ namespace gd3d.framework
                                 let r = Number(`0x${colorVal.substring(0, 2)}`);
                                 let g = Number(`0x${colorVal.substring(2, 4)}`);
                                 let b = Number(`0x${colorVal.substring(4, 6)}`);
-                                let a = vLen == 6 ? 1 : Number(`0x${colorVal.substring(6, 8)}`);
+                                let a = vLen == 6 ? this.color.a * 255 : Number(`0x${colorVal.substring(6, 8)}`);
                                 if (isNaN(r) || isNaN(g) || isNaN(b) || isNaN(a)) continue;
                                 optStack.push(new richOptColor(new gd3d.math.color(r / 255, g / 255, b / 255, a / 255)));
                                 isValid = true;
@@ -1273,8 +1208,7 @@ namespace gd3d.framework
                     }
 
                     if (isValid) { strStack.pop(); }    //选项有效 弹栈
-                } else if (char == "]" && imgStart)
-                {
+                } else if (char == "]" && imgStart) {
                     let str = strStack.pop();
                     let imgStr = str.substring(1, str.length - 1);
                     let imgOpt = new richOptImage(imgStr);
@@ -1283,8 +1217,7 @@ namespace gd3d.framework
                 }
             }
             //最后的数据
-            while (strStack.length > 0)
-            {
+            while (strStack.length > 0) {
                 genBlockFun();
             }
         }
@@ -1292,21 +1225,18 @@ namespace gd3d.framework
         /**
          * @private
          */
-        start()
-        {
+        start() {
 
         }
 
-        onPlay()
-        {
+        onPlay() {
 
         }
 
         /**
          * @private
          */
-        update(delta: number)
-        {
+        update(delta: number) {
 
         }
 
@@ -1322,8 +1252,7 @@ namespace gd3d.framework
         /**
          * @private
          */
-        remove()
-        {
+        remove() {
             if (this._font) this._font.unuse();
             if (this._imageTextAtlas) this._imageTextAtlas.unuse();
             if (this._uimat) this._uimat.unuse();
@@ -1334,6 +1263,9 @@ namespace gd3d.framework
             this._defTextBlocks.length = 0;
             this.transform = null;
             this._cacheMaskV4 = null;
+            this.onAddRendererText = null;
+            this.data_begin = null;
+            this._lastBegin = null;
         }
     }
 
@@ -1344,8 +1276,7 @@ namespace gd3d.framework
      * 横向显示方式
      * @version gd3d 1.0
      */
-    export enum HorizontalType
-    {
+    export enum HorizontalType {
         Center,
         Left,
         Right
@@ -1358,16 +1289,14 @@ namespace gd3d.framework
      * 纵向显示方式
      * @version gd3d 1.0
      */
-    export enum VerticalType
-    {
+    export enum VerticalType {
         Center,
         Top,
         Boom
     }
 
     /** 富文本类型 */
-    enum RichOptType
-    {
+    enum RichOptType {
         /** 颜色 */
         Color,
         /** 下划线 */
@@ -1381,8 +1310,7 @@ namespace gd3d.framework
     }
 
     /** 富文本选项接口 */
-    interface IRichTextOpt
-    {
+    interface IRichTextOpt {
         /** 值 */
         value: any;
         /** 获取类型 */
@@ -1392,10 +1320,8 @@ namespace gd3d.framework
     /**
      * 富文本选项 颜色
      */
-    class richOptColor implements IRichTextOpt
-    {
-        constructor(_c: math.color)
-        {
+    class richOptColor implements IRichTextOpt {
+        constructor(_c: math.color) {
             this.value = new math.color();
             math.colorClone(_c, this.value);
         }
@@ -1406,8 +1332,7 @@ namespace gd3d.framework
     /**
      * 富文本选项 下划线
      */
-    class richOptUnderline implements IRichTextOpt
-    {
+    class richOptUnderline implements IRichTextOpt {
         value: boolean = true;
         getType(): RichOptType { return RichOptType.Underline; }
     }
@@ -1415,8 +1340,7 @@ namespace gd3d.framework
     /**
      * 富文本选项 加粗
      */
-    class richOptBold implements IRichTextOpt
-    {
+    class richOptBold implements IRichTextOpt {
         value: boolean = true;
         getType(): RichOptType { return RichOptType.Bold; }
     }
@@ -1424,8 +1348,7 @@ namespace gd3d.framework
     /**
      * 富文本选项 斜体
      */
-    class richOptItalic implements IRichTextOpt
-    {
+    class richOptItalic implements IRichTextOpt {
         value: boolean = true;
         getType(): RichOptType { return RichOptType.Italic; }
     }
@@ -1433,18 +1356,15 @@ namespace gd3d.framework
     /**
      * 富文本选项 加粗
      */
-    class richOptImage implements IRichTextOpt
-    {
-        constructor(imgSrc: string)
-        {
+    class richOptImage implements IRichTextOpt {
+        constructor(imgSrc: string) {
             this.value = imgSrc;
         }
         value: string;
         getType(): RichOptType { return RichOptType.Image; }
     }
 
-    interface IBlock
-    {
+    interface IBlock {
         text: string,
         opts: IRichTextOpt[]
     };
