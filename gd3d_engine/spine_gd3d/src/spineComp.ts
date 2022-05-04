@@ -108,8 +108,11 @@ export class spineSkeleton implements gd3d.framework.I2DComponent {
         return this._toTransFormMatrix;
     }
 
+    private _pivotMat = new gd3d.math.matrix3x2();
     getToCanvasMatrix(mat = new gd3d.math.matrix3x2()): gd3d.math.matrix3x2 {
-        gd3d.math.matrix3x2Multiply(this.transform.getCanvasWorldMatrix(), this._toTransFormMatrix, mat)
+        gd3d.math.matrix3x2MakeTranslate((0.5 - this.transform.pivot.x) * this.transform.width, (0.5 - this.transform.pivot.y) * this.transform.height, this._pivotMat);
+        gd3d.math.matrix3x2Multiply(this.transform.getCanvasWorldMatrix(), this._pivotMat, mat);
+        gd3d.math.matrix3x2Multiply(mat, this._toTransFormMatrix, mat);
         return mat;
     }
 
