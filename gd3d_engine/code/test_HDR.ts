@@ -39,7 +39,7 @@ class HDR_sample implements IState
         ]
     )
     {
-        const tex: gd3d.framework.texture[] = await Promise.all(images.map(n => this.load(folder, n)));
+        const tex: gd3d.framework.texture[] = await Promise.all(images.map(n => this.load<gd3d.framework.texture>(folder, n)));
         const cubeTex = new gd3d.framework.texture(folder.split('/').pop());
         cubeTex.glTexture = new gd3d.render.glTextureCube(this.app.webgl, gd3d.render.TextureFormatEnum.RGBA, true, true);
         cubeTex.use();
