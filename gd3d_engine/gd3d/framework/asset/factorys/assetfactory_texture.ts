@@ -51,14 +51,15 @@ namespace gd3d.framework
         // }
         //#endregion
         parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, txt: string , dwguid: number)
-        {            
+        {
             let imgGuid = bundle && bundle.texs ?  bundle.texs[filename] : dwguid;
             let _tex = assetMgr.mapImage[imgGuid] || assetMgr.mapLoading[imgGuid].data;
             let _texture =  new texture(filename);
             var _textureFormat = render.TextureFormatEnum.RGBA;//这里需要确定格式
             var t2d = new gd3d.render.glTexture2D(assetmgr.webgl, _textureFormat);
             if(_tex){
-                t2d.uploadImage(_tex, false, true, true, false);
+                t2d.uploadImage(_tex, false, true, true, true); // TODO:
+                // t2d.uploadImage(_tex, false, true, true, false);
             }else{
                 console.warn(`_tex load fail !`);
             }

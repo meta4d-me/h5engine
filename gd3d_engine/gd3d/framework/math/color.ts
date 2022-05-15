@@ -80,15 +80,15 @@
      */
     export function colorToCSS(src: color, hasAlpha = true): string
     {
-        let r = (src.r * 255).toString(16);
-        let g = (src.r * 255).toString(16);
-        let b = (src.r * 255).toString(16);
+        let r = Math.round(src.r * 255).toString(16);
+        let g = Math.round(src.r * 255).toString(16);
+        let b = Math.round(src.r * 255).toString(16);
         if (r.length == 1) r += "0";
         if (g.length == 1) g += "0";
         if (b.length == 1) b += "0";
         if (hasAlpha)
         {
-            let a = (src.r * 255).toString(16);
+            let a = Math.round(src.r * 255).toString(16);
             if (a.length == 1) a += "0";
             return `#${r}${g}${b}${a}`;
         } else
