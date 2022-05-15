@@ -1,12 +1,14 @@
 //UI 组件样例
-class test_uiPerfabLoad implements IState {
+class test_uiPerfabLoad implements IState
+{
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
     camera: gd3d.framework.camera;
     taskmgr: gd3d.framework.taskMgr = new gd3d.framework.taskMgr();
     assetMgr: gd3d.framework.assetMgr;
     rooto2d: gd3d.framework.overlay2D;
-    start(app: gd3d.framework.application) {
+    start(app: gd3d.framework.application)
+    {
 
         this.app = app;
         this.scene = this.app.getScene();
@@ -39,13 +41,14 @@ class test_uiPerfabLoad implements IState {
         inputh.style.width = 100 + "px";
         inputh.style.height = 30 + "px";
         inputh.value = "button_comb1";
-        
+
         let btn = document.createElement("button");
         this.app.container.appendChild(btn);
         btn.textContent = "加载";
         btn.style.position = "absolute";
         btn.style.left = 120 + "px";
-        btn.onclick = ()=>{
+        btn.onclick = () =>
+        {
             console.error(inputh.innerText);
             console.error(inputh.textContent);
             console.error(inputh.value);
@@ -54,8 +57,9 @@ class test_uiPerfabLoad implements IState {
 
     }
 
-    private bgui :gd3d.framework.transform2D;
-    private createUI(astState: gd3d.framework.taskstate, state: gd3d.framework.taskstate) {
+    private bgui: gd3d.framework.transform2D;
+    private createUI(astState: gd3d.framework.taskstate, state: gd3d.framework.taskstate)
+    {
         let atlasComp = this.assetMgr.getAssetByName("comp.atlas.json") as gd3d.framework.atlas;
         let tex_0 = this.assetMgr.getAssetByName("zg03_256.png") as gd3d.framework.texture;
 
@@ -76,10 +80,10 @@ class test_uiPerfabLoad implements IState {
         bg_i.imageBorder.r = 10;
         bg_i.imageBorder.b = 10;
         bg_t.layoutState = 0 | gd3d.framework.layoutOption.LEFT | gd3d.framework.layoutOption.RIGHT | gd3d.framework.layoutOption.TOP | gd3d.framework.layoutOption.BOTTOM;
-        bg_t.setLayoutValue(gd3d.framework.layoutOption.LEFT,60);
-        bg_t.setLayoutValue(gd3d.framework.layoutOption.TOP,60);
-        bg_t.setLayoutValue(gd3d.framework.layoutOption.RIGHT,60);
-        bg_t.setLayoutValue(gd3d.framework.layoutOption.BOTTOM,60);
+        bg_t.setLayoutValue(gd3d.framework.layoutOption.LEFT, 60);
+        bg_t.setLayoutValue(gd3d.framework.layoutOption.TOP, 60);
+        bg_t.setLayoutValue(gd3d.framework.layoutOption.RIGHT, 60);
+        bg_t.setLayoutValue(gd3d.framework.layoutOption.BOTTOM, 60);
 
         this.bgui = bg_t;
 
@@ -91,8 +95,9 @@ class test_uiPerfabLoad implements IState {
 
         this.app.webgl.canvas.addEventListener("keydown", (ev: KeyboardEvent) =>
         {
-            if(ev.keyCode == 81){
-               
+            if (ev.keyCode == 81)
+            {
+
             }
         }, false);
 
@@ -101,49 +106,66 @@ class test_uiPerfabLoad implements IState {
         state.finish = true;
     }
 
-    targetui :gd3d.framework.transform2D ;
-    private doLoad(name){
-        if(!this.bgui) return;
-        if(this.targetui){
+    targetui: gd3d.framework.transform2D;
+    private doLoad(name)
+    {
+        if (!this.bgui) return;
+        if (this.targetui)
+        {
             this.bgui.removeChild(this.targetui);
             this.targetui.dispose();
         }
 
         let prefabName = name;
         // 加载 ui  预制体
-        this.assetMgr.load(`res/prefabs/UI/${prefabName}/${prefabName}.assetbundle.json`, gd3d.framework.AssetTypeEnum.Auto, (s1) => {
-            if (s1.isfinish) {
-                let ass =  this.assetMgr;
-                let temp = this.assetMgr.getAssetByName(`${prefabName}.prefab.json`) as gd3d.framework.prefab; 
+        this.assetMgr.load(`res/prefabs/UI/${prefabName}/${prefabName}.assetbundle.json`, gd3d.framework.AssetTypeEnum.Auto, (s1) =>
+        {
+            if (s1.isfinish)
+            {
+                let ass = this.assetMgr;
+                let temp = this.assetMgr.getAssetByName(`${prefabName}.prefab.json`, `${prefabName}.assetbundle.json`) as gd3d.framework.prefab;
                 let t2d = temp.getCloneTrans2D() as gd3d.framework.transform2D;
                 this.bgui.addChild(t2d);
-                t2d.layoutState = 0 | gd3d.framework.layoutOption.H_CENTER | gd3d.framework.layoutOption.V_CENTER ;
+                t2d.layoutState = 0 | gd3d.framework.layoutOption.H_CENTER | gd3d.framework.layoutOption.V_CENTER;
                 t2d.markDirty();
                 this.targetui = t2d;
-        }
+            }
         });
     }
 
-    private loadShaders(lastState: gd3d.framework.taskstate, state: gd3d.framework.taskstate){
-        this.assetMgr.load("res/shader/shader.assetbundle.json",gd3d.framework.AssetTypeEnum.Auto,(s)=>{
-            if(s.isfinish){
+    private loadShaders(lastState: gd3d.framework.taskstate, state: gd3d.framework.taskstate)
+    {
+        this.assetMgr.load("newRes/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (s) =>
+        {
+            if (s.isfinish)
+            {
                 state.finish = true;
             }
         });
     }
 
-    private loadTexture(lastState: gd3d.framework.taskstate, state: gd3d.framework.taskstate) {
+    private loadTexture(lastState: gd3d.framework.taskstate, state: gd3d.framework.taskstate)
+    {
         //加载图片资源
-        this.assetMgr.load("res/comp/comp.json.png", gd3d.framework.AssetTypeEnum.Auto, (s) => {
-            if (s.isfinish) {
-                this.assetMgr.load("res/comp/comp.atlas.json", gd3d.framework.AssetTypeEnum.Auto, (s) => {
-                    if(s.isfinish){
+        this.assetMgr.load("res/comp/comp.json.png", gd3d.framework.AssetTypeEnum.Auto, (s) =>
+        {
+            if (s.isfinish)
+            {
+                this.assetMgr.load("res/comp/comp.atlas.json", gd3d.framework.AssetTypeEnum.Auto, (s) =>
+                {
+                    if (s.isfinish)
+                    {
                         //加载字体资源
-                        this.assetMgr.load("res/STXINGKA.TTF.png",gd3d.framework.AssetTypeEnum.Auto,(s)=>{
-                            if(s.isfinish){
-                                this.assetMgr.load("res/resources/STXINGKA.font.json",gd3d.framework.AssetTypeEnum.Auto,(s)=>{
-                                    this.assetMgr.load("res/zg03_256.png",gd3d.framework.AssetTypeEnum.Auto,(s)=>{
-                                        if(s.isfinish){
+                        this.assetMgr.load("res/STXINGKA.TTF.png", gd3d.framework.AssetTypeEnum.Auto, (s) =>
+                        {
+                            if (s.isfinish)
+                            {
+                                this.assetMgr.load("res/resources/STXINGKA.font.json", gd3d.framework.AssetTypeEnum.Auto, (s) =>
+                                {
+                                    this.assetMgr.load("res/zg03_256.png", gd3d.framework.AssetTypeEnum.Auto, (s) =>
+                                    {
+                                        if (s.isfinish)
+                                        {
                                             state.finish = true;
                                         }
                                     });
@@ -156,7 +178,8 @@ class test_uiPerfabLoad implements IState {
         });
     }
 
-    update(delta: number) {
+    update(delta: number)
+    {
         this.taskmgr.move(delta); //推进task
 
     }

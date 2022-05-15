@@ -53,7 +53,7 @@ class main implements gd3d.framework.IUserCode
             demoList.addBtn("SSSSS", () => new test_sssss());
             demoList.addBtn("test_trailRender", () => new t.test_trailrender());
             demoList.addBtn("test_light1", () => new t.test_light1());
-            demoList.addBtn("test_light_d1", () => new t.light_d1());
+            // demoList.addBtn("test_light_d1", () => new t.light_d1());
             demoList.addBtn("test_normalmap", () => new t.Test_NormalMap());
             demoList.addBtn("test_f4skin", () => new test_f4skin());
             demoList.addBtn("GPU_Instancing 绘制", () => new test_GPU_instancing());

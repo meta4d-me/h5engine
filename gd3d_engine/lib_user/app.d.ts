@@ -99,10 +99,8 @@ declare namespace t {
     class light_d1 implements IState {
         app: gd3d.framework.application;
         scene: gd3d.framework.scene;
-        private loadShader;
-        private loadText;
         private addcube;
-        private addcamandlight;
+        private addCameraAndLight;
         start(app: gd3d.framework.application): void;
         camera: gd3d.framework.camera;
         light: gd3d.framework.light;
@@ -166,14 +164,7 @@ declare class test_loadScene implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
     start(app: gd3d.framework.application): void;
-    loadScene(assetName: string, isCompress?: boolean): void;
-    baihu: gd3d.framework.transform;
-    camera: gd3d.framework.camera;
-    cube: gd3d.framework.transform;
-    cube2: gd3d.framework.transform;
-    cube3: gd3d.framework.transform;
     timer: number;
-    bere: boolean;
     update(delta: number): void;
 }
 declare class test_loadMulBundle implements IState {
@@ -882,10 +873,11 @@ declare class test_keyFrameAni implements IState {
     camera: gd3d.framework.camera;
     taskMgr: gd3d.framework.taskMgr;
     obj3d: gd3d.framework.transform;
+    cameraNode: gd3d.framework.transform;
+    ins: gd3d.framework.transform;
     start(app: gd3d.framework.application): void;
-    private loadShader;
-    private loadasset;
-    private iniscene;
+    private addCamera;
+    private loadAsset;
     private addbtns;
     private addbtn;
     update(delta: number): void;
@@ -1568,18 +1560,8 @@ declare enum AlignType {
 declare class test_anim implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
-    player: gd3d.framework.transform;
-    cubes: {
-        [id: string]: gd3d.framework.transform;
-    };
-    _assetMgr: gd3d.framework.assetMgr;
-    list: any[];
     start(app: gd3d.framework.application): void;
     camera: gd3d.framework.camera;
-    cube: gd3d.framework.transform;
-    cube2: gd3d.framework.transform;
-    cube3: gd3d.framework.transform;
-    timer: number;
     update(delta: number): void;
 }
 declare class test_loadAsiprefab implements IState {
@@ -1706,15 +1688,14 @@ declare namespace t {
         app: gd3d.framework.application;
         scene: gd3d.framework.scene;
         tex: gd3d.framework.texture;
-        private loadShader;
         private loadText;
-        private addcube;
-        private addcamandlight;
+        private addCubes;
+        private addCube;
+        private addCameraAndLight;
         start(app: gd3d.framework.application): void;
         camera: gd3d.framework.camera;
         light: gd3d.framework.light;
         timer: number;
-        taskmgr: gd3d.framework.taskMgr;
         update(delta: number): void;
     }
 }
@@ -1766,12 +1747,9 @@ declare namespace t {
 declare class test_load implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
+    camera: any;
+    camNode: gd3d.framework.transform;
     start(app: gd3d.framework.application): void;
-    camera: gd3d.framework.camera;
-    cube: gd3d.framework.transform;
-    cube2: gd3d.framework.transform;
-    cube3: gd3d.framework.transform;
-    timer: number;
     update(delta: number): void;
 }
 declare namespace t {
@@ -1989,22 +1967,9 @@ declare namespace t {
     class test_sound implements IState {
         app: gd3d.framework.application;
         scene: gd3d.framework.scene;
-        camera: gd3d.framework.camera;
-        cube: gd3d.framework.transform;
-        parts: gd3d.framework.transform;
-        timer: number;
-        taskmgr: gd3d.framework.taskMgr;
-        count: number;
-        counttimer: number;
-        private angularVelocity;
-        private eulerAngle;
-        loopedBuffer: AudioBuffer;
+        camera: gd3d.framework.transform;
         once1: AudioBuffer;
         once2: AudioBuffer;
-        private loadShader;
-        private loadText;
-        private addcam;
-        private addcube;
         private loadSoundInfe;
         start(app: gd3d.framework.application): void;
         update(delta: number): void;
@@ -2060,6 +2025,8 @@ declare class test_texuv implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
     start(app: gd3d.framework.application): void;
+    private createBaseCube;
+    private createUvCube;
     camera: gd3d.framework.camera;
     baihu: gd3d.framework.transform;
     timer: number;
@@ -2069,23 +2036,15 @@ declare namespace t {
     class test_trailrender implements IState {
         app: gd3d.framework.application;
         scene: gd3d.framework.scene;
+        camera: gd3d.framework.camera;
         texResName: string;
-        private loadShader;
-        private loadText;
-        sh: gd3d.framework.shader;
         private initscene;
         start(app: gd3d.framework.application): void;
         org: gd3d.framework.transform;
-        cube: gd3d.framework.transform;
-        camera: gd3d.framework.camera;
         timer: number;
-        taskmgr: gd3d.framework.taskMgr;
-        grassMat: gd3d.framework.material;
-        private wind;
-        private WaveFrequency;
-        private WaveAmplitude;
         play: boolean;
         update(delta: number): void;
+        private addUI;
         private addbtn;
     }
 }
@@ -2145,6 +2104,13 @@ declare namespace t {
         private cycles;
         update(delta: number): void;
     }
+}
+declare namespace util {
+    function loadShader(assetMgr: gd3d.framework.assetMgr): Promise<void>;
+    function loadModel(assetMgr: gd3d.framework.assetMgr, modelName: string): Promise<gd3d.framework.prefab>;
+    function addCamera(scene: gd3d.framework.scene): gd3d.framework.transform;
+    function loadTex(url: string, assetMgr: gd3d.framework.assetMgr): Promise<void>;
+    function loadTextures(urls: string[], assetMgr: gd3d.framework.assetMgr): Promise<void[]>;
 }
 declare class UseAniplayClipDemo implements IState {
     app: gd3d.framework.application;
