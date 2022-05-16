@@ -974,6 +974,14 @@ declare class test_navMesh implements IState {
     private pointDown;
     update(delta: number): void;
 }
+declare class test_optimize_size_animationClip implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    prefab: gd3d.framework.transform;
+    start(app: gd3d.framework.application): void;
+    camera: gd3d.framework.camera;
+    update(delta: number): void;
+}
 declare class test_pbr implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;

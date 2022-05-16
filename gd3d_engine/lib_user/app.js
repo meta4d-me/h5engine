@@ -1185,6 +1185,7 @@ var main = (function () {
             demoList.addBtn("粒子系統", function () { return new test_ParticleSystem(); });
             demoList.addBtn("线条", function () { return new test_LineRenderer(); });
             demoList.addBtn("拖尾", function () { return new test_TrailRenderer(); });
+            demoList.addBtn("使用优化大小的动画", function () { return new test_optimize_size_animationClip(); });
             demoList.addBtn("Android平台ETC1压缩纹理", function () { return new test_ETC1_KTX(); });
             return new demoList();
         });
@@ -6414,6 +6415,52 @@ var test_navMesh = (function () {
         CameraController.instance().update(delta);
     };
     return test_navMesh;
+}());
+var test_optimize_size_animationClip = (function () {
+    function test_optimize_size_animationClip() {
+    }
+    test_optimize_size_animationClip.prototype.start = function (app) {
+        var _this = this;
+        console.log("i am here.");
+        this.app = app;
+        this.scene = this.app.getScene();
+        gd3d.framework.assetMgr.openGuid = true;
+        this.app.getAssetMgr().load("./newRes/shader/MainShader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
+            if (state.isfinish) {
+                _this.app.getAssetMgr().load("./newRes/pfb/laohu_fs_low/laohu_fs_low.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                    if (s.isfinish) {
+                        var _prefab = _this.app.getAssetMgr().getAssetByName("laohu_fs_low.prefab.json", "laohu_fs_low.assetbundle.json");
+                        var prefabObj_1 = _prefab.getCloneTrans();
+                        _this.scene.addChild(prefabObj_1);
+                        _this.prefab = prefabObj_1;
+                        _this.app.getAssetMgr().load("./newRes/pfb/laohu_fs_low/resources/idle.FBAni.aniclip.bin", gd3d.framework.AssetTypeEnum.Aniclip, function (s) {
+                            if (s.isfinish) {
+                                var aps = prefabObj_1.gameObject.getComponentsInChildren("aniplayer");
+                                var ap = aps[0];
+                                ap.addClip(s.resstateFirst.res);
+                                ap.play("idle.FBAni.aniclip.bin");
+                            }
+                        });
+                    }
+                });
+            }
+        });
+        var objCam = new gd3d.framework.transform();
+        objCam.name = "sth.";
+        this.scene.addChild(objCam);
+        this.camera = objCam.gameObject.addComponent("camera");
+        this.camera.near = 0.01;
+        this.camera.far = 100;
+        objCam.localTranslate = new gd3d.math.vector3(0, 10, 30);
+        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+        objCam.markDirty();
+    };
+    test_optimize_size_animationClip.prototype.update = function (delta) {
+        if (this.prefab) {
+            this.camera.gameObject.transform.lookat(this.prefab);
+        }
+    };
+    return test_optimize_size_animationClip;
 }());
 var test_pbr = (function () {
     function test_pbr() {
