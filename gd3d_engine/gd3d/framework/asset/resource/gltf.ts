@@ -138,12 +138,12 @@ namespace gd3d.framework
                     res(mgr.getAssetByName(uri.split('/').pop()));
                 });
             });
-            this.buffers = await Promise.all(this.data.buffers?.map(({ uri }) => load(uri)));
-            const images = await Promise.all(this.data.images?.map(({ uri }) => load(uri)));
+            this.buffers = await Promise.all(this.data?.buffers?.map(({ uri }) => load(uri)) ?? []);
+            const images = await Promise.all(this.data?.images?.map(({ uri }) => load(uri)) ?? []);
             const textures: texture[] = await Promise.all(this.data.textures?.map(({sampler, source}) => {
                 const tex = images[source] as texture; // TODO:
                 return tex;
-            }));
+            }) ?? []);
             const extrasCfg = this.data.extras?.clayViewerConfig?.materials as any[];
             const materials = this.data.materials?.map(m => {
                 const mat = new material(m.name);

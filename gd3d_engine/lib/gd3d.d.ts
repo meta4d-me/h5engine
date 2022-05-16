@@ -955,6 +955,7 @@ declare namespace gd3d.framework {
     class canvas {
         static readonly ClassName: string;
         private static readonly help_v2;
+        private static readonly help_rect_CanvasV;
         /**
          * @public
          * @language zh_CN
@@ -994,6 +995,8 @@ declare namespace gd3d.framework {
          * 启用UI事件
          */
         enableUIEvent: boolean;
+        /** 启用 剔除超出可视范围的渲染节点  */
+        enableOutsideRenderClip: boolean;
         /**
          * @public
          * @language zh_CN
@@ -1026,6 +1029,10 @@ declare namespace gd3d.framework {
          * @version gd3d 1.0
          */
         scene: scene;
+        /** canvas 更新前回调函数 */
+        onPreUpdate: (dt: number) => any;
+        /** canvas 更新后回调函数 */
+        onLateUpdate: (dt: number) => any;
         /**
          * @public
          * @language zh_CN
@@ -1169,6 +1176,11 @@ declare namespace gd3d.framework {
          * @version gd3d 1.0
          */
         drawScene(node: transform2D, context: renderContext, assetmgr: assetMgr): void;
+        /**
+         * 检查是在可视区域外
+         * @param node 节点
+         */
+        private ckViewOutside;
         private renderTopLabels;
         static readonly depthTag = "__depthTag__";
         static readonly flowIndexTag = "__flowIndexTag__";
@@ -1702,6 +1714,8 @@ declare namespace gd3d.framework {
         static readonly ClassName: string;
         private static readonly help_v2;
         private static readonly help_v2_1;
+        private static readonly help_v2_2;
+        private static readonly help_v2_3;
         private static readonly help_mtx;
         private static readonly help_mtx_1;
         private _canvas;
@@ -1857,6 +1871,7 @@ declare namespace gd3d.framework {
         private dirty;
         private dirtyChild;
         private dirtyWorldDecompose;
+        private dirtyAABB;
         /**
          * @public
          * @language zh_CN
@@ -1898,6 +1913,10 @@ declare namespace gd3d.framework {
          */
         get isMask(): boolean;
         set isMask(b: boolean);
+        private _aabbRect;
+        private _temp_aabbRect;
+        /** aabb 矩形 */
+        get aabbRect(): math.rect;
         private updateMaskRect;
         private _parentIsMask;
         get parentIsMask(): boolean;
@@ -1968,6 +1987,7 @@ declare namespace gd3d.framework {
          * @version gd3d 1.0
          */
         updateWorldTran(): void;
+        private calcAABB;
         private CalcReCanvasMtx;
         /**
          * @private
@@ -2234,7 +2254,10 @@ declare namespace gd3d.framework {
         private lastParentPivot;
         private lastPivot;
         private refreshLayout;
-        private getLayValue;
+        /** 获取Layout 的坐标系值 */
+        private getLayCoordinateValue;
+        /** 设置Layout 的坐标系值 */
+        private setLayCoordinateValue;
         /**
          * @public
          * @language zh_CN
@@ -2259,6 +2282,11 @@ declare namespace gd3d.framework {
          * @version gd3d 1.0
          */
         clone(): transform2D;
+        /**
+         * 设置 节点的本地位置（会处理layout选项）
+         * @param pos
+         */
+        setLocalPosition(pos: math.vector2): void;
     }
     class t2dInfo {
         pivot: math.vector2;
@@ -2713,6 +2741,7 @@ declare namespace gd3d.framework {
     class inputField implements I2DComponent, I2DPointListener {
         static readonly ClassName: string;
         private static readonly helpV2;
+        private static _isIos;
         /**
          * @public
          * @language zh_CN
@@ -2735,7 +2764,15 @@ declare namespace gd3d.framework {
         private beFocus;
         private inputElement;
         private _text;
-        private static _isIos;
+        private _lastAddRTextFID;
+        /** 用户 按回车键时提交 回调函数 */
+        onTextSubmit: (text: string) => void;
+        /** 选择区域的开始位置 */
+        get selectionStart(): number;
+        /** 选择区域的结束位置 */
+        get selectionEnd(): number;
+        /** 选择区域的方向 ， forward ：从前往后 backward ：从后往前 */
+        get selectionDirection(): "none" | "forward" | "backward";
         /**
          * @public
          * @language zh_CN
@@ -2744,6 +2781,11 @@ declare namespace gd3d.framework {
          * @version gd3d 1.0
          */
         get text(): string;
+        set text(val: string);
+        /**
+         * 清除输入文本
+         */
+        clearText(): void;
         private _charlimit;
         /**
          * @public
@@ -2763,7 +2805,7 @@ declare namespace gd3d.framework {
          * @version gd3d 1.0
          */
         get LineType(): lineType;
-        set LineType(lineType: lineType);
+        set LineType(_lineType: lineType);
         private _contentType;
         /**
         * @public
@@ -2772,8 +2814,8 @@ declare namespace gd3d.framework {
         * 文本内容格式
         * @version gd3d 1.0
         */
-        get ContentType(): number;
-        set ContentType(contentType: number);
+        get ContentType(): contentType;
+        set ContentType(contentType: contentType);
         private _textLable;
         /**
          * @public
@@ -2798,6 +2840,14 @@ declare namespace gd3d.framework {
          * 刷新布局
          */
         private layoutRefresh;
+        /**设置 通用 样式 */
+        private setStyleEle;
+        private createInputEle;
+        private createTextAreaEle;
+        /** 初始化 html 元素 */
+        private initEle;
+        private updateEleStyle;
+        private removeEle;
         /**
          * @private
          */
@@ -2814,7 +2864,6 @@ declare namespace gd3d.framework {
          * 输入文本刷新
          */
         private textRefresh;
-        private filterContentText;
         /**
          * @private
          */
@@ -2828,6 +2877,10 @@ declare namespace gd3d.framework {
          */
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
         private setFocus;
+        /** 显示 标签 */
+        private showLable;
+        /** 显示 html组件 */
+        private showEle;
     }
     /**
      * @public
@@ -2837,8 +2890,12 @@ declare namespace gd3d.framework {
      * @version gd3d 1.0
      */
     enum lineType {
+        /** 单行模式 */
         SingleLine = 0,
-        MultiLine = 1
+        /** 多行模式 */
+        MultiLine = 1,
+        /** 多行模式 (输入回车键换行处理)*/
+        MultiLine_NewLine = 2
     }
     /**
      * @language zh_CN
@@ -2848,13 +2905,21 @@ declare namespace gd3d.framework {
      */
     enum contentType {
         None = 0,
+        /** 数字*/
         Number = 1,
+        /** 字母 */
         Word = 2,
+        /** 下划线 */
         Underline = 4,
+        /**中文字符 */
         ChineseCharacter = 8,
+        /**没有中文字符 */
         NoneChineseCharacter = 16,
+        /**邮件 */
         Email = 32,
+        /**密码 */
         PassWord = 64,
+        /** 自定义 */
         Custom = 128
     }
 }
@@ -2867,11 +2932,21 @@ declare namespace gd3d.framework {
      * @version gd3d 1.0
      */
     class label implements IRectRenderer {
+        private static readonly defUIShader;
+        private static readonly defMaskUIShader;
+        private static readonly defImgUIShader;
+        private static readonly defImgMaskUIShader;
+        private static readonly helpOptObj;
+        private static readonly helpColor;
         /** 尝试 动态扩展 字体信息 函数接口 */
         static onTryExpandTexts: (str: string) => void;
         static readonly ClassName: string;
         /**字段 用于快速判断实例是否是label */
         readonly isLabel = true;
+        /** 当需渲染字符被 加入排列时 的回调*/
+        onAddRendererText: (x: number, y: number) => void;
+        /** 有图片字符需要渲染 */
+        private _hasImageChar;
         private _text;
         /**
          * @public
@@ -2894,6 +2969,7 @@ declare namespace gd3d.framework {
         get font(): font;
         set font(font: font);
         private needRefreshFont;
+        private needRefreshAtlas;
         private _fontName;
         private _fontsize;
         /**
@@ -2945,8 +3021,6 @@ declare namespace gd3d.framework {
          * @version gd3d 1.0
          */
         verticalOverflow: boolean;
-        private indexarr;
-        private remainarrx;
         private lastStr;
         /** 检查文字,是否需要 动态添加 */
         private chackText;
@@ -2954,8 +3028,24 @@ declare namespace gd3d.framework {
          * @private
          */
         updateData(_font: gd3d.framework.font): void;
+        /** 更新数据 富文本 模式 */
+        private updateDataRich;
+        /**
+         * 通过 block 设置数据
+         * @param _font
+         * @param blocks
+         */
+        private setDataByBlock;
+        /**获取 图片字符 选项 */
+        private getImgOpt;
+        /** 获取富文本选项 对象 */
+        private getOptObj;
         private data_begin;
+        private _lastBegin;
+        /** 文本顶点数据 */
         private datar;
+        /** 字符图 顶点数据 */
+        private imgDatar;
         /**
          * @public
          * @language zh_CN
@@ -2976,8 +3066,32 @@ declare namespace gd3d.framework {
          * 描边宽度
          */
         outlineWidth: number;
-        private static readonly defUIShader;
-        private static readonly defMaskUIShader;
+        private _richText;
+        /**
+         * 富文本模式 , 通过特定标签使用。
+         *
+         * 文字颜色             <color=#ffffffff>文本</color>       (已经支持);
+         * 文字斜体             \<i>文本\</i>                       (已经支持);
+         * 图片字符（表情）     [imgName]                           (已经支持);
+         * 文字加粗             \<b>文本\</b>                       (支持中);
+         * 文字加下划线         \<u>文本\</u>                       (支持中);
+         */
+        get richText(): boolean;
+        set richText(val: boolean);
+        private _imageTextAtlasName;
+        private _imageTextAtlas;
+        /**
+         * 图像文字图集
+         * (例如 表情)
+         */
+        get imageTextAtlas(): atlas;
+        set imageTextAtlas(val: atlas);
+        /** 富文本 块列表 */
+        private _richTextBlocks;
+        /** 纯文本默认 块列表 */
+        private _defTextBlocks;
+        /**富文本 脏标记  */
+        private _richDrity;
         private _CustomShaderName;
         /**
          * @public
@@ -3004,18 +3118,27 @@ declare namespace gd3d.framework {
          * @version gd3d 1.0
          */
         getDrawBounds(): math.rect;
+        /** 获取材质 通过 shaderName*/
+        private getMatByShader;
         /**
           * @private
           * ui默认材质
           */
         private _uimat;
         private get uimat();
+        /**
+         * 字符图材质
+         */
+        private _imgUIMat;
+        private get imgUIMat();
         private dirtyData;
         /**
          * @private
          */
         render(canvas: canvas): void;
+        private setMaskData;
         private searchTexture;
+        private searchTextureAtlas;
         private _cacheMaskV4;
         /**
          * @private
@@ -3027,6 +3150,11 @@ declare namespace gd3d.framework {
         private max_y;
         /** 计算drawRect */
         private calcDrawRect;
+        /**
+         * 解析 富文本
+         * @param text
+         */
+        private parseRichText;
         /**
          * @private
          */
@@ -3234,6 +3362,23 @@ declare namespace gd3d.framework {
         /**
          * @private
          */
+        remove(): void;
+    }
+}
+declare namespace gd3d.framework {
+    /**
+     * 富文本版 lable
+     * 支持表情字符，自定义样式段落
+     */
+    class richLabel implements IRectRenderer {
+        render(canvas: canvas): void;
+        updateTran(): void;
+        getMaterial(): material;
+        getDrawBounds(): math.rect;
+        onPlay(): void;
+        start(): void;
+        update(delta: number): void;
+        transform: transform2D;
         remove(): void;
     }
 }
@@ -4716,7 +4861,7 @@ declare namespace gd3d.framework {
         };
         static initGuidList(): void;
         static setLoading(guid: number, data: any): void;
-        load(url: string, type?: AssetTypeEnum,
+        load(url: string, type?: AssetTypeEnum, 
         /** 这是解析完成的回调 */
         onstate?: loadCallback, downloadFinish?: () => void): void;
         static setStateError(state: stateLoad, onstate: (state?: stateLoad) => void, err: Error): void;
@@ -5510,12 +5655,19 @@ declare namespace gd3d.framework {
         cmap: {
             [id: string]: charinfo;
         };
+        /** 字体名 */
         fontname: string;
+        /** 像素尺寸 */
         pointSize: number;
+        /** 填充间隔 */
         padding: number;
+        /**行高 */
         lineHeight: number;
+        /** 基线 */
         baseline: number;
+        /** 字符容器图的宽度 */
         atlasWidth: number;
+        /** 字符容器图的高度 */
         atlasHeight: number;
         /**
          * @public
@@ -5541,19 +5693,19 @@ declare namespace gd3d.framework {
          */
         y: number;
         /**
-         * uv长度
+         * uv宽度
          */
         w: number;
         /**
-         * uv长度
+         * uv高度
          */
         h: number;
         /**
-         * 像素
+         * 像素X尺寸
          */
         xSize: number;
         /**
-         * 像素
+         * 像素Y尺寸
          */
         ySize: number;
         /**
@@ -8196,6 +8348,8 @@ declare namespace gd3d.framework {
         private careBoneMat;
         private inversTpos;
         private startepose;
+        private _hasBoneMap;
+        private get hasBoneMap();
         get PlayFrameID(): number;
         get currentAniclipName(): string;
         get currentAniclip(): animationClip;
@@ -8204,6 +8358,14 @@ declare namespace gd3d.framework {
          */
         get playCount(): number;
         private init;
+        /**
+         * 收集所有的 asbone 到 更新列表
+         */
+        allAsboneToCareList(): void;
+        /**
+         * 添加 到 更新骨骼节点列表
+         * @param bone 骨骼节点
+         */
         addToCareList(bone: transform): void;
         private _awaitClips;
         /** 获取待加载的 动画片段名 列表 */
@@ -9750,7 +9912,9 @@ declare namespace gd3d.framework {
         private clipMap;
         private _nowClip;
         private get nowFrame();
-        private nowTime;
+        private _nowTime;
+        /** 当前播放到的时间 */
+        get nowTime(): number;
         private pathPropertyMap;
         gameObject: gameObject;
         private playEndDic;
@@ -12677,6 +12841,7 @@ declare namespace gd3d.math {
     var defaultRotationOrder: RotationOrder;
 }
 declare namespace gd3d.math {
+    function colorSet(out: color, r: number, g: number, b: number, a: number): void;
     function colorSet_White(out: color): void;
     function colorSet_Black(out: color): void;
     function colorSet_Gray(out: color): void;
@@ -12684,6 +12849,13 @@ declare namespace gd3d.math {
     function scaleToRef(src: color, scale: number, out: color): void;
     function colorClone(src: color, out: color): void;
     function colorLerp(srca: color, srcb: color, t: number, out: color): void;
+    /**
+     * 颜色转成 CSS 格式
+     * @param src
+     * @param hasAlpha 是否包含Alpha
+     * @returns like #ffffffff
+     */
+    function colorToCSS(src: color, hasAlpha?: boolean): string;
 }
 declare namespace gd3d.math {
     function calPlaneLineIntersectPoint(planeVector: vector3, planePoint: vector3, lineVector: vector3, linePoint: vector3, out: vector3): void;
@@ -12761,7 +12933,20 @@ declare namespace gd3d.math {
     function rectSet_One(out: rect): void;
     function rectSet_Zero(out: rect): void;
     function rectEqul(src1: rect, src2: rect): boolean;
+    /**
+     * 判断点是否在矩形中
+     * @param x 点坐标x
+     * @param y 点坐标y
+     * @param src 矩形
+     */
     function rectInner(x: number, y: number, src: rect): boolean;
+    /**
+     * 判断两矩形是否重叠
+     * @param r1 矩形1
+     * @param r2 矩形2
+     */
+    function rectOverlap(r1: rect, r2: rect): boolean;
+    function rectSet(out: rect, x: number, y: number, w: number, h: number): void;
     /**
      * 检测两个矩形是否相碰
      * @param r1
@@ -20330,10 +20515,16 @@ declare namespace gd3d.framework {
      * @version gd3d 1.0
      */
     enum Primitive2DType {
+        /** 原始图片渲染器 */
         RawImage2D = 0,
+        /** 多功能图片渲染器（sprite） */
         Image2D = 1,
+        /** 文本渲染器 */
         Label = 2,
-        Button = 3
+        /** 按钮 */
+        Button = 3,
+        /** 输入框 */
+        InputField = 4
     }
     /**
      * 判断 函数对象代码实现内容是否是空的
@@ -20362,7 +20553,7 @@ declare namespace gd3d.framework {
          * @param app application的实例
          * @version gd3d 1.0
          */
-        static CreatePrimitive(type: PrimitiveType, app: application): transform;
+        static CreatePrimitive(type: PrimitiveType, app?: application): transform;
         /**
          * @public
          * @language zh_CN
@@ -20372,11 +20563,13 @@ declare namespace gd3d.framework {
          * @param app application的实例
          * @version gd3d 1.0
          */
-        static Create2DPrimitive(type: Primitive2DType, app: application): transform2D;
+        static Create2DPrimitive(type: Primitive2DType, app?: application): transform2D;
+        private static make2DNode;
         private static create2D_rawImage;
         private static create2D_image2D;
         private static create2D_label;
         private static create2D_button;
+        private static create2D_InputField;
     }
 }
 declare namespace gd3d.framework {
@@ -22337,6 +22530,7 @@ declare namespace gd3d.render {
      */
     class textureReader {
         constructor(webgl: WebGLRenderingContext, texRGBA: WebGLTexture, width: number, height: number, gray?: boolean);
+        private _isDispose;
         private webgl;
         private _width;
         get width(): number;
@@ -22347,9 +22541,11 @@ declare namespace gd3d.render {
         get data(): Uint8Array;
         private _gray;
         get gray(): boolean;
+        get isDispose(): boolean;
         getPixel(u: number, v: number): any;
         /** 刷新data数据 */
         refresh(texRGBA: WebGLTexture): void;
+        dispose(): void;
     }
     /**
      * @private
