@@ -4537,7 +4537,6 @@ var HDR_sample = (function () {
                                         case 2:
                                             root = _b.sent();
                                             gd3d.math.vec3SetAll(root.localScale, scale !== null && scale !== void 0 ? scale : 1);
-                                            root.localScale.x *= -1;
                                             this.app.getScene().addChild(root);
                                             return [2, root];
                                     }
@@ -4546,7 +4545,14 @@ var HDR_sample = (function () {
                         };
                         par = new URL(window.location.href).searchParams;
                         exp = par.has('exp') ? parseFloat(par.get('exp')) : exp;
-                        gltfModels = [];
+                        gltfModels = [
+                            {
+                                gltfFolder: 'res/pbrRes/1scene/',
+                                file: '1scene.gltf',
+                                scale: 1,
+                                cb: function (root) { }
+                            },
+                        ];
                         if (par.has('folder')) {
                             gltfModels.push({
                                 gltfFolder: par.get('folder'),
@@ -4574,6 +4580,7 @@ var HDR_sample = (function () {
                                 .map(function (x) { return parseInt(x, 16); });
                         };
                         [mainLight, secondaryLight, tertiaryLight].map(function (light) {
+                            return;
                             var lightObj = new gd3d.framework.transform();
                             lightObj.name = "Light" + light.name;
                             var mlight = lightObj.gameObject.addComponent("light");
