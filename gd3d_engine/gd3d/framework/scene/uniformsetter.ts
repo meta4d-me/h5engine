@@ -63,6 +63,9 @@ namespace gd3d.framework
             this.autoUniformDic["glstate_lightmapOffset"]=(context: renderContext)=>{
                 return context.lightmapOffset;
             };
+            this.autoUniformDic["glstate_lightmapUV"]=(context: renderContext)=>{
+                return context.lightmapUV;
+            };
             this.autoUniformDic["glstate_fog_start"]=(context: renderContext)=>{
                 return context.fog._Start;
             };

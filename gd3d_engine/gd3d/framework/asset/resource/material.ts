@@ -246,7 +246,8 @@ namespace gd3d.framework
             glstate_matrix_bones: true,
             boneSampler: true,
             glstate_lightmapOffset:true,
-            _LightmapTex:true
+            _LightmapTex:true,
+            glstate_lightmapUV:true
         }
 
         uploadUnifoms(pass: render.glDrawPass, context: renderContext, lastMatSame = false)
