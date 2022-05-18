@@ -4537,7 +4537,6 @@ var HDR_sample = (function () {
                                         case 2:
                                             root = _b.sent();
                                             gd3d.math.vec3SetAll(root.localScale, scale !== null && scale !== void 0 ? scale : 1);
-                                            root.localScale.x *= -1;
                                             this.app.getScene().addChild(root);
                                             return [2, root];
                                     }
@@ -4574,6 +4573,7 @@ var HDR_sample = (function () {
                                 .map(function (x) { return parseInt(x, 16); });
                         };
                         [mainLight, secondaryLight, tertiaryLight].map(function (light) {
+                            return;
                             var lightObj = new gd3d.framework.transform();
                             lightObj.name = "Light" + light.name;
                             var mlight = lightObj.gameObject.addComponent("light");

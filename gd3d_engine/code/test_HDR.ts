@@ -118,13 +118,19 @@ class HDR_sample implements IState
                 const gltf = await this.load<gd3d.framework.gltf>(gltfFolder, file);
                 const root = await gltf.load(this.assetMgr, this.app.webgl, gltfFolder, null, env, irradianceSH, exp, ambientCubemapLight.specularIntensity, ambientCubemapLight.diffuseIntensity);
                 gd3d.math.vec3SetAll(root.localScale, scale ?? 1);
-                root.localScale.x *= -1;
+                // root.localScale.x *= -1;
                 this.app.getScene().addChild(root);
                 return root;
             }
             const par = new URL(window.location.href).searchParams;
             exp = par.has('exp') ? parseFloat(par.get('exp')) : exp;
             const gltfModels = [
+                // {
+                //     gltfFolder: 'res/pbrRes/1scene/',
+                //     file: '1scene.gltf',
+                //     scale: 1,
+                //     cb: root => {}
+                // },
                 // {
                 //     gltfFolder: 'res/pbrRes/FlightHelmet/glTF/',
                 //     file: 'FlightHelmet.gltf',
@@ -167,6 +173,7 @@ class HDR_sample implements IState
                     .map(x => parseInt(x, 16));
 
             [mainLight, secondaryLight, tertiaryLight].map(light => {
+                return;
                 const lightObj = new gd3d.framework.transform();
                 lightObj.name = "Light" + light.name;
                 const mlight = lightObj.gameObject.addComponent("light") as gd3d.framework.light;

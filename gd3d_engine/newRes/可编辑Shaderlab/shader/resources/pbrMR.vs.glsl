@@ -28,16 +28,12 @@ varying vec3 v_pos;
 #define DIST	20.0
 #define FOG_far	100.0
 
-//获取 tangent 的 W 值
-lowp float tangentW(lowp vec3 _tangent){
-	return sqrt(_tangent.x * _tangent.x + _tangent.y * _tangent.y + _tangent.z * _tangent.z) - 2.0;
-}
 
 lowp mat3 calBTNMatrix(lowp mat3 NormalMatToWorld,lowp vec3 _normal,lowp vec3 _tangent)
 {
     lowp vec3 normal=normalize(NormalMatToWorld*_normal);
     lowp vec3 tangent=normalize(NormalMatToWorld*_tangent);
-    lowp vec3 binormal=cross(normal,tangent) * tangentW(_tangent);
+    lowp vec3 binormal=cross(normal,tangent);
   	return (mat3(tangent,binormal,normal));
 
 }

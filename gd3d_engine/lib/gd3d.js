@@ -20792,38 +20792,57 @@ var gd3d;
                 if (specFactor === void 0) { specFactor = 1; }
                 if (irrFactor === void 0) { irrFactor = 1; }
                 return __awaiter(this, void 0, void 0, function () {
-                    var load, _t, images, textures, extrasCfg, materials, views, accessors, meshes, nodes, defaltScene, scene, parseNode, roots;
+                    var load, defaltScene, extensionsUsed, _t, images, textures, sceneExtensions, gd_linfo_scene, hasLightMap, lightMapTexs, maps, extrasCfg, materials, views, accessors, meshes, nodes, scene, parseNode, roots;
                     var _this = this;
                     return __generator(this, function (_u) {
                         switch (_u.label) {
                             case 0:
+                                if (!this.data) {
+                                    console.error("load fail , data is Null.");
+                                    return [2 /*return*/];
+                                }
                                 load = function (uri) { return new Promise(function (res) {
                                     mgr.load(folder + uri, framework.AssetTypeEnum.Auto, function () {
                                         res(mgr.getAssetByName(uri.split('/').pop()));
                                     });
                                 }); };
+                                defaltScene = (_a = this.data.scene) !== null && _a !== void 0 ? _a : 0;
+                                extensionsUsed = this.data.extensionsUsed;
                                 _t = this;
-                                return [4 /*yield*/, Promise.all((_c = (_b = (_a = this.data) === null || _a === void 0 ? void 0 : _a.buffers) === null || _b === void 0 ? void 0 : _b.map(function (_a) {
+                                return [4 /*yield*/, Promise.all((_d = (_c = (_b = this.data) === null || _b === void 0 ? void 0 : _b.buffers) === null || _c === void 0 ? void 0 : _c.map(function (_a) {
                                         var uri = _a.uri;
                                         return load(uri);
-                                    })) !== null && _c !== void 0 ? _c : [])];
+                                    })) !== null && _d !== void 0 ? _d : [])];
                             case 1:
                                 _t.buffers = _u.sent();
-                                return [4 /*yield*/, Promise.all((_f = (_e = (_d = this.data) === null || _d === void 0 ? void 0 : _d.images) === null || _e === void 0 ? void 0 : _e.map(function (_a) {
+                                return [4 /*yield*/, Promise.all((_g = (_f = (_e = this.data) === null || _e === void 0 ? void 0 : _e.images) === null || _f === void 0 ? void 0 : _f.map(function (_a) {
                                         var uri = _a.uri;
                                         return load(uri);
-                                    })) !== null && _f !== void 0 ? _f : [])];
+                                    })) !== null && _g !== void 0 ? _g : [])];
                             case 2:
                                 images = _u.sent();
-                                return [4 /*yield*/, Promise.all((_h = (_g = this.data.textures) === null || _g === void 0 ? void 0 : _g.map(function (_a) {
+                                return [4 /*yield*/, Promise.all((_j = (_h = this.data.textures) === null || _h === void 0 ? void 0 : _h.map(function (_a) {
                                         var sampler = _a.sampler, source = _a.source;
                                         var tex = images[source]; // TODO:
                                         return tex;
-                                    })) !== null && _h !== void 0 ? _h : [])];
+                                    })) !== null && _j !== void 0 ? _j : [])];
                             case 3:
                                 textures = _u.sent();
-                                extrasCfg = (_k = (_j = this.data.extras) === null || _j === void 0 ? void 0 : _j.clayViewerConfig) === null || _k === void 0 ? void 0 : _k.materials;
-                                materials = (_l = this.data.materials) === null || _l === void 0 ? void 0 : _l.map(function (m) {
+                                sceneExtensions = this.data.scenes[defaltScene].extensions;
+                                if (sceneExtensions) {
+                                    gd_linfo_scene = sceneExtensions.gd_linfo_scene;
+                                }
+                                hasLightMap = extensionsUsed.indexOf("gd_linfo") != -1 && extensionsUsed.indexOf("gd_linfo_scene") != -1
+                                    && gd_linfo_scene && gd_linfo_scene.maps && gd_linfo_scene.maps.length > 0;
+                                if (!hasLightMap) return [3 /*break*/, 5];
+                                maps = gd_linfo_scene.maps;
+                                return [4 /*yield*/, Promise.all(maps.map(function (path) { return load(path); }))];
+                            case 4:
+                                lightMapTexs = _u.sent();
+                                _u.label = 5;
+                            case 5:
+                                extrasCfg = (_l = (_k = this.data.extras) === null || _k === void 0 ? void 0 : _k.clayViewerConfig) === null || _l === void 0 ? void 0 : _l.materials;
+                                materials = (_m = this.data.materials) === null || _m === void 0 ? void 0 : _m.map(function (m) {
                                     var _a, _b, _c, _d, _e, _f, _g;
                                     var mat = new framework.material(m.name);
                                     var matCfg;
@@ -20880,20 +20899,20 @@ var gd3d;
                                     }
                                     return mat;
                                 });
-                                views = (_m = this.data.bufferViews) === null || _m === void 0 ? void 0 : _m.map(function (_a) {
+                                views = (_o = this.data.bufferViews) === null || _o === void 0 ? void 0 : _o.map(function (_a) {
                                     var _b = _a.buffer, buffer = _b === void 0 ? 0 : _b, _c = _a.byteOffset, byteOffset = _c === void 0 ? 0 : _c, _d = _a.byteLength, byteLength = _d === void 0 ? 0 : _d, _e = _a.byteStride, byteStride = _e === void 0 ? 0 : _e;
                                     // return {byteStride ,dv: new DataView(this.buffers[buffer].data, byteOffset, byteLength)};
                                     return { byteOffset: byteOffset, byteLength: byteLength, byteStride: byteStride, rawBuffer: _this.buffers[buffer].data };
                                 });
-                                accessors = (_p = (_o = this.data) === null || _o === void 0 ? void 0 : _o.accessors) === null || _p === void 0 ? void 0 : _p.map(function (acc) {
+                                accessors = (_q = (_p = this.data) === null || _p === void 0 ? void 0 : _p.accessors) === null || _q === void 0 ? void 0 : _q.map(function (acc) {
                                     return __assign(__assign({}, acc), { bufferView: views[acc.bufferView] });
                                 });
-                                meshes = (_q = this.data.meshes) === null || _q === void 0 ? void 0 : _q.map(function (_a) {
+                                meshes = (_r = this.data.meshes) === null || _r === void 0 ? void 0 : _r.map(function (_a) {
                                     var name = _a.name, primitives = _a.primitives;
                                     return primitives.map(function (_a) {
                                         var _b, _c, _d, _e, _f;
-                                        var _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1, _2, _3, _4, _5;
-                                        var attributes = _a.attributes, indices = _a.indices, material = _a.material;
+                                        var _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1, _2, _3, _4, _5, _6;
+                                        var attributes = _a.attributes, indices = _a.indices, material = _a.material, extensions = _a.extensions;
                                         var mf = new framework.mesh(folder + name);
                                         var mdata = mf.data = new gd3d.render.meshData();
                                         var vert = mdata.pos = [];
@@ -20989,10 +21008,26 @@ var gd3d;
                                         sm.line = false;
                                         mf.submesh.push(sm);
                                         mf.glMesh.uploadIndexSubData(ctx, 0, ebo);
-                                        return { m: mf, mat: materials[material] };
+                                        //light Map
+                                        var lightMapTexST = null;
+                                        if (hasLightMap && extensions && extensions.gd_linfo) {
+                                            if (extensions.gd_linfo.so) {
+                                                lightMapTexST = extensions.gd_linfo.so;
+                                            }
+                                            else {
+                                                lightMapTexST = [1, 1, 0, 0];
+                                            }
+                                            var texIdx = (_6 = extensions.gd_linfo.index) !== null && _6 !== void 0 ? _6 : 0;
+                                            var lightMapTex = lightMapTexs[texIdx];
+                                            if (lightMapTex) {
+                                                var mat = materials[material];
+                                                mat.setTexture("_LightmapTex", lightMapTex);
+                                            }
+                                        }
+                                        return { m: mf, mat: materials[material], lTexST: lightMapTexST };
                                     });
                                 });
-                                nodes = (_r = this.data.nodes) === null || _r === void 0 ? void 0 : _r.map(function (_a) {
+                                nodes = (_s = this.data.nodes) === null || _s === void 0 ? void 0 : _s.map(function (_a) {
                                     var name = _a.name, mesh = _a.mesh, matrix = _a.matrix, rotation = _a.rotation, scale = _a.scale, translation = _a.translation, skin = _a.skin, camera = _a.camera, children = _a.children;
                                     var n = new gd3d.framework.transform();
                                     n.name = name;
@@ -21015,12 +21050,17 @@ var gd3d;
                                     n.markDirty();
                                     if (mesh != null) {
                                         var child = meshes[mesh].map(function (_a) {
-                                            var m = _a.m, mat = _a.mat;
+                                            var m = _a.m, mat = _a.mat, lTexST = _a.lTexST;
+                                            var texST = lTexST;
                                             var submesh = new gd3d.framework.transform();
                                             var mf = submesh.gameObject.addComponent("meshFilter");
                                             mf.mesh = m;
                                             var renderer = submesh.gameObject.addComponent("meshRenderer");
                                             renderer.materials = [mat];
+                                            if (texST) {
+                                                renderer.lightmapIndex = -2; //标记该节点使用非全局lightmap
+                                                gd3d.math.vec4Set(renderer.lightmapScaleOffset, texST[0], texST[1], texST[2], texST[3]);
+                                            }
                                             // renderer.materials.push(mat);
                                             // renderer.materials.push(new framework.material());
                                             // renderer.materials[0].setShader(mgr.getShader("shader/def"));
@@ -21031,7 +21071,6 @@ var gd3d;
                                     }
                                     return { n: n, children: children };
                                 });
-                                defaltScene = (_s = this.data.scene) !== null && _s !== void 0 ? _s : 0;
                                 scene = new gd3d.framework.transform();
                                 parseNode = function (i) {
                                     var _a = nodes[i], n = _a.n, children = _a.children;
@@ -24894,7 +24933,8 @@ var gd3d;
                 glstate_matrix_bones: true,
                 boneSampler: true,
                 glstate_lightmapOffset: true,
-                _LightmapTex: true
+                _LightmapTex: true,
+                glstate_lightmapUV: true
             };
             material.lastDrawMatID = -1;
             material.lastDrawMeshID = -1;
@@ -60936,6 +60976,9 @@ var gd3d;
                 };
                 this.autoUniformDic["glstate_lightmapOffset"] = function (context) {
                     return context.lightmapOffset;
+                };
+                this.autoUniformDic["glstate_lightmapUV"] = function (context) {
+                    return context.lightmapUV;
                 };
                 this.autoUniformDic["glstate_fog_start"] = function (context) {
                     return context.fog._Start;

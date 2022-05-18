@@ -1,5 +1,5 @@
 attribute highp vec3    _glesVertex;
-attribute highp vec2    _glesMultiTexCoord0;
+attribute mediump vec2    _glesMultiTexCoord0;
 attribute highp vec3    _glesNormal;
 attribute highp vec3    _glesTangent;
 attribute highp vec3    _glesColor;
@@ -12,6 +12,13 @@ varying highp vec3      v_normal;
 varying highp vec3      v_pos;
 varying highp vec2      xlv_TEXCOORD0;
 varying highp mat3		TBN;
+
+#ifdef LIGHTMAP
+attribute mediump vec2 _glesMultiTexCoord1;
+uniform lowp float glstate_lightmapUV;
+uniform mediump vec4 glstate_lightmapOffset;
+varying mediump vec2 lightmap_TEXCOORD;
+#endif
 
 #ifdef FOG
 uniform lowp float glstate_fog_start;
@@ -62,13 +69,20 @@ highp vec4 calcVertex(highp vec4 srcVertex,lowp vec4 blendIndex,lowp vec4 blendW
 #endif
 
 void main () {
-    highp vec3 position = _glesVertex;
+    highp vec4 position = vec4(_glesVertex,1.0);
+
+#ifdef LIGHTMAP
+    mediump vec2 beforelightUV = (1.0 - glstate_lightmapUV) * _glesMultiTexCoord0  + glstate_lightmapUV * _glesMultiTexCoord1;	//unity lightMap UV ,优先使用UV1,次之UV0 
+    lowp float u = beforelightUV.x * glstate_lightmapOffset.x + glstate_lightmapOffset.z;
+    lowp float v = beforelightUV.y * glstate_lightmapOffset.y + glstate_lightmapOffset.w;
+    lightmap_TEXCOORD = vec2(u,v);
+#endif
 
 #ifdef SKIN
     position =calcVertex(position,_glesBlendIndex4,_glesBlendWeight4);
 #endif
 
-    vec4 wpos		= (glstate_matrix_model * vec4(position, 1.0));
+    vec4 wpos		= (glstate_matrix_model * position);
 	v_pos			= wpos.xyz / wpos.w;
     v_normal        = normalize((glstate_matrix_it_modelview * vec4(_glesNormal, 0.0)).xyz);
     xlv_TEXCOORD0   = _glesMultiTexCoord0;
@@ -83,5 +97,5 @@ void main () {
     factor = clamp(factor, 0.0, 1.0);
 #endif
 
-    gl_Position     = glstate_matrix_mvp * vec4(position, 1.0);
+    gl_Position     = glstate_matrix_mvp * position;
 }
