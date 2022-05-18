@@ -1,5 +1,5 @@
 attribute highp vec4 _glesVertex;
-attribute mediump vec4 _glesMultiTexCoord0;
+attribute mediump vec2 _glesMultiTexCoord0;
 
 uniform highp mat4 glstate_matrix_mvp;
 uniform mediump vec4 _MainTex_ST;
@@ -15,7 +15,7 @@ varying highp vec3 v_Mpos;
 
 
 #ifdef LIGHTMAP
-attribute mediump vec4 _glesMultiTexCoord1;
+attribute mediump vec2 _glesMultiTexCoord1;
 uniform mediump vec4 glstate_lightmapOffset;
 uniform lowp float glstate_lightmapUV;
 varying mediump vec2 lightmap_TEXCOORD;
