@@ -125,12 +125,12 @@ class HDR_sample implements IState
             const par = new URL(window.location.href).searchParams;
             exp = par.has('exp') ? parseFloat(par.get('exp')) : exp;
             const gltfModels = [
-                {
-                    gltfFolder: 'res/pbrRes/1scene/',
-                    file: '1scene.gltf',
-                    scale: 1,
-                    cb: root => {}
-                },
+                // {
+                //     gltfFolder: 'res/pbrRes/1scene/',
+                //     file: '1scene.gltf',
+                //     scale: 1,
+                //     cb: root => {}
+                // },
                 // {
                 //     gltfFolder: 'res/pbrRes/FlightHelmet/glTF/',
                 //     file: 'FlightHelmet.gltf',

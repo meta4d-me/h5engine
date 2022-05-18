@@ -4545,14 +4545,7 @@ var HDR_sample = (function () {
                         };
                         par = new URL(window.location.href).searchParams;
                         exp = par.has('exp') ? parseFloat(par.get('exp')) : exp;
-                        gltfModels = [
-                            {
-                                gltfFolder: 'res/pbrRes/1scene/',
-                                file: '1scene.gltf',
-                                scale: 1,
-                                cb: function (root) { }
-                            },
-                        ];
+                        gltfModels = [];
                         if (par.has('folder')) {
                             gltfModels.push({
                                 gltfFolder: par.get('folder'),
