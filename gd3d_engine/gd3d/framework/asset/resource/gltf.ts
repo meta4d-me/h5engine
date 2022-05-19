@@ -144,6 +144,7 @@ namespace gd3d.framework
                 });
             });
             this.buffers = await Promise.all(this.data?.buffers?.map(({ uri }) => load(uri)) ?? []);
+            this.data.samplers = this.data.samplers ?? [];
             const images: HTMLImageElement[] = await Promise.all(this.data?.images?.map(({ uri }) => loadImg(uri)) ?? []);
             const textures: texture[] = await Promise.all(this.data.textures?.map(({sampler, source}) => {
                 const img = images[source];

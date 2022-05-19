@@ -20788,14 +20788,14 @@ var gd3d;
                 configurable: true
             });
             gltf.prototype.load = function (mgr, ctx, folder, brdf, env, irrSH, exposure, specFactor, irrFactor, uvChecker) {
-                var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s;
+                var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t;
                 if (specFactor === void 0) { specFactor = 1; }
                 if (irrFactor === void 0) { irrFactor = 1; }
                 return __awaiter(this, void 0, void 0, function () {
-                    var load, loadImg, _t, images, textures, extrasCfg, materials, views, accessors, meshes, nodes, defaltScene, scene, parseNode, roots;
+                    var load, loadImg, _u, images, textures, extrasCfg, materials, views, accessors, meshes, nodes, defaltScene, scene, parseNode, roots;
                     var _this = this;
-                    return __generator(this, function (_u) {
-                        switch (_u.label) {
+                    return __generator(this, function (_v) {
+                        switch (_v.label) {
                             case 0:
                                 load = function (uri) { return new Promise(function (res) {
                                     mgr.load(folder + uri, framework.AssetTypeEnum.Auto, function () {
@@ -20808,20 +20808,21 @@ var gd3d;
                                             res(img);
                                     });
                                 }); };
-                                _t = this;
+                                _u = this;
                                 return [4 /*yield*/, Promise.all((_c = (_b = (_a = this.data) === null || _a === void 0 ? void 0 : _a.buffers) === null || _b === void 0 ? void 0 : _b.map(function (_a) {
                                         var uri = _a.uri;
                                         return load(uri);
                                     })) !== null && _c !== void 0 ? _c : [])];
                             case 1:
-                                _t.buffers = _u.sent();
-                                return [4 /*yield*/, Promise.all((_f = (_e = (_d = this.data) === null || _d === void 0 ? void 0 : _d.images) === null || _e === void 0 ? void 0 : _e.map(function (_a) {
+                                _u.buffers = _v.sent();
+                                this.data.samplers = (_d = this.data.samplers) !== null && _d !== void 0 ? _d : [];
+                                return [4 /*yield*/, Promise.all((_g = (_f = (_e = this.data) === null || _e === void 0 ? void 0 : _e.images) === null || _f === void 0 ? void 0 : _f.map(function (_a) {
                                         var uri = _a.uri;
                                         return loadImg(uri);
-                                    })) !== null && _f !== void 0 ? _f : [])];
+                                    })) !== null && _g !== void 0 ? _g : [])];
                             case 2:
-                                images = _u.sent();
-                                return [4 /*yield*/, Promise.all((_h = (_g = this.data.textures) === null || _g === void 0 ? void 0 : _g.map(function (_a) {
+                                images = _v.sent();
+                                return [4 /*yield*/, Promise.all((_j = (_h = this.data.textures) === null || _h === void 0 ? void 0 : _h.map(function (_a) {
                                         var sampler = _a.sampler, source = _a.source;
                                         var img = images[source];
                                         var tex = new gd3d.framework.texture(img.src);
@@ -20839,11 +20840,11 @@ var gd3d;
                                         tex.glTexture = glt;
                                         tex.use();
                                         return tex;
-                                    })) !== null && _h !== void 0 ? _h : [])];
+                                    })) !== null && _j !== void 0 ? _j : [])];
                             case 3:
-                                textures = _u.sent();
-                                extrasCfg = (_k = (_j = this.data.extras) === null || _j === void 0 ? void 0 : _j.clayViewerConfig) === null || _k === void 0 ? void 0 : _k.materials;
-                                materials = (_l = this.data.materials) === null || _l === void 0 ? void 0 : _l.map(function (m) {
+                                textures = _v.sent();
+                                extrasCfg = (_l = (_k = this.data.extras) === null || _k === void 0 ? void 0 : _k.clayViewerConfig) === null || _l === void 0 ? void 0 : _l.materials;
+                                materials = (_m = this.data.materials) === null || _m === void 0 ? void 0 : _m.map(function (m) {
                                     var _a, _b, _c, _d, _e, _f, _g;
                                     var mat = new framework.material(m.name);
                                     var matCfg;
@@ -20900,15 +20901,15 @@ var gd3d;
                                     }
                                     return mat;
                                 });
-                                views = (_m = this.data.bufferViews) === null || _m === void 0 ? void 0 : _m.map(function (_a) {
+                                views = (_o = this.data.bufferViews) === null || _o === void 0 ? void 0 : _o.map(function (_a) {
                                     var _b = _a.buffer, buffer = _b === void 0 ? 0 : _b, _c = _a.byteOffset, byteOffset = _c === void 0 ? 0 : _c, _d = _a.byteLength, byteLength = _d === void 0 ? 0 : _d, _e = _a.byteStride, byteStride = _e === void 0 ? 0 : _e;
                                     // return {byteStride ,dv: new DataView(this.buffers[buffer].data, byteOffset, byteLength)};
                                     return { byteOffset: byteOffset, byteLength: byteLength, byteStride: byteStride, rawBuffer: _this.buffers[buffer].data };
                                 });
-                                accessors = (_p = (_o = this.data) === null || _o === void 0 ? void 0 : _o.accessors) === null || _p === void 0 ? void 0 : _p.map(function (acc) {
+                                accessors = (_q = (_p = this.data) === null || _p === void 0 ? void 0 : _p.accessors) === null || _q === void 0 ? void 0 : _q.map(function (acc) {
                                     return __assign(__assign({}, acc), { bufferView: views[acc.bufferView] });
                                 });
-                                meshes = (_q = this.data.meshes) === null || _q === void 0 ? void 0 : _q.map(function (_a) {
+                                meshes = (_r = this.data.meshes) === null || _r === void 0 ? void 0 : _r.map(function (_a) {
                                     var name = _a.name, primitives = _a.primitives;
                                     return primitives.map(function (_a) {
                                         var _b, _c, _d, _e, _f;
@@ -21012,7 +21013,7 @@ var gd3d;
                                         return { m: mf, mat: materials[material] };
                                     });
                                 });
-                                nodes = (_r = this.data.nodes) === null || _r === void 0 ? void 0 : _r.map(function (_a) {
+                                nodes = (_s = this.data.nodes) === null || _s === void 0 ? void 0 : _s.map(function (_a) {
                                     var name = _a.name, mesh = _a.mesh, matrix = _a.matrix, rotation = _a.rotation, scale = _a.scale, translation = _a.translation, skin = _a.skin, camera = _a.camera, children = _a.children;
                                     var n = new gd3d.framework.transform();
                                     n.name = name;
@@ -21051,7 +21052,7 @@ var gd3d;
                                     }
                                     return { n: n, children: children };
                                 });
-                                defaltScene = (_s = this.data.scene) !== null && _s !== void 0 ? _s : 0;
+                                defaltScene = (_t = this.data.scene) !== null && _t !== void 0 ? _t : 0;
                                 scene = new gd3d.framework.transform();
                                 parseNode = function (i) {
                                     var _a = nodes[i], n = _a.n, children = _a.children;
