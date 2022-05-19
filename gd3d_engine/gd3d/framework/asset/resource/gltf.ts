@@ -154,6 +154,7 @@ namespace gd3d.framework
                     if(!err) res(img);
                 });
             });
+            const samplers = this.data.samplers ?? [];
             this.buffers = await Promise.all(this.data?.buffers?.map(({ uri }) => load(uri)) ?? []);
             const images: HTMLImageElement[] = await Promise.all(this.data?.images?.map(({ uri }) => loadImg(uri)) ?? []);
             const textures: texture[] = await Promise.all(this.data.textures?.map(({sampler, source}) => {
@@ -165,7 +166,7 @@ namespace gd3d.framework
                     magFilter: ctx.NEAREST,
                     wrapS: ctx.REPEAT,
                     wrapT: ctx.REPEAT,
-                    ...this.data.samplers[sampler],
+                    ...samplers[sampler],
                 };
                 glt.uploadImage(img, false, false, false, false, false, false); // bind texture
                 ctx.texParameteri(ctx.TEXTURE_2D, ctx.TEXTURE_MAG_FILTER, samp.magFilter);
