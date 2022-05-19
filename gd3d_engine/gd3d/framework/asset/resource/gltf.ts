@@ -149,13 +149,38 @@ namespace gd3d.framework
             const defaltScene = this.data.scene ?? 0;
             const extensionsUsed = this.data.extensionsUsed as string[];
 
+            const loadImg = ( url ) => new Promise((res) => {
+                gd3d.io.loadImg(folder + url, (img, err) => {
+                    if(!err) res(img);
+                });
+            });
             this.buffers = await Promise.all(this.data?.buffers?.map(({ uri }) => load(uri)) ?? []);
-            const images = await Promise.all(this.data?.images?.map(({ uri }) => load(uri)) ?? []);
-            const textures: texture[] = await Promise.all(this.data.textures?.map(({ sampler, source }) =>
-            {
-                const tex = images[source] as texture; // TODO:
+            const images: HTMLImageElement[] = await Promise.all(this.data?.images?.map(({ uri }) => loadImg(uri)) ?? []);
+            const textures: texture[] = await Promise.all(this.data.textures?.map(({sampler, source}) => {
+                const img = images[source];
+                const tex = new gd3d.framework.texture(img.src);
+                const glt = new gd3d.render.glTexture2D(ctx, gd3d.render.TextureFormatEnum.RGB);
+                const samp = {
+                    minFilter: ctx.NEAREST,
+                    magFilter: ctx.NEAREST,
+                    wrapS: ctx.REPEAT,
+                    wrapT: ctx.REPEAT,
+                    ...this.data.samplers[sampler],
+                };
+                glt.uploadImage(img, false, false, false, false, false, false); // bind texture
+                ctx.texParameteri(ctx.TEXTURE_2D, ctx.TEXTURE_MAG_FILTER, samp.magFilter);
+                ctx.texParameteri(ctx.TEXTURE_2D, ctx.TEXTURE_MIN_FILTER, samp.minFilter);
+                ctx.texParameteri(ctx.TEXTURE_2D, ctx.TEXTURE_WRAP_S, samp.wrapS);
+                ctx.texParameteri(ctx.TEXTURE_2D, ctx.TEXTURE_WRAP_T, samp.wrapT);
+                if ((samp.minFilter & 0xFF00) == ctx.NEAREST_MIPMAP_NEAREST) {
+                    ctx.generateMipmap(ctx.TEXTURE_2D);
+                }
+                ctx.bindTexture(ctx.TEXTURE_2D, null); // unbind
+                tex.glTexture = glt;
+                tex.use();
                 return tex;
             }) ?? []);
+
             //lightMap 处理
             let sceneExtensions = this.data.scenes[defaltScene].extensions;
             let gd_linfo_scene: { mode: string, maps: string[] };

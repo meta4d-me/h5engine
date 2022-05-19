@@ -780,7 +780,7 @@ var gd3d;
                     }
                 }
                 // this._userCodeNew.length = 0;
-    
+
                 //update logic
                 var closeindex = -1;
                 for (var i = 0; i < this._userCode.length; i++)
@@ -795,7 +795,7 @@ var gd3d;
                         closeindex = i;
                     }
                 }
-    
+
                 //remove closed
                 if (closeindex >= 0)
                 {
@@ -1488,7 +1488,7 @@ var gd3d;
             if (target["__gdmeta__"][fieldName] == null)
                 target["__gdmeta__"][fieldName] = {};
             target["__gdmeta__"][fieldName]["type"] = "field";
-            //fill meta 
+            //fill meta
             // var t = Reflect.getMetadata("design:type", target, fieldName);
             // if (t == null)//ie.反射这套sb 机制 ，居然和ie不兼容
             // {
@@ -3134,7 +3134,7 @@ var gd3d;
                 this.depthQTree.clear();
                 //所有Renderer 计算 深度
                 this.flowCount = 0;
-                //test 
+                //test
                 this.collectToDepthL(node);
                 //按队列顺序 逐各渲染
                 this.sortDepthList();
@@ -3152,8 +3152,8 @@ var gd3d;
                 var idList = [];
                 var _loop_1 = function (i) {
                     idList.length = 0;
-                    //逐层按相同材质连续排序 
-                    //不同层首尾连接规则 1.队列头部 放置 和上一层同材质类型 2.尾部放置 数量最多的类型 
+                    //逐层按相同材质连续排序
+                    //不同层首尾连接规则 1.队列头部 放置 和上一层同材质类型 2.尾部放置 数量最多的类型
                     var arr = this_1.depthList[i];
                     var tempM = {};
                     arr.forEach(function (rn, idx) {
@@ -3168,7 +3168,7 @@ var gd3d;
                             }
                         }
                     });
-                    //排序  1.队列头部 放置 和上一层同材质类型 2.尾部放置 数量最多的类型 
+                    //排序  1.队列头部 放置 和上一层同材质类型 2.尾部放置 数量最多的类型
                     //1.队列头部 放置 和上一层同材质类型
                     if (lastGuid != -1 && this_1.helpMap[lastGuid] && this_1.helpMap[lastGuid].length > 0) {
                         var sidx = idList.indexOf(lastGuid);
@@ -3241,7 +3241,7 @@ var gd3d;
             canvas.prototype.checkBottomUI = function (rd) {
                 //检测 bottomUI  (逐当前 depthList 层检测 rect 碰撞 ，优化工具 四叉树 )
                 //无 ，depth = 0
-                //有 ，depth = bottomUI.depth + 1 
+                //有 ，depth = bottomUI.depth + 1
                 var tempCup = [];
                 var myr = rd.getDrawBounds();
                 this.depthQTree.retrieve(myr, tempCup);
@@ -3263,7 +3263,7 @@ var gd3d;
                     depth = wrd[canvas_1.depthTag] + 1;
                 }
                 rd[canvas_1.depthTag] = depth;
-                //填入 到四叉树 
+                //填入 到四叉树
                 this.depthQTree.insert(myr);
                 if (!this.depthList[depth])
                     this.depthList[depth] = [];
@@ -6956,7 +6956,7 @@ var gd3d;
                     this.datar[i * this._unitLen + 5] = this.color.b;
                     this.datar[i * this._unitLen + 6] = this.color.a;
                 }
-                //drawRect 
+                //drawRect
                 this.min_x = Math.min(x0, x1, x2, x3, this.min_x);
                 this.min_y = Math.min(y0, y1, y2, y3, this.min_y);
                 this.max_x = Math.max(x0, x1, x2, x3, this.max_x);
@@ -7984,7 +7984,7 @@ var gd3d;
                     var cssColor = gd3d.math.colorToCSS(this._textLable.color, false);
                     inpEle.style.color = cssColor;
                     // let _font = this._textLable.font;
-                    // inpEle.style.fontFamily = 
+                    // inpEle.style.fontFamily =
                     switch (this._textLable.horizontalType) {
                         case framework.HorizontalType.Left:
                             inpEle.style.textAlign = "left";
@@ -8632,7 +8632,7 @@ var gd3d;
             //                 this.datar[rI * 6 * 13 + 13 * j + 11] = this.color2.b;
             //                 this.datar[rI * 6 * 13 + 13 * j + 12] = this.color2.a;
             //             }
-            //             //drawRect 
+            //             //drawRect
             //             this.min_x = Math.min(_x0, _x1, _x2, _x3, this.min_x);
             //             this.min_y = Math.min(_y0, _y1, _y2, _y3, this.min_y);
             //             this.max_x = Math.max(_x0, _x1, _x2, _x3, this.max_x);
@@ -8950,7 +8950,7 @@ var gd3d;
                         datar[_I * 6 * 13 + 13 * 4 + 8] = v1;
                         datar[_I * 6 * 13 + 13 * 5 + 7] = u3;
                         datar[_I * 6 * 13 + 13 * 5 + 8] = v3;
-                        //drawRect 
+                        //drawRect
                         this.min_x = Math.min(_x0, _x1, _x2, _x3, this.min_x);
                         this.min_y = Math.min(_y0, _y1, _y2, _y3, this.min_y);
                         this.max_x = Math.max(_x0, _x1, _x2, _x3, this.max_x);
@@ -9940,7 +9940,7 @@ var gd3d;
             //         if(!canvas.assetmgr) return;
             //         let mat = this._uimat;
             //         if(!mat || mat.getName() != matName){
-            //             if(mat) mat.unuse(); 
+            //             if(mat) mat.unuse();
             //             mat = canvas.assetmgr.getAssetByName(matName) as gd3d.framework.material;
             //             if(mat) mat.use();
             //         }
@@ -10025,7 +10025,7 @@ var gd3d;
                     this.datar[i * 13 + 5] = this.color.b;
                     this.datar[i * 13 + 6] = this.color.a;
                 }
-                //drawRect 
+                //drawRect
                 this.min_x = Math.min(x0, x1, x2, x3, this.min_x);
                 this.min_y = Math.min(y0, y1, y2, y3, this.min_y);
                 this.max_x = Math.max(x0, x1, x2, x3, this.max_x);
@@ -12862,7 +12862,7 @@ var gd3d;
         //资源需要有一个固定的名字，一个唯一的id
         //唯一的id 是定位的需求，他不需要assetMgr就能够满足
         //name 是我们做named的管理时，需要
-        //资源的来源有三种，     
+        //资源的来源有三种，
         //一，随意new，这个也可以用引用计数管理，随你
         //二，加载而来，也是这个使用引用计数管理
         //三，静态管理，这个是特殊的，不要为他设计
@@ -12997,7 +12997,7 @@ var gd3d;
 //          * @language zh_CN
 //          * @classdesc
 //          * 解析包
-//          * @param json 
+//          * @param json
 //          * @version gd3d 1.0
 //          */
 //         parse(json: any, totalLength: number = 0) {
@@ -13104,7 +13104,7 @@ var gd3d;
 //             for(let i=0; i < fLen ;i++){
 //                 let file = filse[i];
 //                 nameMap[file.name] = true;
-//             }            
+//             }
 //             let guidList : {[guid:string] : boolean} = {};
 //             let list: { url: string, type: AssetTypeEnum, guid : string , asset: IAsset, handle: () => any }[] = [];
 //             //遍历每项资源 整理到加载列表
@@ -13128,7 +13128,7 @@ var gd3d;
 //                             continue;
 //                         }
 //                         let sRef = assetmgr.mapRes[mAssId];
-//                         //同guid 资源 是否 正在加载中 
+//                         //同guid 资源 是否 正在加载中
 //                         if (sRef && assetmgr.assetIsLoing(sRef)) {
 //                             //是 加入 guid_waitLoad_map
 //                             //关联到 bundle 的 加载状态队列
@@ -13230,11 +13230,11 @@ var gd3d;
 //                             break;
 //                     }
 //                     _item.asset = asset;
-//                     if (type != AssetTypeEnum.GLVertexShader && 
-//                         type != AssetTypeEnum.GLFragmentShader && 
-//                         type != AssetTypeEnum.Shader&& 
-//                         type != AssetTypeEnum.PackBin && 
-//                         type != AssetTypeEnum.PackTxt && 
+//                     if (type != AssetTypeEnum.GLVertexShader &&
+//                         type != AssetTypeEnum.GLFragmentShader &&
+//                         type != AssetTypeEnum.Shader&&
+//                         type != AssetTypeEnum.PackBin &&
+//                         type != AssetTypeEnum.PackTxt &&
 //                         type != AssetTypeEnum.Prefab&&
 //                         type != AssetTypeEnum.cPrefab
 //                         ) {
@@ -13251,7 +13251,7 @@ var gd3d;
 //                 }
 //             }
 //             let handles = {};
-//             //按类型整理顺序到list 
+//             //按类型整理顺序到list
 //             for (let i = 0, len = asslist.length; i < len; ++i) {
 //                 for (let j = 0, clen = asslist[i].length; j < clen; ++j) {
 //                     let item = asslist[i][j];
@@ -13377,7 +13377,7 @@ var gd3d;
 //         /**
 //          * 添加到仅加载不解析列表 (true 成功)
 //          * @param url assetBundle 的 url
-//          * @param assetmgr 
+//          * @param assetmgr
 //          */
 //         // static addNoParsing(url:string , assetmgr : assetMgr):boolean{
 //         //     if(! url || assetmgr.maploaded[url]) return false;  //对应资源已在 加载中或加载完成的 不处理
@@ -13403,7 +13403,7 @@ var gd3d;
 //         // private static noParsingLoadedDic : {[guid:string] : { url: string, type: AssetTypeEnum, guid: string, asset: IAsset, handle: () => any }} = {};
 //         // private static pardingGuidDic : {[key:string] : boolean} = {};
 //         /**
-//          * 尝试解析预载过的 AB 资源 
+//          * 尝试解析预载过的 AB 资源
 //          * return true 解析成功
 //          * @param url assetBundle 的 url
 //          */
@@ -13446,13 +13446,13 @@ var gd3d;
 //         //         loadlist.push(l);
 //         //     }
 //         //     if(guidCount == 0){
-//         //         source.call(loadlist, source.state, onstate);                           
+//         //         source.call(loadlist, source.state, onstate);
 //         //     }
 //         //     return true;
 //         // }
 //         /** 仅资源加载完毕 回调 , ( 仅 addNoParsing() 调用过的有效 ) */
 //         // static preloadCompleteFun:(url:string)=>any;
-//         //文件加载完毕后统一解析处理 
+//         //文件加载完毕后统一解析处理
 //         // private NextHandle(list: { url: string, type: AssetTypeEnum, guid: string, asset: IAsset, handle: () => any }[], state, onstate) {
 //         //     // if (assetBundle.needParsing) {
 //         //     if (!assetBundle.noParsingDic[this.url]) {
@@ -13464,9 +13464,9 @@ var gd3d;
 //         //         // delete this.assetmgr.mapInLoad[fname]; //inload 记录清除
 //         //         let keyList = [];
 //         //         let len = list.length;
-//         //         for(let i=0; i < len ;i++){  //不解析资源 下载完毕 的guid 或者 url 标记 
+//         //         for(let i=0; i < len ;i++){  //不解析资源 下载完毕 的guid 或者 url 标记
 //         //             let l = list[i];
-//         //             let key = "";   
+//         //             let key = "";
 //         //             if(!l )continue;
 //         //             key = l.guid;
 //         //             if(!key) key = l.url;
@@ -13501,9 +13501,9 @@ var gd3d;
 //                 var hitem = list[i];
 //                 if (!hitem.handle)
 //                     continue;
-//                 if (hitem.type == AssetTypeEnum.Scene || 
-//                     hitem.type == AssetTypeEnum.Prefab || 
-//                     hitem.type == AssetTypeEnum.cPrefab || 
+//                 if (hitem.type == AssetTypeEnum.Scene ||
+//                     hitem.type == AssetTypeEnum.Prefab ||
+//                     hitem.type == AssetTypeEnum.cPrefab ||
 //                     hitem.type == AssetTypeEnum.F14Effect) {
 //                     lastHandle.push(hitem)
 //                     continue;
@@ -13541,7 +13541,7 @@ var gd3d;
 //                             finish();
 //                             awaits.length = 0;
 //                         }
-//                     });                   
+//                     });
 //                 }
 //             }
 //             if(awaits.length == 0){
@@ -13986,7 +13986,7 @@ var gd3d;
 //          * @language zh_CN
 //          * @classdesc
 //          * 通过name获取shader资源
-//          * @param name 
+//          * @param name
 //          * @version gd3d 1.0
 //          */
 //         getShader(name: string): shader
@@ -14459,11 +14459,11 @@ var gd3d;
 //         }
 //         /**
 //          * @private
-//          * @param packnum 
-//          * @param url 
-//          * @param type 
-//          * @param onstate 
-//          * @param state 
+//          * @param packnum
+//          * @param url
+//          * @param type
+//          * @param onstate
+//          * @param state
 //          */
 //         loadResByPack(respack: any, url: string, type: AssetTypeEnum, onstate: (state: stateLoad) => void, state: stateLoad, asset: IAsset, call: (handle: any) => void)
 //         {
@@ -14516,8 +14516,8 @@ var gd3d;
 //         private waitStateDic: { [name: string]: Function[] } = {};
 //         /**
 //          * @private
-//          * @param name 
-//          * @param state 
+//          * @param name
+//          * @param state
 //          */
 //         public doWaitState(name: string, state: stateLoad)
 //         {
@@ -14890,7 +14890,7 @@ var gd3d;
 //             this.load(url, type, onstate);
 //         }
 //         /**
-//          * 
+//          *
 //          * @param scenename 场景名字 (***.scene.json)
 //          */
 //         loadSceneLightmap(sceneurl: string)
@@ -15053,8 +15053,8 @@ var gd3d;
 //          * @language zh_CN
 //          * @classdesc
 //          * 保存材质
-//          * @param mat 
-//          * @param fun 
+//          * @param mat
+//          * @param fun
 //          */
 //         saveMaterial(mat: material, fun: (data: SaveInfo) => void)
 //         {
@@ -15476,7 +15476,7 @@ var gd3d;
                 this.pixelHeight = null;
                 return result;
             };
-            //解码 
+            //解码
             ASTCParse.decodeBuffer = function (ext, _buf) {
                 var header = new Uint8Array(_buf, 0, this.HEADER_MAX);
                 var astcTag = header[3] + (header[2] << 8) + (header[1] << 16) + (header[0] << 24);
@@ -16435,7 +16435,7 @@ var gd3d;
                 for (var i = this.pkgsGuid.length - 1; i >= 0; --i) {
                     var pkgGuid = this.pkgsGuid[i];
                     var pkgld = framework.assetMgr.mapLoading[pkgGuid];
-                    if (!pkgld || !pkgld.data || pkgld.data == 0) //被解析过了不再解析 项目中标记的 
+                    if (!pkgld || !pkgld.data || pkgld.data == 0) //被解析过了不再解析 项目中标记的
                         continue;
                     var isbin = this.pkgs[i].endsWith(".bpkg.json");
                     pkgld.subRes = [];
@@ -16451,7 +16451,7 @@ var gd3d;
                                 var name = String.fromCharCode.apply(null, namebytes);
                                 var fsize = reader.readUInt32();
                                 var bin = reader.readBytesRef(fsize);
-                                var guid = this.files[name] || this.texs[name]; //如果文件找不到,就去找图片                            
+                                var guid = this.files[name] || this.texs[name]; //如果文件找不到,就去找图片
                                 framework.assetMgr.setLoading(guid, { readyok: true, data: bin.buffer });
                                 pkgld.subRes.push(guid);
                                 // console.log(`解压 bin文件${name},size:${fsize},guid:${guid}`);
@@ -16594,7 +16594,7 @@ var gd3d;
             };
             /** 解析后清理 加载缓存资源数据 */
             assetBundle.needClearLoadedRes = false;
-            assetBundle.idNext = -1; //id起始位置               
+            assetBundle.idNext = -1; //id起始位置
             assetBundle.reTryTest = {};
             return assetBundle;
         }());
@@ -16776,7 +16776,7 @@ var gd3d;
                 assetMgr.mapLoading[guid] = data;
             };
             //加载资源
-            assetMgr.prototype.load = function (url, type, 
+            assetMgr.prototype.load = function (url, type,
             /** 这是解析完成的回调 */
             onstate, downloadFinish) {
                 var _this_1 = this;
@@ -17588,35 +17588,35 @@ var gd3d;
             }";
             defShader.vscodefontUI = " \n        attribute vec4 _glesVertex;    \n        attribute vec4 _glesColor;                   \n        attribute vec4 _glesColorEx;                   \n        attribute vec4 _glesMultiTexCoord0;          \n        uniform highp mat4 glstate_matrix_mvp;       \n        varying lowp vec4 xlv_COLOR;                 \n        varying lowp vec4 xlv_COLOREx;                                                  \n        varying highp vec2 xlv_TEXCOORD0;            \n        void main()                                      \n        {                                                \n            highp vec4 tmpvar_1;                         \n            tmpvar_1.w = 1.0;                            \n            tmpvar_1.xyz = _glesVertex.xyz;              \n            xlv_COLOR = _glesColor;                      \n            xlv_COLOREx = _glesColorEx;                      \n            xlv_TEXCOORD0 = vec2(_glesMultiTexCoord0.x,1.0-_glesMultiTexCoord0.y);      \n            gl_Position = (glstate_matrix_mvp * tmpvar_1);   \n        }";
             // 使用正常位图字体shader
-            // static fscodefontUI: string = ` 
-            // precision mediump float ; 
-            // uniform sampler2D _MainTex; 
+            // static fscodefontUI: string = `
+            // precision mediump float ;
+            // uniform sampler2D _MainTex;
             // varying lowp vec4 xlv_COLOR; // 字体颜色
             // varying lowp vec4 xlv_COLOREx; // 描边颜色
-            // varying highp vec2 xlv_TEXCOORD0;     
-            // void main()   
-            // {  
+            // varying highp vec2 xlv_TEXCOORD0;
+            // void main()
+            // {
             //     vec4 col = texture2D(_MainTex, xlv_TEXCOORD0);
             //     col.a = col.r * xlv_COLOR.a;
             //     col.rgb = xlv_COLOR.rgb;
             //     gl_FragData[0] = col;
             // }`;
             // 原来sdf字体shader
-            // static fscodefontUI: string = ` 
-            // precision mediump float ; 
-            // uniform sampler2D _MainTex; 
+            // static fscodefontUI: string = `
+            // precision mediump float ;
+            // uniform sampler2D _MainTex;
             // varying lowp vec4 xlv_COLOR; // 字体颜色
             // varying lowp vec4 xlv_COLOREx; // 描边颜色
-            // varying highp vec2 xlv_TEXCOORD0;     
-            // void main()   
-            // {  
-            //     float scale = 10.0;    
-            //     float d = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.47)*scale;    
-            //     float bd = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.4)*scale;    
-            //     float c=xlv_COLOR.a * clamp ( d,0.0,1.0);   
-            //     float bc=xlv_COLOREx.a * clamp ( bd,0.0,1.0);   
-            //     bc =min(1.0-c,bc);  
-            //     gl_FragData[0] =xlv_COLOR*c + xlv_COLOREx*bc;  
+            // varying highp vec2 xlv_TEXCOORD0;
+            // void main()
+            // {
+            //     float scale = 10.0;
+            //     float d = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.47)*scale;
+            //     float bd = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.4)*scale;
+            //     float c=xlv_COLOR.a * clamp ( d,0.0,1.0);
+            //     float bc=xlv_COLOREx.a * clamp ( bd,0.0,1.0);
+            //     bc =min(1.0-c,bc);
+            //     gl_FragData[0] =xlv_COLOR*c + xlv_COLOREx*bc;
             // }`;
             // 根据 https://zhuanlan.zhihu.com/p/26217154 文章进行修改的shader
             defShader.fscodefontUI = " \n            precision mediump float ; \n            uniform sampler2D _MainTex; \n\n            uniform highp float _outlineWidth; // \u63CF\u8FB9\u5BBD\u5EA6\n\n            varying lowp vec4 xlv_COLOR; // \u5B57\u4F53\u989C\u8272\n            varying lowp vec4 xlv_COLOREx; // \u63CF\u8FB9\u989C\u8272\n            varying highp vec2 xlv_TEXCOORD0;     \n            void main()   \n            {  \n                // \u5728gd3d\u4E2D\u4F7F\u7528\u7684sdf\u5B57\u4F53\u505A\u4E86\u6700\u5927\u503C\u4E3A2\u50CF\u7D20\u7684\u6709\u5411\u8DDD\u79BB\u8FD0\u7B97\u4E14\u4FDD\u5B58\u5230\u4F4D\u56FE\u4E0A\u3002\n                // \u989C\u8272\u503C[0,255]\u5BF9\u4E8E\u533A\u95F4[-2,2]\u3002\n                // \u989C\u8272\u503Cv\u8868\u793A\u8DDD\u79BB\u5B57\u7B26\u8FB9\u7F18\u6709 (v/255*4-2) \u5355\u4F4D\u8DDD\u79BB\u3002\u5355\u4F4D\u8DDD\u79BB\u4E3A\u6B63\u8868\u793A\u5728\u5B57\u7B26\u5185\uFF0C\u5426\u5219\u5728\u5B57\u7B26\u5916\u3002\n                \n                float _DistanceMark = 0.0; // \u8DDD\u79BB\u4E3A 0 \u5904\u662F\u5B57\u7B26\u8FB9\u7F18\n                float _SmoothDelta = 0.5; // \u5728\u5B57\u7B26\u8FB9\u7F18 0.5 \u50CF\u7D20\u8FDB\u884C\u63D2\u503C \n\n                float _OutlineDistanceMark = -_outlineWidth; // \u63CF\u8FB9\u4F4D\u7F6E\n\n                vec4 col = texture2D(_MainTex, xlv_TEXCOORD0);\n                float distance = col.r * 4.0 - 2.0;\n\n                // \u5E73\u6ED1\u5B57\u4F53\u8FB9\u7F18\n                col.a = smoothstep(_DistanceMark - _SmoothDelta, _DistanceMark + _SmoothDelta, distance);\n                // \u4E0D\u5E73\u6ED1 \u76F8\u5F53\u4E8E _SmoothDelta = 0\n                // if (distance < _DistanceMark)\n                //     col.a = 0.0;\n                // else\n                //     col.a = 1.0;\n\n                col.rgb = xlv_COLOR.rgb;\n            \n                // Outlining \u63CF\u8FB9\n                vec4 outlineCol = vec4(1.0,1.0,1.0,1.0);\n\n                outlineCol.a = smoothstep(_OutlineDistanceMark - _outlineWidth, _OutlineDistanceMark + _outlineWidth, distance);\n                outlineCol.rgb = xlv_COLOREx.rgb;\n                outlineCol.a = outlineCol.a * xlv_COLOREx.a;\n                \n                // \u6DF7\u5408\u5B57\u4F53\u4E0E\u63CF\u8FB9\u989C\u8272\n                col = mix(outlineCol, col, col.a);\n\n                col.a = col.a * xlv_COLOR.a;\n                \n                // \u8BBE\u7F6E\u6700\u7EC8\u503C\n                gl_FragData[0] = col;\n        }";
@@ -17799,11 +17799,11 @@ var gd3d;
             {
                 return null;
             }
-    
+
             load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: animationClip, call: (handle: () => void) => void)
             {
                 let filename = getFileName(url);
-    
+
                 state.resstate[filename] = new ResourceState();
                 if(state.resstateFirst==null)
                 {
@@ -17812,7 +17812,7 @@ var gd3d;
                 gd3d.io.loadArrayBuffer(url,
                     (_buffer, err, isloadFail) =>
                     {
-    
+
                         call(() =>
                         {
                             state.isloadFail = isloadFail ? true : false;
@@ -17821,7 +17821,7 @@ var gd3d;
                             let time = Date.now();
                             let _clip = asset ? asset : new animationClip(filename);
                             // _clip.Parse(_buffer);
-    
+
                             // AssetFactoryTools.useAsset(assetMgr, onstate, state, _clip, url);
                             return _clip.Parse(_buffer).then(() =>
                             {
@@ -17830,18 +17830,18 @@ var gd3d;
                                 AssetFactoryTools.useAsset(assetMgr, onstate, state, _clip, url);
                             });
                         });
-    
+
                     },
                     (loadedLength, totalLength) =>
                     {
                         AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                     })
             }
-    
+
             loadByPack(respack, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: animationClip, call: (handle: () => void) => void)
             {
                 let filename = getFileName(url);
-    
+
                 state.resstate[filename] = new ResourceState();
                 if(state.resstateFirst==null)
                 {
@@ -17851,7 +17851,7 @@ var gd3d;
                 let _buffer = respack[filename];
                 let _clip = asset ? asset : new animationClip(filename);
                 // _clip.Parse(_buffer);
-    
+
                 // AssetFactoryTools.useAsset(assetMgr, onstate, state, _clip, url);
                 call(() =>
                 {
@@ -17909,11 +17909,11 @@ var gd3d;
             {
                 return null;
             }
-    
+
             load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: atlas, call: (handle: () => void) => void)
             {
                 let filename = getFileName(url);
-    
+
                 state.resstate[filename] = new ResourceState();
                 if(state.resstateFirst==null)
                 {
@@ -17926,10 +17926,10 @@ var gd3d;
                         state.isloadFail = isloadFail ? true : false;
                         if (AssetFactoryTools.catchError(err, onstate, state))
                             return;
-    
+
                         let _atlas = asset ? asset : new atlas(filename);
                         _atlas.Parse(txt, assetMgr);
-    
+
                         AssetFactoryTools.useAsset(assetMgr, onstate, state, _atlas, url);
                     });
                 },
@@ -17938,7 +17938,7 @@ var gd3d;
                         AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                     })
             }
-    
+
             loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: atlas, call: (handle: () => void) => void)
             {
                 call(() =>
@@ -17952,7 +17952,7 @@ var gd3d;
                     let txt = respack[filename];
                     let _atlas = asset ? asset : new atlas(filename);
                     _atlas.Parse(txt, assetMgr);
-    
+
                     AssetFactoryTools.useAsset(assetMgr, onstate, state, _atlas, url);
                 });
             }*/
@@ -18077,7 +18077,7 @@ var gd3d;
         var AssetFactory_DDS = /** @class */ (function () {
             function AssetFactory_DDS() {
             }
-            //#region 废弃de参考代码        
+            //#region 废弃de参考代码
             // newAsset(): texture
             // {
             //     return null;
@@ -18130,7 +18130,7 @@ var gd3d;
             //         {
             //             AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
             //         });
-            // }        
+            // }
             //#endregion
             AssetFactory_DDS.prototype.parse = function (assetmgr, bundle, filename, bytes) {
                 throw Error("暂不支持dds");
@@ -18744,7 +18744,7 @@ var gd3d;
             //     //             let _mesh = asset ? asset : new mesh(filename);
             //     //             let time = Date.now();
             //     //             return _mesh.Parse(_buffer, assetMgr.webgl).then(() =>
-            //     //             {                            
+            //     //             {
             //     //                 AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
             //     //                 let calc = Date.now() - time;
             //     //                 console.log(`[json]加载:${url}  耗时:${calc}/ms`);
@@ -19277,8 +19277,8 @@ var gd3d;
                 }
             };
             AssetFactory_Shader.prototype.parse = function (assetmgr, bundle, filename, txt) {
-                // if(assetmgr.mapShader[filename]!=null)            
-                //     console.error(`##shader重复设置:${filename}`);                
+                // if(assetmgr.mapShader[filename]!=null)
+                //     console.error(`##shader重复设置:${filename}`);
                 // assetmgr.setAssetUrl(_shader, url);
                 var _shader = new framework.shader(filename);
                 this.parseShader(_shader, assetmgr, txt, filename);
@@ -21191,9 +21191,9 @@ var gd3d;
                 this.helpLPos = new gd3d.math.vector3();
                 this.helpLScale = new gd3d.math.vector3(1, 1, 1);
                 // /**自己是否有组件 */
-                // hasComponent: boolean = false; 
+                // hasComponent: boolean = false;
                 // /**子对象是否有组件  */
-                // hasComponentChild: boolean = false; 
+                // hasComponentChild: boolean = false;
                 /** 自己是否有渲染器组件 */
                 this.hasRendererComp = false;
                 /** 子对象是否有渲染器组件 */
@@ -23164,7 +23164,7 @@ var gd3d;
                 var lightIdx = this.lightmapIndex;
                 for (var i = 0; i < len; i++) {
                     var sm = subMeshs[i];
-                    var mid = subMeshs[i].matIndex; //根据这个找到使用的具体哪个材质    
+                    var mid = subMeshs[i].matIndex; //根据这个找到使用的具体哪个材质
                     var usemat = this.materials[mid];
                     var drawtype = scene.fog ? "base_fog" : "base";
                     if (lightIdx >= 0 && scene.lightmaps.length > 0) {
@@ -23225,7 +23225,7 @@ var gd3d;
                 var drawtype = this.instanceDrawType();
                 for (var i = 0; i < len; i++) {
                     var sm = subMeshs[i];
-                    var mid = subMeshs[i].matIndex; //根据这个找到使用的具体哪个材质    
+                    var mid = subMeshs[i].matIndex; //根据这个找到使用的具体哪个材质
                     var usemat = mr.materials[mid];
                     var drawInstanceInfo = meshGpuInstanceDrawInfo.new_info();
                     drawInstanceInfo.mid = mid;
@@ -23257,7 +23257,7 @@ var gd3d;
                 var len = subMeshs.length;
                 for (var i = 0; i < len; i++) {
                     var sm = subMeshs[i];
-                    var mid = subMeshs[i].matIndex; //根据这个找到使用的具体哪个材质    
+                    var mid = subMeshs[i].matIndex; //根据这个找到使用的具体哪个材质
                     var usemat = mats[mid];
                     var drawtype = this.instanceDrawType();
                     var vbo = this._getVBO(context.webgl);
@@ -24806,7 +24806,7 @@ var gd3d;
                     //                 {
                     //                     shaders.push(k);
                     //                 }
-                    //                 console.error(` 
+                    //                 console.error(`
                     // #######当前shader#######:
                     //                 ${shaders.join("\n")}`);
                     throw new Error("mat解析错误:" + this.name + "  shader 为空！shadername：" + shaderName + " bundleName: " + bundleName);
@@ -25428,7 +25428,7 @@ var gd3d;
             //     read.position = read.position + 24;
             //     var vcount = read.readUInt32();
             //     var vec10tpose: number[] = [];
-            //     //分片加载 
+            //     //分片加载
             //     this.readProcess(read, data, objVF, vcount, vec10tpose, () =>
             //     {
             //         this.readFinish(read, data, inData, objVF, webgl);
@@ -25567,7 +25567,7 @@ var gd3d;
                 this.data.blendWeight = inData.meshData.blendWeight;
                 this.data.trisindex = inData.meshData.trisindex;
                 this.submesh = inData.submesh;
-    
+
                 this.glMesh = new gd3d.render.glMesh();
                 var vertexs = this.data.genVertexDataArray(this.data.originVF);
                 var indices = this.data.genIndexDataArray();
@@ -28570,7 +28570,7 @@ var gd3d;
         //      * @param clipname 动画片段名
         //      */
         //     onPlayEnd:(clipname:string)=>any;
-        //     private checkFrameId(delay: number): void 
+        //     private checkFrameId(delay: number): void
         //     {
         //         if (this.playStyle == PlayStyle.NormalPlay)
         //         {
@@ -28879,7 +28879,7 @@ var gd3d;
                 }
                 // //郭加的
                 // if(this.beLoop)
-                // {   
+                // {
                 //     c.source.onended=()=>
                 //     {
                 //         this.play(buffer, beLoop, volume);
@@ -30032,7 +30032,7 @@ var gd3d;
             camera.prototype._fillRenderer = function (scene, node, _isStatic) {
                 if (_isStatic === void 0) { _isStatic = false; }
                 if (!node.needFillRenderer)
-                    return; //强制不fill 
+                    return; //强制不fill
                 var go = node.gameObject;
                 if (!go || !go.visible || (node.hasRendererComp == false && node.hasRendererCompChild == false))
                     return; //自己没有渲染组件 且 子物体也没有 return
@@ -30220,7 +30220,7 @@ var gd3d;
                 for (var i = 0, l = rlayers.length; i < l; ++i) {
                     var ls = rlayers[i].list;
                     var len = ls.length;
-                    for (var j = 0; j < len; ++j) 
+                    for (var j = 0; j < len; ++j)
                     // for (let item of layer.list)
                     {
                         var item = ls[j];
@@ -31454,10 +31454,10 @@ var gd3d;
 //         }
 //         /**
 //          * 更新特效数据
-//          * 
+//          *
 //          * @private
-//          * @param {number} delta 
-//          * 
+//          * @param {number} delta
+//          *
 //          * @memberof effectSystem
 //          */
 //         private _update(delta: number)
@@ -31523,11 +31523,11 @@ var gd3d;
 //         }
 //         /**
 //          * 将插值信息合并到当前帧数据
-//          * 
-//          * @param {EffectAttrsData} realUseCurFrameData 
-//          * @param {EffectFrameData} curFrameData 
-//          * @returns 
-//          * 
+//          *
+//          * @param {EffectAttrsData} realUseCurFrameData
+//          * @param {EffectFrameData} curFrameData
+//          * @returns
+//          *
 //          * @memberof effectSystem
 //          */
 //         private mergeLerpAttribData(realUseCurFrameData: EffectAttrsData, effect: EffectElementSingleMesh, frameId: number)
@@ -31553,15 +31553,15 @@ var gd3d;
 //         }
 //         /**
 //          * 根据当前帧的数据更新EffectBatcher中的vbo，ebo信息
-//          * 
+//          *
 //          * @private
-//          * @param {EffectBatcher} effectBatcher 
-//          * @param {EffectAttrsData} curAttrsData 
-//          * @param {EffectFrameData} initFrameData 
-//          * @param {number} vertexStartIndex 
-//          * @param {number} delta 
-//          * @returns 
-//          * 
+//          * @param {EffectBatcher} effectBatcher
+//          * @param {EffectAttrsData} curAttrsData
+//          * @param {EffectFrameData} initFrameData
+//          * @param {number} vertexStartIndex
+//          * @param {number} delta
+//          * @returns
+//          *
 //          * @memberof effectSystem
 //          */
 //         private updateEffectBatcher(effectBatcher: EffectBatcherNew, curAttrsData: EffectAttrsData, mesh: gd3d.framework.mesh, vertexStartIndex: number)
@@ -31632,11 +31632,11 @@ var gd3d;
 //         }
 //         /**
 //          * 提交各个EffectBatcher中的数据进行渲染
-//          * 
-//          * @param {renderContext} context 
-//          * @param {assetMgr} assetmgr 
-//          * @param {gd3d.framework.camera} camera 
-//          * 
+//          *
+//          * @param {renderContext} context
+//          * @param {assetMgr} assetmgr
+//          * @param {gd3d.framework.camera} camera
+//          *
 //          * @memberof effectSystem
 //          */
 //         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera)
@@ -31787,9 +31787,9 @@ var gd3d;
 //         private beExecuteNextFrame: boolean = true;
 //         /**
 //          * 计算当前的frameid
-//          * 
+//          *
 //          * @private
-//          * 
+//          *
 //          * @memberof effectSystem
 //          */
 //         private checkFrameId(): boolean
@@ -31989,7 +31989,7 @@ var gd3d;
 //         public effectElements: EffectElementSingleMesh[] = [];
 //         /**
 //          * 当前总的顶点数量
-//          * 
+//          *
 //          * @private
 //          * @type {number}
 //          * @memberof effect
@@ -32025,10 +32025,10 @@ var gd3d;
 //         private _vbosize: number = 0;
 //         /**
 //          * 动态设定vbo大小
-//          * 
-//          * @param {number} value 
-//          * @returns 
-//          * 
+//          *
+//          * @param {number} value
+//          * @returns
+//          *
 //          * @memberof effect
 //          */
 //         public resizeVboSize(value: number)
@@ -33223,7 +33223,7 @@ var gd3d;
                 this._nowTime += delta * this._speed;
                 var raelTime = this._nowTime;
                 var clipTime = clip.time;
-                //    
+                //
                 //是否播完
                 if (this.checkPlayEnd(clip)) {
                     this.OnClipPlayEnd();
@@ -33974,7 +33974,7 @@ var gd3d;
 //         }
 //         /**
 //          * @private
-//          * @param index 
+//          * @param index
 //          */
 //         getMatByIndex(index: number)
 //         {
@@ -34986,7 +34986,7 @@ var gd3d;
                     this.dataForVbo[(i * 2 + 1) * 9 + 7] = i / (length - 1);
                     this.dataForVbo[(i * 2 + 1) * 9 + 8] = 1;
                 }
-                //--------------------------------------     
+                //--------------------------------------
                 for (var k = 0; k < length - 1; k++) {
                     this.dataForEbo[k * 6 + 0] = k * 2;
                     this.dataForEbo[k * 6 + 1] = (k + 1) * 2;
@@ -35700,7 +35700,7 @@ var gd3d;
                 //         return;
                 //     }
                 // }
-                // this.renderActive=true;//上面return了应该不再render 
+                // this.renderActive=true;//上面return了应该不再render
                 // this.totalFrame=this.totalTime*this.fps;
                 // if(!this.data.beloop&&this.totalFrame>this.data.lifeTime)
                 // {
@@ -35963,7 +35963,7 @@ var gd3d;
             //        if(this.frameList[i]>=this.effect.data.lifeTime)
             //         {
             //             this.removeFrame(this.frameList[i]);
-            //         } 
+            //         }
             //     }
             // }
             F14Layer.prototype.addFrame = function (index, framedata) {
@@ -36587,8 +36587,8 @@ var gd3d;
                 this.rotEuler = new gd3d.math.vector3();
                 //----------------render
                 this.rendermodel = RenderModelEnum.Mesh;
-                //public Material material;  
-                //public Mesh mesh;//仅在rendermodel为mesh的时候显示     
+                //public Material material;
+                //public Mesh mesh;//仅在rendermodel为mesh的时候显示
                 this.beloop = true;
                 this.lifeTime = new framework.NumberData(20);
                 this.simulateInLocalSpace = true; //粒子运动运动空间（世界还是本地)
@@ -36950,7 +36950,7 @@ var gd3d;
                     this.emission.particlelist[i].uploadMeshdata();
                 }
                 //---------------------render
-                //this.mesh.glMesh.bindVboBuffer(context.webgl);      
+                //this.mesh.glMesh.bindVboBuffer(context.webgl);
                 this.mesh.glMesh.uploadVertexData(context.webgl, this.dataForVbo);
                 this.mesh.glMesh.uploadIndexData(context.webgl, 0, this.dataForEbo);
                 this.mesh.submesh[0].size = this.curIndexCount;
@@ -38592,7 +38592,7 @@ var gd3d;
              * @param cameraPosition 摄像机局部坐标
              */
             LineRenderer.calcPositionVectex = function (positions, loop, rateAtLines, lineWidth, alignment, cameraPosition) {
-                // 
+                //
                 var positionVectex = [];
                 // 处理两端循环情况
                 if (loop) {
@@ -42974,7 +42974,7 @@ var gd3d;
                     return b;
                 }
                 do {
-                    // 
+                    //
                     var x = a - fa * (b - a) / (fb - fa);
                     var fr = f(x);
                     if (fa * fr < 0) {
@@ -43547,7 +43547,7 @@ var gd3d;
             return false;
         }
         math.isContain = isContain;
-        // 计算叉乘 |P0P1| × |P0P2| 
+        // 计算叉乘 |P0P1| × |P0P2|
         function Multiply(p1, p2, p0) {
             return ((p1.x - p0.x) * (p2.y - p0.y) - (p2.x - p0.x) * (p1.y - p0.y));
         }
@@ -44460,7 +44460,7 @@ var gd3d;
             //to.rawData.set(from.rawData);
             // to.rawData[0]=from.rawData[0];
             // to.rawData[1]=from.rawData[1];
-            // to.rawData[2]=from.rawData[2]; 
+            // to.rawData[2]=from.rawData[2];
         }
         math.vec3Clone = vec3Clone;
         // export function vec3ToString(result: string)
@@ -45285,7 +45285,7 @@ var gd3d;
                 info.vecs = listVec;
                 var polys = [];
                 var list = j["p"];
-                for (var i = 0; i < list.length; i++) 
+                for (var i = 0; i < list.length; i++)
                 //foreach (var json in j.asDict()["p"].AsList())
                 {
                     var json = list[i];
@@ -45941,40 +45941,40 @@ var gd3d;
                 return wayPoints;
             };
             pathFinding.intersectBorder = function (a, b, c, d) {
-                //线段ab的法线N1  
+                //线段ab的法线N1
                 var nx1 = (b.z - a.z), ny1 = (a.x - b.x);
-                //线段cd的法线N2  
+                //线段cd的法线N2
                 var nx2 = (d.z - c.z), ny2 = (c.x - d.x);
-                //两条法线做叉乘, 如果结果为0, 说明线段ab和线段cd平行或共线,不相交  
+                //两条法线做叉乘, 如果结果为0, 说明线段ab和线段cd平行或共线,不相交
                 var denominator = nx1 * ny2 - ny1 * nx2;
                 if (denominator == 0) {
                     return null;
                 }
-                //在法线N2上的投影  
+                //在法线N2上的投影
                 var distC_N2 = nx2 * c.x + ny2 * c.z;
                 var distA_N2 = nx2 * a.x + ny2 * a.z - distC_N2;
                 var distB_N2 = nx2 * b.x + ny2 * b.z - distC_N2;
-                // 点a投影和点b投影在点c投影同侧 (对点在线段上的情况,本例当作不相交处理);  
+                // 点a投影和点b投影在点c投影同侧 (对点在线段上的情况,本例当作不相交处理);
                 if (distA_N2 * distB_N2 >= 0) {
                     return null;
                 }
-                //  
-                //判断点c点d 和线段ab的关系, 原理同上  
-                //  
-                //在法线N1上的投影  
+                //
+                //判断点c点d 和线段ab的关系, 原理同上
+                //
+                //在法线N1上的投影
                 var distA_N1 = nx1 * a.x + ny1 * a.z;
                 var distC_N1 = nx1 * c.x + ny1 * c.z - distA_N1;
                 var distD_N1 = nx1 * d.x + ny1 * d.z - distA_N1;
                 if (distC_N1 * distD_N1 >= 0) {
                     return null;
                 }
-                //计算交点坐标  
+                //计算交点坐标
                 var fraction = distA_N2 / denominator;
                 var dx = fraction * ny1, dz = -fraction * nx1;
                 var newpoint = new framework.navVec3();
                 framework.navVec3.lerp(a, b, -fraction, newpoint);
                 return newpoint;
-                //return { x: a.x + dx , y: a.z + dz };  
+                //return { x: a.x + dx , y: a.z + dz };
             };
             return pathFinding;
         }());
@@ -49254,7 +49254,7 @@ var gd3d;
                 this.frameInternal = 1 / framework.effectSystem.fps;
             };
             RotationAction.prototype.update = function (frameIndex) {
-                // // if (this.startFrame > frameIndex || this.endFrame < frameIndex) 
+                // // if (this.startFrame > frameIndex || this.endFrame < frameIndex)
                 this.elements.curAttrData.euler.z = this.elements.curAttrData.euler.z + (this.velocity.z.getValue()) * this.frameInternal;
                 if (this.elements.curAttrData.renderModel == framework.RenderModel.None) {
                     this.elements.curAttrData.euler.x = this.elements.curAttrData.euler.x + (this.velocity.x.getValue()) * this.frameInternal;
@@ -49807,7 +49807,7 @@ var gd3d;
                             // {
                             //     //data.beLoop = <boolean>_data["beloop"];
                             //     data.paricleLoop=<boolean>_data["beloop"];
-                            //     if(data.paricleLoop) 
+                            //     if(data.paricleLoop)
                             //     {
                             //         data.beLoop=true;
                             //     }
@@ -50368,7 +50368,7 @@ var gd3d;
                 var dir = new gd3d.math.vector3();
                 gd3d.math.vec3Subtract(targetpos, eye, dir);
                 gd3d.math.vec3Normalize(dir, dir);
-                //dir在xz面上的单位投影          
+                //dir在xz面上的单位投影
                 var unitprojectedXZ = new gd3d.math.vector3(dir.x, 0, dir.z);
                 gd3d.math.vec3Normalize(unitprojectedXZ, unitprojectedXZ);
                 var yaw = Math.acos(unitprojectedXZ.z) / Math.PI * 180;
@@ -50379,7 +50379,7 @@ var gd3d;
                 var right = gd3d.math.pool.new_vector3();
                 gd3d.math.vec3Cross(up, dir, right);
                 gd3d.math.vec3Normalize(right, right);
-                //dir在xz面上的投影   
+                //dir在xz面上的投影
                 var projectedXZ = new gd3d.math.vector3(dir.x, 0, dir.z);
                 var length = gd3d.math.vec3Length(projectedXZ);
                 var pitch = Math.acos(length) / Math.PI * 180;
@@ -50439,7 +50439,7 @@ var gd3d;
                 var dir = new gd3d.math.vector3();
                 gd3d.math.vec3Subtract(targetpos, eye, dir);
                 gd3d.math.vec3Normalize(dir, dir);
-                //dir在xz面上的单位投影          
+                //dir在xz面上的单位投影
                 var dirxz = new gd3d.math.vector3(dir.x, 0, dir.z);
                 gd3d.math.vec3Normalize(dirxz, dirxz);
                 var yaw = Math.acos(dirxz.z) / Math.PI * 180;
@@ -51221,7 +51221,7 @@ var gd3d;
                 //detal为 0.01699995994567871  造成短短时间发射大量粒子困难(0.1 发射50)至少需要detal<=0.002,按照detal为0.0169需要0.8左右的时间才能发射完，于是不能deta仅发射一个粒子。
                 //改为按照时间比例发射粒子
                 if (this.emissionData.emissionType == framework.ParticleEmissionType.continue) {
-                    // if (this.numcount == 0) 
+                    // if (this.numcount == 0)
                     // {
                     //     this.addParticle();
                     //     this.numcount++;
@@ -52131,7 +52131,7 @@ var gd3d;
                 var realEmitTime = this._realTime;
                 if (!loop)
                     realEmitTime = Math.min(realEmitTime, duration);
-                // 
+                //
                 var emits = [];
                 // 单粒子发射周期
                 var step = 1 / this.emission.rateOverTime.getValue(rateAtDuration);
@@ -53800,7 +53800,7 @@ var gd3d;
                 gd3d.math.matrixInverse(mat, mat);
                 // 还原到原空间
                 gd3d.math.matrixTransformNormal(pVelocity, mat, pVelocity);
-                // 
+                //
                 gd3d.math.vec3SLerp(particle.velocity, pVelocity, this.dampen, particle.velocity);
             };
             return ParticleLimitVelocityOverLifetimeModule;
@@ -58319,7 +58319,7 @@ var gd3d;
                                     gd3d.math.quatToEulerAngles(lwrot, lEuler); //上一次的 欧拉角
                                 }
                                 _this.lastRotMask = mask_;
-                                //逐轴冻结判定                        
+                                //逐轴冻结判定
                                 var t_x = lEuler.x;
                                 var t_y = lEuler.y;
                                 var t_z = lEuler.z;
@@ -59413,7 +59413,7 @@ var gd3d;
                         continue;
                     if (framework.StringUtil.ENABLED in c.comp && !c.comp[framework.StringUtil.ENABLED])
                         continue;
-                    if (!c.OnPlayed) //还没有 调用 OnPlayed 
+                    if (!c.OnPlayed) //还没有 调用 OnPlayed
                      {
                         c.comp.onPlay(); //运行时的 enabled 开启 后调用 onPlay()
                         c.OnPlayed = true;
@@ -59510,7 +59510,7 @@ var gd3d;
                 // if (comp.update.toString().length < 35)
                 // {
                 //     //update 空转
-                //     comp.update = undefined;                
+                //     comp.update = undefined;
                 // }
                 if (add) {
                     this.components.push(nodeObj);
@@ -60538,12 +60538,12 @@ var gd3d;
                 if (node.gameObject.haveComponet)
                 {
                     node.gameObject.update(delta);
-    
+
                     this.collectCameraAndLight(node);
                 }
                 if (node.children)
                 {
-    
+
                     for (var i = 0, l = node.children.length; i < l; i++)
                     {
                         this.objupdate(node.children[i], delta);
@@ -62536,7 +62536,7 @@ var gd3d;
                     for (var i = 0; i < 8; i++) {
                         gd3d.math.vec3Clone(wVects[i], ray.tempVecs[i]);
                     }
-                    // obb.caclWorldVecs(ray.tempVecs, _collider.gameObject.transform.getWorldMatrix());   
+                    // obb.caclWorldVecs(ray.tempVecs, _collider.gameObject.transform.getWorldMatrix());
                     if (!ray.tempMData)
                         ray.tempMData = new gd3d.render.meshData();
                     gd3d.render.meshData.genBoxByArray(ray.tempVecs, ray.tempMData);
@@ -64013,7 +64013,7 @@ var gd3d;
                 }
                 return false;
             }
-        }, 
+        },
         //处理方法
         {
             priority: 0,
@@ -64028,7 +64028,7 @@ var gd3d;
                 }
                 return false;
             }
-        }, 
+        },
         // 排除不支持序列化对象 serializable == false 时不进行序列化
         {
             priority: 0,
@@ -64039,7 +64039,7 @@ var gd3d;
                 }
                 return false;
             }
-        }, 
+        },
         // 自定义序列化函数
         {
             priority: 0,
@@ -64054,7 +64054,7 @@ var gd3d;
                 }
                 return false;
             }
-        }, 
+        },
         //处理数组
         {
             priority: 0,
@@ -64071,7 +64071,7 @@ var gd3d;
                 }
                 return false;
             }
-        }, 
+        },
         //处理普通Object
         {
             priority: 0,
@@ -64088,7 +64088,7 @@ var gd3d;
                 }
                 return false;
             }
-        }, 
+        },
         // 使用默认序列化
         {
             priority: -10000,
@@ -64129,7 +64129,7 @@ var gd3d;
                 }
                 return false;
             }
-        }, 
+        },
         //处理方法
         {
             priority: 0,
@@ -64141,7 +64141,7 @@ var gd3d;
                 }
                 return false;
             }
-        }, 
+        },
         // 处理非原生Object对象
         {
             priority: 0,
@@ -64153,7 +64153,7 @@ var gd3d;
                 }
                 return false;
             }
-        }, 
+        },
         //处理数组
         {
             priority: 0,
@@ -64170,7 +64170,7 @@ var gd3d;
                 }
                 return false;
             }
-        }, 
+        },
         // 处理 没有类名称标记的 普通Object
         {
             priority: 0,
@@ -64191,7 +64191,7 @@ var gd3d;
                 }
                 return false;
             }
-        }, 
+        },
         // 处理自定义反序列化对象
         {
             priority: 0,
@@ -64210,8 +64210,8 @@ var gd3d;
                 }
                 return false;
             }
-        }, 
-        // 处理自定义对象的反序列化 
+        },
+        // 处理自定义对象的反序列化
         {
             priority: -10000,
             handler: function (target, source, property, handlers, serialization) {
@@ -66893,7 +66893,7 @@ var gd3d;
             req.onerror = function (ev) {
                 if (fun)
                     fun(null, new Error("URL : " + url + " \n onerr on req: "));
-                //因 onloadend 无论成功失败都会回调   这里的重试注掉 
+                //因 onloadend 无论成功失败都会回调   这里的重试注掉
                 // loadFail(req, url, fun, onprocess, responseType, loadedFun);
             };
             req.onloadend = function () {
@@ -66962,7 +66962,7 @@ var gd3d;
                 else {
                     JSONParse(text || cached.text).then(function (json) {
                         //cachedMap[url] = json;
-                        // cached.json = json;                
+                        // cached.json = json;
                         r(json);
                     });
                 }
@@ -67128,7 +67128,7 @@ var gd3d;
 })(gd3d || (gd3d = {}));
 var gd3d;
 (function (gd3d) {
-    //定义 快捷使用池 数据结构对象 
+    //定义 快捷使用池 数据结构对象
     /** 从池中取一个 vector2 */
     function poolv2(clone) { return !clone ? gd3d.math.pool.new_vector2() : gd3d.math.pool.clone_vector2(clone); }
     gd3d.poolv2 = poolv2;
@@ -70801,7 +70801,7 @@ var gd3d;
                     formatGL = this.webgl.RGB;
                 else if (this.format == TextureFormatEnum.Gray)
                     formatGL = this.webgl.LUMINANCE;
-                this.webgl.texImage2D(this.webgl.TEXTURE_2D, 0, formatGL, formatGL, 
+                this.webgl.texImage2D(this.webgl.TEXTURE_2D, 0, formatGL, formatGL,
                 //最后这个type，可以管格式
                 this.webgl.UNSIGNED_BYTE, img);
                 if (mipmap) {
@@ -70883,7 +70883,7 @@ var gd3d;
                     formatGL = this.webgl.RGB;
                 else if (this.format == TextureFormatEnum.Gray)
                     formatGL = this.webgl.LUMINANCE;
-                this.webgl.texImage2D(this.webgl.TEXTURE_2D, 0, formatGL, width, height, 0, formatGL, 
+                this.webgl.texImage2D(this.webgl.TEXTURE_2D, 0, formatGL, width, height, 0, formatGL,
                 //最后这个type，可以管格式
                 dataType, data);
                 if (mipmap) {
@@ -71145,12 +71145,12 @@ var gd3d;
                 else if (this.format == TextureFormatEnum.Gray)
                     formatGL = this.webgl.LUMINANCE;
                 if (data instanceof HTMLImageElement) {
-                    this.webgl.texImage2D(TEXTURE_CUBE_MAP_, 0, formatGL, formatGL, 
+                    this.webgl.texImage2D(TEXTURE_CUBE_MAP_, 0, formatGL, formatGL,
                     //最后这个type，可以管格式
                     this.webgl.UNSIGNED_BYTE, data);
                 }
                 else {
-                    this.webgl.texImage2D(TEXTURE_CUBE_MAP_, 0, formatGL, width, height, 0, formatGL, 
+                    this.webgl.texImage2D(TEXTURE_CUBE_MAP_, 0, formatGL, width, height, 0, formatGL,
                     //最后这个type，可以管格式
                     this.webgl.UNSIGNED_BYTE, data);
                 }
@@ -71285,7 +71285,7 @@ var gd3d;
                 //        data[seek + 1] = 100;
                 //        data[seek + 3] = 255;
                 //    }
-                this.webgl.texImage2D(this.webgl.TEXTURE_2D, 0, this.formatGL, width, height, 0, this.formatGL, 
+                this.webgl.texImage2D(this.webgl.TEXTURE_2D, 0, this.formatGL, width, height, 0, this.formatGL,
                 //最后这个type，可以管格式
                 this.webgl.UNSIGNED_BYTE, data);
                 if (linear) {
