@@ -20792,7 +20792,7 @@ var gd3d;
                 if (specFactor === void 0) { specFactor = 1; }
                 if (irrFactor === void 0) { irrFactor = 1; }
                 return __awaiter(this, void 0, void 0, function () {
-                    var load, _t, images, textures, extrasCfg, materials, views, accessors, meshes, nodes, defaltScene, scene, parseNode, roots;
+                    var load, loadImg, _t, images, textures, extrasCfg, materials, views, accessors, meshes, nodes, defaltScene, scene, parseNode, roots;
                     var _this = this;
                     return __generator(this, function (_u) {
                         switch (_u.label) {
@@ -20800,6 +20800,12 @@ var gd3d;
                                 load = function (uri) { return new Promise(function (res) {
                                     mgr.load(folder + uri, framework.AssetTypeEnum.Auto, function () {
                                         res(mgr.getAssetByName(uri.split('/').pop()));
+                                    });
+                                }); };
+                                loadImg = function (url) { return new Promise(function (res) {
+                                    gd3d.io.loadImg(folder + url, function (img, err) {
+                                        if (!err)
+                                            res(img);
                                     });
                                 }); };
                                 _t = this;
@@ -20811,13 +20817,27 @@ var gd3d;
                                 _t.buffers = _u.sent();
                                 return [4 /*yield*/, Promise.all((_f = (_e = (_d = this.data) === null || _d === void 0 ? void 0 : _d.images) === null || _e === void 0 ? void 0 : _e.map(function (_a) {
                                         var uri = _a.uri;
-                                        return load(uri);
+                                        return loadImg(uri);
                                     })) !== null && _f !== void 0 ? _f : [])];
                             case 2:
                                 images = _u.sent();
                                 return [4 /*yield*/, Promise.all((_h = (_g = this.data.textures) === null || _g === void 0 ? void 0 : _g.map(function (_a) {
                                         var sampler = _a.sampler, source = _a.source;
-                                        var tex = images[source]; // TODO:
+                                        var img = images[source];
+                                        var tex = new gd3d.framework.texture(img.src);
+                                        var glt = new gd3d.render.glTexture2D(ctx, gd3d.render.TextureFormatEnum.RGB);
+                                        var samp = __assign({ minFilter: ctx.NEAREST, magFilter: ctx.NEAREST, wrapS: ctx.REPEAT, wrapT: ctx.REPEAT }, _this.data.samplers[sampler]);
+                                        glt.uploadImage(img, false, false, false, false, false, false); // bind texture
+                                        ctx.texParameteri(ctx.TEXTURE_2D, ctx.TEXTURE_MAG_FILTER, samp.magFilter);
+                                        ctx.texParameteri(ctx.TEXTURE_2D, ctx.TEXTURE_MIN_FILTER, samp.minFilter);
+                                        ctx.texParameteri(ctx.TEXTURE_2D, ctx.TEXTURE_WRAP_S, samp.wrapS);
+                                        ctx.texParameteri(ctx.TEXTURE_2D, ctx.TEXTURE_WRAP_T, samp.wrapT);
+                                        if ((samp.minFilter & 0xFF00) == ctx.NEAREST_MIPMAP_NEAREST) {
+                                            ctx.generateMipmap(ctx.TEXTURE_2D);
+                                        }
+                                        ctx.bindTexture(ctx.TEXTURE_2D, null); // unbind
+                                        tex.glTexture = glt;
+                                        tex.use();
                                         return tex;
                                     })) !== null && _h !== void 0 ? _h : [])];
                             case 3:
