@@ -43,14 +43,14 @@ namespace gd3d.framework
         /**
          * 启用批量渲染相关顶点属性
          */
-        activeAttributes(gl: WebGLRenderingContext, pass : render.glDrawPass): void;
+        activeAttributes(gl: WebGLRenderingContext, pass: render.glDrawPass): void;
         /**
          * 禁用批量渲染相关顶点属性
          */
-        disableAttributes(gl: WebGLRenderingContext, pass : render.glDrawPass): void;
+        disableAttributes(gl: WebGLRenderingContext, pass: render.glDrawPass): void;
     }
 
-    
+
 
     /**
      * @public
@@ -76,16 +76,18 @@ namespace gd3d.framework
          * @version gd3d 1.0
          */
         defaultAsset: boolean = false;
-        
-        private _enableGpuInstancing : boolean = false;
+
+        private _enableGpuInstancing: boolean = false;
         @gd3d.reflect.Field("number")
         /**
          * 开启使用Gpu Instance 渲染模式
          */
-        get enableGpuInstancing (){ return this._enableGpuInstancing ;};
-        set enableGpuInstancing (enable : boolean ){ 
+        get enableGpuInstancing() { return this._enableGpuInstancing; };
+        set enableGpuInstancing(enable: boolean)
+        {
             this._enableGpuInstancing = enable;
-            if(enable){
+            if (enable)
+            {
                 this.getTexGuid(this);   //贴图使用唯一标识ID，gupInstance 使用
                 this.getShaderGuid(this.shader);
                 this.refreshGpuInstancingGUID();
@@ -93,10 +95,10 @@ namespace gd3d.framework
         };
 
         //
-        private _shaderGUID : string = "";
-        private _textureGUID : string = "";
+        private _shaderGUID: string = "";
+        private _textureGUID: string = "";
         /** gpuInstancing 材质唯一ID */
-        gpuInstancingGUID : string = "";
+        gpuInstancingGUID: string = "";
 
         constructor(assetName: string = null)
         {
@@ -245,9 +247,9 @@ namespace gd3d.framework
             glstate_vec4_bones: true,
             glstate_matrix_bones: true,
             boneSampler: true,
-            glstate_lightmapOffset:true,
-            _LightmapTex:true,
-            glstate_lightmapUV:true
+            glstate_lightmapOffset: true,
+            _LightmapTex: true,
+            glstate_lightmapUV: true
         }
 
         uploadUnifoms(pass: render.glDrawPass, context: renderContext, lastMatSame = false)
@@ -260,7 +262,8 @@ namespace gd3d.framework
                 let unifom = pass.mapuniforms[key];
                 if (lastMatSame && !material.sameMatPassMap[unifom.name] && !udMap[unifom.name])
                 {
-                    if(uTEnum.Texture == unifom.type || uTEnum.CubeTexture == unifom.type){
+                    if (uTEnum.Texture == unifom.type || uTEnum.CubeTexture == unifom.type)
+                    {
                         render.shaderUniform.texindex++;
                     }
                     continue;
@@ -295,7 +298,7 @@ namespace gd3d.framework
             }
         }
 
-        instanceAttribValMap : {[id:string]:number[]} = {};
+        instanceAttribValMap: { [id: string]: number[] } = {};
         /** gpu instancing 使用值上传 */
         // uploadInstanceAtteribute(pass: render.glDrawPass,setContainer: number[]){
         //     let attmap =  pass.program.mapCustomAttrib;
@@ -320,20 +323,26 @@ namespace gd3d.framework
          * @param darr 数组对象
          * @param ignoreMap 忽略列表
          */
-        uploadInstanceAtteribute(pass: render.glDrawPass, darr: gd3d.math.ExtenArray<Float32Array>){
-            let attmap =  pass.program.mapCustomAttrib;
-            for(let key in attmap){
+        uploadInstanceAtteribute(pass: render.glDrawPass, darr: gd3d.math.ExtenArray<Float32Array>)
+        {
+            let attmap = pass.program.mapCustomAttrib;
+            for (let key in attmap)
+            {
                 let arr = this.instanceAttribValMap[key];
-                if(!arr){
+                if (!arr)
+                {
                     let att = pass.program.mapCustomAttrib[key];
                     // let oldLen = setContainer.length;
                     // setContainer.length = oldLen + att.size;
                     // setContainer.fill(0,oldLen);
-                    for(let i=0 , len = att.size ; i < len ; i++){
+                    for (let i = 0, len = att.size; i < len; i++)
+                    {
                         darr.push(0);
                     }
-                }else{
-                    for(let i=0 , len = arr.length ; i < len ; i++){
+                } else
+                {
+                    for (let i = 0, len = arr.length; i < len; i++)
+                    {
                         darr.push(arr[i]);
                     }
                 }
@@ -345,14 +354,17 @@ namespace gd3d.framework
         //     this.instanceAttribValMap[id] = arr;
         // }
 
-        private getInstanceAttribValue(id:string){
-            if(this.instanceAttribValMap[id] == null){
+        private getInstanceAttribValue(id: string)
+        {
+            if (this.instanceAttribValMap[id] == null)
+            {
                 this.instanceAttribValMap[id] = [];
             }
             return this.instanceAttribValMap[id];
         }
 
-        private isNotBuildinAttribId(id:string){
+        private isNotBuildinAttribId(id: string)
+        {
             return !render.glProgram.isBuildInAttrib(id);
         }
 
@@ -368,7 +380,8 @@ namespace gd3d.framework
         {
             this.shader = shader;
             this.defaultMapUniform = shader.defaultMapUniform;
-            if(this._enableGpuInstancing){
+            if (this._enableGpuInstancing)
+            {
                 this.getShaderGuid(shader);
                 this.refreshGpuInstancingGUID();
             }
@@ -469,8 +482,9 @@ namespace gd3d.framework
             {
                 console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
             }
-            
-            if( this._enableGpuInstancing && this.isNotBuildinAttribId(_id)){
+
+            if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id))
+            {
                 let arr = this.getInstanceAttribValue(_id);
                 arr[0] = _number;
                 // this.setInstanceAttribValue(_id,[_number]);
@@ -490,15 +504,18 @@ namespace gd3d.framework
                 console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
             }
 
-            if( this._enableGpuInstancing && this.isNotBuildinAttribId(_id)){
+            if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id))
+            {
 
-                if(_numbers.length == 1 || _numbers.length == 4){
+                if (_numbers.length == 1 || _numbers.length == 4)
+                {
                     let arr = this.getInstanceAttribValue(_id);
-                    for(let i=0 , len = _numbers.length ;i < len ;i++){
+                    for (let i = 0, len = _numbers.length; i < len; i++)
+                    {
                         arr[i] = _numbers[i];
                     }
                 }
-                
+
                 // let arr : number [] = []
                 // _numbers.forEach((v,i)=>{
                 //     arr.push(v);
@@ -520,7 +537,8 @@ namespace gd3d.framework
                 console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
             }
 
-            if( this._enableGpuInstancing && this.isNotBuildinAttribId(_id)){
+            if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id))
+            {
                 let arr = this.getInstanceAttribValue(_id);
                 arr[0] = _vector4.x;
                 arr[1] = _vector4.y;
@@ -543,9 +561,11 @@ namespace gd3d.framework
             {
                 console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
             }
-            if( this._enableGpuInstancing && this.isNotBuildinAttribId(_id)){
+            if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id))
+            {
                 let arr = this.getInstanceAttribValue(_id);
-                for(let i=0 , len = _vector4v.length ;i < len ;i++){
+                for (let i = 0, len = _vector4v.length; i < len; i++)
+                {
                     arr[i] = _vector4v[i];
                 }
 
@@ -626,7 +646,8 @@ namespace gd3d.framework
                 }
                 this.uniformDirtyMap[_id] = true;
 
-                if(this._enableGpuInstancing){
+                if (this._enableGpuInstancing)
+                {
                     this.getTexGuid(this);   //贴图使用唯一标识ID，gupInstance 使用
                     this.refreshGpuInstancingGUID();
                 }
@@ -648,28 +669,35 @@ namespace gd3d.framework
         }
 
         //贴图使用唯一标识ID，gupInstance 使用
-        private getTexGuid(mat : material){
+        private getTexGuid(mat: material)
+        {
             let staMap = mat.statedMapUniforms;
             this._textureGUID = "";
-            for(let key in staMap){
+            for (let key in staMap)
+            {
                 let val = staMap[key];
-                if(val.getGUID == null) continue;
+                if (val.getGUID == null) continue;
                 let guid = (val as gd3d.framework.texture).getGUID();
                 this._textureGUID += `_${guid}`;
             }
         }
 
-        private getShaderGuid(sh : gd3d.framework.shader){
-            if(!sh) return;
-            if(!sh.passes["instance"] && !sh.passes["instance_fog"]){
+        private getShaderGuid(sh: gd3d.framework.shader)
+        {
+            if (!sh) return;
+            if (!sh.passes["instance"] && !sh.passes["instance_fog"])
+            {
                 console.warn(`shader ${sh.getName()} , has not "instance" pass when enable gpuInstance on the material ${this.getName()}.`);
-            }else{
-                this._shaderGUID = ""+ sh.getGUID();
+            } else
+            {
+                this._shaderGUID = "" + sh.getGUID();
             }
         }
 
-        private refreshGpuInstancingGUID(){
-            if(!this._shaderGUID) {
+        private refreshGpuInstancingGUID()
+        {
+            if (!this._shaderGUID)
+            {
                 this.gpuInstancingGUID = "";
                 return;
             }
@@ -694,7 +722,7 @@ namespace gd3d.framework
                     //图片的尺寸信息(1/width,1/height,width,height)
                     let _texelsizeName = _id + "_TexelSize";
                     let _gltexture = _texture.glTexture;
-                    if (_gltexture != null)
+                    if (_gltexture != null && this.defaultMapUniform[_texelsizeName] != null)
                     {
                         this.setVector4(_texelsizeName, new math.vector4(1.0 / _gltexture.width, 1.0 / _gltexture.height, _gltexture.width, _gltexture.height));
                     }
@@ -804,15 +832,15 @@ namespace gd3d.framework
             var shader = assetmgr.getShader(shaderName) as gd3d.framework.shader;
             if (shader == null)
             {
-//                 let shaders = [];
-//                 for(let k in assetmgr.mapShader)
-//                 {
-//                     shaders.push(k);
-//                 }
-//                 console.error(` 
-// #######当前shader#######:
-//                 ${shaders.join("\n")}`);
-                throw new Error("mat解析错误:"+this.name+"  shader 为空！shadername：" + shaderName + " bundleName: " + bundleName);
+                //                 let shaders = [];
+                //                 for(let k in assetmgr.mapShader)
+                //                 {
+                //                     shaders.push(k);
+                //                 }
+                //                 console.error(` 
+                // #######当前shader#######:
+                //                 ${shaders.join("\n")}`);
+                throw new Error("mat解析错误:" + this.name + "  shader 为空！shadername：" + shaderName + " bundleName: " + bundleName);
             }
             this.setShader(shader);
             var queue = json["queue"];
