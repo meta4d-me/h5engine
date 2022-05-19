@@ -208,7 +208,8 @@ namespace gd3d.framework
                 }
                 mat.setFloat("specularIntensity", specFactor);
                 mat.setFloat("diffuseIntensity", irrFactor);
-                mat.setFloatv('CustomBasecolor', new Float32Array(this.hexToRgb(matCfg?.color) ?? m.pbrMetallicRoughness?.baseColorFactor));
+                let _bColor: number[] = this.hexToRgb(matCfg?.color) ?? m.pbrMetallicRoughness?.baseColorFactor ?? [1, 1, 1, 1];
+                mat.setVector4('CustomBasecolor', new math.vector4(_bColor[0], _bColor[1], _bColor[2], _bColor[3]));
                 mat.setFloat('CustomMetallic', matCfg?.metalness ?? m.pbrMetallicRoughness?.metallicFactor);
                 mat.setFloat('CustomRoughness', matCfg?.roughness ?? m.pbrMetallicRoughness?.roughnessFactor);
                 // console.log(matCfg.name);

@@ -363,7 +363,7 @@
   "cameras": [
     {
       "perspective": {
-        "aspectRatio": 1.3333333730697632,
+        "aspectRatio": 2.3204271793365479,
         "yfov": 1.0471975803375244,
         "zfar": 1000.1340942382813,
         "znear": 0.30000001192092896
@@ -375,8 +375,14 @@
   "materials": [
     {
       "pbrMetallicRoughness": {
-        "metallicFactor": 0.0,
-        "roughnessFactor": 0.5
+        "baseColorFactor": [
+          1.0,
+          0.4292453,
+          0.636633039,
+          1.0
+        ],
+        "metallicFactor": 0.699999988079071,
+        "roughnessFactor": 0.13099998235702515
       },
       "name": "001"
     },
@@ -520,11 +526,11 @@
         0.8754261
       ],
       "translation": [
-        -2.66,
-        0.69,
-        0.0
+        1.609144,
+        -5.80888939,
+        -5.38681746
       ],
-      "name": "Directional Light"
+      "name": "Directional Light (1)"
     },
     {
       "children": [
@@ -559,6 +565,20 @@
         1.676
       ],
       "name": "a"
+    },
+    {
+      "rotation": [
+        0.408217877,
+        0.234569684,
+        -0.109381631,
+        0.8754261
+      ],
+      "translation": [
+        -2.66,
+        0.69,
+        0.0
+      ],
+      "name": "plihgt"
     }
   ],
   "scene": 0,
@@ -569,7 +589,8 @@
         1,
         2,
         4,
-        5
+        5,
+        6
       ],
       "name": "1",
       "extensions": {

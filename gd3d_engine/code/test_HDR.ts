@@ -173,7 +173,7 @@ class HDR_sample implements IState
                     .map(x => parseInt(x, 16));
 
             [mainLight, secondaryLight, tertiaryLight].map(light => {
-                return;
+                // return;
                 const lightObj = new gd3d.framework.transform();
                 lightObj.name = "Light" + light.name;
                 const mlight = lightObj.gameObject.addComponent("light") as gd3d.framework.light;
