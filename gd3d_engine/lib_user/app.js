@@ -4573,7 +4573,6 @@ var HDR_sample = (function () {
                                 .map(function (x) { return parseInt(x, 16); });
                         };
                         [mainLight, secondaryLight, tertiaryLight].map(function (light) {
-                            return;
                             var lightObj = new gd3d.framework.transform();
                             lightObj.name = "Light" + light.name;
                             var mlight = lightObj.gameObject.addComponent("light");
