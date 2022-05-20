@@ -21,11 +21,19 @@ class main implements gd3d.framework.IUserCode
         //关闭 guid 依赖
         gd3d.framework.assetMgr.openGuid = false;
 
+        this.clearBtn();
+        // 移动端调试log
+        window['eruda']?.init();
+        // new HDR_sample().start(this.app);
+
+        // return;
+
         //-------------------------------------基础
-        this.addBtn("基础==>",()=>{
-            demoList.addBtn("最小demo",()=>new mini_sample());
-            demoList.addBtn("f14effect",()=>new dome.db_test_f14eff());
-            demoList.addBtn("物理2d_dome",()=>new physic2d_dome());
+        this.addBtn("基础==>", () =>
+        {
+            demoList.addBtn("最小demo", () => new mini_sample());
+            demoList.addBtn("f14effect", () => new dome.db_test_f14eff());
+            demoList.addBtn("物理2d_dome", () => new physic2d_dome());
             demoList.addBtn("test_load", () => new test_load());
             demoList.addBtn("test_loadScene", () => new test_loadScene());
             demoList.addBtn("test_pick", () => new test_pick());
@@ -49,13 +57,14 @@ class main implements gd3d.framework.IUserCode
             demoList.addBtn("test_tex_uv", () => new test_texuv());
             demoList.addBtn("test_PBR 展示", () => new test_pbr());
             demoList.addBtn("test_PBR 场景", () => new test_pbr_scene());
+            demoList.addBtn("test_glTF 场景", () => new HDR_sample());
             demoList.addBtn("SSSSS", () => new test_sssss());
             demoList.addBtn("test_trailRender", () => new t.test_trailrender());
             demoList.addBtn("test_light1", () => new t.test_light1());
-            demoList.addBtn("test_light_d1", () => new t.light_d1());
+            // demoList.addBtn("test_light_d1", () => new t.light_d1());
             demoList.addBtn("test_normalmap", () => new t.Test_NormalMap());
             demoList.addBtn("test_f4skin", () => new test_f4skin());
-            demoList.addBtn("GPU_Instancing 绘制",()=>new test_GPU_instancing());
+            demoList.addBtn("GPU_Instancing 绘制", () => new test_GPU_instancing());
             return new demoList();
         });
 
@@ -89,6 +98,27 @@ class main implements gd3d.framework.IUserCode
             demoList.addBtn("cannonPhysics3D", () => new PhysicDemo.physic_01());
             return new demoList();
         });
+
+        //-------------------------------------------物理
+        this.addBtn("SPINE样例==>", () =>
+        {
+            demoList.addBtn("SPINE_图集动画", () => new test_spine_spriteSheet());
+            demoList.addBtn("SPINE_变换图片", () => new test_spine_imageChange());
+            demoList.addBtn("SPINE_动画混合", () => new test_spine_transition());
+            demoList.addBtn("SPINE_网格变形", () => new test_spine_mesh());
+            demoList.addBtn("SPINE_换皮肤", () => new test_spine_changeSkin());
+            demoList.addBtn("SPINE_反向动力学", () => new test_spine_IK());
+            demoList.addBtn("SPINE_相加动画混合", () => new test_spine_additiveBlending());
+            demoList.addBtn("SPINE_路径约束", () => new test_spine_vin());
+            demoList.addBtn("SPINE_变形人", () => new test_spine_stretchyMan());
+            demoList.addBtn("SPINE_动画裁剪", () => new test_spine_clip());
+            demoList.addBtn("SPINE_变形约束", () => new test_spine_tank());
+            demoList.addBtn("SPINE_转动约束", () => new test_spine_wheelTransform());
+            demoList.addBtn("SPINE_换Region插槽图片", () => new test_spine_change_slot_region_tex());
+            demoList.addBtn("SPINE_换Mesh插槽图片", () => new test_spine_change_slot_mesh_tex());
+            return new demoList();
+        });
+
 
         //-------------------------------------其他
         this.addBtn("其他==>", () =>

@@ -1,5 +1,5 @@
 attribute highp vec4 _glesVertex;
-attribute mediump vec4 _glesMultiTexCoord0;
+attribute mediump vec2 _glesMultiTexCoord0;
 
 uniform highp mat4 glstate_matrix_mvp;
 uniform mediump vec4 _MainTex_ST;
@@ -15,9 +15,9 @@ varying highp vec3 v_Mpos;
 
 
 #ifdef LIGHTMAP
-attribute mediump vec4 _glesMultiTexCoord1;
+attribute mediump vec2 _glesMultiTexCoord1;
 uniform mediump vec4 glstate_lightmapOffset;
-// uniform mediump float glstate_lightmapUV;
+uniform lowp float glstate_lightmapUV;
 varying mediump vec2 lightmap_TEXCOORD;
 #endif
 
@@ -92,7 +92,7 @@ void main()
 
     //----------------------------------------------------------
     #ifdef LIGHTMAP
-    mediump vec2 beforelightUV = _glesMultiTexCoord1.xy;
+    mediump vec2 beforelightUV = (1.0 - glstate_lightmapUV) * _glesMultiTexCoord0  + glstate_lightmapUV * _glesMultiTexCoord1;	//unity lightMap UV ,优先使用UV1,次之UV0 
     lowp float u = beforelightUV.x * glstate_lightmapOffset.x + glstate_lightmapOffset.z;
     lowp float v = beforelightUV.y * glstate_lightmapOffset.y + glstate_lightmapOffset.w;
     lightmap_TEXCOORD = vec2(u,v);

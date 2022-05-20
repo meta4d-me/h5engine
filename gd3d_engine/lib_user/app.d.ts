@@ -99,10 +99,8 @@ declare namespace t {
     class light_d1 implements IState {
         app: gd3d.framework.application;
         scene: gd3d.framework.scene;
-        private loadShader;
-        private loadText;
         private addcube;
-        private addcamandlight;
+        private addCameraAndLight;
         start(app: gd3d.framework.application): void;
         camera: gd3d.framework.camera;
         light: gd3d.framework.light;
@@ -166,14 +164,7 @@ declare class test_loadScene implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
     start(app: gd3d.framework.application): void;
-    loadScene(assetName: string, isCompress?: boolean): void;
-    baihu: gd3d.framework.transform;
-    camera: gd3d.framework.camera;
-    cube: gd3d.framework.transform;
-    cube2: gd3d.framework.transform;
-    cube3: gd3d.framework.transform;
     timer: number;
-    bere: boolean;
     update(delta: number): void;
 }
 declare class test_loadMulBundle implements IState {
@@ -682,6 +673,17 @@ declare class gpuInstanceMgr {
     private static fillParameters;
     private static ckCanUseGpuInstance;
 }
+declare class HDR_sample implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    assetMgr: gd3d.framework.assetMgr;
+    sceneConfig: string;
+    _load(path: string, type?: gd3d.framework.AssetTypeEnum): Promise<unknown>;
+    load<T extends gd3d.framework.IAsset>(path: string, name: string, type?: gd3d.framework.AssetTypeEnum): Promise<T>;
+    loadCubeTexture(folder: string, images?: string[]): Promise<gd3d.framework.texture>;
+    start(app: gd3d.framework.application): void;
+    update(delta: number): void;
+}
 declare class test_LineRenderer implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
@@ -815,6 +817,7 @@ declare class test_UIGuideMask implements IState {
 }
 declare var fontjson: string;
 declare var fontpng: string;
+declare let emoji: string;
 declare class test_UI_Component implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
@@ -826,6 +829,7 @@ declare class test_UI_Component implements IState {
     start(app: gd3d.framework.application): void;
     private createUI;
     private loadTexture;
+    private loadAtlas;
     update(delta: number): void;
     testFun(): void;
 }
@@ -880,10 +884,11 @@ declare class test_keyFrameAni implements IState {
     camera: gd3d.framework.camera;
     taskMgr: gd3d.framework.taskMgr;
     obj3d: gd3d.framework.transform;
+    cameraNode: gd3d.framework.transform;
+    ins: gd3d.framework.transform;
     start(app: gd3d.framework.application): void;
-    private loadShader;
-    private loadasset;
-    private iniscene;
+    private addCamera;
+    private loadAsset;
     private addbtns;
     private addbtn;
     update(delta: number): void;
@@ -1094,6 +1099,282 @@ declare class test_softCut implements IState {
     private loadTexture;
     update(delta: number): void;
 }
+declare class test_spine_additiveBlending implements IState {
+    start(app: gd3d.framework.application): void;
+    update(delta: number): void;
+    private _comp;
+}
+declare class test_spine_changeSkin implements IState {
+    start(app: gd3d.framework.application): void;
+    setGUI(): void;
+    private randomSkin;
+    private randomGroupSkin;
+    private speed;
+    update(delta: number): void;
+    private _comp;
+}
+declare class test_spine_change_slot_mesh_tex implements IState {
+    assetManager: spine_gd3d.SpineAssetMgr;
+    private _index;
+    start(app: gd3d.framework.application): void;
+    private changeSlot;
+    private clearSlot;
+    setGUI(): void;
+    private speed;
+    update(delta: number): void;
+    private _comp;
+}
+declare class test_spine_change_slot_region_tex implements IState {
+    assetManager: spine_gd3d.SpineAssetMgr;
+    private _index;
+    start(app: gd3d.framework.application): void;
+    private changeSlot;
+    setGUI(): void;
+    private speed;
+    update(delta: number): void;
+    private _comp;
+}
+declare class test_spine_clip implements IState {
+    start(app: gd3d.framework.application): void;
+    setGUI(): void;
+    private speed;
+    update(delta: number): void;
+    private _comp;
+}
+declare class test_spine_IK implements IState {
+    private _inited;
+    private controlBones;
+    private _temptMat;
+    private _temptPos;
+    private _chooseBone;
+    private bonesPos;
+    private _hoverBone;
+    start(app: gd3d.framework.application): void;
+    private fire;
+    private jump;
+    setGUI(): void;
+    private speed;
+    update(delta: number): void;
+    private _comp;
+}
+declare class test_spine_imageChange implements IState {
+    start(app: gd3d.framework.application): void;
+    update(delta: number): void;
+}
+declare class test_spine_mesh implements IState {
+    start(app: gd3d.framework.application): void;
+    setGUI(): void;
+    private speed;
+    update(delta: number): void;
+    private _comp;
+}
+declare namespace spine_gd3d {
+    class Gd3dTexture {
+    }
+    class spineSkeleton implements gd3d.framework.I2DComponent {
+        constructor(skeletonData: any);
+        state: AnimationState;
+        animData: any;
+        skeleton: Skeleton;
+        onPlay(): any;
+        start(): any;
+        update(delta: number): any;
+        transform: gd3d.framework.transform2D;
+        remove(): any;
+        onUpdate: () => void;
+        getToCanvasMatrix(mat?: gd3d.math.matrix3x2): gd3d.math.matrix3x2;
+        changeSlotTexture(slotName: string, texture: Gd3dTexture): any;
+        clearSlot(slotName: string): any;
+    }
+    class SpineAssetMgr {
+        constructor(mgr: gd3d.framework.assetMgr, baseUrl?: string);
+        loadBinary(path: string, success?: (path: string, binary: Uint8Array) => void, error?: (path: string, message: string) => void): void;
+        loadText(path: string, success?: (path: string, text: string) => void, error?: (path: string, message: string) => void): void;
+        loadJson(path: string, success?: (path: string, object: object) => void, error?: (path: string, message: string) => void): void;
+        loadTexture(path: string, success?: (path: string, texture: Gd3dTexture) => void, error?: (path: string, message: string) => void): void;
+        loadTextureAtlas(path: string, success?: (path: string, atlas: any) => void, error?: (path: string, message: string) => void, fileAlias?: {
+            [keyword: string]: string;
+        }): void;
+        get(asset: string): any;
+    }
+    class AtlasAttachmentLoader {
+        constructor(atlas: any);
+    }
+    class SkeletonJson {
+        constructor(json: any);
+        readSkeletonData(data: any): any;
+        scale: number;
+    }
+    class AnimationState {
+        timeScale: number;
+        addAnimation(trackIndex: number, animationName: string, loop?: boolean, delay?: number): TrackEntry;
+        setAnimation(trackIndex: number, animationName: string, loop?: boolean): TrackEntry;
+        addEmptyAnimation(trackIndex: number, mixDuration?: number, delay?: number): TrackEntry;
+        setEmptyAnimations(mixDuration?: number): void;
+        setEmptyAnimation(trackIndex: number, mixDuration?: number): TrackEntry;
+    }
+    class TrackEntry {
+        previous: TrackEntry;
+        next: TrackEntry;
+        mixingFrom: TrackEntry;
+        mixingTo: TrackEntry;
+        listener: AnimationStateListener;
+        trackIndex: number;
+        loop: boolean;
+        mixBlend: MixBlend;
+        alpha: number;
+    }
+    enum MixBlend {
+        setup = 0,
+        first = 1,
+        replace = 2,
+        add = 3
+    }
+    class AnimationStateListener {
+        start?(entry: TrackEntry): void;
+        interrupt?(entry: TrackEntry): void;
+        end?(entry: TrackEntry): void;
+        dispose?(entry: TrackEntry): void;
+        complete?(entry: TrackEntry): void;
+        event?(entry: TrackEntry, event: Event): void;
+    }
+    class Skeleton {
+        data: SkeletonData;
+        slots: Slot[];
+        scaleX: number;
+        scaleY: number;
+        x: number;
+        y: number;
+        setSkinByName(skinName: string): void;
+        setSkin(skin: Skin): void;
+        setSlotsToSetupPose(): any;
+        findBone(boneName: string): Bone;
+    }
+    class SkeletonData {
+        skins: Skin[];
+    }
+    class Skin {
+        name: string;
+        setAttachment(slotIndex: number, name: string, attachment: Attachment): void;
+        attachments: {
+            [att: string]: Attachment;
+        }[];
+        constructor(name: string);
+    }
+    class Bone {
+        data: BoneData;
+        skeleton: Skeleton;
+        parent: Bone;
+        children: Bone[];
+        x: number;
+        y: number;
+        rotation: number;
+        scaleX: number;
+        scaleY: number;
+        shearX: number;
+        shearY: number;
+        ax: number;
+        ay: number;
+        arotation: number;
+        ascaleX: number;
+        ascaleY: number;
+        ashearX: number;
+        ashearY: number;
+        a: number;
+        b: number;
+        c: number;
+        d: number;
+        worldY: number;
+        worldX: number;
+        sorted: boolean;
+        active: boolean;
+        worldToLocal(world: Vector2): Vector2;
+        localToWorld(local: Vector2): Vector2;
+        worldToLocalRotation(worldRotation: number): number;
+        localToWorldRotation(localRotation: number): number;
+        rotateWorld(degrees: number): void;
+    }
+    class BoneData {
+        index: number;
+        name: string;
+        parent: BoneData;
+        length: number;
+        x: number;
+        y: number;
+        rotation: number;
+        scaleX: number;
+        scaleY: number;
+        shearX: number;
+        shearY: number;
+    }
+    class Slot {
+    }
+    abstract class Attachment {
+        name: string;
+    }
+    class Vector2 {
+        x: number;
+        y: number;
+        set(x: number, y: number): any;
+    }
+}
+declare class test_spine_spriteSheet implements IState {
+    start(app: gd3d.framework.application): void;
+    setGUI(): void;
+    private speed;
+    update(delta: number): void;
+    private _comp;
+}
+declare class test_spine_stretchyMan implements IState {
+    private _inited;
+    private controlBones;
+    private _temptMat;
+    private _temptPos;
+    private _chooseBone;
+    private bonesPos;
+    start(app: gd3d.framework.application): void;
+    update(delta: number): void;
+    private _comp;
+}
+declare class test_spine_tank implements IState {
+    start(app: gd3d.framework.application): void;
+    setGUI(): void;
+    private speed;
+    update(delta: number): void;
+    private _comp;
+}
+declare class test_spine_transition implements IState {
+    start(app: gd3d.framework.application): void;
+    private setAnimations;
+    setGUI(): void;
+    private playDie;
+    private speed;
+    update(delta: number): void;
+    private _comp;
+}
+declare class test_spine_vin implements IState {
+    private _inited;
+    private controlBones;
+    private _temptMat;
+    private _temptPos;
+    private _chooseBone;
+    private bonesPos;
+    start(app: gd3d.framework.application): void;
+    update(delta: number): void;
+    private _comp;
+}
+declare class test_spine_wheelTransform implements IState {
+    private _inited;
+    private controlBones;
+    private _temptMat;
+    private _temptPos;
+    private _chooseBone;
+    private bonesPos;
+    private _hoverBone;
+    start(app: gd3d.framework.application): void;
+    update(delta: number): void;
+    private _comp;
+}
 declare class test_sssss implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
@@ -1268,7 +1549,7 @@ declare class Rect extends gd3d.framework.transform {
     width: number;
     height: number;
     offset: gd3d.math.vector3;
-    parent: Rect;
+    get bParent(): Rect;
     children: Rect[];
     alignType: AlignType;
     points: gd3d.math.vector3[];
@@ -1290,18 +1571,8 @@ declare enum AlignType {
 declare class test_anim implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
-    player: gd3d.framework.transform;
-    cubes: {
-        [id: string]: gd3d.framework.transform;
-    };
-    _assetMgr: gd3d.framework.assetMgr;
-    list: any[];
     start(app: gd3d.framework.application): void;
     camera: gd3d.framework.camera;
-    cube: gd3d.framework.transform;
-    cube2: gd3d.framework.transform;
-    cube3: gd3d.framework.transform;
-    timer: number;
     update(delta: number): void;
 }
 declare class test_loadAsiprefab implements IState {
@@ -1428,15 +1699,14 @@ declare namespace t {
         app: gd3d.framework.application;
         scene: gd3d.framework.scene;
         tex: gd3d.framework.texture;
-        private loadShader;
         private loadText;
-        private addcube;
-        private addcamandlight;
+        private addCubes;
+        private addCube;
+        private addCameraAndLight;
         start(app: gd3d.framework.application): void;
         camera: gd3d.framework.camera;
         light: gd3d.framework.light;
         timer: number;
-        taskmgr: gd3d.framework.taskMgr;
         update(delta: number): void;
     }
 }
@@ -1488,12 +1758,9 @@ declare namespace t {
 declare class test_load implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
+    camera: any;
+    camNode: gd3d.framework.transform;
     start(app: gd3d.framework.application): void;
-    camera: gd3d.framework.camera;
-    cube: gd3d.framework.transform;
-    cube2: gd3d.framework.transform;
-    cube3: gd3d.framework.transform;
-    timer: number;
     update(delta: number): void;
 }
 declare namespace t {
@@ -1711,22 +1978,9 @@ declare namespace t {
     class test_sound implements IState {
         app: gd3d.framework.application;
         scene: gd3d.framework.scene;
-        camera: gd3d.framework.camera;
-        cube: gd3d.framework.transform;
-        parts: gd3d.framework.transform;
-        timer: number;
-        taskmgr: gd3d.framework.taskMgr;
-        count: number;
-        counttimer: number;
-        private angularVelocity;
-        private eulerAngle;
-        loopedBuffer: AudioBuffer;
+        camera: gd3d.framework.transform;
         once1: AudioBuffer;
         once2: AudioBuffer;
-        private loadShader;
-        private loadText;
-        private addcam;
-        private addcube;
         private loadSoundInfe;
         start(app: gd3d.framework.application): void;
         update(delta: number): void;
@@ -1782,6 +2036,8 @@ declare class test_texuv implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
     start(app: gd3d.framework.application): void;
+    private createBaseCube;
+    private createUvCube;
     camera: gd3d.framework.camera;
     baihu: gd3d.framework.transform;
     timer: number;
@@ -1791,23 +2047,15 @@ declare namespace t {
     class test_trailrender implements IState {
         app: gd3d.framework.application;
         scene: gd3d.framework.scene;
+        camera: gd3d.framework.camera;
         texResName: string;
-        private loadShader;
-        private loadText;
-        sh: gd3d.framework.shader;
         private initscene;
         start(app: gd3d.framework.application): void;
         org: gd3d.framework.transform;
-        cube: gd3d.framework.transform;
-        camera: gd3d.framework.camera;
         timer: number;
-        taskmgr: gd3d.framework.taskMgr;
-        grassMat: gd3d.framework.material;
-        private wind;
-        private WaveFrequency;
-        private WaveAmplitude;
         play: boolean;
         update(delta: number): void;
+        private addUI;
         private addbtn;
     }
 }
@@ -1867,6 +2115,13 @@ declare namespace t {
         private cycles;
         update(delta: number): void;
     }
+}
+declare namespace util {
+    function loadShader(assetMgr: gd3d.framework.assetMgr): Promise<void>;
+    function loadModel(assetMgr: gd3d.framework.assetMgr, modelName: string): Promise<gd3d.framework.prefab>;
+    function addCamera(scene: gd3d.framework.scene): gd3d.framework.transform;
+    function loadTex(url: string, assetMgr: gd3d.framework.assetMgr): Promise<void>;
+    function loadTextures(urls: string[], assetMgr: gd3d.framework.assetMgr): Promise<void[]>;
 }
 declare class UseAniplayClipDemo implements IState {
     app: gd3d.framework.application;
@@ -2432,12 +2687,18 @@ declare namespace gd3d.framework {
         private _lastDistance;
         private _panAngle;
         private _panRad;
+        private _cur_panRad;
+        private damping;
+        private panSpeed;
         set panAngle(value: number);
         get panAngle(): number;
         private _tiltAngle;
         private _tiltRad;
+        private _cur_tiltRad;
         set tiltAngle(value: number);
         get tiltAngle(): number;
+        private panDir;
+        private targetOffset;
         onPlay(): void;
         start(): void;
         private cupTargetV3;
@@ -2446,7 +2707,16 @@ declare namespace gd3d.framework {
         private onPointUp;
         private onPointMove;
         private onWheel;
+        lastTouch: math.vector2;
+        diffv2: math.vector2;
+        touchRotateID: number;
+        lastTouches: {
+            id: number;
+            pos: pointinfo;
+        }[];
+        panFingers: math.vector2[];
         private onTouch;
+        private onTouchMove;
         remove(): void;
     }
 }
@@ -2524,7 +2794,6 @@ declare class guideMask extends gd3d.framework.behaviour2d {
     private right;
     private refreshMask;
 }
-declare let Promise: any;
 declare class datGui {
     private static _inited;
     static init(): Promise<void>;

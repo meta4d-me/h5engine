@@ -6,138 +6,41 @@ namespace t
     {
         app: gd3d.framework.application;
         scene: gd3d.framework.scene;
-        private loadShader(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate)
+        private addcube()
         {
-            this.app.getAssetMgr().load("res/shader/Mainshader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (_state) =>
+            var smesh1 = this.app.getAssetMgr().getDefaultMesh("cube");
+            for (var i = -4; i < 5; i++)
             {
-                if(_state.isfinish)
+                for (var j = -4; j < 5; j++)
                 {
-                    state.finish = true;
+                    var baihu = new gd3d.framework.transform();
+                    this.scene.addChild(baihu);
+                    baihu.localScale = new gd3d.math.vector3(0.5, 0.5, 0.5);
+                    baihu.localTranslate.x = i;
+                    baihu.localTranslate.y = j;
+                    //gd3d.math.quatFromEulerAngles(-90, 0, 0, baihu.localRotate);
+                    baihu.markDirty();
+
+                    // var smesh1 = this.app.getAssetMgr().getAssetByName("Sphere.mesh.bin") as gd3d.framework.mesh;
+                    var mesh1 = baihu.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
+                    mesh1.mesh = (smesh1);
+                    var renderer = baihu.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
+                    baihu.markDirty();
+                    var sh = this.app.getAssetMgr().getShader("light3.shader.json");
+                    renderer.materials = [];
+                    renderer.materials.push(new gd3d.framework.material());
+                    renderer.materials[0].setShader(sh);
+
+                    let texture = this.app.getAssetMgr().getAssetByName("rock256.png") as gd3d.framework.texture;
+                    renderer.materials[0].setTexture("_MainTex", texture);
+
+                    var tex2 = this.app.getAssetMgr().getAssetByName("rock_n256.png") as gd3d.framework.texture;
+                    renderer.materials[0].setTexture("_NormalTex", tex2);
                 }
-                
             }
-            );
         }
-
-        private loadText(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate)
+        private addCameraAndLight()
         {
-            this.app.getAssetMgr().load("res/zg256.png", gd3d.framework.AssetTypeEnum.Auto, (s) =>
-            {
-                if (s.isfinish)
-                {
-                    state.finish = true;
-                }
-                else
-                {
-                    state.error = true;
-                }
-            }
-            );
-            this.app.getAssetMgr().load("res/rock256.png", gd3d.framework.AssetTypeEnum.Auto, (s) =>
-            {
-                if (s.isfinish)
-                {
-                    state.finish = true;
-                }
-                else
-                {
-                    state.error = true;
-                }
-            }
-            );
-            this.app.getAssetMgr().load("res/rock_n256.png", gd3d.framework.AssetTypeEnum.Auto, (s) =>
-            {
-                if (s.isfinish)
-                {
-                    state.finish = true;
-                }
-                else
-                {
-                    state.error = true;
-                }
-            }
-            );
-        }
-
-        private addcube(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate)
-        {
-
-            //var cube = new gd3d.framework.transform();
-            //cube.name = "cube";
-            //cube.localScale.x = 4;
-
-            //cube.localScale.y = 4;
-            //cube.localScale.z =4;
-            //cube.markDirty();
-            //this.scene.addChild(cube);
-            //var mesh = cube.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
-
-            //var smesh = this.app.getAssetMgr().getDefaultMesh("cube");
-            //mesh.mesh = (smesh);
-            //var renderer = cube.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
-            //let cuber = renderer;
-
-            //var sh = this.app.getAssetMgr().getShader("light3.shader.json");
-            //if (sh != null)
-            //{
-            //    cuber.materials = [];
-            //    cuber.materials.push(new gd3d.framework.material());
-            //    cuber.materials[0].setShader(sh); //----------------使用shader
-            //    //cuber.materials[0].setVector4("_Color", new gd3d.math.vector4(0.4, 0.4, 0.2, 1.0));
-
-            //    let texture = this.app.getAssetMgr().getAssetByName("rock256.png") as gd3d.framework.texture;
-            //    cuber.materials[0].setTexture("_MainTex", texture);
-
-            //    var tex2 = this.app.getAssetMgr().getAssetByName("rock_n256.png") as gd3d.framework.texture;
-            //    cuber.materials[0].setTexture("_NormalTex", tex2);
-            //}
-
-            var sphereString = "res/prefabs/sphere/resources/Sphere.mesh.bin";
-            var cubeString = "res/prefabs/cube/resources/Cube.mesh.bin";
-
-            this.app.getAssetMgr().load(sphereString, gd3d.framework.AssetTypeEnum.Auto, (s) =>
-            {
-                if (s.isfinish)
-                {
-                    for (var i = -4; i < 5; i++)
-                    {
-                        for (var j = -4; j < 5; j++)
-                        {
-                            var baihu = new gd3d.framework.transform();
-                            this.scene.addChild(baihu);
-                            baihu.localScale = new gd3d.math.vector3(0.5, 0.5, 0.5);
-                            baihu.localTranslate.x = i;
-                            baihu.localTranslate.y = j;
-                            //gd3d.math.quatFromEulerAngles(-90, 0, 0, baihu.localRotate);
-                            baihu.markDirty();
-
-                            var smesh1 = this.app.getAssetMgr().getAssetByName("Sphere.mesh.bin") as gd3d.framework.mesh;
-                            var mesh1 = baihu.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
-                            mesh1.mesh = (smesh1);
-                            var renderer = baihu.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
-                            baihu.markDirty();
-                            var sh = this.app.getAssetMgr().getShader("light3.shader.json");
-                            renderer.materials = [];
-                            renderer.materials.push(new gd3d.framework.material());
-                            renderer.materials[0].setShader(sh);
-
-                            let texture = this.app.getAssetMgr().getAssetByName("rock256.png") as gd3d.framework.texture;
-                            renderer.materials[0].setTexture("_MainTex", texture);
-
-                            var tex2 = this.app.getAssetMgr().getAssetByName("rock_n256.png") as gd3d.framework.texture;
-                            renderer.materials[0].setTexture("_NormalTex", tex2);
-                        }
-                    }
-
-                    state.finish = true;
-                }
-            });
-
-
-        }
-        private addcamandlight(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate)
-        {
-
             //添加一个摄像机
             var objCam = new gd3d.framework.transform();
             objCam.name = "sth.";
@@ -171,8 +74,6 @@ namespace t
                 var renderer = cube.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
                 let cuber = renderer;
             }
-            state.finish = true;
-
         }
         start(app: gd3d.framework.application)
         {
@@ -207,11 +108,10 @@ namespace t
             btn.style.position = "absolute";
             this.app.container.appendChild(btn);
 
-            //任务排队执行系统
-            this.taskmgr.addTaskCall(this.loadShader.bind(this));
-            this.taskmgr.addTaskCall(this.loadText.bind(this));
-            this.taskmgr.addTaskCall(this.addcube.bind(this));
-            this.taskmgr.addTaskCall(this.addcamandlight.bind(this));
+            util.loadShader(this.app.getAssetMgr())
+                .then(() => Promise.all(["newRes/zg256.png", "newRes/rock256.png", "newRes/rock_n256.png"].map(item => util.loadTex(item, this.app.getAssetMgr()))))
+                .then(() => this.addcube())
+                .then(() => this.addCameraAndLight())
         }
 
         camera: gd3d.framework.camera;

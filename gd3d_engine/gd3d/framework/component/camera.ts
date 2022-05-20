@@ -138,7 +138,7 @@ namespace gd3d.framework
         /**
          * 相机剔除时，计算 z 轴上的平面 （far & near plane）
          */
-        cullZPlane : boolean = true;
+        cullZPlane: boolean = true;
 
         /**
          * @public
@@ -248,7 +248,8 @@ namespace gd3d.framework
             this._updateOverLays(delta);
 
             let _scene = sceneMgr.scene;
-            if(_scene.autoCollectlightCamera){
+            if (_scene.autoCollectlightCamera)
+            {
                 // //收集摄像机
                 // var c = this;
                 // if (c.gameObject.visibleInScene)
@@ -261,7 +262,7 @@ namespace gd3d.framework
                 //     _scene.renderContext.push(new renderContext(_scene.webgl));
                 // }
                 if (this.gameObject.visibleInScene)
-                _scene.addCamera(this);
+                    _scene.addCamera(this);
             }
         }
 
@@ -389,29 +390,30 @@ namespace gd3d.framework
                 return a.sortOrder - b.sortOrder;
             });
         }
-       
+
         private LastCamWorldMtx = new math.matrix();
-         /**
-         * @public
-         * @language zh_CN
-         * 计算视矩阵, return 是否有变化
-         * @param outMatrix 返回的视矩阵
-         * @classdesc
-         * 计算相机的viewmatrix（视矩阵）
-         * @version gd3d 1.0
-         */
-        calcViewMatrix(outMatrix ? : gd3d.math.matrix):boolean
+        /**
+        * @public
+        * @language zh_CN
+        * 计算视矩阵, return 是否有变化
+        * @param outMatrix 返回的视矩阵
+        * @classdesc
+        * 计算相机的viewmatrix（视矩阵）
+        * @version gd3d 1.0
+        */
+        calcViewMatrix(outMatrix?: gd3d.math.matrix): boolean
         {
             let wMtx = this.gameObject.transform.getWorldMatrix();
-            let dirty = ! gd3d.math.matrixEqual(wMtx,this.LastCamWorldMtx,0.000001);
-            
-            if(dirty){
-                gd3d.math.matrixClone( wMtx ,this.LastCamWorldMtx);
+            let dirty = !gd3d.math.matrixEqual(wMtx, this.LastCamWorldMtx, 0.000001);
+
+            if (dirty)
+            {
+                gd3d.math.matrixClone(wMtx, this.LastCamWorldMtx);
                 //视矩阵刚好是摄像机世界矩阵的逆
                 gd3d.math.matrixInverse(wMtx, this.viewMatrix);
             }
 
-            if(outMatrix)
+            if (outMatrix)
                 gd3d.math.matrixClone(this.viewMatrix, outMatrix);
 
             return true;
@@ -436,7 +438,7 @@ namespace gd3d.framework
          * 计算相机视口像素rect
          * @version gd3d 1.0
          */
-        calcViewPortPixel(app: application, viewPortPixel ?: math.rect)
+        calcViewPortPixel(app: application, viewPortPixel?: math.rect)
         {
 
             let w: number;
@@ -457,8 +459,9 @@ namespace gd3d.framework
             cvpr.y = h * vp.y;
             cvpr.w = w * vp.w;
             cvpr.h = h * vp.h;
-            if(viewPortPixel){
-                gd3d.math.rectClone( this.currViewPixelRect , viewPortPixel );
+            if (viewPortPixel)
+            {
+                gd3d.math.rectClone(this.currViewPixelRect, viewPortPixel);
             }
 
             this.currViewPixelASP = cvpr.w / cvpr.h;
@@ -477,12 +480,13 @@ namespace gd3d.framework
          */
         calcProjectMatrix(asp: number, outMatrix: gd3d.math.matrix)
         {
-            if(this.projectMatrixDirty || this.lastAsp != asp){
+            if (this.projectMatrixDirty || this.lastAsp != asp)
+            {
                 if (this._opvalue > 0)
                     math.matrixProject_PerspectiveLH(this._fov, asp, this._near, this._far, this.matProjP);
                 if (this._opvalue < 1)
                     math.matrixProject_OrthoLH(this._size * asp, this._size, this._near, this._far, this.matProjO);
-    
+
                 if (this._opvalue == 0)
                     math.matrixClone(this.matProjO, this.projectMatrix);
                 else if (this._opvalue == 1)
@@ -494,7 +498,7 @@ namespace gd3d.framework
             this.projectMatrixDirty = false;
             this.lastAsp = asp;
             //投影矩阵函数缺一个
-            if(outMatrix)
+            if (outMatrix)
                 gd3d.math.matrixClone(this.projectMatrix, outMatrix);
 
             return true;
@@ -507,17 +511,19 @@ namespace gd3d.framework
          * @param outViewMatrix 
          * @param outProjectMatrix 
          */
-        calcViewProjectMatrix(app:application, outViewProjectMatrix? : math.matrix, outViewMatrix? : math.matrix , outProjectMatrix? : math.matrix){
+        calcViewProjectMatrix(app: application, outViewProjectMatrix?: math.matrix, outViewMatrix?: math.matrix, outProjectMatrix?: math.matrix)
+        {
             let vd = this.calcViewMatrix(outViewMatrix);
             // let vpp = camera.helprect;
             // this.calcViewPortPixel(app, vpp);
             // let asp = vpp.w / vpp.h;
             let asp = this.currViewPixelASP;
-            let pd = this.calcProjectMatrix(asp,outProjectMatrix);
-            if(vd || pd){
+            let pd = this.calcProjectMatrix(asp, outProjectMatrix);
+            if (vd || pd)
+            {
                 gd3d.math.matrixMultiply(this.projectMatrix, this.viewMatrix, this.viewProjectMatrix);
-                if(outViewProjectMatrix)
-                    math.matrixClone(this.viewProjectMatrix,outViewProjectMatrix);
+                if (outViewProjectMatrix)
+                    math.matrixClone(this.viewProjectMatrix, outViewProjectMatrix);
             }
 
             return vd || pd;
@@ -581,10 +587,11 @@ namespace gd3d.framework
             // let vpp = camera.helprect;
             let vpp = this.currViewPixelRect;
             // this.calcViewPortPixel(app, vpp);
-            
+
             let matinv = this.InverseViewProjectMatrix;
             let vpd = this.calcViewProjectMatrix(app);
-            if(vpd){
+            if (vpd)
+            {
                 gd3d.math.matrixInverse(this.viewProjectMatrix, matinv);
             }
 
@@ -610,7 +617,7 @@ namespace gd3d.framework
             // let vpp = camera.helprect;
             let vpp = this.currViewPixelRect;
             // this.calcViewPortPixel(app, vpp);
-            
+
             // let matrixView = camera.helpmtx;
             // let matrixProject = camera.helpmtx_1;
             // let asp = vpp.w / vpp.h;
@@ -649,14 +656,15 @@ namespace gd3d.framework
          * 由世界坐标得到裁剪空间坐标
          * @version gd3d 1.0
          */
-        calcClipPosFromWorldPos(app: application, worldPos: math.vector3, outClipPos: math.vector3){
+        calcClipPosFromWorldPos(app: application, worldPos: math.vector3, outClipPos: math.vector3)
+        {
             this.calcViewProjectMatrix(app);
-            gd3d.math.matrixTransformVector3(worldPos,this.viewProjectMatrix,outClipPos);
+            gd3d.math.matrixTransformVector3(worldPos, this.viewProjectMatrix, outClipPos);
         }
 
         private lastCamMtx = new math.matrix();
         private lastCamRect = new math.rect();
-        private paraArr = [NaN , NaN, NaN , NaN , NaN];  // [fov,near,far,opvalue,size]
+        private paraArr = [NaN, NaN, NaN, NaN, NaN];  // [fov,near,far,opvalue,size]
         /**
          * @private 计算相机框
          * @param app
@@ -672,12 +680,13 @@ namespace gd3d.framework
                 this.paraArr[0] == this._fov && this.paraArr[1] == this._near && this.paraArr[2] == this._far)
             {
                 //opvalue
-                if(this.paraArr[3] == tOpval && ( tOpval == 1 || this.paraArr[4] == this._size )){
+                if (this.paraArr[3] == tOpval && (tOpval == 1 || this.paraArr[4] == this._size))
+                {
                     return;
                 }
             }
 
-            let needSize = tOpval == 0 ;
+            let needSize = tOpval == 0;
 
             //同步last
             math.matrixClone(matrix, this.lastCamMtx);
@@ -690,9 +699,10 @@ namespace gd3d.framework
 
             let tanFov = Math.tan(this._fov * 0.5);
             let nearSize = this._near * tanFov;
-            let farSize  = this._far  * tanFov;
+            let farSize = this._far * tanFov;
             //set size
-            if(needSize){
+            if (needSize)
+            {
                 nearSize = farSize = this._size * 0.5;
             }
 
@@ -743,12 +753,12 @@ namespace gd3d.framework
         private matProjP: math.matrix = new math.matrix;
         private matProjO: math.matrix = new math.matrix;
         private projectMatrix: math.matrix = new math.matrix;
-        private viewProjectMatrix : math.matrix = new math.matrix;
-        private InverseViewProjectMatrix : math.matrix = new math.matrix;
+        private viewProjectMatrix: math.matrix = new math.matrix;
+        private InverseViewProjectMatrix: math.matrix = new math.matrix;
 
         private frameVecs: math.vector3[] = [];
 
-        private _fov : number = 60 * Math.PI / 180;//透视投影的fov
+        private _fov: number = 60 * Math.PI / 180;//透视投影的fov
         /**
          * @public
          * @language zh_CN
@@ -757,11 +767,13 @@ namespace gd3d.framework
          * @version gd3d 1.0
          */
         @gd3d.reflect.Field("number")
-        set fov(val:number){
+        set fov(val: number)
+        {
             this._fov = val;
             this.projectMatrixDirty = true;
         }
-        get fov(){
+        get fov()
+        {
             return this._fov;
         }
 
@@ -774,11 +786,13 @@ namespace gd3d.framework
          * @version gd3d 1.0
          */
         @gd3d.reflect.Field("number")
-        set size(val:number){
+        set size(val: number)
+        {
             this._size = val;
             this.projectMatrixDirty = true;
         }
-        get size(){
+        get size()
+        {
             return this._size;
         }
 
@@ -867,7 +881,7 @@ namespace gd3d.framework
 
         private _fillRenderer(scene: scene, node: transform, _isStatic: boolean = false)
         {
-            if(!node.needFillRenderer) return;  //强制不fill 
+            if (!node.needFillRenderer) return;  //强制不fill 
             let go = node.gameObject;
             if (!go || !go.visible || (node.hasRendererComp == false && node.hasRendererCompChild == false)) return;  //自己没有渲染组件 且 子物体也没有 return
 
@@ -875,7 +889,7 @@ namespace gd3d.framework
             go.isStatic = _isStatic || go.isStatic;
             const id = node.insId.getInsID();
             let renderer = go.renderer;
-            let islayerPass = renderer != null? this.CullingMask & (1 << renderer.renderLayer) : false;
+            let islayerPass = renderer != null ? this.CullingMask & (1 << renderer.renderLayer) : false;
             if (node.dirtiedOfFrustumCulling || this.gameObject.transform.dirtiedOfFrustumCulling)
             {
                 if (this.needUpdateWpos)
@@ -885,7 +899,8 @@ namespace gd3d.framework
                 }
 
                 this.cullingMap[id] = false;
-                if(islayerPass && node.enableCulling && scene.app.isFrustumCulling){
+                if (islayerPass && node.enableCulling && scene.app.isFrustumCulling)
+                {
                     this.cullingMap[id] = this.isCulling(node);
                     node.inCameraVisible = node.inCameraVisible || !this.cullingMap[id];
                 }
@@ -896,7 +911,7 @@ namespace gd3d.framework
 
             if (islayerPass && !this.cullingMap[id])  //判断加入到渲染列表
             {
-                scene.renderList.addRenderer(renderer,scene.webgl);
+                scene.renderList.addRenderer(renderer, scene.webgl);
             }
 
             if (node.children)
@@ -941,7 +956,7 @@ namespace gd3d.framework
             gd3d.math.vec3Subtract(aabb.maximum, aabb.minimum, vec3cache);
             const radius = gd3d.math.vec3Length(vec3cache) * 0.5;
             const center = node.aabb.center;
-            return this.cullTest(radius , center);
+            return this.cullTest(radius, center);
         }
 
         /**
@@ -949,7 +964,8 @@ namespace gd3d.framework
          * @param radius 
          * @param center 
          */
-        cullTest(radius : number , center : math.vector3){
+        cullTest(radius: number, center: math.vector3)
+        {
             // Left
             if (this.isRight(
                 this.frameVecs[this.fruMap.nearLD],
@@ -986,7 +1002,7 @@ namespace gd3d.framework
                 radius
             )) return true;
 
-            if(!this.cullZPlane) return false;
+            if (!this.cullZPlane) return false;
 
             // Front
             if (this.isRight(
@@ -1133,7 +1149,7 @@ namespace gd3d.framework
             {
                 let ls = rlayers[i].list;
                 let len = ls.length;
-                for (let j = 0 ; j < len; ++j)
+                for (let j = 0; j < len; ++j)
                 // for (let item of layer.list)
                 {
                     let item = ls[j];
@@ -1148,18 +1164,20 @@ namespace gd3d.framework
 
                 //gpu instancing process
                 let rmap = rlayers[i].gpuInstanceMap;
-                for(let key in rmap){
+                for (let key in rmap)
+                {
                     let gpuList = rmap[key];
-                    if(!gpuList) continue;
-                    meshRenderer.GpuInstancingRender(context , gpuList);
+                    if (!gpuList) continue;
+                    meshRenderer.GpuInstancingRender(context, gpuList);
                 }
 
                 // Batcher gpu instancing process
                 let bRmap = rlayers[i].gpuInstanceBatcherMap;
-                for(let key in bRmap){
+                for (let key in bRmap)
+                {
                     let obj = bRmap[key];
-                    if(!obj) continue;
-                    meshRenderer.GpuInstancingRenderBatcher(context , obj);
+                    if (!obj) continue;
+                    meshRenderer.GpuInstancingRenderBatcher(context, obj);
                 }
             }
             // for (var i = 0; i < scene.renderList.renderLayers.length; i++)
@@ -1199,9 +1217,9 @@ namespace gd3d.framework
                         list.sort((a, b) =>
                         {
                             if (a.queue != b.queue)
-                            {                                
+                            {
                                 return a.queue - b.queue;
-                            }else if(a instanceof ParticleSystem && b instanceof ParticleSystem)
+                            } else if (a instanceof ParticleSystem && b instanceof ParticleSystem)
                             {
                                 return b.sortingFudge - a.sortingFudge;
                             }

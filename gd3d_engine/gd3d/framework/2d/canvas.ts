@@ -138,6 +138,7 @@ namespace gd3d.framework {
         static readonly ClassName: string = "canvas";
 
         private static readonly help_v2 = new gd3d.math.vector2();
+        private static readonly help_rect_CanvasV = new gd3d.math.rect();
 
         /**
          * @public
@@ -188,6 +189,9 @@ namespace gd3d.framework {
          */
         enableUIEvent = true;
 
+        /** 启用 剔除超出可视范围的渲染节点  */
+        enableOutsideRenderClip = true;
+
         /**
          * @public
          * @language zh_CN
@@ -223,6 +227,11 @@ namespace gd3d.framework {
          * @version gd3d 1.0
          */
         scene: scene;
+
+        /** canvas 更新前回调函数 */
+        onPreUpdate: (dt: number) => any;
+        /** canvas 更新后回调函数 */
+        onLateUpdate: (dt: number) => any;
 
         /**
          * @public
@@ -342,6 +351,8 @@ namespace gd3d.framework {
 
         /** 刷新节点树 */
         public updateNodeTree(delta: number) {
+            if (this.onPreUpdate) this.onPreUpdate(delta);
+
             //upadte
             this.rootNode.updateTran(false);
             //rootnode.update(delta);
@@ -349,6 +360,8 @@ namespace gd3d.framework {
                 this._peCareListBuoy = -1;
                 this.objupdate(this.rootNode, delta);
             }
+
+            if (this.onLateUpdate) this.onLateUpdate(delta);
         }
 
         /**
@@ -665,11 +678,12 @@ namespace gd3d.framework {
             //context.updateModel(this.gameObject.transform);
             if (!node.visible) return;
             let r = node.renderer;
-            if (r != null) {
+            if (r != null && (!this.enableOutsideRenderClip || !this.ckViewOutside(node))) { //视窗剔除
+                //渲染
                 if (!this.isForceLabelTopRender || !("isLabel" in r)) {
                     r.render(this);
                 } else {
-                    canvas.helpLabelArr.push(r);
+                    canvas.helpLabelArr.push(r as any);
                 }
             }
             if (node.children != null) {
@@ -677,6 +691,19 @@ namespace gd3d.framework {
                     this.drawScene(node.children[i], context, assetmgr);
                 }
             }
+        }
+
+        /**
+         * 检查是在可视区域外
+         * @param node 节点
+         */
+        private ckViewOutside(node: transform2D): boolean {
+            let canvasRect = canvas.help_rect_CanvasV;
+            math.rectSet(canvasRect, 0, 0, this.pixelWidth, this.pixelHeight);
+            // let nodeRect = node.getDrawBounds();
+            let nodeRect = node.aabbRect;
+            let isInside = math.rectOverlap(canvasRect, nodeRect);
+            return !isInside;
         }
 
         private renderTopLabels() {

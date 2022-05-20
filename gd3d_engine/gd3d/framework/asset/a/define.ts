@@ -187,6 +187,12 @@ namespace gd3d.framework
          * 拖尾
          */
         TrailRenderer,
+        /**
+         * HDR贴图
+         */
+        HDR,
+        GLTF,
+        BIN,
     }
 
     /**

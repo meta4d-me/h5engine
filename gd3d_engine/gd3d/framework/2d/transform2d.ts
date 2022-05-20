@@ -1,7 +1,8 @@
 /// <reference path="../../io/reflect.ts" />
 /// <reference path="../../render/struct.ts" />
 
-namespace gd3d.framework {
+namespace gd3d.framework
+{
     /**
      * @public
      * @language zh_CN
@@ -9,7 +10,8 @@ namespace gd3d.framework {
      * UI布局选项
      * @version gd3d 1.0
      */
-    export enum layoutOption {
+    export enum layoutOption
+    {
         LEFT = 1,
         TOP = 2,
         RIGHT = 4,
@@ -25,7 +27,8 @@ namespace gd3d.framework {
      * 2d Point事件流接口
      * @version gd3d 1.0
      */
-    export interface I2DPointListener{
+    export interface I2DPointListener
+    {
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean);
     }
 
@@ -33,7 +36,8 @@ namespace gd3d.framework {
      * 实例对象是 I2DPointListener
      * @param object
      */
-    export function instanceOfI2DPointListener(object){
+    export function instanceOfI2DPointListener(object)
+    {
         return "onPointEvent" in object;
     }
 
@@ -90,14 +94,16 @@ namespace gd3d.framework {
      * @version gd3d 1.0
      */
     @gd3d.reflect.SerializeType
-    export class C2DComponent {
-        static readonly ClassName:string="C2DComponent";
+    export class C2DComponent
+    {
+        static readonly ClassName: string = "C2DComponent";
 
         @gd3d.reflect.Field("I2DComponent")
         comp: I2DComponent;
         init: boolean;
-        OnPlayed : boolean = false;
-        constructor(comp: I2DComponent, init: boolean = false) {
+        OnPlayed: boolean = false;
+        constructor(comp: I2DComponent, init: boolean = false)
+        {
             this.comp = comp;
             this.init = init;
         }
@@ -113,11 +119,14 @@ namespace gd3d.framework {
      * @version gd3d 1.0
      */
     @gd3d.reflect.SerializeType
-    export class transform2D {
-        static readonly ClassName:string="transform2D";
+    export class transform2D
+    {
+        static readonly ClassName: string = "transform2D";
 
         private static readonly help_v2 = new gd3d.math.vector2();
         private static readonly help_v2_1 = new gd3d.math.vector2();
+        private static readonly help_v2_2 = new gd3d.math.vector2();
+        private static readonly help_v2_3 = new gd3d.math.vector2();
 
         private static readonly help_mtx = new gd3d.math.matrix3x2();
         private static readonly help_mtx_1 = new gd3d.math.matrix3x2();
@@ -126,12 +135,13 @@ namespace gd3d.framework {
         private _canvas: canvas;
 
         //insID : transform2D 收集 map
-        private static _transform2DMap : {[guid:number]: transform2D} = {};
+        private static _transform2DMap: { [guid: number]: transform2D } = {};
         /**
          * 获取transform2D 通过 insID
          * @param id transform2D
          */
-        static getTransform2DById(insID:number){
+        static getTransform2DById(insID: number)
+        {
             return this._transform2DMap[insID];
         }
 
@@ -153,12 +163,15 @@ namespace gd3d.framework {
          * 当前2d节点所属的canvas
          * @version gd3d 1.0
          */
-        set canvas(val: canvas) {
+        set canvas(val: canvas)
+        {
             if (!val) return;
             this._canvas = val;
         }
-        get canvas(): canvas {
-            if (this._canvas == null) {
+        get canvas(): canvas
+        {
+            if (this._canvas == null)
+            {
                 if (this._parent == null)
                     return null;
                 return this._parent.canvas;
@@ -224,7 +237,8 @@ namespace gd3d.framework {
          * @version gd3d 1.0
          */
         private _parent: transform2D;
-        get parent(){
+        get parent()
+        {
             return this._parent;
         }
 
@@ -236,10 +250,12 @@ namespace gd3d.framework {
          * @version gd3d 1.0
          */
         @gd3d.reflect.Field("transform2D[]")
-        get children(){
+        get children()
+        {
             return this._children;
         }
-        set children(children:transform2D[]){
+        set children(children: transform2D[])
+        {
             this._children = children;
         }
         private _children: transform2D[] = [];
@@ -304,9 +320,11 @@ namespace gd3d.framework {
          * 如果其父节点不可见，其同样不可见
          * @version gd3d 1.0
          */
-        get visibleInScene() {
+        get visibleInScene()
+        {
             let obj: transform2D = this;
-            while (obj.visible) {
+            while (obj.visible)
+            {
                 obj = obj._parent;
             }
             return obj.visible;
@@ -319,11 +337,14 @@ namespace gd3d.framework {
          * 当前2d节点的隐藏状态
          * @version gd3d 1.0
          */
-        get visible(): boolean {
+        get visible(): boolean
+        {
             return this._visible;
         };
-        set visible(val: boolean) {
-            if (val != this._visible) {
+        set visible(val: boolean)
+        {
+            if (val != this._visible)
+            {
                 this._visible = val;
                 sceneMgr.app.markNotify(this, NotifyType.ChangeVisible);
             }
@@ -336,7 +357,8 @@ namespace gd3d.framework {
          * 获取自身
          * @version gd3d 1.0
          */
-        get transform() {
+        get transform()
+        {
             return this;
         }
 
@@ -351,6 +373,7 @@ namespace gd3d.framework {
         private dirty: boolean = true;//自己是否需要更新
         private dirtyChild: boolean = true;//子层是否需要更新
         private dirtyWorldDecompose: boolean = false;
+        private dirtyAABB: boolean = false;//AABB 标记脏
 
         /**
          * @public
@@ -384,15 +407,17 @@ namespace gd3d.framework {
 
         private _maskrectId = "";
         /** 裁剪遮罩矩形 ID */
-        get maskRectId () {return this._maskrectId; }
+        get maskRectId() { return this._maskrectId; }
 
 
         private _maskRect: math.rect;
         private _temp_maskRect: math.rect;
         /** 裁剪遮罩矩形 */
-        get maskRect() {
+        get maskRect()
+        {
             if (this._temp_maskRect == null) this._temp_maskRect = new math.rect();
-            if (this._maskRect != null) {
+            if (this._maskRect != null)
+            {
                 this._temp_maskRect.x = this._maskRect.x;
                 this._temp_maskRect.y = this._maskRect.y;
                 this._temp_maskRect.w = this._maskRect.w;
@@ -409,31 +434,57 @@ namespace gd3d.framework {
          * @version gd3d 1.0
          */
         @gd3d.reflect.Field("boolean")
-        get isMask() {
+        get isMask()
+        {
             return this._isMask;
         }
-        set isMask(b: boolean) {
+        set isMask(b: boolean)
+        {
             this._isMask = b;
             this.markDirty();
             if (this._parent != null)
                 this.updateTran(true);
         }
 
-        private updateMaskRect() {
+        private _aabbRect: math.rect = new math.rect();
+        private _temp_aabbRect: math.rect;
+        /** aabb 矩形 */
+        get aabbRect()
+        {
+            if (this._temp_aabbRect == null) this._temp_aabbRect = new math.rect();
+            if (this._aabbRect != null)
+            {
+                math.rectClone(this._aabbRect, this._temp_aabbRect);
+            }
+
+            if (this.dirtyAABB)
+            {
+                this.calcAABB(this.worldMatrix);
+                this.dirtyAABB = false;
+            }
+            return this._temp_aabbRect;
+        }
+
+        private updateMaskRect()
+        {
             let rect_x; let rect_y; let rect_w; let rect_h;
             let ParentRect;
-            if (this._parent != null) {
+            if (this._parent != null)
+            {
                 this._parentIsMask = this._parent.isMask || this._parent.parentIsMask;
                 ParentRect = this._parent.maskRect;
             } else
                 this._parentIsMask = false;
-            if (this.isMask || this.parentIsMask) {
+            if (this.isMask || this.parentIsMask)
+            {
                 this._maskrectId = "";
-                if(this.parentIsMask){
+                if (this.parentIsMask)
+                {
                     this._maskrectId = this._parent._maskrectId;
                 }
 
-                if (this.isMask) {
+                if (this.isMask)
+                {
                     this._maskrectId += `_${this.insId.getInsID()}`;
                     //计算 maskrect
                     let wPos = this.getWorldTranslate();
@@ -443,7 +494,8 @@ namespace gd3d.framework {
                     rect_y = wPos.y / wH;
                     rect_w = this.width / wW;
                     rect_h = this.height / wH;
-                    if (this.parentIsMask && ParentRect != null) {
+                    if (this.parentIsMask && ParentRect != null)
+                    {
                         //计算 rect  ∩  parentRect
                         let min_x = Math.max(rect_x, ParentRect.x);
                         let min_y = Math.max(rect_y, ParentRect.y);
@@ -455,12 +507,14 @@ namespace gd3d.framework {
                         rect_w = max_x - min_x;
                         rect_h = max_y - min_y;
                     }
-                } else if (ParentRect != null) {
+                } else if (ParentRect != null)
+                {
                     rect_x = ParentRect.x; rect_y = ParentRect.y; rect_w = ParentRect.w; rect_h = ParentRect.h;
                 }
                 if (this._maskRect == null) this._maskRect = new math.rect();
 
-                if (this._maskRect.x != rect_x || this._maskRect.x != rect_y || this._maskRect.x != rect_w || this._maskRect.x != rect_h) {
+                if (this._maskRect.x != rect_x || this._maskRect.x != rect_y || this._maskRect.x != rect_w || this._maskRect.x != rect_h)
+                {
                     this._maskRect.x = rect_x;
                     this._maskRect.y = rect_y;
                     this._maskRect.w = rect_w;
@@ -471,7 +525,8 @@ namespace gd3d.framework {
 
 
         private _parentIsMask = false;
-        get parentIsMask() {
+        get parentIsMask()
+        {
             return this._parentIsMask;
         }
 
@@ -492,7 +547,8 @@ namespace gd3d.framework {
          * @param node 要添加的子节点
          * @version gd3d 1.0
          */
-        addChild(node: transform2D) {
+        addChild(node: transform2D)
+        {
             // if (node.parent != null) {
             //     node.parent.removeChild(node);
             // }
@@ -503,7 +559,7 @@ namespace gd3d.framework {
             // node.canvas = this.canvas;
             // sceneMgr.app.markNotify(node, NotifyType.AddChild);
             // this.markDirty();
-            this.addChildAt(node,this._children.length);
+            this.addChildAt(node, this._children.length);
         }
 
         /**
@@ -515,11 +571,14 @@ namespace gd3d.framework {
          * @param index 要插入到的位置
          * @version gd3d 1.0
          */
-        addChildAt(node: transform2D, index: number) {
-            if (index < 0 || !node ){
+        addChildAt(node: transform2D, index: number)
+        {
+            if (index < 0 || !node)
+            {
                 return;
             }
-            if (node._parent != null) {
+            if (node._parent != null)
+            {
                 node._parent.removeChild(node);
             }
             if (this._children == null)
@@ -542,17 +601,20 @@ namespace gd3d.framework {
          * @param 要移除的子节点
          * @version gd3d 1.0
          */
-        removeChild(node: transform2D) {
-            if(!node){
+        removeChild(node: transform2D)
+        {
+            if (!node)
+            {
                 console.warn(`target is null`);
                 return;
             }
-            if (node._parent != this || this._children == null) {
+            if (node._parent != this || this._children == null)
+            {
                 console.warn("not my child.");
-                return ;
+                return;
             }
             var i = this._children.indexOf(node);
-            if(i < 0 ) return;
+            if (i < 0) return;
             this._children.splice(i, 1);
             node._parent = null;
             delete transform2D._transform2DMap[node.insId.getInsID()];
@@ -566,9 +628,11 @@ namespace gd3d.framework {
          * 为当前2d节点移除所有子节点
          * @version gd3d 1.0
          */
-        removeAllChild(needDispose:boolean = false) {
-            while (this._children.length > 0) {
-                if(needDispose)
+        removeAllChild(needDispose: boolean = false)
+        {
+            while (this._children.length > 0)
+            {
+                if (needDispose)
                     this._children[0].dispose();
                 else
                     this.removeChild(this._children[0]);
@@ -582,10 +646,12 @@ namespace gd3d.framework {
          * 标记自身脏了
          * @version gd3d 1.0
          */
-        markDirty() {
+        markDirty()
+        {
             this.dirty = true;
             var p = this._parent;
-            while (p != null) {
+            while (p != null)
+            {
                 p.dirtyChild = true;
                 p = p._parent;
             }
@@ -599,36 +665,49 @@ namespace gd3d.framework {
          * @param parentChange 父节点是否发生变化
          * @version gd3d 1.0
          */
-        updateTran(parentChange: boolean) {
+        updateTran(parentChange: boolean)
+        {
             //无刷
             if (this.dirtyChild == false && this.dirty == false && parentChange == false)
                 return;
 
-            if (this.dirty) {
+            if (this.dirty)
+            {
                 gd3d.math.matrix3x2MakeTransformRTS(this.localTranslate, this.localScale, this.localRotate, this.localMatrix);
             }
-            if (this.dirty || parentChange) {
-                if(this.enableUILayout){
+            if (this.dirty || parentChange)
+            {
+                if (this.enableUILayout)
+                {
                     this.refreshLayout();
                 }
-                if (this.parent == null) {
+                if (this.parent == null)
+                {
                     gd3d.math.matrix3x2Clone(this.localMatrix, this.worldMatrix);
                 }
-                else {
+                else
+                {
                     gd3d.math.matrix3x2Multiply(this.parent.worldMatrix, this.localMatrix, this.worldMatrix);
                 }
 
                 this.dirtyWorldDecompose = true;
-                if(this.enableUIMaskRect){
+                if (this.enableUIMaskRect)
+                {
                     this.updateMaskRect();
                 }
-                if (this.renderer != null) {
+                if (this.renderer != null)
+                {
                     this.renderer.updateTran();
                 }
             }
 
-            if (this._children != null) {
-                for (var i = 0,l=this._children.length; i < l; i++) {
+            //aabb
+            this.dirtyAABB = true;
+
+            if (this._children != null)
+            {
+                for (var i = 0, l = this._children.length; i < l; i++)
+                {
                     this._children[i].updateTran(parentChange || this.dirty);
                 }
             }
@@ -643,12 +722,14 @@ namespace gd3d.framework {
          * 更新整个节点结构
          * @version gd3d 1.0
          */
-        updateWorldTran() {
+        updateWorldTran()
+        {
             //parent 找到顶，第一个dirty的
             var p = this._parent;
             var dirtylist: transform2D[] = [];
             dirtylist.push(this);
-            while (p != null) {
+            while (p != null)
+            {
                 if (p.dirty)
                     dirtylist.push(p);
                 p = p._parent;
@@ -657,8 +738,49 @@ namespace gd3d.framework {
             top.updateTran(false);
         }
 
+        //计算AABB 包围盒
+        private calcAABB(wMtx: math.matrix3x2)
+        {
+            let w = this.width;
+            let h = this.height;
+            let px = this.pivot.x;
+            let py = this.pivot.y;
+            let osX = px * w;
+            let osY = py * h;
+
+            let p0 = transform2D.help_v2;
+            let p1 = transform2D.help_v2_1;
+            let p2 = transform2D.help_v2_2;
+            let p3 = transform2D.help_v2_3;
+            gd3d.math.vec2Set(p0, -osX, -osY);
+            gd3d.math.vec2Set(p1, w - osX, -osY);
+            gd3d.math.vec2Set(p2, w - osX, h - osY);
+            gd3d.math.vec2Set(p3, -osX, h - osY);
+
+            gd3d.math.matrix3x2TransformVector2(wMtx, p0, p0);
+            gd3d.math.matrix3x2TransformVector2(wMtx, p1, p1);
+            gd3d.math.matrix3x2TransformVector2(wMtx, p2, p2);
+            gd3d.math.matrix3x2TransformVector2(wMtx, p3, p3);
+
+            if (this.canvas)
+            {
+                this.canvas.clipPosToCanvasPos(p0, p0);
+                this.canvas.clipPosToCanvasPos(p1, p1);
+                this.canvas.clipPosToCanvasPos(p2, p2);
+                this.canvas.clipPosToCanvasPos(p3, p3);
+            }
+
+            let min = p0;
+            let max = p1;
+            math.vec2Set(min, Math.min(p0.x, p1.x, p2.x, p3.x), Math.min(p0.y, p1.y, p2.y, p3.y));
+            math.vec2Set(max, Math.max(p0.x, p1.x, p2.x, p3.x), Math.max(p0.y, p1.y, p2.y, p3.y));
+
+            math.rectSet(this._aabbRect, min.x, min.y, max.x - min.x, max.y - min.y);
+        }
+
         //计算 to canvasMtx 矩阵
-        private CalcReCanvasMtx(out: math.matrix3x2) {
+        private CalcReCanvasMtx(out: math.matrix3x2)
+        {
             if (!out) return;
             // let tsca = gd3d.math.pool.new_vector2();
             // let ttran = gd3d.math.pool.new_vector2();
@@ -676,8 +798,10 @@ namespace gd3d.framework {
          * @private
          * 转换并拆解canvas坐标空间 RTS
          */
-        private decomposeWorldMatrix() {
-            if (this.dirtyWorldDecompose) {
+        private decomposeWorldMatrix()
+        {
+            if (this.dirtyWorldDecompose)
+            {
                 // let reCanvasMtx = gd3d.math.pool.new_matrix3x2();
                 let reCanvasMtx = transform2D.help_mtx;
                 // let tsca = gd3d.math.pool.new_vector2();
@@ -709,7 +833,8 @@ namespace gd3d.framework {
          * 获取当前节点的相对于canvas的位置
          * @version gd3d 1.0
          */
-        getWorldTranslate() {
+        getWorldTranslate()
+        {
             this.decomposeWorldMatrix();
             return this.worldTranslate;
         }
@@ -721,7 +846,8 @@ namespace gd3d.framework {
          * 获取当前节点的相对于canvas的缩放
          * @version gd3d 1.0
          */
-        getWorldScale() {
+        getWorldScale()
+        {
             this.decomposeWorldMatrix();
             return this.worldScale;
         }
@@ -733,7 +859,8 @@ namespace gd3d.framework {
          * 获取当前节点的相对于canvas的旋转
          * @version gd3d 1.0
          */
-        getWorldRotate() {
+        getWorldRotate()
+        {
             this.decomposeWorldMatrix();
             return this.worldRotate;
         }
@@ -745,7 +872,8 @@ namespace gd3d.framework {
          * 获取当前节点的本地变换矩阵
          * @version gd3d 1.0
          */
-        getLocalMatrix(): gd3d.math.matrix3x2 {
+        getLocalMatrix(): gd3d.math.matrix3x2
+        {
             return this.localMatrix;
         }
 
@@ -756,7 +884,8 @@ namespace gd3d.framework {
          * 获取当前节点的世界变换矩阵
          * @version gd3d 1.0
          */
-        getWorldMatrix(): gd3d.math.matrix3x2 {
+        getWorldMatrix(): gd3d.math.matrix3x2
+        {
             return this.worldMatrix;
         }
 
@@ -767,7 +896,8 @@ namespace gd3d.framework {
          * 获取当前节点的Canvas_世界_变换矩阵
          * @version gd3d 1.0
          */
-        getCanvasWorldMatrix(): gd3d.math.matrix3x2 {
+        getCanvasWorldMatrix(): gd3d.math.matrix3x2
+        {
             this.decomposeWorldMatrix();
             return this.canvasWorldMatrix;
         }
@@ -810,7 +940,8 @@ namespace gd3d.framework {
          * @param pos 相对于canvas的位置
          * @version gd3d 1.0
          */
-        setWorldPosition(pos: math.vector2) {
+        setWorldPosition(pos: math.vector2)
+        {
             // var dir = math.pool.new_vector2();
             // var pworld = math.pool.new_matrix3x2();
             // let matinv = math.pool.new_matrix3x2();
@@ -824,10 +955,12 @@ namespace gd3d.framework {
             dir.y = pos.y - thispos.y;
 
             let pworld = transform2D.help_mtx;
-            if (this._parent != null) {
+            if (this._parent != null)
+            {
                 math.matrix3x2Clone(this._parent.worldMatrix, pworld);
             }
-            else {
+            else
+            {
                 math.matrix3x2MakeIdentity(pworld);
             }
             let matinv = transform2D.help_mtx_1;
@@ -851,13 +984,13 @@ namespace gd3d.framework {
          * 获取当前transform是否被释放掉了
          * @version gd3d 1.0
          */
-        get beDispose():boolean
+        get beDispose(): boolean
         {
             return this._beDispose;
         }
-        private _beDispose:boolean = false;//是否被释放了
+        private _beDispose: boolean = false;//是否被释放了
 
-        public onDispose:()=>void;
+        public onDispose: () => void;
 
         /**
          * @public
@@ -866,15 +999,19 @@ namespace gd3d.framework {
          * 释放当前节点，包括其子节点
          * @version gd3d 1.0
          */
-        dispose() {
-            if(this._parent)    this._parent.removeChild(this);
+        dispose()
+        {
+            if (this._parent) this._parent.removeChild(this);
             this._dispose();
         }
 
-        private _dispose(){
-            if(this._beDispose)  return;
-            if (this._children) {
-                for (var k in this._children) {
+        private _dispose()
+        {
+            if (this._beDispose) return;
+            if (this._children)
+            {
+                for (var k in this._children)
+                {
                     this._children[k]._dispose();
                 }
                 this.removeAllChild();
@@ -883,7 +1020,7 @@ namespace gd3d.framework {
             this.removeAllComponents();
 
             this._beDispose = true;
-            if(this.onDispose)
+            if (this.onDispose)
                 this.onDispose();
         }
 
@@ -923,8 +1060,8 @@ namespace gd3d.framework {
          */
         @gd3d.reflect.Field("C2DComponent[]")
         components: C2DComponent[] = [];
-        componentTypes:{[key:string]:boolean} = {};
-        private componentsInit :C2DComponent[]=[];
+        componentTypes: { [key: string]: boolean } = {};
+        private componentsInit: C2DComponent[] = [];
         // private componentplayed :C2DComponent[]=[];
 
         /**
@@ -934,12 +1071,14 @@ namespace gd3d.framework {
          * 组件的初始化
          * @version gd3d 1.0
          */
-        init(bePlay = false) {
+        init(bePlay = false)
+        {
 
             let comps = this.componentsInit;
-            if(comps.length <= 0 ) return;
+            if (comps.length <= 0) return;
 
-            while(comps.length > 0){    //这里不要再改回 for循环 , 当组件init 时添加其他组件时，会造成问题
+            while (comps.length > 0)
+            {    //这里不要再改回 for循环 , 当组件init 时添加其他组件时，会造成问题
                 let c = comps.shift();
                 c.comp.start();
                 c.init = true;
@@ -960,9 +1099,10 @@ namespace gd3d.framework {
          * @param type 组件名称
          * @version gd3d 1.0
          */
-        addComponent(type: string): I2DComponent {
+        addComponent(type: string): I2DComponent
+        {
             let pp = gd3d.reflect.getPrototype(type);
-            if(!pp) throw new Error(`get null of ${type} to getPrototype`);
+            if (!pp) throw new Error(`get null of ${type} to getPrototype`);
             let comp = gd3d.reflect.createInstance(pp, { "2dcomp": "1" });
             return this.addComponentDirect(comp);
         }
@@ -975,19 +1115,23 @@ namespace gd3d.framework {
          * @param comp 2d组件实例
          * @version gd3d 1.0
          */
-        addComponentDirect(comp: I2DComponent): I2DComponent {
-            if(!comp) {
+        addComponentDirect(comp: I2DComponent): I2DComponent
+        {
+            if (!comp)
+            {
                 console.error("this component is null");
                 return;
             }
-            if (comp.transform != null) {
+            if (comp.transform != null)
+            {
                 console.error("this components has added to a  gameObject");
                 return;
             }
             comp.transform = this;
             let typeStr = getClassName(comp);
-            if(this.componentTypes[typeStr]){
-                console.error(this.name+"   已经有一个" + typeStr + "的组件了，不能俩");
+            if (this.componentTypes[typeStr])
+            {
+                console.error(this.name + "   已经有一个" + typeStr + "的组件了，不能俩");
                 return;
             }
 
@@ -996,41 +1140,50 @@ namespace gd3d.framework {
             let _comp: C2DComponent = new C2DComponent(comp, false);
             this.components.push(_comp);
             this.componentsInit.push(_comp);
-            if (reflect.getClassTag(comp["__proto__"], "renderer") == "1") {//这货是个渲染器
+            if (reflect.getClassTag(comp["__proto__"], "renderer") == "1")
+            {//这货是个渲染器
 
-                if (this.renderer == null) {
+                if (this.renderer == null)
+                {
                     this.renderer = comp as any;
                     // console.warn("add renderer:" + this.name);
                 }
-                else {
+                else
+                {
                     console.error("已经有一个渲染器的组件了，不能俩");
                     return;
                 }
             }
-            if (reflect.getClassTag(comp["__proto__"], "boxcollider2d") == "1") {//这货是个boxcollider2d
-                if (this.collider == null) {
+            if (reflect.getClassTag(comp["__proto__"], "boxcollider2d") == "1")
+            {//这货是个boxcollider2d
+                if (this.collider == null)
+                {
                     this.collider = comp as any;
                 }
-                else {
+                else
+                {
                     console.error("已经有一个碰撞组件了，不能俩");
                     return;
                 }
             }
-            if (reflect.getClassTag(comp["__proto__"], "node2dphysicsbody") == "1") {//这货是个node2dphysicsbody
-                if (this.physicsBody == null) {
+            if (reflect.getClassTag(comp["__proto__"], "node2dphysicsbody") == "1")
+            {//这货是个node2dphysicsbody
+                if (this.physicsBody == null)
+                {
                     this.physicsBody = comp as any;
                 }
-                else {
+                else
+                {
                     console.error("已经有一个碰撞组件了，不能俩");
                     return;
                 }
             }
 
 
-            if(functionIsEmpty(comp.update))
-                comp.update =undefined;//update空转
+            if (functionIsEmpty(comp.update))
+                comp.update = undefined;//update空转
 
-			this.componentTypes[typeStr] = true;
+            this.componentTypes[typeStr] = true;
             return comp;
         }
 
@@ -1042,16 +1195,19 @@ namespace gd3d.framework {
          * @param comp 2d组件实例
          * @version gd3d 1.0
          */
-        removeComponent(comp: I2DComponent) {
+        removeComponent(comp: I2DComponent)
+        {
             if (!comp) return;
             // let typeName =  reflect.getClassName(comp); //组件继承时remove fial
             let typeName = getClassName(comp);
 
-            if(!this.componentTypes[typeName])
+            if (!this.componentTypes[typeName])
                 return;
             delete this.componentTypes[typeName];
-            for (var i = 0; i < this.components.length; i++) {
-                if (this.components[i].comp == comp) {
+            for (var i = 0; i < this.components.length; i++)
+            {
+                if (this.components[i].comp == comp)
+                {
                     this.clearOfCompRemove(this.components[i]);
                     this.components.splice(i, 1);
                     break;
@@ -1059,13 +1215,16 @@ namespace gd3d.framework {
             }
         }
 
-        private clearOfCompRemove(cComp: C2DComponent){
+        private clearOfCompRemove(cComp: C2DComponent)
+        {
             let comp = cComp.comp;
-            if(cComp.init){
+            if (cComp.init)
+            {
                 comp.remove();
-            }else{
+            } else
+            {
                 let i = this.componentsInit.indexOf(cComp);
-                if(i != -1) this.componentsInit.splice(i, 1);
+                if (i != -1) this.componentsInit.splice(i, 1);
             }
 
             if (comp == this.renderer) this.renderer = null;
@@ -1082,15 +1241,18 @@ namespace gd3d.framework {
          * @param type 2d组件名称
          * @version gd3d 1.0
          */
-        removeComponentByTypeName(type: string) {
-            if(!this.componentTypes[type])
-            return;
+        removeComponentByTypeName(type: string)
+        {
+            if (!this.componentTypes[type])
+                return;
             delete this.componentTypes[type];
             let comps = this.components;
             let len = comps.length;
-            for (var i = 0; i < len; i++) {
+            for (var i = 0; i < len; i++)
+            {
                 // if (reflect.getClassName(this.components[i].comp) == type) {
-                if (getClassName(comps[i].comp) == type) {
+                if (getClassName(comps[i].comp) == type)
+                {
                     this.clearOfCompRemove(comps[i]);
                     var p = comps.splice(i, 1);
                     return p[0];
@@ -1106,10 +1268,12 @@ namespace gd3d.framework {
          * @param type 2d组件名称
          * @version gd3d 1.0
          */
-        removeAllComponents() {
+        removeAllComponents()
+        {
             this.componentsInit.length = 0;
             let len = this.components.length;
-            for (var i = 0; i < len; i++) {
+            for (var i = 0; i < len; i++)
+            {
                 this.components[i].comp.remove();
                 this.components[i].comp.transform = null;
             }
@@ -1128,12 +1292,15 @@ namespace gd3d.framework {
          * @param type 2d组件的名字
          * @version gd3d 1.0
          */
-        getComponent(type: string): I2DComponent {
-            for (var i = 0; i < this.components.length; i++) {
+        getComponent(type: string): I2DComponent
+        {
+            for (var i = 0; i < this.components.length; i++)
+            {
                 let comp = this.components[i].comp;
                 let cname = getClassName(comp);
                 // var cname = gd3d.reflect.getClassName(this.components[i].comp["__proto__"]);
-                if (cname == type) {
+                if (cname == type)
+                {
                     return comp;
                 }
             }
@@ -1147,9 +1314,11 @@ namespace gd3d.framework {
          * 获取当前节点身上所有的组件
          * @version gd3d 1.0
          */
-        getComponents(): I2DComponent[] {
+        getComponents(): I2DComponent[]
+        {
             let components: I2DComponent[] = [];
-            for (var i = 0; i < this.components.length; i++) {
+            for (var i = 0; i < this.components.length; i++)
+            {
                 components.push(this.components[i].comp);
             }
             return components;
@@ -1163,7 +1332,8 @@ namespace gd3d.framework {
          * @param type 组件名称
          * @version gd3d 1.0
          */
-        getComponentsInChildren(type: string): I2DComponent[] {
+        getComponentsInChildren(type: string): I2DComponent[]
+        {
             let components: I2DComponent[] = [];
             this.getNodeCompoents(this, type, components);
 
@@ -1177,19 +1347,24 @@ namespace gd3d.framework {
          * @param _type
          * @param comps
          */
-        private getNodeCompoents(node: transform2D, _type: string, comps: I2DComponent[]) {
+        private getNodeCompoents(node: transform2D, _type: string, comps: I2DComponent[])
+        {
             let len = node.components.length;
-            for(let i = 0; i < len ;i++){
+            for (let i = 0; i < len; i++)
+            {
                 let comp = node.components[i].comp;
                 let cname = getClassName(comp);
                 // var cname = gd3d.reflect.getClassName(node.components[i].comp["__proto__"]);
-                if (cname == _type) {
+                if (cname == _type)
+                {
                     comps.push(comp);
                 }
             }
-            if (node._children != null) {
+            if (node._children != null)
+            {
                 let len_1 = node._children.length;
-                for(let j = 0; j < len_1 ;j++){
+                for (let j = 0; j < len_1; j++)
+                {
                     this.getNodeCompoents(node._children[j], _type, comps);
                 }
             }
@@ -1199,7 +1374,8 @@ namespace gd3d.framework {
          * 获取当前节点下及子节点第一个能找到的组件
          * @param type 组件名称
          */
-        getFirstComponentInChildren(type: string):I2DComponent{
+        getFirstComponentInChildren(type: string): I2DComponent
+        {
             return this.getNodeFirstComponent(this, type);
         }
 
@@ -1208,21 +1384,26 @@ namespace gd3d.framework {
          * @param node
          * @param type
          */
-        private getNodeFirstComponent(node: transform2D, type: string){
+        private getNodeFirstComponent(node: transform2D, type: string)
+        {
             let len = node.components.length;
-            for(let i = 0; i < len ;i++){
+            for (let i = 0; i < len; i++)
+            {
                 let comp = node.components[i].comp;
                 let cname = getClassName(comp);
                 // var cname = gd3d.reflect.getClassName(node.components[i].comp["__proto__"]);
-                if (cname == type) {
+                if (cname == type)
+                {
                     return comp;
                 }
             }
-            if (node._children != null){
+            if (node._children != null)
+            {
                 let len_1 = node._children.length;
-                for(let j = 0; j < len_1 ;j++){
+                for (let j = 0; j < len_1; j++)
+                {
                     let result = node.getNodeFirstComponent(node._children[j], type);
-                    if(result) return result;
+                    if (result) return result;
                 }
             }
         }
@@ -1276,7 +1457,8 @@ namespace gd3d.framework {
          * @param ModelPos 模型空间位置
          * @version gd3d 1.0
          */
-        ContainsCanvasPoint(ModelPos: math.vector2, tolerance: number = 0): boolean {
+        ContainsCanvasPoint(ModelPos: math.vector2, tolerance: number = 0): boolean
+        {
             let result = false;
             var mworld = this.getWorldMatrix();
             // var mout = math.pool.new_matrix3x2();
@@ -1341,15 +1523,18 @@ namespace gd3d.framework {
          * @version gd3d 1.0
          */
         @reflect.Field("number")
-        set layoutState(state: number) {
+        set layoutState(state: number)
+        {
             if (isNaN(state) || state == undefined) return;
-            if (state != this._layoutState) {
+            if (state != this._layoutState)
+            {
                 this.layoutDirty = true;
                 this.markDirty();
                 this._layoutState = state;
             }
         }
-        get layoutState() {
+        get layoutState()
+        {
             return this._layoutState;
         }
 
@@ -1363,15 +1548,18 @@ namespace gd3d.framework {
          * 布局设定值
          * @version gd3d 1.0
          */
-        setLayoutValue(option: layoutOption, value: number) {
+        setLayoutValue(option: layoutOption, value: number)
+        {
             if (isNaN(option) || isNaN(value) || option == undefined || value == undefined) return;
-            if (this.layoutValueMap[option] == undefined || value != this.layoutValueMap[option]) {
+            if (this.layoutValueMap[option] == undefined || value != this.layoutValueMap[option])
+            {
                 this.layoutDirty = true;
                 this.markDirty();
                 this.layoutValueMap[option] = value;
             }
         }
-        getLayoutValue(option: layoutOption) {
+        getLayoutValue(option: layoutOption)
+        {
             if (this.layoutValueMap[option] == undefined)
                 this.layoutValueMap[option] = 0;
             return this.layoutValueMap[option];
@@ -1386,15 +1574,18 @@ namespace gd3d.framework {
          * @version gd3d 1.0
          */
         @reflect.Field("number")
-        set layoutPercentState(state: number) {
+        set layoutPercentState(state: number)
+        {
             if (isNaN(state) || state == undefined) return;
-            if (state != this._layoutPercentState) {
+            if (state != this._layoutPercentState)
+            {
                 this.layoutDirty = true;
                 this.markDirty();
                 this._layoutPercentState = state;
             }
         }
-        get layoutPercentState() {
+        get layoutPercentState()
+        {
             return this._layoutPercentState;
         }
 
@@ -1406,7 +1597,8 @@ namespace gd3d.framework {
         private lastParentPivot = new math.vector2(0, 0);
         private lastPivot = new math.vector2(0, 0);
 
-        private refreshLayout() {
+        private refreshLayout()
+        {
             let parent = this._parent;
             if (!parent) return;
             if (this.width != this.lastWidth || this.height != this.lastHeight || parent.width != this.lastParentWidth || parent.height != this.lastParentHeight || parent.pivot.x != this.lastParentPivot.x
@@ -1415,31 +1607,40 @@ namespace gd3d.framework {
 
             if (!this.layoutDirty) return;
             let state = this._layoutState | this._layoutPercentState;
-            if (state != 0) {
-                if (state & layoutOption.LEFT) {
-                    if (state & layoutOption.RIGHT) {
-                        this.width = parent.width - this.getLayValue(layoutOption.LEFT) - this.getLayValue(layoutOption.RIGHT);
+            if (state != 0)
+            {
+                if (state & layoutOption.LEFT)
+                {
+                    if (state & layoutOption.RIGHT)
+                    {
+                        this.width = parent.width - this.getLayCoordinateValue(layoutOption.LEFT) - this.getLayCoordinateValue(layoutOption.RIGHT);
                     }
-                    this.localTranslate.x = this.getLayValue(layoutOption.LEFT) - parent.pivot.x * parent.width + this.pivot.x * this.width;
-                } else if (state & layoutOption.RIGHT) {
-                    this.localTranslate.x = parent.width - this.width - this.getLayValue(layoutOption.RIGHT) - parent.pivot.x * parent.width + this.pivot.x * this.width;
+                    this.localTranslate.x = this.getLayCoordinateValue(layoutOption.LEFT) - parent.pivot.x * parent.width + this.pivot.x * this.width;
+                } else if (state & layoutOption.RIGHT)
+                {
+                    this.localTranslate.x = parent.width - this.width - this.getLayCoordinateValue(layoutOption.RIGHT) - parent.pivot.x * parent.width + this.pivot.x * this.width;
                 }
 
-                if (state & layoutOption.H_CENTER) {
-                    this.localTranslate.x = (parent.width - this.width) / 2 + this.getLayValue(layoutOption.H_CENTER) - parent.pivot.x * parent.width + this.pivot.x * this.width;
+                if (state & layoutOption.H_CENTER)
+                {
+                    this.localTranslate.x = (parent.width - this.width) / 2 + this.getLayCoordinateValue(layoutOption.H_CENTER) - parent.pivot.x * parent.width + this.pivot.x * this.width;
                 }
 
-                if (state & layoutOption.TOP) {
-                    if (state & layoutOption.BOTTOM) {
-                        this.height = parent.height - this.getLayValue(layoutOption.TOP) - this.getLayValue(layoutOption.BOTTOM);
+                if (state & layoutOption.TOP)
+                {
+                    if (state & layoutOption.BOTTOM)
+                    {
+                        this.height = parent.height - this.getLayCoordinateValue(layoutOption.TOP) - this.getLayCoordinateValue(layoutOption.BOTTOM);
                     }
-                    this.localTranslate.y = this.getLayValue(layoutOption.TOP) - parent.pivot.y * parent.height + this.pivot.y * this.height;
-                } else if (state & layoutOption.BOTTOM) {
-                    this.localTranslate.y = parent.height - this.height - this.getLayValue(layoutOption.BOTTOM) - parent.pivot.y * parent.height + this.pivot.y * this.height;
+                    this.localTranslate.y = this.getLayCoordinateValue(layoutOption.TOP) - parent.pivot.y * parent.height + this.pivot.y * this.height;
+                } else if (state & layoutOption.BOTTOM)
+                {
+                    this.localTranslate.y = parent.height - this.height - this.getLayCoordinateValue(layoutOption.BOTTOM) - parent.pivot.y * parent.height + this.pivot.y * this.height;
                 }
 
-                if (state & layoutOption.V_CENTER) {
-                    this.localTranslate.y = (parent.height - this.height) / 2 + this.getLayValue(layoutOption.V_CENTER) - parent.pivot.y * parent.height + this.pivot.y * this.height;
+                if (state & layoutOption.V_CENTER)
+                {
+                    this.localTranslate.y = (parent.height - this.height) / 2 + this.getLayCoordinateValue(layoutOption.V_CENTER) - parent.pivot.y * parent.height + this.pivot.y * this.height;
                 }
                 //布局调整 后刷新 matrix
                 gd3d.math.matrix3x2MakeTransformRTS(this.localTranslate, this.localScale, this.localRotate, this.localMatrix);
@@ -1456,14 +1657,19 @@ namespace gd3d.framework {
             this.lastPivot.y = this.pivot.y;
         }
 
-        private getLayValue(option: layoutOption) {
+        /** 获取Layout 的坐标系值 */
+        private getLayCoordinateValue(option: layoutOption)
+        {
             if (this.layoutValueMap[option] == undefined)
                 this.layoutValueMap[option] = 0;
 
             let value = 0;
-            if (this._layoutPercentState & option) {
-                if (this._parent) {
-                    switch (option) {
+            if (this._layoutPercentState & option)
+            {
+                if (this._parent)
+                {
+                    switch (option)
+                    {
                         case layoutOption.LEFT:
                         case layoutOption.H_CENTER:
                         case layoutOption.RIGHT:
@@ -1476,11 +1682,46 @@ namespace gd3d.framework {
                             break;
                     }
                 }
-            } else {
+            } else
+            {
                 value = this.layoutValueMap[option];
             }
 
             return value;
+        }
+
+        /** 设置Layout 的坐标系值 */
+        private setLayCoordinateValue(option: layoutOption, value: number)
+        {
+            if (isNaN(option) || isNaN(value) || option == undefined || value == undefined) return;
+            let _v: number = value;
+            if (this._layoutPercentState & option)
+            {
+                if (this._parent)
+                {
+                    switch (option)
+                    {
+                        case layoutOption.LEFT:
+                        case layoutOption.H_CENTER:
+                        case layoutOption.RIGHT:
+                            _v = value / this._parent.width * 100;
+                            break;
+                        case layoutOption.TOP:
+                        case layoutOption.V_CENTER:
+                        case layoutOption.BOTTOM:
+                            _v = value / this._parent.height * 100;
+                            break;
+                    }
+                }
+            }
+
+            //save value
+            if (this.layoutValueMap[option] == undefined || _v != this.layoutValueMap[option])
+            {
+                this.layoutDirty = true;
+                this.markDirty();
+                this.layoutValueMap[option] = _v;
+            }
         }
 
         /**
@@ -1490,14 +1731,15 @@ namespace gd3d.framework {
          * 设置兄弟姐妹序列索引
          * @version gd3d 1.0
          */
-        setSiblingIndex(siblingIndex:number){
+        setSiblingIndex(siblingIndex: number)
+        {
             let p = this._parent;
-            if(!p || !p._children || siblingIndex >= p._children.length || isNaN(siblingIndex) || siblingIndex < 0 ) return;
+            if (!p || !p._children || siblingIndex >= p._children.length || isNaN(siblingIndex) || siblingIndex < 0) return;
             let currIdx = p._children.indexOf(this);
-            if(currIdx == -1 || currIdx == siblingIndex)   return;
-            p._children.splice(currIdx,1);
+            if (currIdx == -1 || currIdx == siblingIndex) return;
+            p._children.splice(currIdx, 1);
             let useidx = siblingIndex > currIdx ? siblingIndex - 1 : siblingIndex;
-            p._children.splice(useidx,0,this); //insert to target pos
+            p._children.splice(useidx, 0, this); //insert to target pos
         }
 
         /**
@@ -1507,10 +1749,11 @@ namespace gd3d.framework {
          * 获取兄弟姐妹序列索引
          * @version gd3d 1.0
          */
-        getSiblingIndex():number{
+        getSiblingIndex(): number
+        {
             let p = this._parent;
-            if(!p || !p._children)  return -1;
-            if(p._children.length < 1)   return 0;
+            if (!p || !p._children) return -1;
+            if (p._children.length < 1) return 0;
             return p._children.indexOf(this);
         }
 
@@ -1521,19 +1764,85 @@ namespace gd3d.framework {
          * 获取当前transform2D的克隆
          * @version gd3d 1.0
          */
-        clone(): transform2D {
+        clone(): transform2D
+        {
             return io.cloneObj(this) as transform2D;
+        }
+
+        /**
+         * 设置 节点的本地位置（会处理layout选项）
+         * @param pos 
+         */
+        setLocalPosition(pos: math.vector2)
+        {
+            let state = this._layoutState | this._layoutPercentState;
+            let lPos = this.localTranslate;
+            let x = pos.x;
+            let y = pos.y;
+            let parent = this.parent;
+            if (state == 0 || !parent)
+            {
+                if (lPos.x != x || lPos.y != y) this.markDirty();
+                lPos.x = x;
+                lPos.y = y;
+            }
+
+            //layout 模式处理
+            if (!parent) return;
+            //x
+            if (state & layoutOption.LEFT)
+            {
+                let l = x;
+                if (state & layoutOption.RIGHT)
+                {
+                    let r = -x;
+                    this.setLayCoordinateValue(layoutOption.RIGHT, r);
+                }
+                this.setLayCoordinateValue(layoutOption.LEFT, l);
+            } else if (state & layoutOption.RIGHT)
+            {
+                this.setLayCoordinateValue(layoutOption.RIGHT, -x);
+            }
+
+            if (state & layoutOption.H_CENTER)
+            {
+                let difHalf = (parent.width - this.width) / 2;
+                this.setLayCoordinateValue(layoutOption.H_CENTER, x - difHalf);
+            }
+
+            //y
+            if (state & layoutOption.TOP)
+            {
+                let t = y;
+                if (state & layoutOption.BOTTOM)
+                {
+                    let b = -y;
+                    this.setLayCoordinateValue(layoutOption.BOTTOM, b);
+                }
+                this.setLayCoordinateValue(layoutOption.TOP, t);
+            } else if (state & layoutOption.BOTTOM)
+            {
+                this.setLayCoordinateValue(layoutOption.BOTTOM, -y);
+            }
+
+            if (state & layoutOption.V_CENTER)
+            {
+                let difHalf = (parent.height - this.height) / 2;
+                this.setLayCoordinateValue(layoutOption.V_CENTER, y - difHalf);
+            }
         }
     }
 
-    export class t2dInfo {
+    export class t2dInfo
+    {
         pivot: math.vector2 = new math.vector2();
         pivotPos: math.vector2 = new math.vector2();
         width: number;
         height: number;
         rot: number;
 
-        public static getCenter(info: t2dInfo, outCenter: math.vector2) {
+        public static getCenter(info: t2dInfo, outCenter: math.vector2)
+        {
             outCenter.x = info.pivotPos.x + info.width * (0.5 - info.pivot.x) * Math.cos(info.rot) - info.height * (0.5 - info.pivot.y) * Math.sin(info.rot);
             outCenter.y = info.pivotPos.y - info.width * (0.5 - info.pivot.x) * Math.sin(info.rot) + info.height * (0.5 - info.pivot.y) * Math.cos(info.rot);
         }

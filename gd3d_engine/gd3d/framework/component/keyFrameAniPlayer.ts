@@ -1,8 +1,7 @@
 /// <reference path="../../io/reflect.ts" />
 
-namespace gd3d.framework
-{
-    export enum AnimationCullingType{
+namespace gd3d.framework {
+    export enum AnimationCullingType {
         /** Animation culling is disabled - object is animated even when offscreen. */
         AlwaysAnimate = 0,
         /** Animation is disabled when renderers are not visible. */
@@ -12,8 +11,7 @@ namespace gd3d.framework
     }
 
     @reflect.nodeComponent
-    export class keyFrameAniPlayer implements INodeComponent
-    {
+    export class keyFrameAniPlayer implements INodeComponent {
         static readonly ClassName: string = "keyFrameAniPlayer";
 
         /**
@@ -30,13 +28,15 @@ namespace gd3d.framework
         //当前播放的clip
         private _nowClip: keyFrameAniClip;
         //当前播放到的帧
-        private get nowFrame()
-        {
+        private get nowFrame() {
             if (!this._nowClip) return 0;
-            return Math.floor(this._nowClip.fps * this.nowTime);
+            return Math.floor(this._nowClip.fps * this._nowTime);
         };
         //当前播放到的时间
-        private nowTime: number = 0;
+        private _nowTime: number = 0;
+        /** 当前播放到的时间 */
+        public get nowTime() { return this._nowTime; };
+
         //对象路径map
         private pathPropertyMap = {};
 
@@ -58,44 +58,40 @@ namespace gd3d.framework
         get animateOnlyIfVisible() { return this._animateOnlyIfVisible; }
         set animateOnlyIfVisible(v: boolean) { this._animateOnlyIfVisible = v; }
 
-        private _cullingType : AnimationCullingType = AnimationCullingType.AlwaysAnimate;
+        private _cullingType: AnimationCullingType = AnimationCullingType.AlwaysAnimate;
         /** 动画的剔除类型 */
-        get cullingType(){return this._cullingType;}
-        set cullingType(v){this._cullingType = v;}
+        get cullingType() { return this._cullingType; }
+        set cullingType(v) { this._cullingType = v; }
 
-        private _localBounds : aabb ;
+        private _localBounds: aabb;
         /** 动画的剔除类型 */
-        get localBounds(){return this._localBounds;}
-        set localBounds(v){this._localBounds = v;}
+        get localBounds() { return this._localBounds; }
+        set localBounds(v) { this._localBounds = v; }
         /** 播放结束的归一化时间点 范围 0 ~ 1 */
         private endNormalizedTime: number = 1;
 
-        start()
-        {
+        start() {
             this.init();
         }
 
-        onPlay()
-        {
+        onPlay() {
 
         }
 
-        update(delta: number)
-        {
+        update(delta: number) {
             if (this._animateOnlyIfVisible && !this.gameObject.visible) return;
             let clip = this._nowClip;
             if (!clip) return;
-            this.nowTime += delta * this._speed;
-            let raelTime = this.nowTime;
+            this._nowTime += delta * this._speed;
+            let raelTime = this._nowTime;
             let clipTime = clip.time;
             //    
             //是否播完
-            if (this.checkPlayEnd(clip))
-            {
+            if (this.checkPlayEnd(clip)) {
                 this.OnClipPlayEnd();
             }
-            this.nowTime = raelTime % clipTime;
-            let playTime = this._nowClip == null ? clipTime : this.nowTime ;  //当前播放时间
+            this._nowTime = raelTime % clipTime;
+            let playTime = this._nowClip == null ? clipTime : this._nowTime;  //当前播放时间
             this.displayByTime(clip, playTime);
         }
 
@@ -103,26 +99,22 @@ namespace gd3d.framework
          * 获取指定名称的clip 资源 
          * @param clipName 
          */
-        getClip(clipName: string)
-        {
+        getClip(clipName: string) {
             if (!this.clips || this.clips.length < 1) return;
             if (this.clipMap[clipName]) return this.clipMap[clipName];
             let len = this.clips.length;
-            for (var i = 0; i < len; i++)
-            {
+            for (var i = 0; i < len; i++) {
                 let clip = this.clips[i];
                 if (clip && clip.getName() == clipName) return clip;
             }
         }
 
         //播放到指定时间状态
-        private displayByTime(clip: keyFrameAniClip, playTime: number)
-        {
+        private displayByTime(clip: keyFrameAniClip, playTime: number) {
             let curves = this.timeFilterCurves(clip, playTime);
             if (!curves || curves.length < 1) return;
             //修改属性值
-            for (var i = 0; i < curves.length; i++)
-            {
+            for (var i = 0; i < curves.length; i++) {
                 let tempc = curves[i];
                 this.refrasCurveProperty(tempc, playTime);
             }
@@ -136,34 +128,29 @@ namespace gd3d.framework
         private static rhquat = new gd3d.math.quaternion();
         private static resvec = new gd3d.math.vector3();
         private static resquat = new gd3d.math.quaternion();
-        private static vec3lerp(a: gd3d.math.vector3, b: gd3d.math.vector3, t: number, out: gd3d.math.vector3)
-        {
+        private static vec3lerp(a: gd3d.math.vector3, b: gd3d.math.vector3, t: number, out: gd3d.math.vector3) {
             out.x = a.x + t * (b.x - a.x);
             out.y = a.y + t * (b.y - a.y);
             out.z = a.z + t * (b.z - a.z);
             return out;
         }
-        private static quatSlerp(a: gd3d.math.quaternion, b: gd3d.math.quaternion, t: number, out: gd3d.math.quaternion)
-        {
+        private static quatSlerp(a: gd3d.math.quaternion, b: gd3d.math.quaternion, t: number, out: gd3d.math.quaternion) {
             let omega, cosom, sinom, scale0, scale1;
 
             cosom = a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
-            if (cosom < 0.0)
-            {
+            if (cosom < 0.0) {
                 cosom = -cosom;
                 b.x = - b.x;
                 b.y = - b.y;
                 b.z = - b.z;
                 b.w = - b.w;
             }
-            if ((1.0 - cosom) > 0.000001)
-            {
+            if ((1.0 - cosom) > 0.000001) {
                 omega = Math.acos(cosom);
                 sinom = Math.sin(omega);
                 scale0 = Math.sin((1.0 - t) * omega) / sinom;
                 scale1 = Math.sin(t * omega) / sinom;
-            } else
-            {
+            } else {
                 scale0 = 1.0 - t;
                 scale1 = t;
             }
@@ -174,19 +161,16 @@ namespace gd3d.framework
 
             return out;
         }
-        private calcValueByTime(curve: AnimationCurve, playTime: number)
-        {
+        private calcValueByTime(curve: AnimationCurve, playTime: number) {
             let kfs = curve.keyFrames;
             if (!kfs || kfs.length < 1) return 0;
             if (kfs.length == 1 && kfs[0]) return kfs[0].value;
             //找到目标关键帧
             let leftKf: keyFrame;
             let rightKf: keyFrame;
-            for (var i = 0; i < kfs.length; i++)
-            {
+            for (var i = 0; i < kfs.length; i++) {
                 rightKf = kfs[i];
-                if (kfs[i].time > playTime)
-                {
+                if (kfs[i].time > playTime) {
                     if (i > 0) leftKf = kfs[i - 1];
                     break;
                 }
@@ -195,15 +179,13 @@ namespace gd3d.framework
             const progress = leftKf
                 ? (playTime - leftKf.time) / (rightKf.time - leftKf.time)
                 : 1;
-            switch (curve.propertyName)
-            {
+            switch (curve.propertyName) {
                 case 'localScale':
                 case 'localTranslate':
                     keyFrameAniPlayer.rhvec.x = rightKf.value[0];
                     keyFrameAniPlayer.rhvec.y = rightKf.value[1];
                     keyFrameAniPlayer.rhvec.z = rightKf.value[2];
-                    if (!leftKf)
-                    {
+                    if (!leftKf) {
                         return keyFrameAniPlayer.rhvec;
                     }
                     keyFrameAniPlayer.lhvec.x = leftKf.value[0];
@@ -216,8 +198,7 @@ namespace gd3d.framework
                     keyFrameAniPlayer.rhquat.y = rightKf.value[1];
                     keyFrameAniPlayer.rhquat.z = rightKf.value[2];
                     keyFrameAniPlayer.rhquat.w = rightKf.value[3];
-                    if (!leftKf)
-                    {
+                    if (!leftKf) {
                         return keyFrameAniPlayer.rhquat;
                     }
                     keyFrameAniPlayer.lhquat.x = leftKf.value[0];
@@ -236,8 +217,7 @@ namespace gd3d.framework
         private eulerStatusMap = {};
         private eulerMap = {};
         //刷新curve 属性
-        private refrasCurveProperty(curve: AnimationCurve, playTime: number)
-        {
+        private refrasCurveProperty(curve: AnimationCurve, playTime: number) {
             if (playTime < 0 || !curve || curve.keyFrames.length < 2 || StringUtil.isNullOrEmptyObject(curve.propertyName)) return;
             let path = curve.path;
             let key = `${path}_${curve.type}`;
@@ -246,21 +226,15 @@ namespace gd3d.framework
             let sub = obj;
             let strs = curve.propertyName.split(".");
             let prop_type = "";
-            while (strs.length > 0)
-            {
-                if (strs.length == 1)
-                {
+            while (strs.length > 0) {
+                if (strs.length == 1) {
                     let str_p = strs[0];
                     const target = this.calcValueByTime(curve, playTime);
                     // const target = 0;
-                    if (curve.type == transform["name"])
-                    {
-                        if (obj instanceof transform)
-                        {
-                            if (target)
-                            {
-                                switch (curve.propertyName)
-                                {
+                    if (curve.type == transform["name"]) {
+                        if (obj instanceof transform) {
+                            if (target) {
+                                switch (curve.propertyName) {
                                     case 'localScale':
                                         obj.localScale.x = target['x'];
                                         obj.localScale.y = target['y'];
@@ -324,12 +298,10 @@ namespace gd3d.framework
         }
 
         //按时间筛选需要播放的 curve
-        private timeFilterCurves(clip: keyFrameAniClip, nowTime: number)
-        {
+        private timeFilterCurves(clip: keyFrameAniClip, nowTime: number) {
             if (!clip || clip.curves.length < 1) return;
             let result: AnimationCurve[] = [];
-            for (var i = 0; i < clip.curves.length; i++)
-            {
+            for (var i = 0; i < clip.curves.length; i++) {
                 let curve = clip.curves[i];
                 let kfs = curve.keyFrames;
                 if (kfs.length < 1 || !kfs[kfs.length - 1] || kfs[kfs.length - 1].time < nowTime) continue;
@@ -339,20 +311,16 @@ namespace gd3d.framework
         }
 
         //检查播放是否完毕
-        private checkPlayEnd(clip: keyFrameAniClip)
-        {
+        private checkPlayEnd(clip: keyFrameAniClip) {
             if (!clip) return true;
             if (clip._wrapMode == WrapMode.Loop || clip._wrapMode == WrapMode.PingPong) return false;
-            if (this.nowTime >= clip.time * this.endNormalizedTime) return true;
+            if (this._nowTime >= clip.time * this.endNormalizedTime) return true;
         }
 
-        private init()
-        {
-            if (this.clips)
-            {
+        private init() {
+            if (this.clips) {
                 let len = this.clips.length;
-                for (let i = 0; i < len; i++)
-                {
+                for (let i = 0; i < len; i++) {
                     let clip = this.clips[i];
                     if (i == 0) this._currClipName = clip.getName();
                     this.clipMap[clip.getName()] = clip;
@@ -364,10 +332,9 @@ namespace gd3d.framework
          * 动画是否在播放
          * @param ClipName 指定片段名 ，不指定仅判断当前是否在执行
          */
-        isPlaying(ClipName: string = "")
-        {
-            if(!this._nowClip) return false;
-            if(ClipName) return this._nowClip.getName() == ClipName;
+        isPlaying(ClipName: string = "") {
+            if (!this._nowClip) return false;
+            if (ClipName) return this._nowClip.getName() == ClipName;
             return true;
         }
 
@@ -390,45 +357,42 @@ namespace gd3d.framework
          * @param onPlayEnd 播放结束后回调函数
          * @param normalizedTime 播放结束时间点归一化时间（范围：0~1）
          */
-        play(ClipName: string = "", onPlayEnd: () => void = null , normalizedTime : number = 1 )
-        {
-            if(!this.clips) return;
-            if(!isNaN(normalizedTime)){
-                this.endNormalizedTime = math.floatClamp(normalizedTime,0,1);
+        play(ClipName: string = "", onPlayEnd: () => void = null, normalizedTime: number = 1) {
+            if (!this.clips) return;
+            if (!isNaN(normalizedTime) && normalizedTime != null) {
+                this.endNormalizedTime = math.floatClamp(normalizedTime, 0, 1);
             }
             let clip = this.getClip(ClipName);
             this.playByClip(clip, onPlayEnd);
         }
-        
+
         /**
          * 播放动画 通过 clip
          * @param clip 
          */
-        private playByClip(clip: keyFrameAniClip, onPlayEnd: () => void = null)
-        {
-            if(this._nowClip){
+        private playByClip(clip: keyFrameAniClip, onPlayEnd: () => void = null) {
+            if (this._nowClip) {
                 this.OnClipPlayEnd();
             }
 
             if (!clip) return;
             let clipName = clip.getName();
             this.playEndDic[clipName] = onPlayEnd;
-            this.nowTime = 0;
+            this._nowTime = 0;
             this._nowClip = clip;
             this._currClipName = clipName;
             this.collectPathPropertyObj(this._nowClip, this.pathPropertyMap);
         }
 
         /** clip 播放完毕 */
-        private OnClipPlayEnd()
-        {
-            if(!this._nowClip) return;
+        private OnClipPlayEnd() {
+            if (!this._nowClip) return;
             let clipName = this._nowClip.getName();
             this._nowClip = null;
-            this.nowTime = 0;
+            this._nowTime = 0;
             this.endNormalizedTime = 1;
             let endFunc = this.playEndDic[clipName];
-            if (endFunc)    endFunc();
+            if (endFunc) endFunc();
         }
 
         /**
@@ -438,8 +402,7 @@ namespace gd3d.framework
          * 停止默认动画
          * @version gd3d 1.0
          */
-        stop()
-        {
+        stop() {
             this._nowClip = null;
         }
 
@@ -450,34 +413,28 @@ namespace gd3d.framework
          * 倒带默认动画
          * @version gd3d 1.0
          */
-        rewind()
-        {
+        rewind() {
             if (!this._nowClip) return;
             this.displayByTime(this._nowClip, 0);  //到第一帧
-            this.nowTime = 0;
+            this._nowTime = 0;
         }
 
-        addClip(clip: keyFrameAniClip)
-        {
+        addClip(clip: keyFrameAniClip) {
             if (!this.clips) this.clips = [];
             this.clips.push(clip);
             this.clipMap[clip.getName()] = clip;
         }
 
-        private collectPropertyObj(clip: keyFrameAniClip)
-        {
+        private collectPropertyObj(clip: keyFrameAniClip) {
             if (!clip) return;
-            for (var i = 0; i < clip.curves.length; i++)
-            {  //"gameobj_0/gameobj_1"
+            for (var i = 0; i < clip.curves.length; i++) {  //"gameobj_0/gameobj_1"
                 let curve = clip.curves[i];
                 let tran = this.gameObject.transform;
-                if (!StringUtil.isNullOrEmptyObject(curve.path))
-                {
+                if (!StringUtil.isNullOrEmptyObject(curve.path)) {
                     tran = this.pathPropertyMap[curve.path];
                 }
                 let comp: any = tran;
-                if (curve.type != transform.prototype.name)
-                {
+                if (curve.type != transform.prototype.name) {
                     comp = tran.gameObject.getComponent(curve.type);
                 }
                 if (!comp) continue;
@@ -486,19 +443,15 @@ namespace gd3d.framework
         }
 
         //children对象收集路径
-        private collectPathPropertyObj(clip: keyFrameAniClip, pathMap)
-        {
+        private collectPathPropertyObj(clip: keyFrameAniClip, pathMap) {
             if (!clip || !pathMap) return;
-            for (var i = 0; i < clip.curves.length; i++)
-            {  //"gameobj_0/gameobj_1"
+            for (var i = 0; i < clip.curves.length; i++) {  //"gameobj_0/gameobj_1"
                 let curve = clip.curves[i];
                 let key = "";
                 let tran = this.gameObject.transform;
-                if (!StringUtil.isNullOrEmptyObject(curve.path))
-                {
+                if (!StringUtil.isNullOrEmptyObject(curve.path)) {
                     let strs = curve.path.split("/");
-                    for (var j = 0; j < strs.length; j++)
-                    {
+                    for (var j = 0; j < strs.length; j++) {
                         tran = this.serchChild(strs[j], tran);
                         if (!tran) break;
                     }
@@ -506,8 +459,7 @@ namespace gd3d.framework
                 }
                 key = `${curve.path}_${curve.type}`;
                 let comp: any = tran;
-                if (curve.type != transform["name"])
-                {
+                if (curve.type != transform["name"]) {
                     comp = tran.gameObject.getComponent(curve.type);
                 }
                 pathMap[key] = comp;
@@ -515,29 +467,24 @@ namespace gd3d.framework
         }
 
         //寻找child by name
-        private serchChild(name: string, trans: transform)
-        {
+        private serchChild(name: string, trans: transform) {
             if (!trans || !trans.children || trans.children.length < 1) return;
-            for (var i = 0; i < trans.children.length; i++)
-            {
+            for (var i = 0; i < trans.children.length; i++) {
                 let child = trans.children[i];
                 if (child && child.name == name)
                     return child;
             }
         }
 
-        clone()
-        {
+        clone() {
 
         }
 
-        remove()
-        {
+        remove() {
             this.gameObject = null;
             this.pathPropertyMap = null;
             this._nowClip = null;
-            if (this.clips)
-            {
+            if (this.clips) {
                 this.clips.length = 0;
             }
             this.clips = null;
@@ -548,11 +495,9 @@ namespace gd3d.framework
     }
 
     //贝塞尔计算工具
-    class bezierCurveTool
-    {
+    class bezierCurveTool {
         private static cupV2 = new math.vector2();
-        static calcValue(kf_l: keyFrame, kf_r: keyFrame, playTime: number)
-        {
+        static calcValue(kf_l: keyFrame, kf_r: keyFrame, playTime: number) {
             //是否 是常量
             if (kf_l.outTangent == Infinity || kf_r.inTangent == Infinity) return kf_l.value;
             let rate = (playTime - kf_l.time) / (kf_r.time - kf_l.time);
@@ -560,8 +505,7 @@ namespace gd3d.framework
             return v2.y;
         }
 
-        private static converCalc(inV: number, outV: number, inTime: number, outTime: number, inTangent: number, outTangent: number, t: number)
-        {
+        private static converCalc(inV: number, outV: number, inTime: number, outTime: number, inTangent: number, outTangent: number, t: number) {
             let p0 = math.pool.new_vector2(inTime, inV);
             let p1 = math.pool.new_vector2();
             let p2 = math.pool.new_vector2();
@@ -578,10 +522,8 @@ namespace gd3d.framework
         }
 
         //三阶 贝塞尔曲线
-        private static calcCurve(t: number, P0: math.vector2, P1: math.vector2, P2: math.vector2, P3: math.vector2, out: math.vector2)
-        {
-            var equation = (t: number, val0: number, val1: number, val2: number, val3: number) =>
-            {
+        private static calcCurve(t: number, P0: math.vector2, P1: math.vector2, P2: math.vector2, P3: math.vector2, out: math.vector2) {
+            var equation = (t: number, val0: number, val1: number, val2: number, val3: number) => {
                 var res = (1.0 - t) * (1.0 - t) * (1.0 - t) * val0 + 3.0 * t * (1.0 - t) * (1.0 - t) * val1 + 3.0 * t * t * (1.0 - t) * val2 + t * t * t * val3;
                 return res;
             }

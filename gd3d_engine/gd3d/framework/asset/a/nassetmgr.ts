@@ -98,6 +98,12 @@ namespace gd3d.framework
                     return AssetTypeEnum.ParticleSystem;
                 case ".trailrenderer.json":
                     return AssetTypeEnum.TrailRenderer;
+                case ".hdr":
+                    return AssetTypeEnum.HDR;
+                case ".gltf":
+                    return AssetTypeEnum.GLTF;
+                case ".bin":
+                    return AssetTypeEnum.BIN;
             }
 
             i = file.indexOf(".", i + 1);
@@ -126,6 +132,7 @@ namespace gd3d.framework
             case e.TextureDesc:
             case e.PackTxt:
             case e.ParticleSystem:
+            case e.GLTF:
                 return "text";
             case e.Aniclip:
             case e.DDS:
@@ -134,7 +141,9 @@ namespace gd3d.framework
             case e.KTX:
             case e.ASTC:
             case e.PackBin:
+            case e.HDR:
             case e.RAW:
+            case e.BIN:
                 return "arraybuffer";
             default:
                 // throw Error(`无法识别类型 enum:${AssetTypeEnum[type]},type:${type}`);
@@ -161,7 +170,7 @@ namespace gd3d.framework
 
         static noparseBundle: Array<assetBundle> = [];//未解析的资源包
 
-        static atonceParse: boolean = true;//是否立即解析        
+        static atonceParse: boolean = true;//是否立即解析
         static openGuid: boolean = true;//是否开启去重能力
         name_bundles: { [key: string]: assetBundle } = {};
         kurl_bundles: { [key: string]: assetBundle } = {};
@@ -248,7 +257,7 @@ namespace gd3d.framework
                     {
                         this.parseRes({ name, guid, type, dwguid }).then((asset: IAsset) =>
                         {
-                            //解析完毕                       
+                            //解析完毕
                             state.isfinish = true;
                             if (asset)
                             {
