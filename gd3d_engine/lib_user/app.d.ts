@@ -674,14 +674,38 @@ declare class gpuInstanceMgr {
     private static ckCanUseGpuInstance;
 }
 declare class HDR_sample implements IState {
+    dec: string;
+    isEnableGUI: boolean;
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
     assetMgr: gd3d.framework.assetMgr;
     sceneConfig: string;
+    gltfModels: {
+        gltfFolder: string;
+        file: string;
+        scale: number;
+        cb: (root: any) => void;
+    }[];
+    HDRList: string[];
+    HDRpath: string;
+    _HDR: string;
+    _Model: string;
+    ModelList: string[];
+    _enableLight: boolean;
+    lightRoot: gd3d.framework.transform;
+    modelRoot: gd3d.framework.transform;
     _load(path: string, type?: gd3d.framework.AssetTypeEnum): Promise<unknown>;
     load<T extends gd3d.framework.IAsset>(path: string, name: string, type?: gd3d.framework.AssetTypeEnum): Promise<T>;
     loadCubeTexture(folder: string, images?: string[]): Promise<gd3d.framework.texture>;
-    start(app: gd3d.framework.application): void;
+    start(app: gd3d.framework.application): Promise<void>;
+    toLoadGLTF(gltfModels: any[]): Promise<void>;
+    enableGUI(): Promise<void>;
+    get Model(): string;
+    set Model(val: string);
+    get enableLight(): boolean;
+    set enableLight(val: boolean);
+    toLoad(): void;
+    clearGLTF(): void;
     update(delta: number): void;
 }
 declare class test_LineRenderer implements IState {

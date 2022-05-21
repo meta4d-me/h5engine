@@ -227,20 +227,24 @@ void main() {
     vec3 IBLColor = decoRGBE(textureCubeLodEXT(u_env, c.R, lod));
     vec3 IBLspecular = 1.0 * IBLColor * (c.f0 * brdf.x + brdf.y);
     finalColor += IBLspecular * specularIntensity;
+#ifndef LIGHTMAP
+    //有lightMap 时，用lightmap 替代 间接光照的贡献
     finalColor += c.diffuse.rgb * decoRGBE(textureCubeLodEXT(u_diffuse, c.R, lod)) * diffuseIntensity;
-
+#endif
     // finalColor += sRGBtoLINEAR(texture2D(uv_Emissive, xlv_TEXCOORD0 * uvRepeat)).rgb;
+
+    finalColor *= u_Exposure * texture2D(uv_AO, xlv_TEXCOORD0 * uvRepeat).r;
+    finalColor = toneMapACES(finalColor);
 
 #ifdef LIGHTMAP
     lowp vec4 lightmap = texture2D(_LightmapTex, lightmap_TEXCOORD);
-    finalColor.xyz *= decode_hdr(lightmap);
+    // finalColor.xyz *= decode_hdr(lightmap);
+    // finalColor.xyz *= lightmap.xyz;
+    finalColor.xyz += c.diffuse.rgb * lightmap.xyz;
 #endif
 
 #ifdef FOG
     finalColor.xyz = mix(glstate_fog_color.rgb, finalColor.rgb, factor);
 #endif
-
-    finalColor *= u_Exposure * texture2D(uv_AO, xlv_TEXCOORD0 * uvRepeat).r;
-
-    gl_FragColor = vec4(toneMapACES(finalColor), c.diffuse.a);
+    gl_FragColor = vec4(finalColor, c.diffuse.a);
 }

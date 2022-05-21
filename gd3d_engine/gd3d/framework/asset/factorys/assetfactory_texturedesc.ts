@@ -1,13 +1,12 @@
-namespace gd3d.framework
-{
+namespace gd3d.framework {
     @assetF(AssetTypeEnum.TextureDesc)
-    export class AssetFactory_TextureDesc implements IAssetFactory
-    {
+    export class AssetFactory_TextureDesc implements IAssetFactory {
         private readonly t_Normal = "t_Normal";
         private readonly t_PVR = "t_PVR";
         private readonly t_DDS = "t_DDS";
         private readonly t_KTX = "t_KTX";
         private readonly t_ASTC = "t_ASTC";
+        private readonly t_RAW = "t_RAW";
         //#region 废弃de参考代码
         // newAsset(): texture
         // {
@@ -139,8 +138,7 @@ namespace gd3d.framework
         //#endregion
 
 
-        parse(assetmgr: assetMgr, bundle: assetBundle, name: string, data: string, dwguid: number)
-        {
+        parse(assetmgr: assetMgr, bundle: assetBundle, name: string, data: string, dwguid: number) {
             var _texturedesc = JSON.parse(data);
             var _name: string = _texturedesc["name"];
             var _filterMode: string = _texturedesc["filterMode"];
@@ -149,8 +147,7 @@ namespace gd3d.framework
             var _wrap: string = _texturedesc["wrap"];
             var _premultiplyAlpha: boolean = _texturedesc["premultiplyAlpha"];
 
-            if (_premultiplyAlpha == undefined)
-            {
+            if (_premultiplyAlpha == undefined) {
                 _premultiplyAlpha = true;
             }
             var _textureFormat = render.TextureFormatEnum.RGBA;//这里需要确定格式
@@ -174,34 +171,36 @@ namespace gd3d.framework
 
             _texture.realName = _name;
             let tType = this.t_Normal;
-            if (_name.indexOf(".astc") >= 0)
-            {
+            if (_name.indexOf(".astc") >= 0) {
                 tType = this.t_ASTC;
             }
-            else if (_name.indexOf(".pvr.bin") >= 0)
-            {
+            else if (_name.indexOf(".pvr.bin") >= 0) {
                 tType = this.t_PVR;
             }
-            else if (_name.indexOf(".ktx") >= 0)
-            {
+            else if (_name.indexOf(".ktx") >= 0) {
                 tType = this.t_KTX;
             }
-            else if (_name.indexOf(".dds.bin") >= 0)
-            {
+            else if (_name.indexOf(".dds.bin") >= 0) {
                 tType = this.t_DDS;
             }
-            let imgGuid = dwguid || bundle.texs[_name];
+            else if (_name.indexOf(".raw") >= 0) {
+                tType = this.t_RAW;
+            }
+            let imgGuid = dwguid || bundle.texs[_name] || bundle.files[_name];
             let img = assetMgr.mapImage[imgGuid] || assetMgr.mapLoading[imgGuid].data;
             //构建贴图
-            switch (tType)
-            {
+            switch (tType) {
                 case this.t_Normal:
                     var t2d = new gd3d.render.glTexture2D(assetmgr.webgl, _textureFormat);
-                    if (img)
-                    {
+                    if (img) {
                         t2d.uploadImage(img, _mipmap, _linear, _premultiplyAlpha, _repeat);
                     }
                     _texture.glTexture = t2d;
+                    break;
+                case this.t_RAW:
+                    //检查是否有 已经解析完的 资源了 
+                        //替换原有资源
+                    _texture.glTexture = RAWParse.parseByAtt(assetmgr.webgl, img, _mipmap, _linear, _premultiplyAlpha, _repeat);
                     break;
                 case this.t_ASTC:
                     _texture.glTexture = ASTCParse.parse(assetmgr.webgl, img);
@@ -230,8 +229,7 @@ namespace gd3d.framework
             return _texture;
         }
 
-        needDownload(text: string)
-        {
+        needDownload(text: string) {
             let json = JSON.parse(text);
             return json.name;
         }

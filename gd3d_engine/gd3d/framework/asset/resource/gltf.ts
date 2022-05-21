@@ -147,7 +147,7 @@ namespace gd3d.framework
                 });
             });
             const defaltScene = this.data.scene ?? 0;
-            const extensionsUsed = this.data.extensionsUsed as string[];
+            const extensionsUsed = this.data.extensionsUsed as string[] ?? [];
 
             const loadImg = ( url ) => new Promise((res) => {
                 gd3d.io.loadImg(folder + url, (img, err) => {

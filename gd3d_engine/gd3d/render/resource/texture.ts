@@ -13,6 +13,7 @@
         PVRTC2_RGB = 4,
         PVRTC2_RGBA = 4,
         KTX = 5,
+        FLOAT16 = 6,
         ASTC_RGBA_4x4,
         ASTC_RGBA_5x4,
         ASTC_RGBA_5x5,
@@ -324,7 +325,7 @@
             //this.img = null;
 
         }
-        uploadByteArray(mipmap: boolean, linear: boolean, width: number, height: number, data: Uint8Array | Float32Array, repeat: boolean = false, mirroredU: boolean = false, mirroredV: boolean = false, premultiplyAlpha = true, flipY = true, dataType: number = this.webgl.UNSIGNED_BYTE): void {
+        uploadByteArray(mipmap: boolean, linear: boolean, width: number, height: number, data: Uint8Array | Uint16Array | Float32Array, repeat: boolean = false, mirroredU: boolean = false, mirroredV: boolean = false, premultiplyAlpha = true, flipY = true, dataType: number = this.webgl.UNSIGNED_BYTE): void {
             this.width = width;
             this.height = height;
             this.mipmap = mipmap;
@@ -348,6 +349,12 @@
             var formatGL = this.webgl.RGBA;
             if (this.format == TextureFormatEnum.RGB)
                 formatGL = this.webgl.RGB;
+            else if (this.format == TextureFormatEnum.FLOAT16) {
+                formatGL = this.webgl.RGBA;
+                var ext = this.webgl.getExtension('OES_texture_half_float');
+                if (ext == null) throw "nit support oes";
+                dataType = ext.HALF_FLOAT_OES;
+            }
             else if (this.format == TextureFormatEnum.Gray)
                 formatGL = this.webgl.LUMINANCE;
             this.webgl.texImage2D(this.webgl.TEXTURE_2D,
@@ -358,8 +365,8 @@
                 0,
                 formatGL,
                 //最后这个type，可以管格式
-                dataType
-                , data);
+                dataType,
+                data);
             if (mipmap) {
                 //生成mipmap
                 this.webgl.generateMipmap(this.webgl.TEXTURE_2D);
@@ -557,8 +564,7 @@
             return t;
         }
 
-        static particleTexture(webgl: WebGLRenderingContext,name = framework.defTexture.particle)
-        {
+        static particleTexture(webgl: WebGLRenderingContext, name = framework.defTexture.particle) {
             var t = glTexture2D.mapTexture[name];
             if (t != undefined)
                 return t;
@@ -608,35 +614,34 @@
             this.texture = webgl.createTexture();
         }
         uploadImages(
-            Texture_NEGATIVE_X: framework.texture ,
-            Texture_NEGATIVE_Y: framework.texture ,
-            Texture_NEGATIVE_Z: framework.texture ,
-            Texture_POSITIVE_X: framework.texture ,
-            Texture_POSITIVE_Y: framework.texture ,
-            Texture_POSITIVE_Z: framework.texture ,
+            Texture_NEGATIVE_X: framework.texture,
+            Texture_NEGATIVE_Y: framework.texture,
+            Texture_NEGATIVE_Z: framework.texture,
+            Texture_POSITIVE_X: framework.texture,
+            Texture_POSITIVE_Y: framework.texture,
+            Texture_POSITIVE_Z: framework.texture,
             min = WebGLRenderingContext.NEAREST, max = WebGLRenderingContext.NEAREST, mipmap: number = null
         ) {
-                let wrc = this.webgl;
+            let wrc = this.webgl;
 
-                let textures = [Texture_NEGATIVE_X,Texture_NEGATIVE_Y,Texture_NEGATIVE_Z,Texture_POSITIVE_X,Texture_POSITIVE_Y,Texture_POSITIVE_Z];
-                const typeArr = [wrc.TEXTURE_CUBE_MAP_NEGATIVE_X,wrc.TEXTURE_CUBE_MAP_NEGATIVE_Y,wrc.TEXTURE_CUBE_MAP_NEGATIVE_Z,wrc.TEXTURE_CUBE_MAP_POSITIVE_X,wrc.TEXTURE_CUBE_MAP_POSITIVE_Y,wrc.TEXTURE_CUBE_MAP_POSITIVE_Z];
-                for(var i=0; i<typeArr.length ;i++){
-                    let reader = (textures[i].glTexture as glTexture2D).getReader();
-                    if(!reader){
-                        console.warn(`getReader() fail : ${textures[i].getName()}`);
-                        return ;
-                    }
-                    this.upload(reader.data,reader.width,reader.height,typeArr[i]);
+            let textures = [Texture_NEGATIVE_X, Texture_NEGATIVE_Y, Texture_NEGATIVE_Z, Texture_POSITIVE_X, Texture_POSITIVE_Y, Texture_POSITIVE_Z];
+            const typeArr = [wrc.TEXTURE_CUBE_MAP_NEGATIVE_X, wrc.TEXTURE_CUBE_MAP_NEGATIVE_Y, wrc.TEXTURE_CUBE_MAP_NEGATIVE_Z, wrc.TEXTURE_CUBE_MAP_POSITIVE_X, wrc.TEXTURE_CUBE_MAP_POSITIVE_Y, wrc.TEXTURE_CUBE_MAP_POSITIVE_Z];
+            for (var i = 0; i < typeArr.length; i++) {
+                let reader = (textures[i].glTexture as glTexture2D).getReader();
+                if (!reader) {
+                    console.warn(`getReader() fail : ${textures[i].getName()}`);
+                    return;
                 }
-                wrc.texParameteri(wrc.TEXTURE_CUBE_MAP, wrc.TEXTURE_MIN_FILTER, min);
-                wrc.texParameteri(wrc.TEXTURE_CUBE_MAP, wrc.TEXTURE_MAG_FILTER, max);
-                wrc.texParameteri(wrc.TEXTURE_CUBE_MAP, wrc.TEXTURE_WRAP_S, wrc.CLAMP_TO_EDGE);
-                wrc.texParameteri(wrc.TEXTURE_CUBE_MAP, wrc.TEXTURE_WRAP_T, wrc.CLAMP_TO_EDGE);
+                this.upload(reader.data, reader.width, reader.height, typeArr[i]);
+            }
+            wrc.texParameteri(wrc.TEXTURE_CUBE_MAP, wrc.TEXTURE_MIN_FILTER, min);
+            wrc.texParameteri(wrc.TEXTURE_CUBE_MAP, wrc.TEXTURE_MAG_FILTER, max);
+            wrc.texParameteri(wrc.TEXTURE_CUBE_MAP, wrc.TEXTURE_WRAP_S, wrc.CLAMP_TO_EDGE);
+            wrc.texParameteri(wrc.TEXTURE_CUBE_MAP, wrc.TEXTURE_WRAP_T, wrc.CLAMP_TO_EDGE);
 
-                if (mipmap !== null)
-                {
-                    wrc.generateMipmap(wrc.TEXTURE_CUBE_MAP);
-                }
+            if (mipmap !== null) {
+                wrc.generateMipmap(wrc.TEXTURE_CUBE_MAP);
+            }
 
         }
 

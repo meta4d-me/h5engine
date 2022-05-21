@@ -4440,6 +4440,34 @@ declare enum ChannelTypes {
     UnsignedFloat = 13
 }
 declare namespace gd3d.framework {
+    class RAWParse {
+        private static readonly HEADER_SIZE_X;
+        private static readonly HEADER_SIZE_Y;
+        private static readonly HEADER_SIZE_Z;
+        private static readonly HEADER_MAX;
+        private static gLInternalFormat;
+        private static pixelWidth;
+        private static pixelHeight;
+        /**
+         *
+         * @param gl WebGLRenderingContext
+         * @param arrayBuffer contents of the ASTC container file
+         */
+        static parse(gl: WebGLRenderingContext, arrayBuffer: ArrayBuffer): render.glTexture2D;
+        /**
+         * 解析纹理 通过参数
+         * @param gl
+         * @param arrayBuffer
+         * @param _mipmap
+         * @param _linear
+         * @param _premultiplyAlpha
+         * @param _repeat
+         * @returns
+         */
+        static parseByAtt(gl: WebGLRenderingContext, arrayBuffer: ArrayBuffer, _mipmap?: boolean, _linear?: boolean, _premultiplyAlpha?: boolean, _repeat?: boolean): render.glTexture2D;
+    }
+}
+declare namespace gd3d.framework {
     /**
      * @public
      * @language zh_CN
@@ -4590,43 +4618,45 @@ declare namespace gd3d.framework {
          * ARM 压缩纹理，ios 、android 通用
          */
         ASTC = 21,
-        F14Effect = 22,
+        /** float 16 texture */
+        RAW = 22,
+        F14Effect = 23,
         /**
          * @public
          * @language zh_CN
          * dds贴图
          * @version gd3d 1.0
          */
-        DDS = 23,
+        DDS = 24,
         /**
          * @public
          * @language zh_CN
          * 场景
          * @version gd3d 1.0
          */
-        Scene = 24,
+        Scene = 25,
         /**
          * @public
          * @language zh_CN
          * 预设
          * @version gd3d 1.0
          */
-        Prefab = 25,
-        cPrefab = 26,
+        Prefab = 26,
+        cPrefab = 27,
         /**
          * 粒子系统
          */
-        ParticleSystem = 27,
+        ParticleSystem = 28,
         /**
          * 拖尾
          */
-        TrailRenderer = 28,
+        TrailRenderer = 29,
         /**
          * HDR贴图
          */
-        HDR = 29,
-        GLTF = 30,
-        BIN = 31
+        HDR = 30,
+        GLTF = 31,
+        BIN = 32
     }
     /**
      * @public
@@ -4769,17 +4799,22 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class assetBundle {
+    type fileIdMap = {
+        [name: string]: number;
+    };
+    export class assetBundle {
         private assetmgr;
         /** 解析后清理 加载缓存资源数据 */
         static needClearLoadedRes: boolean;
         static idNext: number;
-        files: {
-            [key: string]: number;
-        };
-        texs: {
-            [name: string]: number;
-        };
+        /** 关注的 二进制 纹理格式 字符串 */
+        private static careBinTexMap;
+        /** 关注的 基础 纹理格式 字符串 */
+        private static careBaseTexMap;
+        /** 修复 texs map */
+        private static enableFixTexs;
+        files: fileIdMap;
+        texs: fileIdMap;
         pkgs: string[];
         pkgsGuid: number[];
         url: string;
@@ -4798,12 +4833,14 @@ declare namespace gd3d.framework {
         static reTryTest: {};
         constructor(url: string, assetmgr: assetMgr, guid?: number);
         static buildGuid(): number;
+        private getFixBundleTextures;
         parseBundle(data: string): Promise<unknown>;
         private unpkg;
         parseFile(): Promise<void>;
         unload(disposeNow?: boolean): void;
         fail(error: Error): void;
     }
+    export {};
 }
 declare namespace gd3d.framework {
     type loadCallback = (state?: stateLoad) => void;
@@ -4996,6 +5033,7 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     class defTexture {
         static readonly white = "white";
+        static readonly black = "black";
         static readonly gray = "gray";
         static readonly normal = "normal";
         static readonly grid = "grid";
@@ -5117,6 +5155,11 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class AssetFactory_RAW implements IAssetFactory {
+        parse(assetmgr: assetMgr, bundle: assetBundle, name: string, bytes: ArrayBuffer, dwguid: number): texture;
+    }
+}
+declare namespace gd3d.framework {
     class AssetFactory_Scene implements IAssetFactory {
         parse(assetmgr: assetMgr, bundle: assetBundle, name: string, txt: string): Promise<rawscene>;
     }
@@ -5145,6 +5188,7 @@ declare namespace gd3d.framework {
         private readonly t_DDS;
         private readonly t_KTX;
         private readonly t_ASTC;
+        private readonly t_RAW;
         parse(assetmgr: assetMgr, bundle: assetBundle, name: string, data: string, dwguid: number): texture;
         needDownload(text: string): any;
     }
@@ -6749,6 +6793,7 @@ declare namespace gd3d.framework {
         refreshLayerAndQue(): void;
         update(delta: number): void;
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
+        private static getLightMap_01Img;
         private static onGpuInsDisableAttribute;
         static GpuInstancingRender(context: renderContext, instanceArray: gd3d.math.ReuseArray<IRendererGpuIns>, cacheBuffer?: Float32Array): void;
         static GpuInstancingRenderBatcher(context: renderContext, batcher: meshGpuInsBatcher): void;
@@ -18542,6 +18587,7 @@ declare namespace gd3d.framework {
         private _floatLightIntensity;
         private _floatLightSpotAngleCos;
         lightmap: gd3d.framework.texture;
+        lightmap_01: gd3d.framework.texture;
         lightmapUV: number;
         lightmapOffset: gd3d.math.vector4;
         fog: Fog;
@@ -20453,6 +20499,8 @@ declare namespace gd3d.framework {
          * @private
          */
         static readonly RESOURCES_MESH_CUBE = "cube";
+        /** 匹配文件后缀 */
+        private static suffixPattern;
         /**
          * @public
          * @language zh_CN
@@ -20483,6 +20531,12 @@ declare namespace gd3d.framework {
          */
         static firstCharToLowerCase(str: string): string;
         static isNullOrEmptyObject(obj: any): boolean;
+        /**
+         * 获取文件的 后缀
+         * @param filePath 文件字符串
+         * @returns
+         */
+        static GetSuffix(filePath: string): string;
     }
 }
 declare namespace gd3d.framework {
@@ -22510,20 +22564,21 @@ declare namespace gd3d.render {
         PVRTC2_RGB = 4,
         PVRTC2_RGBA = 4,
         KTX = 5,
-        ASTC_RGBA_4x4 = 6,
-        ASTC_RGBA_5x4 = 7,
-        ASTC_RGBA_5x5 = 8,
-        ASTC_RGBA_6x5 = 9,
-        ASTC_RGBA_6x6 = 10,
-        ASTC_RGBA_8x5 = 11,
-        ASTC_RGBA_8x6 = 12,
-        ASTC_RGBA_8x8 = 13,
-        ASTC_RGBA_10x5 = 14,
-        ASTC_RGBA_10x6 = 15,
-        ASTC_RGBA_10x8 = 16,
-        ASTC_RGBA_10x10 = 17,
-        ASTC_RGBA_12x10 = 18,
-        ASTC_RGBA_12x12 = 19
+        FLOAT16 = 6,
+        ASTC_RGBA_4x4 = 7,
+        ASTC_RGBA_5x4 = 8,
+        ASTC_RGBA_5x5 = 9,
+        ASTC_RGBA_6x5 = 10,
+        ASTC_RGBA_6x6 = 11,
+        ASTC_RGBA_8x5 = 12,
+        ASTC_RGBA_8x6 = 13,
+        ASTC_RGBA_8x8 = 14,
+        ASTC_RGBA_10x5 = 15,
+        ASTC_RGBA_10x6 = 16,
+        ASTC_RGBA_10x8 = 17,
+        ASTC_RGBA_10x10 = 18,
+        ASTC_RGBA_12x10 = 19,
+        ASTC_RGBA_12x12 = 20
     }
     /**
      * @private
@@ -22587,7 +22642,7 @@ declare namespace gd3d.render {
         constructor(webgl: WebGLRenderingContext, format?: TextureFormatEnum, mipmap?: boolean, linear?: boolean);
         private getExt;
         uploadImage(img: HTMLImageElement, mipmap: boolean, linear: boolean, premultiply?: boolean, repeat?: boolean, mirroredU?: boolean, mirroredV?: boolean): void;
-        uploadByteArray(mipmap: boolean, linear: boolean, width: number, height: number, data: Uint8Array | Float32Array, repeat?: boolean, mirroredU?: boolean, mirroredV?: boolean, premultiplyAlpha?: boolean, flipY?: boolean, dataType?: number): void;
+        uploadByteArray(mipmap: boolean, linear: boolean, width: number, height: number, data: Uint8Array | Uint16Array | Float32Array, repeat?: boolean, mirroredU?: boolean, mirroredV?: boolean, premultiplyAlpha?: boolean, flipY?: boolean, dataType?: number): void;
         webgl: WebGLRenderingContext;
         loaded: boolean;
         texture: WebGLTexture;

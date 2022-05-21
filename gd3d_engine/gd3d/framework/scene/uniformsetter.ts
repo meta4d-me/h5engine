@@ -60,6 +60,9 @@ namespace gd3d.framework
             this.autoUniformDic["_LightmapTex"]=(context: renderContext)=>{
                 return context.lightmap;
             };
+            this.autoUniformDic["_LightmapTex_01"]=(context: renderContext)=>{
+                return context.lightmap_01;
+            };
             this.autoUniformDic["glstate_lightmapOffset"]=(context: renderContext)=>{
                 return context.lightmapOffset;
             };

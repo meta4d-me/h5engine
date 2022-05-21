@@ -263,6 +263,96 @@
       "min": [
         0.0
       ]
+    },
+    {
+      "bufferView": 17,
+      "componentType": 5126,
+      "count": 550,
+      "type": "VEC3",
+      "max": [
+        0.5,
+        1.0,
+        0.5
+      ],
+      "min": [
+        -0.5,
+        -1.0,
+        -0.5
+      ]
+    },
+    {
+      "bufferView": 18,
+      "componentType": 5126,
+      "count": 550,
+      "type": "VEC3",
+      "max": [
+        0.99871253967285156,
+        1.0,
+        0.99871253967285156
+      ],
+      "min": [
+        -0.99871253967285156,
+        -0.99999916553497314,
+        -0.99871253967285156
+      ]
+    },
+    {
+      "bufferView": 19,
+      "componentType": 5126,
+      "count": 550,
+      "type": "VEC4",
+      "max": [
+        1.0,
+        0.0303095281124115,
+        1.0,
+        1.0
+      ],
+      "min": [
+        -1.0,
+        -0.031331468373537064,
+        -1.0,
+        -1.0
+      ]
+    },
+    {
+      "bufferView": 20,
+      "componentType": 5126,
+      "count": 550,
+      "type": "VEC2",
+      "max": [
+        0.99892324209213257,
+        0.99884068965911865
+      ],
+      "min": [
+        -0.0010808706283569336,
+        -5.3644180297851563E-06
+      ]
+    },
+    {
+      "bufferView": 21,
+      "componentType": 5126,
+      "count": 550,
+      "type": "VEC2",
+      "max": [
+        0.99924451112747192,
+        1.0
+      ],
+      "min": [
+        0.0,
+        0.20864897966384888
+      ]
+    },
+    {
+      "bufferView": 22,
+      "componentType": 5123,
+      "count": 2496,
+      "type": "SCALAR",
+      "max": [
+        549.0
+      ],
+      "min": [
+        0.0
+      ]
     }
   ],
   "asset": {
@@ -270,8 +360,8 @@
   },
   "buffers": [
     {
-      "uri": "1.bin",
-      "byteLength": 41236
+      "uri": "pbrLightMap.bin",
+      "byteLength": 77028
     }
   ],
   "bufferViews": [
@@ -358,12 +448,42 @@
       "buffer": 0,
       "byteOffset": 40636,
       "byteLength": 600
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 41236,
+      "byteLength": 6600
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 47836,
+      "byteLength": 6600
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 54436,
+      "byteLength": 8800
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 63236,
+      "byteLength": 4400
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 67636,
+      "byteLength": 4400
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 72036,
+      "byteLength": 4992
     }
   ],
   "cameras": [
     {
       "perspective": {
-        "aspectRatio": 1.3333333730697632,
+        "aspectRatio": 2.3204271793365479,
         "yfov": 1.0471975803375244,
         "zfar": 1000.1340942382813,
         "znear": 0.30000001192092896
@@ -389,14 +509,16 @@
     {
       "pbrMetallicRoughness": {
         "metallicFactor": 0.0,
-        "roughnessFactor": 0.5
+        "roughnessFactor": 0.16600000858306885
       },
-      "emissiveFactor": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "name": "Default-Material"
+      "name": "000"
+    },
+    {
+      "pbrMetallicRoughness": {
+        "metallicFactor": 0.32499998807907104,
+        "roughnessFactor": 0.1809999942779541
+      },
+      "name": "003"
     }
   ],
   "meshes": [
@@ -491,7 +613,7 @@
             "TEXCOORD_1": 4
           },
           "indices": 5,
-          "material": 0,
+          "material": 1,
           "extensions": {
             "gd_linfo": {
               "index": 0,
@@ -506,6 +628,22 @@
         }
       ],
       "name": "a"
+    },
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 17,
+            "NORMAL": 18,
+            "TANGENT": 19,
+            "TEXCOORD_0": 20,
+            "TEXCOORD_1": 21
+          },
+          "indices": 22,
+          "material": 2
+        }
+      ],
+      "name": "Capsule"
     }
   ],
   "nodes": [
@@ -520,10 +658,10 @@
     },
     {
       "rotation": [
-        0.408217877,
-        0.234569684,
-        -0.109381631,
-        0.8754261
+        0.4281175,
+        0.0116384374,
+        0.018647952,
+        0.9034557
       ],
       "translation": [
         1.609144,
@@ -579,6 +717,35 @@
         0.0
       ],
       "name": "plihgt"
+    },
+    {
+      "rotation": [
+        0.408217877,
+        0.234569684,
+        -0.109381631,
+        0.8754261
+      ],
+      "translation": [
+        2.2,
+        1.77,
+        3.26
+      ],
+      "name": "plihgt (1)"
+    },
+    {
+      "mesh": 4,
+      "rotation": [
+        0.468326151,
+        0.529583037,
+        0.0260818638,
+        0.706775963
+      ],
+      "translation": [
+        -4.616,
+        0.886,
+        -0.339
+      ],
+      "name": "Capsule"
     }
   ],
   "scene": 0,
@@ -590,14 +757,16 @@
         2,
         4,
         5,
-        6
+        6,
+        7,
+        8
       ],
-      "name": "1",
+      "name": "pbrLightMap",
       "extensions": {
         "gd_linfo_scene": {
           "mode": "NonDirectional",
           "maps": [
-            "Assets/1/Lightmap-0_comp_light.png"
+            "Assets/pbrLightMap/Lightmap-0_comp_light.raw"
           ]
         }
       }
