@@ -92,10 +92,12 @@ void main () {
 	vec3 bitangent = cross(v_normal, tangent);// * _glesTangent.w;
 	TBN = mat3(tangent, bitangent, v_normal);
 
+	position = glstate_matrix_mvp * position;
+
 #ifdef FOG
     factor = (glstate_fog_end - abs(position.z))/(glstate_fog_end - glstate_fog_start);
     factor = clamp(factor, 0.0, 1.0);
 #endif
 
-    gl_Position     = glstate_matrix_mvp * position;
+    gl_Position	= position;
 }
