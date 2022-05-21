@@ -61,6 +61,9 @@ class HDR_sample implements IState
         this.scene = this.app.getScene();
         this.assetMgr = this.app.getAssetMgr();
         // gd3d.framework.assetMgr.openGuid = true;
+        if (this.app.webgl.extensions.EXT_shader_texture_lod != null) {
+            this.app.globalMacros.push('TEXTURE_LOD');
+        }
 
         const scene = app.getScene();
 

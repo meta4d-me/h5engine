@@ -214,10 +214,18 @@ void main() {
 
     // vec3 brdf = sRGBtoLINEAR(texture2D(brdf, clamp(vec2(c.NoV, 1. - c.roughness), vec2(0), vec2(1)))).rgb;
     vec2 brdf = DFGApprox(c.NoV, c.roughness);
-    vec3 IBLColor = decoRGBE(textureCubeLodEXT(u_env, c.R, lod));
+    #ifdef TEXTURE_LOD
+        vec3 IBLColor = decoRGBE(textureCubeLodEXT(u_env, c.R, lod));
+    #else
+        vec3 IBLColor = decoRGBE(textureCube(u_env, c.R));
+    #endif
     vec3 IBLspecular = 1.0 * IBLColor * (c.f0 * brdf.x + brdf.y);
     finalColor += IBLspecular * specularIntensity;
-    finalColor += c.diffuse.rgb * decoRGBE(textureCubeLodEXT(u_diffuse, c.R, lod)) * diffuseIntensity;
+    #ifdef TEXTURE_LOD
+        finalColor += c.diffuse.rgb * decoRGBE(textureCubeLodEXT(u_diffuse, c.R, lod)) * diffuseIntensity;
+    #else
+        finalColor += c.diffuse.rgb * decoRGBE(textureCube(u_diffuse, c.R)) * diffuseIntensity;
+    #endif
 
     // finalColor += sRGBtoLINEAR(texture2D(uv_Emissive, xlv_TEXCOORD0 * uvRepeat)).rgb;
 

@@ -4476,6 +4476,9 @@ var HDR_sample = (function () {
         this.app = app;
         this.scene = this.app.getScene();
         this.assetMgr = this.app.getAssetMgr();
+        if (this.app.webgl.extensions.EXT_shader_texture_lod != null) {
+            this.app.globalMacros.push('TEXTURE_LOD');
+        }
         var scene = app.getScene();
         var objCam = new gd3d.framework.transform();
         scene.addChild(objCam);
