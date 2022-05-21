@@ -29,7 +29,7 @@ namespace gd3d.framework {
          * @param _repeat 
          * @returns 
          */
-        public static parseByAtt(gl: WebGLRenderingContext, arrayBuffer: ArrayBuffer, _mipmap = false, _linear = true, _premultiplyAlpha = true, _repeat = true) {
+        public static parseByAtt(gl: WebGLRenderingContext, arrayBuffer: ArrayBuffer, _mipmap = false, _linear = true, _premultiplyAlpha = true, _repeat = false) {
             var reader = new io.binReader(arrayBuffer);
             var w = reader.readUInt16();
             var h = reader.readUInt16();
