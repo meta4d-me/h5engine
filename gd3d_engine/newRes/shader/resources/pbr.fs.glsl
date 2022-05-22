@@ -1,5 +1,7 @@
 #extension GL_OES_standard_derivatives : enable
+#ifdef TEXTURE_LOD
 #extension GL_EXT_shader_texture_lod : enable
+#endif
 #ifdef GL_FRAGMENT_PRECISION_HIGH
 precision highp float;
 #else
