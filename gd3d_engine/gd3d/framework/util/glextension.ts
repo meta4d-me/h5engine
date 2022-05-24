@@ -88,6 +88,12 @@ namespace gd3d.framework
             this.initExtensions(gl);
             this.cacheGLQuery(gl);
             this.wrap(gl);
+
+            //webgl拓展兼容,加宏标记
+            if (this.EXT_shader_texture_lod != null)
+            {
+                sceneMgr.app.globalMacros.push('TEXTURE_LOD');
+            }
         }
 
         private initExtensions(gl: WebGLRenderingContext)

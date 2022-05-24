@@ -63781,6 +63781,10 @@ var gd3d;
                 this.initExtensions(gl);
                 this.cacheGLQuery(gl);
                 this.wrap(gl);
+                //webgl拓展兼容,加宏标记
+                if (this.EXT_shader_texture_lod != null) {
+                    framework.sceneMgr.app.globalMacros.push('TEXTURE_LOD');
+                }
             }
             GLExtension.prototype.initExtensions = function (gl) {
                 this.ANGLE_instanced_arrays = gl.getExtension("ANGLE_instanced_arrays");
