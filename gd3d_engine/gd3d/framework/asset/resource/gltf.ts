@@ -210,11 +210,12 @@ namespace gd3d.framework
                 }
                 if (env)
                 {
-                    mat.setCubeTexture('u_env', env);
+                    // mat.setCubeTexture('u_env', env);
                 }
                 if (irrSH)
                 {
                     mat.setCubeTexture('u_diffuse', irrSH);
+                    mat.setCubeTexture('u_env', irrSH);
                 }
                 if (m.normalTexture)
                 {
