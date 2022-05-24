@@ -44,6 +44,7 @@ class main implements gd3d.framework.IUserCode
             demoList.addBtn("粒子系統", () => new test_ParticleSystem());
             demoList.addBtn("线条", () => new test_LineRenderer());
             demoList.addBtn("拖尾", () => new test_TrailRenderer());
+            demoList.addBtn("使用优化大小的动画", () => new test_optimize_size_animationClip())
             demoList.addBtn("Android平台ETC1压缩纹理", () => new test_ETC1_KTX());
             return new demoList();
         });
