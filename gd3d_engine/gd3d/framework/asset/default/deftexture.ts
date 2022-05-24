@@ -3,6 +3,7 @@ namespace gd3d.framework
     export class defTexture
     {
         static readonly white = "white";
+        static readonly black = "black";
         static readonly gray = "gray";
         static readonly normal = "normal";
         static readonly grid = "grid";
@@ -14,6 +15,11 @@ namespace gd3d.framework
             t.glTexture = gd3d.render.glTexture2D.staticTexture(assetmgr.webgl, this.white);
             t.defaultAsset = true;
             assetmgr.mapDefaultTexture[this.white] = t;
+
+            var t = new texture(this.black);
+            t.glTexture = gd3d.render.glTexture2D.staticTexture(assetmgr.webgl, this.black);
+            t.defaultAsset = true;
+            assetmgr.mapDefaultTexture[this.black] = t;
 
             var t = new texture(this.gray);
             t.glTexture = gd3d.render.glTexture2D.staticTexture(assetmgr.webgl, this.gray);

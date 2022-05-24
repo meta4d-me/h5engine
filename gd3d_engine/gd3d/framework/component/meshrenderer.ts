@@ -357,6 +357,7 @@ namespace gd3d.framework
                     if (scene.lightmaps.length > lightIdx)
                     {
                         context.lightmap = scene.lightmaps[lightIdx];
+                        //context.lightmap_01 = meshRenderer.getLightMap_01Img(context.lightmap);
                         context.lightmapOffset = this.lightmapScaleOffset;
                         context.lightmapUV = mesh.glMesh.vertexFormat & gd3d.render.VertexFormatMask.UV1 ? 1 : 0;
                     }
@@ -368,6 +369,8 @@ namespace gd3d.framework
                     {
                         drawtype = scene.fog ? "lightmap_fog" : "lightmap";
                         context.lightmap = usemat.statedMapUniforms["_LightmapTex"];
+                        //if(context.lightmap.getName){}
+                        //context.lightmap_01 = meshRenderer.getLightMap_01Img(context.lightmap);
                         context.lightmapOffset = this.lightmapScaleOffset;
                         context.lightmapUV = mesh.glMesh.vertexFormat & gd3d.render.VertexFormatMask.UV1 ? 1 : 0;
                     }
@@ -380,6 +383,20 @@ namespace gd3d.framework
                     usemat.draw(context, mesh, sm, drawtype);
             }
 
+        }
+
+        //获取 李总修改 lightMap 第二图
+        private static getLightMap_01Img(lightMapImg : texture) : texture{
+            let imgName = lightMapImg.getName();
+            let srcImgName = `${imgName.substr(0,imgName.length - 13)}_01.imgdesc.json`;
+            let srcImgBundleName = (lightMapImg as IAsset).bundle.name;
+            let assetMgrIns = gd3d.framework.assetMgr.Instance;
+            let lightMapimg_01 = assetMgrIns.getAssetByName(srcImgName,srcImgBundleName) as gd3d.framework.texture;
+            //没有 _LightmapTex_01 给一张默认图（纯黑色）
+            if(!lightMapimg_01){
+                lightMapimg_01 = assetMgrIns.getDefaultTexture("black");
+            }
+            return lightMapimg_01;
         }
 
         private static onGpuInsDisableAttribute (info : meshGpuInstanceDrawInfo){

@@ -52,6 +52,16 @@ varying vec3 v_pos;
 varying vec2 xlv_TEXCOORD0;
 varying mat3 TBN;
 
+#ifdef LIGHTMAP
+uniform lowp sampler2D _LightmapTex;
+varying mediump vec2 lightmap_TEXCOORD;
+lowp vec3 decode_hdr(lowp vec4 data)
+{
+    lowp float power =pow( 2.0 ,data.a * 255.0 - 128.0);
+    return data.rgb * power * 2.0 ;
+}
+#endif
+
 #ifdef FOG
 uniform lowp vec4 glstate_fog_color;
 varying lowp float factor;
@@ -223,19 +233,29 @@ void main() {
     #endif
     vec3 IBLspecular = 1.0 * IBLColor * (c.f0 * brdf.x + brdf.y);
     finalColor += IBLspecular * specularIntensity;
+
+#ifndef LIGHTMAP
+    //有lightMap 时，用lightmap 替代 间接光照的贡献
     #ifdef TEXTURE_LOD
         finalColor += c.diffuse.rgb * decoRGBE(textureCubeLodEXT(u_diffuse, c.R, lod)) * diffuseIntensity;
     #else
         finalColor += c.diffuse.rgb * decoRGBE(textureCube(u_diffuse, c.R)) * diffuseIntensity;
     #endif
-
+#endif
     // finalColor += sRGBtoLINEAR(texture2D(uv_Emissive, xlv_TEXCOORD0 * uvRepeat)).rgb;
+
+    finalColor *= u_Exposure * texture2D(uv_AO, xlv_TEXCOORD0 * uvRepeat).r;
+    finalColor = toneMapACES(finalColor);
+
+#ifdef LIGHTMAP
+    lowp vec4 lightmap = texture2D(_LightmapTex, lightmap_TEXCOORD);
+    // finalColor.xyz *= decode_hdr(lightmap);
+    // finalColor.xyz *= lightmap.xyz;
+    finalColor.xyz += c.diffuse.rgb * lightmap.xyz;
+#endif
 
 #ifdef FOG
     finalColor.xyz = mix(glstate_fog_color.rgb, finalColor.rgb, factor);
 #endif
-
-    finalColor *= u_Exposure * texture2D(uv_AO, xlv_TEXCOORD0 * uvRepeat).r;
-
-    gl_FragColor = vec4(toneMapACES(finalColor), c.diffuse.a);
+    gl_FragColor = vec4(finalColor, c.diffuse.a);
 }

@@ -1,5 +1,8 @@
 {
     "layer": "geometry",
+    "properties": [
+        "u_Exposure('Exposure',Range(0.0,100.0)) = 1.0"
+    ],
     "passes": {
         "base": [
             {

@@ -153,7 +153,8 @@ namespace gd3d.framework
          * ARM 压缩纹理，ios 、android 通用
          */
         ASTC,
-
+        /** float 16 texture */
+        RAW,
         F14Effect,
 
         /**

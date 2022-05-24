@@ -20,13 +20,44 @@
             }
         ],
         "base_fog": [
-
+            {
+                "blendmode": "blend",
+                "showface": "all",
+                "vs": "pbr",
+                "fs": "pbr"
+            }
         ],
         "skin": [
-
+            {
+                "blendmode": "blend",
+                "showface": "all",
+                "vs": "pbr",
+                "fs": "pbr"
+            }
         ],
         "skin_fog": [
-
+            {
+                "blendmode": "blend",
+                "showface": "all",
+                "vs": "pbr",
+                "fs": "pbr"
+            }
+        ],
+        "lightmap": [
+            {
+                "blendmode": "blend",
+                "showface": "all",
+                "vs": "pbr",
+                "fs": "pbr"
+            }
+        ],
+        "lightmap_fog": [
+            {
+                "blendmode": "blend",
+                "showface": "all",
+                "vs": "pbr",
+                "fs": "pbr"
+            }
         ],
         "shadowgen": [],
         "bone": [],

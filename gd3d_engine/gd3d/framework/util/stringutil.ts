@@ -189,6 +189,9 @@ namespace gd3d.framework
          */
         public static readonly RESOURCES_MESH_CUBE = "cube";
 
+        /** 匹配文件后缀 */
+        private static suffixPattern = /(\.([a-z|0-9]*)){1,2}$/;
+
         /**
          * @public
          * @language zh_CN
@@ -244,6 +247,18 @@ namespace gd3d.framework
                 return false
             }
             return true;
+        }
+
+        /**
+         * 获取文件的 后缀
+         * @param filePath 文件字符串 
+         * @returns 
+         */
+        static GetSuffix(filePath : string):string
+        {
+            var _r = this.suffixPattern.exec(filePath);
+            if(_r == null) return "";
+            return _r[0];
         }
     }
 
