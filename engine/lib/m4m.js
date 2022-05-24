@@ -19924,60 +19924,147 @@ var m4m;
                 return new Promise(function (resolve, reject) {
                     try {
                         var read = new m4m.io.binReader(buf);
-                        // var _name =
-                        read.readStringUtf8();
-                        _this.fps = read.readFloat();
-                        var scaleMagic = read.readByte();
-                        _this.hasScaled = scaleMagic == 0xFA;
-                        if (_this.hasScaled) {
-                            console.log("动画有缩放");
+                        if (read.readByte() == 0xFD) {
+                            //版本3，当前版本
+                            read.readStringUtf8();
+                            _this.fps = read.readFloat();
+                            var optimizeSize = read.readBoolean();
+                            _this.hasScaled = read.readBoolean();
                             _this.loop = read.readBoolean();
-                        }
-                        else {
-                            _this.loop = scaleMagic > 0;
-                        }
-                        _this.boneCount = read.readInt();
-                        _this.bones = [];
-                        for (var i = 0; i < _this.boneCount; i++) {
-                            var bonename = read.readStringUtf8();
-                            _this.bones.push(bonename);
-                            _this.indexDic[bonename] = i;
-                        }
-                        _this.indexDic["len"] = _this.boneCount;
-                        _this.subclipCount = read.readInt();
-                        _this.subclips = [];
-                        for (var i = 0; i < _this.subclipCount; i++) {
-                            var _subClip = new subClip();
-                            _subClip.name = read.readStringUtf8();
-                            _subClip.loop = read.readBoolean();
-                            _this.subclips.push(_subClip);
-                        }
-                        _this.frameCount = read.readInt();
-                        _this.frames = {};
-                        // byte stride
-                        var bs = _this.hasScaled
-                            ? 8
-                            : 7;
-                        for (var i = 0; i < _this.frameCount; i++) {
-                            var _fid = read.readInt().toString();
-                            var _key = read.readBoolean();
-                            var _frame = new Float32Array(_this.boneCount * bs + 1);
-                            _frame[0] = _key ? 1 : 0;
-                            var _boneInfo = new PoseBoneMatrix();
-                            for (var i_1 = 0; i_1 < _this.boneCount; i_1++) {
-                                _boneInfo.load(read, _this.hasScaled);
-                                _frame[i_1 * bs + 1] = _boneInfo.r.x;
-                                _frame[i_1 * bs + 2] = _boneInfo.r.y;
-                                _frame[i_1 * bs + 3] = _boneInfo.r.z;
-                                _frame[i_1 * bs + 4] = _boneInfo.r.w;
-                                _frame[i_1 * bs + 5] = _boneInfo.t.x;
-                                _frame[i_1 * bs + 6] = _boneInfo.t.y;
-                                _frame[i_1 * bs + 7] = _boneInfo.t.z;
-                                if (_this.hasScaled) {
-                                    _frame[i_1 * bs + 8] = _boneInfo.s;
+                            _this.boneCount = read.readInt();
+                            _this.bones = [];
+                            for (var i = 0; i < _this.boneCount; i++) {
+                                var bonename = read.readStringUtf8();
+                                _this.bones.push(bonename);
+                                _this.indexDic[bonename] = i;
+                            }
+                            _this.indexDic["len"] = _this.boneCount;
+                            _this.subclipCount = read.readInt();
+                            _this.subclips = [];
+                            for (var i = 0; i < _this.subclipCount; i++) {
+                                var _subClip = new subClip();
+                                _subClip.name = read.readStringUtf8();
+                                _subClip.loop = read.readBoolean();
+                                _this.subclips.push(_subClip);
+                            }
+                            _this.frameCount = read.readInt();
+                            _this.frames = {};
+                            // byte stride
+                            var bs = _this.hasScaled ? 8 : 7;
+                            var minVals = [];
+                            var maxVals = [];
+                            if (optimizeSize) {
+                                for (var i = 0; i < bs; i++) {
+                                    minVals.push(read.readFloat());
+                                    maxVals.push(read.readFloat());
                                 }
                             }
-                            _this.frames[_fid] = _frame;
+                            for (var i = 0; i < _this.frameCount; i++) {
+                                var _fid = read.readInt().toString();
+                                var _key = read.readBoolean();
+                                var _frame = new Float32Array(_this.boneCount * bs + 1);
+                                _frame[0] = _key ? 1 : 0;
+                                var _boneInfo = new PoseBoneMatrix();
+                                for (var i_1 = 0; i_1 < _this.boneCount; i_1++) {
+                                    _boneInfo.load(read, _this.hasScaled, optimizeSize ? { maxVals: maxVals, minVals: minVals } : null);
+                                    _frame[i_1 * bs + 1] = _boneInfo.r.x;
+                                    _frame[i_1 * bs + 2] = _boneInfo.r.y;
+                                    _frame[i_1 * bs + 3] = _boneInfo.r.z;
+                                    _frame[i_1 * bs + 4] = _boneInfo.r.w;
+                                    _frame[i_1 * bs + 5] = _boneInfo.t.x;
+                                    _frame[i_1 * bs + 6] = _boneInfo.t.y;
+                                    _frame[i_1 * bs + 7] = _boneInfo.t.z;
+                                    if (_this.hasScaled) {
+                                        _frame[i_1 * bs + 8] = _boneInfo.s;
+                                    }
+                                }
+                                _this.frames[_fid] = _frame;
+                            }
+                        }
+                        else {
+                            //重新开始读
+                            read.seek(0);
+                            // var _name =
+                            read.readStringUtf8();
+                            _this.fps = read.readFloat();
+                            var magic = read.readByte();
+                            var optimizeSize = false;
+                            if (magic == 0) //版本1
+                             {
+                                _this.hasScaled = false;
+                                _this.loop = false;
+                            }
+                            else if (magic == 1) //版本1
+                             {
+                                _this.hasScaled = false;
+                                _this.loop = true;
+                            }
+                            else if (magic == 0xFA) //版本1
+                             {
+                                _this.hasScaled = true;
+                                _this.loop = read.readBoolean();
+                            }
+                            else if (magic == 0xFB) //版本2
+                             {
+                                optimizeSize = true;
+                                _this.hasScaled = false;
+                                _this.loop = read.readBoolean();
+                            }
+                            else if (magic == 0xFC) //版本2
+                             {
+                                optimizeSize = true;
+                                _this.hasScaled = true;
+                                _this.loop = read.readBoolean();
+                            }
+                            _this.boneCount = read.readInt();
+                            _this.bones = [];
+                            for (var i = 0; i < _this.boneCount; i++) {
+                                var bonename = read.readStringUtf8();
+                                _this.bones.push(bonename);
+                                _this.indexDic[bonename] = i;
+                            }
+                            _this.indexDic["len"] = _this.boneCount;
+                            _this.subclipCount = read.readInt();
+                            _this.subclips = [];
+                            for (var i = 0; i < _this.subclipCount; i++) {
+                                var _subClip = new subClip();
+                                _subClip.name = read.readStringUtf8();
+                                _subClip.loop = read.readBoolean();
+                                _this.subclips.push(_subClip);
+                            }
+                            _this.frameCount = read.readInt();
+                            _this.frames = {};
+                            // byte stride
+                            var bs = _this.hasScaled ? 8 : 7;
+                            var minVals = [];
+                            var maxVals = [];
+                            if (optimizeSize) {
+                                for (var i = 0; i < 8; i++) {
+                                    minVals.push(read.readFloat());
+                                    maxVals.push(read.readFloat());
+                                }
+                            }
+                            for (var i = 0; i < _this.frameCount; i++) {
+                                var _fid = read.readInt().toString();
+                                var _key = read.readBoolean();
+                                var _frame = new Float32Array(_this.boneCount * bs + 1);
+                                _frame[0] = _key ? 1 : 0;
+                                var _boneInfo = new PoseBoneMatrix();
+                                for (var i_2 = 0; i_2 < _this.boneCount; i_2++) {
+                                    _boneInfo.load(read, _this.hasScaled, optimizeSize ? { maxVals: maxVals, minVals: minVals } : null);
+                                    _frame[i_2 * bs + 1] = _boneInfo.r.x;
+                                    _frame[i_2 * bs + 2] = _boneInfo.r.y;
+                                    _frame[i_2 * bs + 3] = _boneInfo.r.z;
+                                    _frame[i_2 * bs + 4] = _boneInfo.r.w;
+                                    _frame[i_2 * bs + 5] = _boneInfo.t.x;
+                                    _frame[i_2 * bs + 6] = _boneInfo.t.y;
+                                    _frame[i_2 * bs + 7] = _boneInfo.t.z;
+                                    if (_this.hasScaled) {
+                                        _frame[i_2 * bs + 8] = _boneInfo.s;
+                                    }
+                                }
+                                _this.frames[_fid] = _frame;
+                            }
                         }
                     }
                     catch (error) {
@@ -20034,24 +20121,63 @@ var m4m;
                 m4m.math.quatClone(this.r, p.r);
                 return p;
             };
-            PoseBoneMatrix.prototype.load = function (read, hasScaled) {
+            PoseBoneMatrix.prototype.load = function (read, hasScaled, optimizeSize) {
                 if (hasScaled === void 0) { hasScaled = false; }
-                {
-                    var x = read.readSingle();
-                    var y = read.readSingle();
-                    var z = read.readSingle();
-                    var w = read.readSingle();
-                    this.r = new m4m.math.quaternion(x, y, z, w);
+                if (optimizeSize === void 0) { optimizeSize = null; }
+                if (!optimizeSize) {
+                    {
+                        var x = read.readSingle();
+                        var y = read.readSingle();
+                        var z = read.readSingle();
+                        var w = read.readSingle();
+                        this.r = new m4m.math.quaternion(x, y, z, w);
+                    }
+                    {
+                        var x = read.readSingle();
+                        var y = read.readSingle();
+                        var z = read.readSingle();
+                        this.t = new m4m.math.vector3(x, y, z);
+                    }
+                    {
+                        if (hasScaled) {
+                            this.s = read.readSingle();
+                        }
+                    }
                 }
-                {
-                    var x = read.readSingle();
-                    var y = read.readSingle();
-                    var z = read.readSingle();
-                    this.t = new m4m.math.vector3(x, y, z);
-                }
-                {
-                    if (hasScaled) {
-                        this.s = read.readSingle();
+                else {
+                    var minVals = optimizeSize.minVals, maxVals = optimizeSize.maxVals;
+                    {
+                        //原始16byte优化为=》quat存储4 *（1.5 byte）12个位= 6 byte
+                        var byte1 = read.readByte();
+                        var byte2 = read.readByte();
+                        var byte3 = read.readByte();
+                        var byte4 = read.readByte();
+                        var byte5 = read.readByte();
+                        var byte6 = read.readByte();
+                        var x_1 = minVals[0] + (byte1 + ((byte5 & 0x0f) << 8)) * (maxVals[0] - minVals[0]) / 0xfff;
+                        var y_1 = minVals[1] + (byte2 + ((byte5 & 0xf0) << 4)) * (maxVals[1] - minVals[1]) / 0xfff;
+                        var z_1 = minVals[2] + (byte3 + ((byte6 & 0x0f) << 8)) * (maxVals[2] - minVals[2]) / 0xfff;
+                        var w_1 = minVals[3] + (byte4 + ((byte6 & 0xf0) << 4)) * (maxVals[3] - minVals[3]) / 0xfff;
+                        this.r = new m4m.math.quaternion(x_1, y_1, z_1, w_1);
+                    }
+                    {
+                        //原始12byte优化为=》translate存储3 *（1.5 byte）12个位 = 4.5 byte = 5 byte
+                        var byte1 = read.readByte();
+                        var byte2 = read.readByte();
+                        var byte3 = read.readByte();
+                        var byte4 = read.readByte();
+                        var byte5 = read.readByte();
+                        var x_2 = minVals[4] + (byte1 + ((byte4 & 0x0f) << 8)) * (maxVals[4] - minVals[4]) / 0xfff;
+                        var y_2 = minVals[5] + (byte2 + ((byte4 & 0xf0) << 4)) * (maxVals[5] - minVals[5]) / 0xfff;
+                        var z_2 = minVals[6] + (byte3 + (byte5 << 8)) * (maxVals[6] - minVals[6]) / 0xfff;
+                        this.t = new m4m.math.vector3(x_2, y_2, z_2);
+                    }
+                    {
+                        if (hasScaled) {
+                            //scale.x 原始4byte优化为=》1byte
+                            var byte1 = read.readByte();
+                            this.s = minVals[7] + byte1 * (maxVals[7] - minVals[7]) / 0xff;
+                        }
                     }
                 }
             };
@@ -25478,7 +25604,7 @@ var m4m;
                 var vertexCount = read.readUInt32();
                 var fmt = m4m.render.VertexFormatMask;
                 data.pos = [];
-                for (var i_2 = 0; i_2 < vertexCount; ++i_2) {
+                for (var i_3 = 0; i_3 < vertexCount; ++i_3) {
                     data.pos.push({
                         x: read.readSingle(),
                         y: read.readSingle(),
@@ -30481,8 +30607,8 @@ var m4m;
                 }
                 else {
                     // for (let item of this.postQueues)
-                    for (var i_3 = 0, l_1 = this.postQueues.length; i_3 < l_1; ++i_3) {
-                        this.postQueues[i_3].render(scene, context, this);
+                    for (var i_4 = 0, l_1 = this.postQueues.length; i_4 < l_1; ++i_4) {
+                        this.postQueues[i_4].render(scene, context, this);
                     }
                     context.webgl.flush();
                 }
@@ -31241,9 +31367,9 @@ var m4m;
                     return;
                 var index = -1;
                 if (_initFrameData.attrsData.mat != null) {
-                    for (var i_4 = 0; i_4 < this.matDataGroups.length; i_4++) {
-                        if (framework.EffectMatData.beEqual(this.matDataGroups[i_4], _initFrameData.attrsData.mat)) {
-                            index = i_4;
+                    for (var i_5 = 0; i_5 < this.matDataGroups.length; i_5++) {
+                        if (framework.EffectMatData.beEqual(this.matDataGroups[i_5], _initFrameData.attrsData.mat)) {
+                            index = i_5;
                             break;
                         }
                     }
@@ -31307,42 +31433,42 @@ var m4m;
                 // }
                 element.update();
                 subEffectBatcher.effectElements.push(element);
-                for (var i_5 = 0; i_5 < vertexCount; i_5++) {
+                for (var i_6 = 0; i_6 < vertexCount; i_6++) {
                     { //postion
                         var vertex = m4m.math.pool.new_vector3();
-                        vertex.x = vertexArr[i_5 * vertexSize + 0];
-                        vertex.y = vertexArr[i_5 * vertexSize + 1];
-                        vertex.z = vertexArr[i_5 * vertexSize + 2];
+                        vertex.x = vertexArr[i_6 * vertexSize + 0];
+                        vertex.y = vertexArr[i_6 * vertexSize + 1];
+                        vertex.z = vertexArr[i_6 * vertexSize + 2];
                         m4m.math.matrixTransformVector3(vertex, element.curAttrData.matrix, vertex);
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 0] = vertex.x;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 1] = vertex.y;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 2] = vertex.z;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 0] = vertex.x;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 1] = vertex.y;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 2] = vertex.z;
                         m4m.math.pool.delete_vector3(vertex);
                     }
                     { //normal
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 3] = vertexArr[i_5 * vertexSize + 3];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 4] = vertexArr[i_5 * vertexSize + 4];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 5] = vertexArr[i_5 * vertexSize + 5];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 3] = vertexArr[i_6 * vertexSize + 3];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 4] = vertexArr[i_6 * vertexSize + 4];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 5] = vertexArr[i_6 * vertexSize + 5];
                     }
                     { //tangent
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 6] = vertexArr[i_5 * vertexSize + 6];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 7] = vertexArr[i_5 * vertexSize + 7];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 8] = vertexArr[i_5 * vertexSize + 8];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 6] = vertexArr[i_6 * vertexSize + 6];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 7] = vertexArr[i_6 * vertexSize + 7];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 8] = vertexArr[i_6 * vertexSize + 8];
                     }
                     { //color
                         //处理一下颜色，以防灰度值 > 1\
                         var r = m4m.math.floatClamp(element.curAttrData.color.x, 0, 1);
                         var g = m4m.math.floatClamp(element.curAttrData.color.y, 0, 1);
                         var b = m4m.math.floatClamp(element.curAttrData.color.z, 0, 1);
-                        var a = m4m.math.floatClamp(vertexArr[i_5 * vertexSize + 12] * element.curAttrData.alpha, 0, 1);
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 9] = r;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 10] = g;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 11] = b;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 12] = a;
+                        var a = m4m.math.floatClamp(vertexArr[i_6 * vertexSize + 12] * element.curAttrData.alpha, 0, 1);
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * 15 + 9] = r;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * 15 + 10] = g;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * 15 + 11] = b;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * 15 + 12] = a;
                     }
                     { //uv
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 13] = vertexArr[i_5 * vertexSize + 13] * element.curAttrData.tilling.x;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 14] = vertexArr[i_5 * vertexSize + 14] * element.curAttrData.tilling.y;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 13] = vertexArr[i_6 * vertexSize + 13] * element.curAttrData.tilling.x;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 14] = vertexArr[i_6 * vertexSize + 14] * element.curAttrData.tilling.y;
                         //  this.dataForVbo[(this._vercount + i) * total + 13] = vertexArr[i * total + 13] * materialData.tiling.x + materialData.offset.x;
                         // this.dataForVbo[(this._vercount + i) * total + 14] = vertexArr[i * total + 14] * materialData.tiling.y + materialData.offset.y;
                     }
@@ -32425,11 +32551,11 @@ var m4m;
                 if (this.delayElements.length > 0) {
                     if (this.refElements.length > 0)
                         this.refElements = [];
-                    for (var i_6 = this.delayElements.length - 1; i_6 >= 0; i_6--) {
-                        var data = this.delayElements[i_6];
+                    for (var i_7 = this.delayElements.length - 1; i_7 >= 0; i_7--) {
+                        var data = this.delayElements[i_7];
                         if (data.delayTime <= this.playTimer) {
-                            this.addElement(this.delayElements[i_6]);
-                            this.delayElements.splice(i_6, 1);
+                            this.addElement(this.delayElements[i_7]);
+                            this.delayElements.splice(i_7, 1);
                         }
                     }
                 }
@@ -52369,8 +52495,8 @@ var m4m;
                     // 处理喷发
                     var inCycleStart = startTime - cycleStartTime;
                     var inCycleEnd = endTime - cycleStartTime;
-                    for (var i_7 = 0; i_7 < bursts.length; i_7++) {
-                        var burst = bursts[i_7];
+                    for (var i_8 = 0; i_8 < bursts.length; i_8++) {
+                        var burst = bursts[i_8];
                         if (burst.isProbability && inCycleStart <= burst.time && burst.time < inCycleEnd) {
                             emits.push({ time: cycleStartTime + burst.time, num: burst.count.getValue(rateAtDuration) });
                         }

@@ -68,7 +68,7 @@ namespace t
             );
         }
 
-        private addcam(laststate: m4m.framework.taskstate, state: m4m.framework.taskstate)
+        private addcam()
         {
 
             //添加一个摄像机
@@ -81,12 +81,10 @@ namespace t
             objCam.localTranslate = new m4m.math.vector3(0, 10, 10);
             objCam.lookatPoint(new m4m.math.vector3(0, 0, 0));
             objCam.markDirty();//标记为需要刷新
-            state.finish = true;
-
         }
 
         foreground: m4m.framework.transform;
-        private addplane(laststate: m4m.framework.taskstate, state: m4m.framework.taskstate)
+        private addplane()
         {
             {
                 let background = new m4m.framework.transform();
@@ -130,18 +128,17 @@ namespace t
                 var renderer = foreground.gameObject.addComponent("meshRenderer") as m4m.framework.meshRenderer;
                 let meshRender = renderer;
 
-                var sh = this.app.getAssetMgr().getShader("particles_additive.shader.json") as m4m.framework.shader;
+                var sh = this.app.getAssetMgr().getShader("particles_add.shader.json") as m4m.framework.shader;
                 if (sh != null)
                 {
                     meshRender.materials = [];
                     meshRender.materials.push(new m4m.framework.material());
                     meshRender.materials[0].setShader(sh);
                     let texture = this.app.getAssetMgr().getAssetByName("trailtest2.png") as m4m.framework.texture;
-                    meshRender.materials[0].setTexture("_MainTex", texture);
+                    meshRender.materials[0].setTexture("_Main_Tex", texture);
                 }
                 this.foreground = foreground;
             }
-            state.finish = true;
         }
 
 
@@ -150,12 +147,11 @@ namespace t
             console.log("i am here.");
             this.app = app;
             this.scene = this.app.getScene();
-
-            //任务排队执行系统
-            this.taskmgr.addTaskCall(this.loadText.bind(this));
-            this.taskmgr.addTaskCall(this.loadShader.bind(this));
-            this.taskmgr.addTaskCall(this.addplane.bind(this))
-            this.taskmgr.addTaskCall(this.addcam.bind(this));
+            let assetMgr = app.getAssetMgr();
+            util.loadShader(assetMgr)
+                .then(() => util.loadTextures(["res/zg256.png", "res/trailtest2.png"], assetMgr))
+                .then(() => this.addplane())
+                .then(() => util.addCamera(this.scene))
         }
 
         update(delta: number)

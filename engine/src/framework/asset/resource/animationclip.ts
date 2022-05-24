@@ -128,76 +128,175 @@ namespace m4m.framework
          */
         Parse(buf: ArrayBuffer): Promise<animationClip>
         {
-            return new Promise((resolve,reject) =>
+            return new Promise((resolve, reject) =>
             {
                 try
                 {
                     var read: m4m.io.binReader = new m4m.io.binReader(buf);
-                    // var _name =
-                    read.readStringUtf8();
-                    this.fps = read.readFloat();
-                    const scaleMagic = read.readByte();
-                    this.hasScaled = scaleMagic == 0xFA
-                    if (this.hasScaled)
+                    if (read.readByte() == 0xFD)
                     {
-                        console.log("动画有缩放");
+                        //版本3，当前版本
+                        read.readStringUtf8();
+                        this.fps = read.readFloat();
+                        let optimizeSize = read.readBoolean();
+                        this.hasScaled = read.readBoolean();
                         this.loop = read.readBoolean();
-                    } else
-                    {
-                        this.loop = scaleMagic > 0;
-                    }
-
-                    this.boneCount = read.readInt();
-                    this.bones = [];
-                    for (let i = 0; i < this.boneCount; i++)
-                    {
-                        let bonename = read.readStringUtf8();
-                        this.bones.push(bonename);
-                        this.indexDic[bonename] = i;
-                    }
-                    this.indexDic["len"] = this.boneCount;
-
-                    this.subclipCount = read.readInt();
-                    this.subclips = [];
-                    for (let i = 0; i < this.subclipCount; i++)
-                    {
-                        let _subClip = new subClip();
-                        _subClip.name = read.readStringUtf8();
-                        _subClip.loop = read.readBoolean();
-                        this.subclips.push(_subClip);
-                    }
-
-                    this.frameCount = read.readInt();
-                    this.frames = {};
-                    // byte stride
-                    const bs = this.hasScaled
-                        ? 8
-                        : 7;
-
-                    for (let i = 0; i < this.frameCount; i++)
-                    {
-                        let _fid = read.readInt().toString();
-                        let _key = read.readBoolean();
-                        let _frame = new Float32Array(this.boneCount * bs + 1);
-                        _frame[0] = _key ? 1 : 0;
-
-                        let _boneInfo = new PoseBoneMatrix();
+                        this.boneCount = read.readInt();
+                        this.bones = [];
                         for (let i = 0; i < this.boneCount; i++)
                         {
-                            _boneInfo.load(read, this.hasScaled);
-                            _frame[i * bs + 1] = _boneInfo.r.x;
-                            _frame[i * bs + 2] = _boneInfo.r.y;
-                            _frame[i * bs + 3] = _boneInfo.r.z;
-                            _frame[i * bs + 4] = _boneInfo.r.w;
-                            _frame[i * bs + 5] = _boneInfo.t.x;
-                            _frame[i * bs + 6] = _boneInfo.t.y;
-                            _frame[i * bs + 7] = _boneInfo.t.z;
-                            if (this.hasScaled)
+                            let bonename = read.readStringUtf8();
+                            this.bones.push(bonename);
+                            this.indexDic[bonename] = i;
+                        }
+                        this.indexDic["len"] = this.boneCount;
+
+                        this.subclipCount = read.readInt();
+                        this.subclips = [];
+                        for (let i = 0; i < this.subclipCount; i++)
+                        {
+                            let _subClip = new subClip();
+                            _subClip.name = read.readStringUtf8();
+                            _subClip.loop = read.readBoolean();
+                            this.subclips.push(_subClip);
+                        }
+
+                        this.frameCount = read.readInt();
+                        this.frames = {};
+                        // byte stride
+                        const bs = this.hasScaled ? 8 : 7;
+                        let minVals = [];
+                        let maxVals = [];
+                        if (optimizeSize)
+                        {
+                            for (let i = 0; i < bs; i++)
                             {
-                                _frame[i * bs + 8] = _boneInfo.s;
+                                minVals.push(read.readFloat());
+                                maxVals.push(read.readFloat());
                             }
                         }
-                        this.frames[_fid] = _frame;
+
+                        for (let i = 0; i < this.frameCount; i++)
+                        {
+                            let _fid = read.readInt().toString();
+                            let _key = read.readBoolean();
+                            let _frame = new Float32Array(this.boneCount * bs + 1);
+                            _frame[0] = _key ? 1 : 0;
+
+                            let _boneInfo = new PoseBoneMatrix();
+                            for (let i = 0; i < this.boneCount; i++)
+                            {
+                                _boneInfo.load(read, this.hasScaled, optimizeSize ? { maxVals, minVals } : null);
+                                _frame[i * bs + 1] = _boneInfo.r.x;
+                                _frame[i * bs + 2] = _boneInfo.r.y;
+                                _frame[i * bs + 3] = _boneInfo.r.z;
+                                _frame[i * bs + 4] = _boneInfo.r.w;
+                                _frame[i * bs + 5] = _boneInfo.t.x;
+                                _frame[i * bs + 6] = _boneInfo.t.y;
+                                _frame[i * bs + 7] = _boneInfo.t.z;
+                                if (this.hasScaled)
+                                {
+                                    _frame[i * bs + 8] = _boneInfo.s;
+                                }
+                            }
+                            this.frames[_fid] = _frame;
+                        }
+
+                    } else
+                    {
+                        //重新开始读
+                        read.seek(0)
+                        // var _name =
+                        read.readStringUtf8();
+                        this.fps = read.readFloat();
+                        const magic = read.readByte();
+
+                        let optimizeSize = false;
+
+                        if (magic == 0) //版本1
+                        {
+                            this.hasScaled = false;
+                            this.loop = false;
+                        } else if (magic == 1) //版本1
+                        {
+                            this.hasScaled = false;
+                            this.loop = true;
+                        } else if (magic == 0xFA) //版本1
+                        {
+                            this.hasScaled = true;
+                            this.loop = read.readBoolean();
+                        } else if (magic == 0xFB) //版本2
+                        {
+                            optimizeSize = true;
+                            this.hasScaled = false;
+                            this.loop = read.readBoolean();
+                        } else if (magic == 0xFC) //版本2
+                        {
+                            optimizeSize = true;
+                            this.hasScaled = true;
+                            this.loop = read.readBoolean();
+                        }
+
+                        this.boneCount = read.readInt();
+                        this.bones = [];
+                        for (let i = 0; i < this.boneCount; i++)
+                        {
+                            let bonename = read.readStringUtf8();
+                            this.bones.push(bonename);
+                            this.indexDic[bonename] = i;
+                        }
+                        this.indexDic["len"] = this.boneCount;
+
+                        this.subclipCount = read.readInt();
+                        this.subclips = [];
+                        for (let i = 0; i < this.subclipCount; i++)
+                        {
+                            let _subClip = new subClip();
+                            _subClip.name = read.readStringUtf8();
+                            _subClip.loop = read.readBoolean();
+                            this.subclips.push(_subClip);
+                        }
+
+                        this.frameCount = read.readInt();
+                        this.frames = {};
+                        // byte stride
+                        const bs = this.hasScaled ? 8 : 7;
+                        let minVals = [];
+                        let maxVals = [];
+                        if (optimizeSize)
+                        {
+                            for (let i = 0; i < 8; i++)
+                            {
+                                minVals.push(read.readFloat());
+                                maxVals.push(read.readFloat());
+                            }
+                        }
+
+                        for (let i = 0; i < this.frameCount; i++)
+                        {
+                            let _fid = read.readInt().toString();
+                            let _key = read.readBoolean();
+                            let _frame = new Float32Array(this.boneCount * bs + 1);
+                            _frame[0] = _key ? 1 : 0;
+
+                            let _boneInfo = new PoseBoneMatrix();
+                            for (let i = 0; i < this.boneCount; i++)
+                            {
+                                _boneInfo.load(read, this.hasScaled, optimizeSize ? { maxVals, minVals } : null);
+                                _frame[i * bs + 1] = _boneInfo.r.x;
+                                _frame[i * bs + 2] = _boneInfo.r.y;
+                                _frame[i * bs + 3] = _boneInfo.r.z;
+                                _frame[i * bs + 4] = _boneInfo.r.w;
+                                _frame[i * bs + 5] = _boneInfo.t.x;
+                                _frame[i * bs + 6] = _boneInfo.t.y;
+                                _frame[i * bs + 7] = _boneInfo.t.z;
+                                if (this.hasScaled)
+                                {
+                                    _frame[i * bs + 8] = _boneInfo.s;
+                                }
+                            }
+                            this.frames[_fid] = _frame;
+                        }
                     }
                 } catch (error)
                 {
@@ -309,28 +408,71 @@ namespace m4m.framework
             math.quatClone(this.r, p.r);
             return p;
         }
-        load(read: io.binReader, hasScaled = false)
+        load(read: io.binReader, hasScaled = false, optimizeSize: { minVals: number[], maxVals: number[] } = null)
         {
+            if (!optimizeSize)
             {
-                var x = read.readSingle();
-                var y = read.readSingle();
-                var z = read.readSingle();
-                var w = read.readSingle();
-                this.r = new math.quaternion(x, y, z, w);
-            }
-            {
-                var x = read.readSingle();
-                var y = read.readSingle();
-                var z = read.readSingle();
-                this.t = new math.vector3(x, y, z);
-            }
-            {
-                if (hasScaled)
                 {
-                    this.s = read.readSingle();
+                    var x = read.readSingle();
+                    var y = read.readSingle();
+                    var z = read.readSingle();
+                    var w = read.readSingle();
+                    this.r = new math.quaternion(x, y, z, w);
+                }
+                {
+                    var x = read.readSingle();
+                    var y = read.readSingle();
+                    var z = read.readSingle();
+                    this.t = new math.vector3(x, y, z);
+                }
+                {
+                    if (hasScaled)
+                    {
+                        this.s = read.readSingle();
+                    }
+                }
+            } else
+            {
+                let { minVals, maxVals } = optimizeSize;
+                {
+                    //原始16byte优化为=》quat存储4 *（1.5 byte）12个位= 6 byte
+                    let byte1 = read.readByte();
+                    let byte2 = read.readByte();
+                    let byte3 = read.readByte();
+                    let byte4 = read.readByte();
+                    let byte5 = read.readByte();
+                    let byte6 = read.readByte();
+
+                    let x = minVals[0] + (byte1 + ((byte5 & 0x0f) << 8)) * (maxVals[0] - minVals[0]) / 0xfff;
+                    let y = minVals[1] + (byte2 + ((byte5 & 0xf0) << 4)) * (maxVals[1] - minVals[1]) / 0xfff;
+                    let z = minVals[2] + (byte3 + ((byte6 & 0x0f) << 8)) * (maxVals[2] - minVals[2]) / 0xfff;
+                    let w = minVals[3] + (byte4 + ((byte6 & 0xf0) << 4)) * (maxVals[3] - minVals[3]) / 0xfff;
+                    this.r = new math.quaternion(x, y, z, w);
+                }
+                {
+                    //原始12byte优化为=》translate存储3 *（1.5 byte）12个位 = 4.5 byte = 5 byte
+                    let byte1 = read.readByte();
+                    let byte2 = read.readByte();
+                    let byte3 = read.readByte();
+                    let byte4 = read.readByte();
+                    let byte5 = read.readByte();
+
+                    let x = minVals[4] + (byte1 + ((byte4 & 0x0f) << 8)) * (maxVals[4] - minVals[4]) / 0xfff;
+                    let y = minVals[5] + (byte2 + ((byte4 & 0xf0) << 4)) * (maxVals[5] - minVals[5]) / 0xfff;
+                    let z = minVals[6] + (byte3 + (byte5 << 8)) * (maxVals[6] - minVals[6]) / 0xfff;
+                    this.t = new math.vector3(x, y, z);
+                }
+                {
+                    if (hasScaled)
+                    {
+                        //scale.x 原始4byte优化为=》1byte
+                        let byte1 = read.readByte();
+                        this.s = minVals[7] + byte1 * (maxVals[7] - minVals[7]) / 0xff;
+                    }
                 }
             }
         }
+
         static createDefault(): PoseBoneMatrix
         {
             var pt = new PoseBoneMatrix();

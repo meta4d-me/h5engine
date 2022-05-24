@@ -1001,6 +1001,14 @@ declare class test_navMesh implements IState {
     private pointDown;
     update(delta: number): void;
 }
+declare class test_optimize_size_animationClip implements IState {
+    app: m4m.framework.application;
+    scene: m4m.framework.scene;
+    prefab: m4m.framework.transform;
+    start(app: m4m.framework.application): void;
+    camera: m4m.framework.camera;
+    update(delta: number): void;
+}
 declare class test_pbr implements IState {
     app: m4m.framework.application;
     scene: m4m.framework.scene;
