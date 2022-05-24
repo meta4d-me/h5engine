@@ -5351,7 +5351,10 @@ declare namespace gd3d.framework {
         s: math.float;
         static caclByteLength(): number;
         Clone(): PoseBoneMatrix;
-        load(read: io.binReader, hasScaled?: boolean): void;
+        load(read: io.binReader, hasScaled?: boolean, optimizeSize?: {
+            minVals: number[];
+            maxVals: number[];
+        }): void;
         static createDefault(): PoseBoneMatrix;
         copyFrom(src: PoseBoneMatrix): void;
         copyFromData(src: Float32Array, seek: number): void;

@@ -48,6 +48,8 @@ var __extends = (this && this.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -6673,18 +6675,18 @@ var test_optimize_size_animationClip = (function () {
         gd3d.framework.assetMgr.openGuid = true;
         this.app.getAssetMgr().load("./newRes/shader/MainShader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
             if (state.isfinish) {
-                _this.app.getAssetMgr().load("./newRes/pfb/laohu_fs_low/laohu_fs_low.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                _this.app.getAssetMgr().load("./newRes/pfb/elong_prefab/elong_prefab.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                     if (s.isfinish) {
-                        var _prefab = _this.app.getAssetMgr().getAssetByName("laohu_fs_low.prefab.json", "laohu_fs_low.assetbundle.json");
+                        var _prefab = _this.app.getAssetMgr().getAssetByName("elong_prefab.prefab.json", "elong_prefab.assetbundle.json");
                         var prefabObj_1 = _prefab.getCloneTrans();
                         _this.scene.addChild(prefabObj_1);
                         _this.prefab = prefabObj_1;
-                        _this.app.getAssetMgr().load("./newRes/pfb/laohu_fs_low/resources/idle.FBAni.aniclip.bin", gd3d.framework.AssetTypeEnum.Aniclip, function (s) {
+                        _this.app.getAssetMgr().load("./newRes/pfb/elong_prefab/resources/Ready.FBAni.min.aniclip.bin", gd3d.framework.AssetTypeEnum.Aniclip, function (s) {
                             if (s.isfinish) {
                                 var aps = prefabObj_1.gameObject.getComponentsInChildren("aniplayer");
                                 var ap = aps[0];
                                 ap.addClip(s.resstateFirst.res);
-                                ap.play("idle.FBAni.aniclip.bin");
+                                ap.play("Ready.FBAni.min.aniclip.bin");
                             }
                         });
                     }

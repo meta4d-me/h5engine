@@ -14,24 +14,24 @@ class test_optimize_size_animationClip implements IState
         {
             if (state.isfinish)
             {
-                this.app.getAssetMgr().load(`./newRes/pfb/laohu_fs_low/laohu_fs_low.assetbundle.json`, gd3d.framework.AssetTypeEnum.Auto, (s) =>
+                this.app.getAssetMgr().load(`./newRes/pfb/elong_prefab/elong_prefab.assetbundle.json`, gd3d.framework.AssetTypeEnum.Auto, (s) =>
                 {
                     if (s.isfinish)
                     {
-                        var _prefab: gd3d.framework.prefab = this.app.getAssetMgr().getAssetByName(`laohu_fs_low.prefab.json`, "laohu_fs_low.assetbundle.json") as gd3d.framework.prefab;
+                        var _prefab: gd3d.framework.prefab = this.app.getAssetMgr().getAssetByName(`elong_prefab.prefab.json`, "elong_prefab.assetbundle.json") as gd3d.framework.prefab;
                         let prefabObj = _prefab.getCloneTrans();
                         this.scene.addChild(prefabObj);
                         this.prefab = prefabObj;
 
 
-                        this.app.getAssetMgr().load(`./newRes/pfb/laohu_fs_low/resources/idle.FBAni.aniclip.bin`, gd3d.framework.AssetTypeEnum.Aniclip, (s) =>
+                        this.app.getAssetMgr().load(`./newRes/pfb/elong_prefab/resources/Ready.FBAni.min.aniclip.bin`, gd3d.framework.AssetTypeEnum.Aniclip, (s) =>
                         {
                             if (s.isfinish)
                             {
                                 var aps = prefabObj.gameObject.getComponentsInChildren("aniplayer") as gd3d.framework.aniplayer[];
                                 var ap = aps[0];
                                 ap.addClip(s.resstateFirst.res as gd3d.framework.animationClip);
-                                ap.play("idle.FBAni.aniclip.bin");
+                                ap.play("Ready.FBAni.min.aniclip.bin");
                             }
                         });
                     }
