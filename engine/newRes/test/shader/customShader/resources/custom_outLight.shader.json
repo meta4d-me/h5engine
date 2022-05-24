@@ -1,0 +1,41 @@
+{
+    "layer": "geometry",
+    "properties": [
+        "_rimColor ('RimColor', Color) = (1,1,1,1)",
+        "_rimPower('RimPower',Range(0.0,10.0)) = 0.1",
+        "_MainTex('MainTex',Texture)='white'{}",
+        "_AlphaCut('AlphaCut',Range(0.0,1.0)) = 0.5",
+        "_MainTex_ST('MainTex_ST',Vector) = (1,1,0,0)",
+        "_MainColor ('MainColor', Color) = (1,1,1,1)"
+    ],
+    "passes": {
+        "base": [
+            {
+                "showface": "all",
+                "vs": "custom_outLight",
+                "fs": "custom_outLight"
+            }
+        ],
+        "base_fog": [
+            {
+                "showface": "all",
+                "vs": "custom_outLight",
+                "fs": "custom_outLight"
+            }
+        ],
+        "skin": [
+            {
+                "showface": "all",
+                "vs": "custom_outLight",
+                "fs": "custom_outLight"
+            }
+        ],
+        "skin_fog": [
+            {
+                "showface": "all",
+                "vs": "custom_outLight",
+                "fs": "custom_outLight"
+            }
+        ]
+    }
+}
