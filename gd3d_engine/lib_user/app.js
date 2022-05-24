@@ -5765,7 +5765,7 @@ var t;
                 }
             });
         };
-        test_blend.prototype.addcam = function (laststate, state) {
+        test_blend.prototype.addcam = function () {
             var objCam = new gd3d.framework.transform();
             objCam.name = "sth.";
             this.scene.addChild(objCam);
@@ -5775,9 +5775,8 @@ var t;
             objCam.localTranslate = new gd3d.math.vector3(0, 10, 10);
             objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
             objCam.markDirty();
-            state.finish = true;
         };
-        test_blend.prototype.addplane = function (laststate, state) {
+        test_blend.prototype.addplane = function () {
             {
                 var background = new gd3d.framework.transform();
                 background.name = "background";
@@ -5814,26 +5813,27 @@ var t;
                 mesh.mesh = (smesh);
                 var renderer = foreground.gameObject.addComponent("meshRenderer");
                 var meshRender = renderer;
-                var sh = this.app.getAssetMgr().getShader("particles_additive.shader.json");
+                var sh = this.app.getAssetMgr().getShader("particles_add.shader.json");
                 if (sh != null) {
                     meshRender.materials = [];
                     meshRender.materials.push(new gd3d.framework.material());
                     meshRender.materials[0].setShader(sh);
                     var texture = this.app.getAssetMgr().getAssetByName("trailtest2.png");
-                    meshRender.materials[0].setTexture("_MainTex", texture);
+                    meshRender.materials[0].setTexture("_Main_Tex", texture);
                 }
                 this.foreground = foreground;
             }
-            state.finish = true;
         };
         test_blend.prototype.start = function (app) {
+            var _this = this;
             console.log("i am here.");
             this.app = app;
             this.scene = this.app.getScene();
-            this.taskmgr.addTaskCall(this.loadText.bind(this));
-            this.taskmgr.addTaskCall(this.loadShader.bind(this));
-            this.taskmgr.addTaskCall(this.addplane.bind(this));
-            this.taskmgr.addTaskCall(this.addcam.bind(this));
+            var assetMgr = app.getAssetMgr();
+            util.loadShader(assetMgr)
+                .then(function () { return util.loadTextures(["res/zg256.png", "res/trailtest2.png"], assetMgr); })
+                .then(function () { return _this.addplane(); })
+                .then(function () { return util.addCamera(_this.scene); });
         };
         test_blend.prototype.update = function (delta) {
             this.taskmgr.move(delta);
