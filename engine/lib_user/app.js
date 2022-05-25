@@ -17093,177 +17093,46 @@ var dome;
     var db_test_f14eff = (function () {
         function db_test_f14eff() {
             this.timer = 0;
-            this.taskmgr = new m4m.framework.taskMgr();
             this.rot = new m4m.math.quaternion();
-            this.beTrailParticle = false;
-            this.beActive = false;
-            this.currentalpha = 0.9;
-            this.boneIndex = 0;
-            this.count = 0;
-            this.beplay = false;
-            this.a = new m4m.math.vector3(1, 12, 123);
-            this.b = new m4m.math.vector3(1, 12, 123);
-            this.c = new m4m.math.vector3(1, 12, 123);
-            this.enableMove = false;
         }
-        db_test_f14eff.prototype.loadShader = function (laststate, state) {
-            var cuttime = Date.now();
-            this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", m4m.framework.AssetTypeEnum.Auto, function (_state) {
-                if (_state.isfinish) {
-                    state.finish = true;
-                    var endtime = Date.now();
-                    console.log();
-                }
-            });
-        };
         db_test_f14eff.prototype.start = function (app) {
             var _this = this;
             console.log("i am here.");
             this.app = app;
             this.scene = this.app.getScene();
-            this.taskmgr.addTaskCall(this.loadShader.bind(this));
-            this.taskmgr.addTaskCall(this.loadRole.bind(this));
-            this.taskmgr.addTaskCall(this.loadSkill.bind(this));
-            this.taskmgr.addTaskCall(this.addcam.bind(this));
-            this.taskmgr.addTaskCall(this.addcontroll.bind(this));
-            this.taskmgr.addTaskCall(this.loadWeapon.bind(this));
-            this.taskmgr.addTaskCall(this.loadEffectPrefab.bind(this));
-            document.onkeypress = function (ev) {
-                var key = ev.keyCode;
-                var keystr = ev.key.toUpperCase();
-                console.log(keystr);
-                if (keystr == "P" && _this.role != null) {
-                    _this.rotEuler += 1;
-                    m4m.math.quatFromEulerAngles(0, 1, 0, _this.rot);
-                    m4m.math.quatMultiply(_this.role.localRotate, _this.rot, _this.role.localRotate);
-                    _this.role.markDirty();
-                }
-            };
+            util.loadShader(app.getAssetMgr())
+                .then(function () { return _this.loadEffectPrefab(); })
+                .then(function () { return _this.addCamera(); })
+                .then(function () { return _this.addUI(); });
         };
-        db_test_f14eff.prototype.loadmesh = function (laststate, state) {
+        db_test_f14eff.prototype.loadEffectPrefab = function (name) {
             var _this = this;
-            var name = "zs_chuangjue_01";
-            name = "cwc_001";
-            name = "pc1";
-            name = "Quad_1";
-            name = "baoxiang_ceshinn";
-            name = "pc2_MergeSuit_104";
-            this.app.getAssetMgr().load("res/prefabs/" + name + "/" + name + ".assetbundle.json", m4m.framework.AssetTypeEnum.Auto, function (s) {
-                if (s.isfinish) {
-                    var _prefab = _this.app.getAssetMgr().getAssetByName(name + ".prefab.json");
-                    var value = _prefab.getCloneTrans();
-                    _this.model = value;
-                    var skins = _this.model.gameObject.getComponentsInChildren(m4m.framework.StringUtil.COMPONENT_SKINMESHRENDER);
-                    var roleskins = _this.role.gameObject.getComponentsInChildren(m4m.framework.StringUtil.COMPONENT_SKINMESHRENDER);
-                    for (var item in roleskins) {
-                        var skin = roleskins[item];
-                        var nameARR = skin.gameObject.transform.name.split('_');
-                        if (nameARR[1] != null && nameARR[1] == "MergeSuit") {
-                            _this.role.removeChild(skin.gameObject.transform);
-                            _this.role.addChild(skins[0].gameObject.transform);
-                            _this.suitTrans = skins[0].gameObject.transform;
-                            _this.suitSkin = skins[0];
-                        }
-                    }
-                    _this.model.markDirty();
-                    state.finish = true;
-                }
-            });
-        };
-        db_test_f14eff.prototype.loadWeapon = function (laststate, state) {
-            var _this = this;
-            var name = "wp_ds_001";
-            name = "box";
-            this.app.getAssetMgr().load("res/prefabs/" + name + "/" + name + ".assetbundle.json", m4m.framework.AssetTypeEnum.Auto, function (s) {
-                if (s.isfinish) {
-                    var _prefab = _this.app.getAssetMgr().getAssetByName(name + ".prefab.json");
-                    var rhand = _this.role.find("Bip01 Prop1");
-                    var lhand = _this.role.find("Bip01 Prop2");
-                    if (rhand) {
-                        var weapon = _prefab.getCloneTrans();
-                        rhand.addChild(weapon);
-                        weapon.localRotate = new m4m.math.quaternion();
-                        weapon.localTranslate = new m4m.math.vector3();
-                        weapon.localScale = new m4m.math.vector3(1, 1, 1);
-                        weapon.markDirty();
-                    }
-                    if (lhand) {
-                        var weapon = _prefab.getCloneTrans();
-                        lhand.addChild(weapon);
-                        weapon.localRotate = new m4m.math.quaternion();
-                        weapon.localTranslate = new m4m.math.vector3();
-                        weapon.localScale = new m4m.math.vector3(1, 1, 1);
-                        weapon.markDirty();
-                    }
-                    state.finish = true;
-                }
-            });
-        };
-        db_test_f14eff.prototype.loadEffectPrefab = function (laststate, state) {
-            var _this = this;
-            var name = "effprefab";
-            name = "GameObject";
-            name = "ceshi";
-            name = "fx_cg_ui";
-            name = "s_b";
-            name = "fx_zgg_Skill01_S";
-            name = "fx_wp_bj";
-            name = "fx_wd";
-            name = "fx_wd";
-            name = "fx_js";
-            this.app.getAssetMgr().load("res/f14effprefab/" + name + "/" + name + ".assetbundle.json", m4m.framework.AssetTypeEnum.Auto, function (s) {
-                if (s.isfinish) {
-                    var _prefab = _this.app.getAssetMgr().getAssetByName(name + ".prefab.json");
-                    _this.effbaseprefab = _prefab;
-                    var prefab = _prefab.getCloneTrans();
-                    _this.effPrefab = prefab;
-                    var f14Effect = _this.effPrefab.gameObject.getComponent("f14EffectSystem");
-                    _this.f14eff = f14Effect;
-                    if (_this.role) {
-                        _this.role.addChild(_this.effPrefab);
-                    }
-                    else {
+            if (name === void 0) { name = "fx_yh"; }
+            return new Promise(function (resolve, reject) {
+                _this.app.getAssetMgr().load("newRes/f14effprefab/" + name + "/" + name + ".assetbundle.json", m4m.framework.AssetTypeEnum.Auto, function (s) {
+                    if (s.isfinish) {
+                        var _prefab = _this.app.getAssetMgr().getAssetByName(name + ".prefab.json", name + ".assetbundle.json");
+                        _this.effbaseprefab = _prefab;
+                        var prefab = _prefab.getCloneTrans();
+                        _this.effPrefab = prefab;
+                        var f14Effect = _this.effPrefab.gameObject.getComponent("f14EffectSystem");
+                        _this.f14eff = f14Effect;
                         _this.scene.addChild(_this.effPrefab);
+                        resolve();
                     }
-                    var delayTime = f14Effect.delay;
-                    state.finish = true;
-                }
+                });
             });
         };
-        db_test_f14eff.prototype.loadSkill = function (laststate, state) {
-            var _this = this;
-            var name = "xc_skill1.FBAni.aniclip.bin";
-            name = "skill.FBAni.aniclip.bin";
-            name = "pc1_run.FBAni.aniclip.bin";
-            name = "pc2_run.FBAni.aniclip.bin";
-            name = "GWB02_sw_die1.FBAni.aniclip.bin";
-            name = "UIbaoxiang_no_idle.FBAni.aniclip.bin";
-            name = "gmd_xs_run.FBAni.aniclip.bin";
-            name = "Run.FBAni.aniclip.bin";
-            this.SkillName = name;
-            var url = "res/prefabs/" + this.RoleName + "/resources/" + this.SkillName;
-            this.app.getAssetMgr().load(url, m4m.framework.AssetTypeEnum.Auto, function (s) {
-                if (s.isfinish) {
-                    var clip = _this.app.getAssetMgr().getAssetByName(_this.SkillName);
-                    _this.aniPlayer.addClip(clip);
-                    state.finish = true;
-                    console.log("加载技能完成. res name:" + clip.getName());
-                }
-            });
-        };
-        db_test_f14eff.prototype.addcontroll = function (laststate, state) {
+        db_test_f14eff.prototype.addUI = function () {
             this.addButton();
             this.addButton2();
-            state.finish = true;
         };
         db_test_f14eff.prototype.addButton = function () {
             var _this = this;
             var btn = document.createElement("button");
             btn.textContent = "Play";
             btn.onclick = function () {
-                _this.currentalpha *= 0.5;
-                _this.f14eff.changeAlpha(_this.currentalpha);
-                _this.aniPlayer.play(_this.SkillName);
+                _this.f14eff.play();
             };
             btn.style.top = "160px";
             btn.style.position = "absolute";
@@ -17275,13 +17144,12 @@ var dome;
             btn.textContent = "stop";
             btn.onclick = function () {
                 _this.f14eff.stop();
-                _this.enableMove = false;
             };
             btn.style.top = "200px";
             btn.style.position = "absolute";
             this.app.container.appendChild(btn);
         };
-        db_test_f14eff.prototype.addcam = function (laststate, state) {
+        db_test_f14eff.prototype.addCamera = function () {
             var objCam = new m4m.framework.transform();
             objCam.name = "sth.";
             this.scene.addChild(objCam);
@@ -17295,42 +17163,9 @@ var dome;
             objCam.markDirty();
             CameraController.instance().init(this.app, this.camera);
             this.app.getScene().mainCamera = this.camera;
-            state.finish = true;
-        };
-        db_test_f14eff.prototype.loadRole = function (laststate, state) {
-            var _this = this;
-            var name = "hmb";
-            name = "GWB02";
-            name = "UIbaoxiang";
-            name = "gmd";
-            name = "elong";
-            this.RoleName = name;
-            this.app.getAssetMgr().load("res/prefabs/" + name + "/" + name + ".assetbundle.json", m4m.framework.AssetTypeEnum.Auto, function (s) {
-                if (s.isfinish) {
-                    var _prefab = _this.app.getAssetMgr().getAssetByName(name + ".prefab.json");
-                    var role = _prefab.getCloneTrans();
-                    _this.role = role;
-                    _this.aniPlayer = _this.role.gameObject.getComponent("aniplayer");
-                    _this.aniPlayer.autoplay = false;
-                    _this.aniclips = _this.aniPlayer.clips;
-                    _this.scene.addChild(_this.role);
-                    _this.role.markDirty();
-                    var skins = _this.role.gameObject.getComponentsInChildren(m4m.framework.StringUtil.COMPONENT_SKINMESHRENDER);
-                    for (var key in skins) {
-                        skins[key].gameObject.transform.localScale = new m4m.math.vector3(1.2, 1.2, 1.2);
-                        skins[key].gameObject.transform.markDirty();
-                    }
-                    state.finish = true;
-                }
-            });
         };
         db_test_f14eff.prototype.update = function (delta) {
-            this.taskmgr.move(delta);
             CameraController.instance().update(delta);
-            if (this.enableMove) {
-                this.effPrefab.localPosition.z += 0.2;
-                this.effPrefab.markDirty();
-            }
         };
         return db_test_f14eff;
     }());
