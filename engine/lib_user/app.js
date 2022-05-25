@@ -48,6 +48,8 @@ var __extends = (this && this.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -2248,7 +2250,7 @@ var test_f4skin = (function () {
                         this.camera.far = 100;
                         objCam.localTranslate = new m4m.math.vector3(0, 10, -10);
                         objCam.markDirty();
-                        return [4, demoTool.loadbySync("newRes/shader/MainShader.assetbundle.json", this.app.getAssetMgr())];
+                        return [4, util.loadShader(app.getAssetMgr())];
                     case 1:
                         _c.sent();
                         sample = new m4m.framework.transform();
@@ -2265,7 +2267,7 @@ var test_f4skin = (function () {
                         mr.initBoneMatrices();
                         objCam.lookat(sample);
                         loadNameRes = "PF_PlayerSharkAlien";
-                        return [4, demoTool.loadbySync("newRes/pfb/model/" + loadNameRes + "/" + loadNameRes + ".assetbundle.json", this.app.getAssetMgr())];
+                        return [4, util.loadModel(this.app.getAssetMgr(), loadNameRes)];
                     case 2:
                         _c.sent();
                         pf = this.app.getAssetMgr().getAssetByName(loadNameRes + ".prefab.json", loadNameRes + ".assetbundle.json").getCloneTrans();
@@ -13280,9 +13282,9 @@ var test_ShadowMap = (function () {
         var name = "baihu";
         this.app.getAssetMgr().load("newRes/shader/Mainshader.assetbundle.json", m4m.framework.AssetTypeEnum.Auto, function (state) {
             if (state.isfinish) {
-                _this.app.getAssetMgr().load("res/scenes/testshadowmap/testshadowmap.assetbundle.json", m4m.framework.AssetTypeEnum.Auto, function (s) {
+                _this.app.getAssetMgr().load("newRes/scenes/testshadowmap/testshadowmap.assetbundle.json", m4m.framework.AssetTypeEnum.Auto, function (s) {
                     if (s.isfinish) {
-                        var _scene = _this.app.getAssetMgr().getAssetByName("testshadowmap.scene.json");
+                        var _scene = _this.app.getAssetMgr().getAssetByName("testshadowmap.scene.json", "testshadowmap.assetbundle.json");
                         var _root = _scene.getSceneRoot();
                         var assetmgr = _this.app.getAssetMgr();
                         _this.scene.addChild(_root);
@@ -13298,7 +13300,14 @@ var test_ShadowMap = (function () {
                             _this.depthTexture = new m4m.framework.texture("_depth");
                             _this.depthTexture.glTexture = depth.renderTarget;
                         }
-                        _this.collectMat();
+                        var mrs = _root.gameObject.getComponentsInChildren("meshRenderer");
+                        mrs.forEach(function (item) {
+                            item.materials.forEach(function (el) {
+                                if (el.getShader().getName() == _this.shadowSh) {
+                                    _this.mats.push(el);
+                                }
+                            });
+                        });
                         _this.mats.forEach(function (element) {
                             if (element)
                                 element.setTexture("_Light_Depth", _this.depthTexture);

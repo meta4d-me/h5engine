@@ -1,28 +1,22 @@
-class test_ShadowMap implements IState
-{
+class test_ShadowMap implements IState {
     app: m4m.framework.application;
     scene: m4m.framework.scene;
     renderer: m4m.framework.meshRenderer[];
     skinRenders: m4m.framework.skinnedMeshRenderer[];
     assetmgr: m4m.framework.assetMgr;
-    start(app: m4m.framework.application)
-    {
+    start(app: m4m.framework.application) {
         console.log("i am here.");
         this.app = app;
         this.scene = this.app.getScene();
         this.assetmgr = this.app.getAssetMgr();
         this.scene.getRoot().localTranslate = new m4m.math.vector3(0, 0, 0);
         let name = "baihu";
-        this.app.getAssetMgr().load("newRes/shader/Mainshader.assetbundle.json", m4m.framework.AssetTypeEnum.Auto, (state) =>
-        {
-            if (state.isfinish)
-            {
-                this.app.getAssetMgr().load("res/scenes/testshadowmap/testshadowmap.assetbundle.json", m4m.framework.AssetTypeEnum.Auto,
-                    (s) =>
-                    {
-                        if (s.isfinish)
-                        {
-                            var _scene: m4m.framework.rawscene = this.app.getAssetMgr().getAssetByName("testshadowmap.scene.json") as m4m.framework.rawscene;
+        this.app.getAssetMgr().load("newRes/shader/Mainshader.assetbundle.json", m4m.framework.AssetTypeEnum.Auto, (state) => {
+            if (state.isfinish) {
+                this.app.getAssetMgr().load("newRes/scenes/testshadowmap/testshadowmap.assetbundle.json", m4m.framework.AssetTypeEnum.Auto,
+                    (s) => {
+                        if (s.isfinish) {
+                            var _scene: m4m.framework.rawscene = this.app.getAssetMgr().getAssetByName("testshadowmap.scene.json", "testshadowmap.assetbundle.json") as m4m.framework.rawscene;
                             var _root = _scene.getSceneRoot();
                             let assetmgr = this.app.getAssetMgr();
                             this.scene.addChild(_root);
@@ -36,7 +30,6 @@ class test_ShadowMap implements IState
                             this.FitToScene(this.lightcamera, _aabb);
                             this.ShowCameraInfo(this.lightcamera);
 
-
                             {
                                 var depth = new m4m.framework.cameraPostQueue_Depth();
                                 depth.renderTarget = new m4m.render.glRenderTarget(this.scene.webgl, 1024, 1024, true, false);
@@ -47,9 +40,18 @@ class test_ShadowMap implements IState
                                 // m4m.framework.shader.setGlobalTexture ("_Light_Depth",this.depthTexture);
                             }
 
-                            this.collectMat();
-                            this.mats.forEach(element =>
-                            {
+
+                            let mrs = _root.gameObject.getComponentsInChildren("meshRenderer") as m4m.framework.meshRenderer[];
+                            mrs.forEach(item => {
+                                item.materials.forEach(el => {
+                                    if (el.getShader().getName() == this.shadowSh) {
+                                        this.mats.push(el);
+                                    }
+                                })
+                            })
+
+                            // this.collectMat();
+                            this.mats.forEach(element => {
                                 if (element) element.setTexture("_Light_Depth", this.depthTexture);
                             });
                         }
@@ -81,12 +83,10 @@ class test_ShadowMap implements IState
 
     private shadowSh = "shadowmap.shader.json";
     private mats: m4m.framework.material[] = [];
-    private collectMat()
-    {
+    private collectMat() {
         if (!this.assetmgr) return
         let resmap = this.assetmgr.mapRes;
-        for (let key in resmap)
-        {
+        for (let key in resmap) {
             let asset = resmap[key];
             if (!asset["asset"] || !(asset["asset"] instanceof m4m.framework.material)) continue;
             let mat = asset["asset"] as m4m.framework.material;
@@ -95,11 +95,9 @@ class test_ShadowMap implements IState
         }
     }
 
-    private setmat(key: string, value: any)
-    {
+    private setmat(key: string, value: any) {
         if (!this.mats) return;
-        this.mats.forEach(element =>
-        {
+        this.mats.forEach(element => {
             if (element) element.setTexture("_Light_Depth", this.depthTexture);
         });
     }
@@ -116,8 +114,7 @@ class test_ShadowMap implements IState
     posToUV: m4m.math.matrix = new m4m.math.matrix();
     lightProjection: m4m.math.matrix = new m4m.math.matrix();
 
-    update(delta: number)
-    {
+    update(delta: number) {
         this.posToUV.rawData[0] = 0.5;
         this.posToUV.rawData[1] = 0.0;
         this.posToUV.rawData[2] = 0.0;
@@ -152,18 +149,15 @@ class test_ShadowMap implements IState
         m4m.math.matrixMultiply(this.posToUV, this.lightProjection, this.lightProjection);
         // m4m.framework.shader.setGlobalMatrix("_LightProjection", this.lightProjection);
         // m4m.framework.shader.setGlobalFloat("_bias",0.001);
-        this.mats.forEach(element =>
-        {
-            if (element)
-            {
+        this.mats.forEach(element => {
+            if (element) {
                 element.setMatrix("_LightProjection", this.lightProjection);
                 if (element) element.setFloat("_bias", 0.001);
             }
         });
     }
 
-    FitToScene(lightCamera: m4m.framework.camera, aabb: m4m.framework.aabb)
-    {
+    FitToScene(lightCamera: m4m.framework.camera, aabb: m4m.framework.aabb) {
         lightCamera.gameObject.transform.setWorldPosition(new m4m.math.vector3(aabb.center.x, aabb.center.y, aabb.center.z));
 
         let _vec3 = m4m.math.pool.new_vector3();
@@ -183,16 +177,12 @@ class test_ShadowMap implements IState
     inputNear: HTMLInputElement;
     inputFar: HTMLInputElement;
 
-    ShowUI()
-    {
-        document.addEventListener("keydown", (ev) =>
-        {
-            if (ev.key === "c")
-            {
+    ShowUI() {
+        document.addEventListener("keydown", (ev) => {
+            if (ev.key === "c") {
                 if (this.viewcamera.postQueues.length > 0)
                     this.viewcamera.postQueues = [];
-                else
-                {
+                else {
                     var post = new m4m.framework.cameraPostQueue_Quad();
                     post.material.setShader(this.scene.app.getAssetMgr().getShader("mask.shader.json"));
 
@@ -212,11 +202,9 @@ class test_ShadowMap implements IState
         this.inputNear.min = "-15";
         this.inputNear.max = "15";
         this.inputNear.step = "0.1";
-        this.inputNear.oninput = () =>
-        {
+        this.inputNear.oninput = () => {
             let _value = parseFloat(this.inputNear.value);
-            if (_value > this.lightcamera.far)
-            {
+            if (_value > this.lightcamera.far) {
                 _value = this.lightcamera.far;
                 this.inputNear.value = _value.toString();
             }
@@ -241,11 +229,9 @@ class test_ShadowMap implements IState
         this.inputFar.min = "-15";
         this.inputFar.max = "15";
         this.inputFar.step = "0.1";
-        this.inputFar.oninput = () =>
-        {
+        this.inputFar.oninput = () => {
             let _value = parseFloat(this.inputFar.value);
-            if (_value < this.lightcamera.near)
-            {
+            if (_value < this.lightcamera.near) {
                 _value = this.lightcamera.near;
                 this.inputFar.value = _value.toString();
             }
@@ -303,8 +289,7 @@ class test_ShadowMap implements IState
         inputCameraRotateY.min = "-180";
         inputCameraRotateY.max = "180";
         inputCameraRotateY.step = "1";
-        inputCameraRotateY.oninput = () =>
-        {
+        inputCameraRotateY.oninput = () => {
             let _value = parseFloat(inputCameraRotateY.value);
 
             let _angle = this.lightcamera.gameObject.transform.localEulerAngles;
@@ -317,8 +302,7 @@ class test_ShadowMap implements IState
         this.app.container.appendChild(inputCameraRotateY);
     }
 
-    ShowCameraInfo(camera: m4m.framework.camera)
-    {
+    ShowCameraInfo(camera: m4m.framework.camera) {
         let near = camera.near.toString();
         let far = camera.far.toString();
         this.inputNear.value = near;
