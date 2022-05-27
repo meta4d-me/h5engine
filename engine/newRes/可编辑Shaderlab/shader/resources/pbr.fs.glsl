@@ -53,6 +53,7 @@ varying vec2 xlv_TEXCOORD0;
 varying mat3 TBN;
 
 #ifdef LIGHTMAP
+uniform lowp float glstate_lightmapRGBAF16;
 uniform lowp sampler2D _LightmapTex;
 varying mediump vec2 lightmap_TEXCOORD;
 lowp vec3 decode_hdr(lowp vec4 data)
@@ -249,9 +250,12 @@ void main() {
 
 #ifdef LIGHTMAP
     lowp vec4 lightmap = texture2D(_LightmapTex, lightmap_TEXCOORD);
-    // finalColor.xyz *= decode_hdr(lightmap);
-    // finalColor.xyz *= lightmap.xyz;
-    finalColor.xyz += c.diffuse.rgb * lightmap.xyz;
+    if(glstate_lightmapRGBAF16 == 1.0){
+        // finalColor.xyz *= lightmap.xyz;
+        finalColor.xyz += c.diffuse.rgb * lightmap.xyz;
+    }else{
+        finalColor.xyz *= decode_hdr(lightmap);
+    }
 #endif
 
 #ifdef FOG

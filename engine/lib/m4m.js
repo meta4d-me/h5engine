@@ -23455,14 +23455,13 @@ var m4m;
                     var mid = subMeshs[i].matIndex; //根据这个找到使用的具体哪个材质    
                     var usemat = this.materials[mid];
                     var drawtype = scene.fog ? "base_fog" : "base";
+                    context.lightmap = null;
                     if (lightIdx >= 0 && scene.lightmaps.length > 0) {
                         drawtype = scene.fog ? "lightmap_fog" : "lightmap";
                         //usemat.shaderStatus = shaderStatus.Lightmap;
                         if (scene.lightmaps.length > lightIdx) {
                             context.lightmap = scene.lightmaps[lightIdx];
                             //context.lightmap_01 = meshRenderer.getLightMap_01Img(context.lightmap);
-                            context.lightmapOffset = this.lightmapScaleOffset;
-                            context.lightmapUV = mesh.glMesh.vertexFormat & m4m.render.VertexFormatMask.UV1 ? 1 : 0;
                         }
                     }
                     else {
@@ -23471,9 +23470,13 @@ var m4m;
                             context.lightmap = usemat.statedMapUniforms["_LightmapTex"];
                             //if(context.lightmap.getName){}
                             //context.lightmap_01 = meshRenderer.getLightMap_01Img(context.lightmap);
-                            context.lightmapOffset = this.lightmapScaleOffset;
-                            context.lightmapUV = mesh.glMesh.vertexFormat & m4m.render.VertexFormatMask.UV1 ? 1 : 0;
                         }
+                    }
+                    if (context.lightmap && context.lightmap.glTexture) {
+                        context.lightmapOffset = this.lightmapScaleOffset;
+                        context.lightmapUV = mesh.glMesh.vertexFormat & m4m.render.VertexFormatMask.UV1 ? 1 : 0;
+                        var format = context.lightmap.glTexture.format;
+                        context.lightmapRGBAF16 = format == m4m.render.TextureFormatEnum.FLOAT16 ? 1 : 0;
                     }
                     // if (scene.fog)
                     // {
@@ -25228,6 +25231,7 @@ var m4m;
             };
             var material_3;
             material.ClassName = "material";
+            //状态去重忽略列表
             material.sameMatPassMap = {
                 glstate_matrix_model: true,
                 glstate_matrix_world2object: true,
@@ -25239,7 +25243,8 @@ var m4m;
                 boneSampler: true,
                 glstate_lightmapOffset: true,
                 _LightmapTex: true,
-                glstate_lightmapUV: true
+                glstate_lightmapUV: true,
+                glstate_lightmapRGBAF16: true
             };
             material.lastDrawMatID = -1;
             material.lastDrawMeshID = -1;
@@ -60170,6 +60175,7 @@ var m4m;
                 this.lightmap = null;
                 this.lightmap_01 = null;
                 this.lightmapUV = 1;
+                this.lightmapRGBAF16 = 0; //是否为RGBA16 纹理，0: 不是 1：是
                 this.lightmapOffset = new m4m.math.vector4(1, 1, 0, 0);
                 this.webgl = webgl;
             }
@@ -61288,6 +61294,9 @@ var m4m;
                 };
                 this.autoUniformDic["glstate_lightmapUV"] = function (context) {
                     return context.lightmapUV;
+                };
+                this.autoUniformDic["glstate_lightmapRGBAF16"] = function (context) {
+                    return context.lightmapRGBAF16;
                 };
                 this.autoUniformDic["glstate_fog_start"] = function (context) {
                     return context.fog._Start;

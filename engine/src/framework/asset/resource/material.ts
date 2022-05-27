@@ -238,6 +238,7 @@ namespace m4m.framework
             return total;
         }
 
+        //状态去重忽略列表
         private static sameMatPassMap = {
             glstate_matrix_model: true,
             glstate_matrix_world2object: true,
@@ -249,7 +250,8 @@ namespace m4m.framework
             boneSampler: true,
             glstate_lightmapOffset: true,
             _LightmapTex: true,
-            glstate_lightmapUV: true
+            glstate_lightmapUV: true,
+            glstate_lightmapRGBAF16: true
         }
 
         uploadUnifoms(pass: render.glDrawPass, context: renderContext, lastMatSame = false)

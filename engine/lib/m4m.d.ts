@@ -18592,6 +18592,7 @@ declare namespace m4m.framework {
         lightmap: m4m.framework.texture;
         lightmap_01: m4m.framework.texture;
         lightmapUV: number;
+        lightmapRGBAF16: number;
         lightmapOffset: m4m.math.vector4;
         fog: Fog;
         vec4_bones: Float32Array;

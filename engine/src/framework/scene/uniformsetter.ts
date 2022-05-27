@@ -69,6 +69,9 @@ namespace m4m.framework
             this.autoUniformDic["glstate_lightmapUV"]=(context: renderContext)=>{
                 return context.lightmapUV;
             };
+            this.autoUniformDic["glstate_lightmapRGBAF16"]=(context: renderContext)=>{
+                return context.lightmapRGBAF16;
+            };
             this.autoUniformDic["glstate_fog_start"]=(context: renderContext)=>{
                 return context.fog._Start;
             };

@@ -21,8 +21,8 @@ varying lowp vec3 v_Mpos;
 
 //texture2DEtC1Mark
 
-
 #ifdef LIGHTMAP
+uniform lowp float glstate_lightmapRGBAF16;
 uniform lowp sampler2D _LightmapTex;
 varying mediump vec2 lightmap_TEXCOORD;
 lowp vec3 decode_hdr(lowp vec4 data)
@@ -93,22 +93,26 @@ void main()
     //light
     calcCOLOR();
     
-    #ifdef LIGHTMAP
+#ifdef LIGHTMAP
     lowp vec4 lightmap = texture2D(_LightmapTex, lightmap_TEXCOORD);
-    emission.xyz *= decode_hdr(lightmap);
+    if(glstate_lightmapRGBAF16 == 1.0){
+        emission.xyz *= lightmap.xyz;
+    }else{
+        emission.xyz *= decode_hdr(lightmap);
+    }
     if(hasLight){ // have light
         fristColor = fristColor * xlv_COLOR ;
         emission = emission + mix(vec4(1.0, 1.0, 1.0, 1.0), fristColor, fristColor.wwww);
     }
-    #else
+#else
 	if(hasLight){ // have light
         emission = (fristColor * xlv_COLOR) + (fristColor * vec4(fixedAmbient,1.0));
     }
-    #endif
+#endif
 
-    #ifdef FOG
+#ifdef FOG
     emission.xyz = mix(glstate_fog_color.rgb, emission.rgb, factor);
-    #endif
+#endif
     
     gl_FragData[0] = emission;
 }

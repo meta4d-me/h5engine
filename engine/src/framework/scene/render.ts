@@ -1,12 +1,9 @@
-namespace m4m.framework
-{
+namespace m4m.framework {
     /**
      * @private
      */
-    export class renderContext
-    {
-        constructor(webgl: WebGLRenderingContext)
-        {
+    export class renderContext {
+        constructor(webgl: WebGLRenderingContext) {
             this.webgl = webgl;
         }
 
@@ -23,30 +20,29 @@ namespace m4m.framework
         private _lastM_IT: m4m.math.matrix = new m4m.math.matrix();
         private _matrixWorld2Object: m4m.math.matrix = new m4m.math.matrix();
         /** M 矩阵的逆矩阵 */
-        get matrixWorld2Object()
-        {
-            if(!m4m.math.matrixEqual(this._lastM_IT,this.matrixModel , 0)){
+        get matrixWorld2Object() {
+            if (!m4m.math.matrixEqual(this._lastM_IT, this.matrixModel, 0)) {
                 m4m.math.matrixInverse(this.matrixModel, this._matrixWorld2Object);
-                m4m.math.matrixClone(this.matrixModel ,this._lastM_IT);
+                m4m.math.matrixClone(this.matrixModel, this._lastM_IT);
             }
             return this._matrixWorld2Object;
         }
         matrixModelViewProject: m4m.math.matrix = new m4m.math.matrix;
 
         private _matrixModelView: m4m.math.matrix = new m4m.math.matrix;
-        get matrixModelView(){
-            m4m.math.matrixMultiply(this.matrixView , this.matrixModel ,this._matrixModelView);
+        get matrixModelView() {
+            m4m.math.matrixMultiply(this.matrixView, this.matrixModel, this._matrixModelView);
             return this._matrixModelView;
         }
 
         private _matrixInverseModelView: m4m.math.matrix = new m4m.math.matrix;
-        private _lastMV_IT : m4m.math.matrix = new m4m.math.matrix;
+        private _lastMV_IT: m4m.math.matrix = new m4m.math.matrix;
         /** MV 矩阵的逆转置矩阵 */
-        get matrixInverseModelView(){
+        get matrixInverseModelView() {
             // if(!m4m.math.matrixEqual(this._lastMV_IT , this.matrixModelView , 0)){
-                m4m.math.matrixInverse(this.matrixModel, this._matrixInverseModelView);
-                m4m.math.matrixTranspose(this._matrixInverseModelView,this._matrixInverseModelView);
-                // m4m.math.matrixClone(this._matrixInverseModelView ,this._lastMV_IT);
+            m4m.math.matrixInverse(this.matrixModel, this._matrixInverseModelView);
+            m4m.math.matrixTranspose(this._matrixInverseModelView, this._matrixInverseModelView);
+            // m4m.math.matrixClone(this._matrixInverseModelView ,this._lastMV_IT);
             // }
             return this._matrixInverseModelView;
         }
@@ -75,14 +71,14 @@ namespace m4m.framework
         lightmap: m4m.framework.texture = null;
         lightmap_01: m4m.framework.texture = null;
         lightmapUV: number = 1;
+        lightmapRGBAF16: number = 0;                //是否为RGBA16 纹理，0: 不是 1：是
         lightmapOffset: m4m.math.vector4 = new m4m.math.vector4(1, 1, 0, 0);
         fog: Fog;
 
         //skin auto uniform
         vec4_bones: Float32Array;
         matrix_bones: Float32Array;
-        updateCamera(app: application, camera: camera)
-        {
+        updateCamera(app: application, camera: camera) {
             // camera.calcViewPortPixel(app, this.viewPortPixel);
             // var asp = this.viewPortPixel.w / this.viewPortPixel.h;
             //update viewport
@@ -90,7 +86,7 @@ namespace m4m.framework
             // camera.calcViewMatrix(this.matrixView);
             // camera.calcProjectMatrix(asp, this.matrixProject);
             // m4m.math.matrixMultiply(this.matrixProject, this.matrixView, this.matrixViewProject);
-            camera.calcViewProjectMatrix(app,this.matrixViewProject,this.matrixView,this.matrixProject);
+            camera.calcViewProjectMatrix(app, this.matrixViewProject, this.matrixView, this.matrixProject);
             this.floatTimer = app.getTotalTime();
 
             var pso = camera.gameObject.transform.getWorldTranslate();
@@ -98,15 +94,13 @@ namespace m4m.framework
             this.eyePos.y = pso.y;
             this.eyePos.z = pso.z;
         }
-        updateLights(lights: light[])
-        {
+        updateLights(lights: light[]) {
             this._intLightCount = lights.length;
-            if(this._intLightCount < 1) return;
+            if (this._intLightCount < 1) return;
 
             this._lightCullingMask.length = 0;
             var dirt = math.pool.new_vector3();
-            for (var i = 0, len = lights.length; i < len; i++)
-            {
+            for (var i = 0, len = lights.length; i < len; i++) {
                 this._lightCullingMask.push(lights[i].cullingMask);
                 {
                     var pos = lights[i].gameObject.transform.getWorldTranslate();
@@ -138,8 +132,7 @@ namespace m4m.framework
             math.pool.delete_vector3(dirt);
             //收集灯光参数
         }
-        updateOverlay()
-        {   //可能性优化点 UI 不用乘MVP 矩阵
+        updateOverlay() {   //可能性优化点 UI 不用乘MVP 矩阵
             //v 特殊
             //m4m.math.matrixMakeIdentity(this.matrixView);//v
             //m4m.math.matrixMakeIdentity(this.matrixProject);//p
@@ -150,39 +143,33 @@ namespace m4m.framework
             //m4m.math.matrixMultiply(this.matrixViewProject, this.matrixModel, this.matrixModelViewProject);//mvp
             m4m.math.matrixMakeIdentity(this.matrixModelViewProject);
         }
-        updateModel(model: transform)
-        {
+        updateModel(model: transform) {
             this.updateModelByMatrix(model.getWorldMatrix());
         }
-        updateModelByMatrix(m_matrix: m4m.math.matrix)
-        {
+        updateModelByMatrix(m_matrix: m4m.math.matrix) {
             //注意，这tm是个引用
             m4m.math.matrixClone(m_matrix, this.matrixModel);
             m4m.math.matrixMultiply(this.matrixViewProject, this.matrixModel, this.matrixModelViewProject);
         }
 
         //为特效拖尾服务
-        updateModeTrail()
-        {
+        updateModeTrail() {
             m4m.math.matrixClone(this.matrixView, this.matrixModelView);
             m4m.math.matrixClone(this.matrixViewProject, this.matrixModelViewProject);
         }
 
         //更新 光照剔除mask
-        updateLightMask(layer: number)
-        {
+        updateLightMask(layer: number) {
             this.intLightCount = 0;
             if (this._intLightCount == 0) return;
             let num = 1 << layer;
             let indexList: number[] = [];
-            for (var i = 0; i < this._lightCullingMask.length; i++)
-            {
+            for (var i = 0; i < this._lightCullingMask.length; i++) {
                 let mask = this._lightCullingMask[i];
                 if (mask & num) indexList.push(i);
             }
             this.intLightCount = indexList.length;
-            for (var i = 0; i < indexList.length; i++)
-            {
+            for (var i = 0; i < indexList.length; i++) {
                 let idx = indexList[i];
                 this.floatLightSpotAngleCos[i] = this._floatLightSpotAngleCos[idx];
                 this.floatLightRange[i] = this._floatLightRange[idx];
@@ -212,8 +199,7 @@ namespace m4m.framework
      * 渲染的层级
      * @version m4m 1.0
      */
-    export enum RenderLayerEnum
-    {
+    export enum RenderLayerEnum {
         /**
          * @public
          * @language zh_CN
@@ -258,10 +244,8 @@ namespace m4m.framework
     /**
      * @private
      */
-    export class renderList
-    {
-        constructor()
-        {
+    export class renderList {
+        constructor() {
             this.renderLayers = [];
             var common = new renderLayer(false);
             var transparent = new renderLayer(true);
@@ -270,31 +254,29 @@ namespace m4m.framework
             this.renderLayers.push(transparent);
             this.renderLayers.push(overlay);
         }
-        clear()
-        {
+        clear() {
             let lys = this.renderLayers;
-            for(let i=0 , len = lys.length;i < len;i++){
+            for (let i = 0, len = lys.length; i < len; i++) {
                 lys[i].list.length = 0;
                 let obj = lys[i].gpuInstanceMap;
-                for(let key in obj){
+                for (let key in obj) {
                     // obj[key].clear();
-                    obj[key].length=0;
+                    obj[key].length = 0;
                 }
                 // this.renderLayers[i].gpuInstanceMap = {};
             }
         }
-        clearBatcher(){
+        clearBatcher() {
             let lys = this.renderLayers;
-            for(let i=0 , len = lys.length;i < len;i++){
+            for (let i = 0, len = lys.length; i < len; i++) {
                 let obj = lys[i].gpuInstanceBatcherMap;
-                for(let key in obj){
+                for (let key in obj) {
                     obj[key].dispose();
                     delete obj[key];
                 }
             }
         }
-        addRenderer(renderer: IRenderer , webgl : WebGLRenderingContext)
-        {
+        addRenderer(renderer: IRenderer, webgl: WebGLRenderingContext) {
             var idx = renderer.layer;
             // let layer = renderer.layer;
             // var idx = 0;
@@ -310,17 +292,17 @@ namespace m4m.framework
             //     idx = 1;
             // }
             let gpuInsR = (renderer as IRendererGpuIns);
-            if(!webgl.drawArraysInstanced || !gpuInsR.isGpuInstancing || !gpuInsR.isGpuInstancing()){
+            if (!webgl.drawArraysInstanced || !gpuInsR.isGpuInstancing || !gpuInsR.isGpuInstancing()) {
                 this.renderLayers[idx].list.push(renderer);
-            }else{
+            } else {
                 this.renderLayers[idx].addInstance(gpuInsR);
             }
         }
 
-        addStaticInstanceRenderer(renderer: IRendererGpuIns , webgl : WebGLRenderingContext , isStatic : boolean){
-            if(!isStatic) return;
+        addStaticInstanceRenderer(renderer: IRendererGpuIns, webgl: WebGLRenderingContext, isStatic: boolean) {
+            if (!isStatic) return;
             let go = renderer.gameObject;
-            if( !go || !go.transform.needGpuInstancBatcher || !renderer.isGpuInstancing || !renderer.isGpuInstancing()) return;
+            if (!go || !go.transform.needGpuInstancBatcher || !renderer.isGpuInstancing || !renderer.isGpuInstancing()) return;
             let idx = renderer.layer;
             this.renderLayers[idx].addInstanceToBatcher(renderer);
         }
@@ -332,75 +314,73 @@ namespace m4m.framework
     /**
      * @private
      */
-    export class renderLayer
-    {
+    export class renderLayer {
         needSort: boolean = false;
         //先暂时分配 透明与不透明两组
         list: IRenderer[] = [];
-        constructor(_sort: boolean = false)
-        {
+        constructor(_sort: boolean = false) {
             this.needSort = _sort;
         }
 
         /** gpu instance map*/
         // gpuInstanceMap: {[sID:string] : IRendererGpuIns[]} = {};
-        gpuInstanceMap: {[sID:string] : math.ReuseArray<IRendererGpuIns>} = {};
-        gpuInstanceBatcherMap: {[sID:string] : meshGpuInsBatcher} = {};
+        gpuInstanceMap: { [sID: string]: math.ReuseArray<IRendererGpuIns> } = {};
+        gpuInstanceBatcherMap: { [sID: string]: meshGpuInsBatcher } = {};
 
-        addInstance(r : IRendererGpuIns){
+        addInstance(r: IRendererGpuIns) {
             let mr = r as meshRenderer;
             let mf = mr.filter;
-            if(!mf || !mf.mesh) return;
+            if (!mf || !mf.mesh) return;
             let mat = mr.materials[0];
-            if(!mat) return;
+            if (!mat) return;
             let gpuInstancingGUID = mat.gpuInstancingGUID;
-            if(!gpuInstancingGUID) return;
-            let id = renderLayer.getRandererGUID(mf.mesh.getGUID() , gpuInstancingGUID);
-            if(!this.gpuInstanceMap[id]) {
+            if (!gpuInstancingGUID) return;
+            let id = renderLayer.getRandererGUID(mf.mesh.getGUID(), gpuInstancingGUID);
+            if (!this.gpuInstanceMap[id]) {
                 this.gpuInstanceMap[id] = new math.ReuseArray<IRendererGpuIns>();
             }
             this.gpuInstanceMap[id].push(r);
         }
 
-        addInstanceToBatcher(r : IRendererGpuIns){
+        addInstanceToBatcher(r: IRendererGpuIns) {
             let mr = r as meshRenderer;
             let mf = mr.filter;
-            if(!mf) return;
+            if (!mf) return;
             let mat = mr.materials[0];
-            if(!mat) return;
+            if (!mat) return;
             let gpuInstancingGUID = mat.gpuInstancingGUID;
-            if(!gpuInstancingGUID) return;
+            if (!gpuInstancingGUID) return;
             // if(!mf){
             //     mf = mr.gameObject.getComponent("meshFilter") as m4m.framework.meshFilter;
             // }
             let mesh = mf.mesh;
-            let id = renderLayer.getRandererGUID(mesh.getGUID() , gpuInstancingGUID);
-            let bs : m4m.framework.meshGpuInsBatcher = this.gpuInstanceBatcherMap[id];
-            if(!bs){
-                bs = this.gpuInstanceBatcherMap[id] = new m4m.framework.meshGpuInsBatcher(mr.gameObject.layer , mesh , mr.materials);
+            let id = renderLayer.getRandererGUID(mesh.getGUID(), gpuInstancingGUID);
+            let bs: m4m.framework.meshGpuInsBatcher = this.gpuInstanceBatcherMap[id];
+            if (!bs) {
+                bs = this.gpuInstanceBatcherMap[id] = new m4m.framework.meshGpuInsBatcher(mr.gameObject.layer, mesh, mr.materials);
             }
 
-            for(let i=0 , len = bs.bufferDArrs.length ; i < len ;i++){
+            for (let i = 0, len = bs.bufferDArrs.length; i < len; i++) {
                 let pass = bs.passArr[i];
                 let darr = bs.bufferDArrs[i];
-                m4m.framework.meshRenderer.setInstanceOffsetMatrix(mr.gameObject.transform , mat , pass); //RTS offset 矩阵
-                mat.uploadInstanceAtteribute(pass ,darr);  //收集 各material instance atteribute
+                m4m.framework.meshRenderer.setInstanceOffsetMatrix(mr.gameObject.transform, mat, pass); //RTS offset 矩阵
+                mat.uploadInstanceAtteribute(pass, darr);  //收集 各material instance atteribute
             }
 
-            bs.count ++;
+            bs.count++;
         }
 
 
         private static gpuInsRandererGUID = -1;
         private static gpuInsRandererGUIDMap = {};
         /** gpuInstancing 唯一ID */
-        private static getRandererGUID(meshGuid :number , materialGuid : string): number{
+        private static getRandererGUID(meshGuid: number, materialGuid: string): number {
             let meshTemp = this.gpuInsRandererGUIDMap[meshGuid];
-            if(!meshTemp){
+            if (!meshTemp) {
                 meshTemp = this.gpuInsRandererGUIDMap[meshGuid] = {};
             }
             let rId = meshTemp[materialGuid];
-            if(rId == null){
+            if (rId == null) {
                 this.gpuInsRandererGUID++;
                 rId = meshTemp[materialGuid] = this.gpuInsRandererGUID;
             }
