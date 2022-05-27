@@ -13,6 +13,12 @@ class HDR_sample implements IState
 
     gltfModels = [
         {
+            gltfFolder: 'res/pbrRes/artRoom/',
+            file: 'artRoom.gltf',
+            scale: 1,
+            cb: root => { }
+        },
+        {
             gltfFolder: 'res/pbrRes/pbrLightMap/',
             file: 'pbrLightMap.gltf',
             scale: 1,
@@ -180,7 +186,7 @@ class HDR_sample implements IState
             const gltf = await this.load<m4m.framework.gltf>(gltfFolder, file);
             const root = await gltf.load(this.assetMgr, this.app.webgl, gltfFolder, null, env, irradianceSH, exp, ambientCubemapLight.specularIntensity, ambientCubemapLight.diffuseIntensity);
             m4m.math.vec3SetAll(root.localScale, scale ?? 1);
-            // root.localScale.x *= -1;
+            root.localScale.x *= -1;
             // this.app.getScene().addChild(root);
             this.modelRoot.addChild(root);
             return root;

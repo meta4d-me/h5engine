@@ -129,7 +129,7 @@ namespace m4m.framework
             hex?.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i
                 , (m, r, g, b) => '#' + r + r + g + g + b + b)
                 .substring(1).match(/.{2}/g)
-                .map(x => parseInt(x, 16));
+                .map(x => parseInt(x, 16)/255);
 
         buffers: bin[];
         async load(mgr: assetMgr, ctx: WebGLRenderingContext, folder: string, brdf: texture, env: texture, irrSH: texture, exposure?, specFactor = 1, irrFactor = 1, uvChecker?: texture)
@@ -234,7 +234,13 @@ namespace m4m.framework
                 }
                 mat.setFloat("specularIntensity", specFactor);
                 mat.setFloat("diffuseIntensity", irrFactor);
-                let _bColor: number[] = this.hexToRgb(matCfg?.color) ?? m.pbrMetallicRoughness?.baseColorFactor ?? [1, 1, 1, 1];
+                let _bColor = m.pbrMetallicRoughness?.baseColorFactor ?? [1, 1, 1, 1];
+                let _clayViewerColor = this.hexToRgb(matCfg?.color);
+                if(_clayViewerColor){
+                    _bColor[0] = _clayViewerColor[0];
+                    _bColor[1] = _clayViewerColor[1];
+                    _bColor[2] = _clayViewerColor[2];
+                }
                 mat.setVector4('CustomBasecolor', new math.vector4(_bColor[0], _bColor[1], _bColor[2], _bColor[3]));
                 mat.setFloat('CustomMetallic', matCfg?.metalness ?? m.pbrMetallicRoughness?.metallicFactor);
                 mat.setFloat('CustomRoughness', matCfg?.roughness ?? m.pbrMetallicRoughness?.roughnessFactor);

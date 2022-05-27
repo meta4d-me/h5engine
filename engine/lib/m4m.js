@@ -20963,7 +20963,7 @@ var m4m;
                  * @version m4m 1.0
                  */
                 this.defaultAsset = false;
-                this.hexToRgb = function (hex) { return hex === null || hex === void 0 ? void 0 : hex.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i, function (m, r, g, b) { return '#' + r + r + g + g + b + b; }).substring(1).match(/.{2}/g).map(function (x) { return parseInt(x, 16); }); };
+                this.hexToRgb = function (hex) { return hex === null || hex === void 0 ? void 0 : hex.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i, function (m, r, g, b) { return '#' + r + r + g + g + b + b; }).substring(1).match(/.{2}/g).map(function (x) { return parseInt(x, 16) / 255; }); };
                 if (!assetName) {
                     assetName = "json_" + this.getGUID();
                 }
@@ -21131,7 +21131,7 @@ var m4m;
                             case 5:
                                 extrasCfg = (_o = (_m = this.data.extras) === null || _m === void 0 ? void 0 : _m.clayViewerConfig) === null || _o === void 0 ? void 0 : _o.materials;
                                 materials = (_p = this.data.materials) === null || _p === void 0 ? void 0 : _p.map(function (m) {
-                                    var _a, _b, _c, _d, _e, _f, _g, _h;
+                                    var _a, _b, _c, _d, _e, _f, _g;
                                     var mat = new framework.material(m.name);
                                     var matCfg;
                                     var cfgs = extrasCfg === null || extrasCfg === void 0 ? void 0 : extrasCfg.filter(function (e) { return e.name === m.name; });
@@ -21161,21 +21161,27 @@ var m4m;
                                     }
                                     mat.setFloat("specularIntensity", specFactor);
                                     mat.setFloat("diffuseIntensity", irrFactor);
-                                    var _bColor = (_c = (_a = _this.hexToRgb(matCfg === null || matCfg === void 0 ? void 0 : matCfg.color)) !== null && _a !== void 0 ? _a : (_b = m.pbrMetallicRoughness) === null || _b === void 0 ? void 0 : _b.baseColorFactor) !== null && _c !== void 0 ? _c : [1, 1, 1, 1];
+                                    var _bColor = (_b = (_a = m.pbrMetallicRoughness) === null || _a === void 0 ? void 0 : _a.baseColorFactor) !== null && _b !== void 0 ? _b : [1, 1, 1, 1];
+                                    var _clayViewerColor = _this.hexToRgb(matCfg === null || matCfg === void 0 ? void 0 : matCfg.color);
+                                    if (_clayViewerColor) {
+                                        _bColor[0] = _clayViewerColor[0];
+                                        _bColor[1] = _clayViewerColor[1];
+                                        _bColor[2] = _clayViewerColor[2];
+                                    }
                                     mat.setVector4('CustomBasecolor', new m4m.math.vector4(_bColor[0], _bColor[1], _bColor[2], _bColor[3]));
-                                    mat.setFloat('CustomMetallic', (_d = matCfg === null || matCfg === void 0 ? void 0 : matCfg.metalness) !== null && _d !== void 0 ? _d : (_e = m.pbrMetallicRoughness) === null || _e === void 0 ? void 0 : _e.metallicFactor);
-                                    mat.setFloat('CustomRoughness', (_f = matCfg === null || matCfg === void 0 ? void 0 : matCfg.roughness) !== null && _f !== void 0 ? _f : (_g = m.pbrMetallicRoughness) === null || _g === void 0 ? void 0 : _g.roughnessFactor);
+                                    mat.setFloat('CustomMetallic', (_c = matCfg === null || matCfg === void 0 ? void 0 : matCfg.metalness) !== null && _c !== void 0 ? _c : (_d = m.pbrMetallicRoughness) === null || _d === void 0 ? void 0 : _d.metallicFactor);
+                                    mat.setFloat('CustomRoughness', (_e = matCfg === null || matCfg === void 0 ? void 0 : matCfg.roughness) !== null && _e !== void 0 ? _e : (_f = m.pbrMetallicRoughness) === null || _f === void 0 ? void 0 : _f.roughnessFactor);
                                     // console.log(matCfg.name);
                                     // console.table({...m.pbrMetallicRoughness});
                                     // console.table(matCfg);
                                     // if (matCfg && matCfg.length > 0) {
                                     // mat.setFloatv("uvRepeat", new Float32Array([matCfg[0]?.uvRepeat[0] ?? 1, matCfg[0]?.uvRepeat[1] ?? 1]));
-                                    mat.setFloat("uvRepeat", (_h = matCfg === null || matCfg === void 0 ? void 0 : matCfg.uvRepeat[0]) !== null && _h !== void 0 ? _h : 1);
+                                    mat.setFloat("uvRepeat", (_g = matCfg === null || matCfg === void 0 ? void 0 : matCfg.uvRepeat[0]) !== null && _g !== void 0 ? _g : 1);
                                     // } else {
                                     // mat.setFloat("uvRepeat", 1);
                                     // }
                                     if (m.pbrMetallicRoughness) {
-                                        var _j = m.pbrMetallicRoughness, baseColorFactor = _j.baseColorFactor, baseColorTexture = _j.baseColorTexture, metallicFactor = _j.metallicFactor, roughnessFactor = _j.roughnessFactor, metallicRoughnessTexture = _j.metallicRoughnessTexture;
+                                        var _h = m.pbrMetallicRoughness, baseColorFactor = _h.baseColorFactor, baseColorTexture = _h.baseColorTexture, metallicFactor = _h.metallicFactor, roughnessFactor = _h.roughnessFactor, metallicRoughnessTexture = _h.metallicRoughnessTexture;
                                         if (baseColorTexture) {
                                             mat.setTexture("uv_Basecolor", uvChecker !== null && uvChecker !== void 0 ? uvChecker : textures[baseColorTexture.index]);
                                         }
