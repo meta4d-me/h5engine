@@ -21305,6 +21305,7 @@ var m4m;
                                         mf.glMesh.uploadIndexSubData(ctx, 0, ebo);
                                         //light Map
                                         var lightMapTexST = null;
+                                        var outMat = materials[material];
                                         if (hasLightMap && extensions && extensions.gd_linfo) {
                                             if (extensions.gd_linfo.so) {
                                                 lightMapTexST = extensions.gd_linfo.so;
@@ -21315,11 +21316,14 @@ var m4m;
                                             var texIdx = (_6 = extensions.gd_linfo.index) !== null && _6 !== void 0 ? _6 : 0;
                                             var lightMapTex = lightMapTexs[texIdx];
                                             if (lightMapTex) {
-                                                var mat = materials[material];
-                                                mat.setTexture("_LightmapTex", lightMapTex);
+                                                if (outMat.statedMapUniforms["_LightmapTex"]) {
+                                                    outMat = outMat.clone(); //公用材质但lightmap 不同，需要clone一个新材质
+                                                }
+                                                outMat.setTexture("_LightmapTex", lightMapTex);
+                                                outMat = outMat;
                                             }
                                         }
-                                        return { m: mf, mat: materials[material], lTexST: lightMapTexST };
+                                        return { m: mf, mat: outMat, lTexST: lightMapTexST };
                                     });
                                 });
                                 nodes = (_u = this.data.nodes) === null || _u === void 0 ? void 0 : _u.map(function (_a) {
@@ -24894,6 +24898,7 @@ var m4m;
                 if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == m4m.render.UniformTypeEnum.Float4v) {
                     this.statedMapUniforms[_id] = _vector4v;
                     this.uniformDirtyMap[_id] = true;
+                    _vector4v.length;
                 }
                 else {
                     console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
@@ -25184,24 +25189,44 @@ var m4m;
                 var mat = new material_3(this.getName());
                 mat.setShader(this.shader);
                 mat._enableGpuInstancing = this._enableGpuInstancing;
+                mat.defaultMapUniform = this.defaultMapUniform;
+                mat.queue = this.queue;
+                for (var key in this.uniformDirtyMap) {
+                    mat.uniformDirtyMap[key] = this.uniformDirtyMap[key];
+                }
                 for (var i in this.statedMapUniforms) {
-                    var _uniformType = this.defaultMapUniform[i].type;
-                    var value = this.statedMapUniforms[i];
-                    switch (_uniformType) {
-                        case m4m.render.UniformTypeEnum.Texture:
-                            mat.setTexture(i, value);
-                            break;
-                        case m4m.render.UniformTypeEnum.CubeTexture:
-                            mat.setCubeTexture(i, value);
-                            break;
-                        case m4m.render.UniformTypeEnum.Float:
-                            mat.setFloat(i, value);
-                            break;
-                        case m4m.render.UniformTypeEnum.Float4:
-                            mat.setVector4(i, value);
-                            break;
-                        default:
-                            break;
+                    var srcSta = this.statedMapUniforms[i];
+                    if (srcSta == null)
+                        continue;
+                    var typeStr = typeof (srcSta);
+                    if (typeStr != "object") {
+                        mat.statedMapUniforms[i] = srcSta;
+                    }
+                    else {
+                        if (srcSta.use != null) {
+                            //是资源、texture
+                            mat.statedMapUniforms[i] = srcSta;
+                        }
+                        else if (srcSta.length != null) {
+                            //arry
+                            mat.statedMapUniforms[i] = new Float32Array(srcSta);
+                        }
+                        else if (srcSta.x != null) {
+                            //vec4
+                            mat.statedMapUniforms[i] = new m4m.math.vector4();
+                            m4m.math.vec4Clone(srcSta, mat.statedMapUniforms[i]);
+                        }
+                        else if (srcSta.rawData != null) {
+                            //matrix
+                            mat.statedMapUniforms[i] = new m4m.math.matrix();
+                            m4m.math.matrixClone(srcSta, mat.statedMapUniforms[i]);
+                        }
+                    }
+                }
+                if (mat._enableGpuInstancing) {
+                    for (var key in this.instanceAttribValMap) {
+                        var arr = this.instanceAttribValMap[key];
+                        mat.instanceAttribValMap[key] = arr.concat(); //copy
                     }
                 }
                 return mat;

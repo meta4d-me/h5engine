@@ -1,13 +1,11 @@
 /// <reference path="../../../io/reflect.ts" />
 
-namespace m4m.framework
-{
+namespace m4m.framework {
     /**
      * @private
      */
     @m4m.reflect.SerializeType
-    export class UniformData
-    {
+    export class UniformData {
         @m4m.reflect.Field("number")
         @m4m.reflect.UIStyle("UniformTypeEnum")
         type: render.UniformTypeEnum;
@@ -17,8 +15,7 @@ namespace m4m.framework
 
         resname: string;
 
-        constructor(type: render.UniformTypeEnum, value: any, defaultValue: any = null)
-        {
+        constructor(type: render.UniformTypeEnum, value: any, defaultValue: any = null) {
             this.type = type;
             this.value = value;
             this.defaultValue = defaultValue;
@@ -28,8 +25,7 @@ namespace m4m.framework
     /**
      * 批量渲染相关接口
      */
-    export interface DrawInstanceInfo
-    {
+    export interface DrawInstanceInfo {
         /**
          * 渲染数量
          */
@@ -61,8 +57,7 @@ namespace m4m.framework
      * @version m4m 1.0
      */
     @m4m.reflect.SerializeType
-    export class material implements IAsset
-    {
+    export class material implements IAsset {
         static readonly ClassName: string = "material";
 
         @m4m.reflect.Field("constText")
@@ -83,11 +78,9 @@ namespace m4m.framework
          * 开启使用Gpu Instance 渲染模式
          */
         get enableGpuInstancing() { return this._enableGpuInstancing; };
-        set enableGpuInstancing(enable: boolean)
-        {
+        set enableGpuInstancing(enable: boolean) {
             this._enableGpuInstancing = enable;
-            if (enable)
-            {
+            if (enable) {
                 this.getTexGuid(this);   //贴图使用唯一标识ID，gupInstance 使用
                 this.getShaderGuid(this.shader);
                 this.refreshGpuInstancingGUID();
@@ -100,10 +93,8 @@ namespace m4m.framework
         /** gpuInstancing 材质唯一ID */
         gpuInstancingGUID: string = "";
 
-        constructor(assetName: string = null)
-        {
-            if (!assetName)
-            {
+        constructor(assetName: string = null) {
+            if (!assetName) {
                 assetName = "material_" + this.getGUID();
             }
             this.name = new constText(assetName);
@@ -118,10 +109,8 @@ namespace m4m.framework
          * 获取资源名称
          * @version m4m 1.0
          */
-        getName(): string
-        {
-            if (this.name == undefined)
-            {
+        getName(): string {
+            if (this.name == undefined) {
                 return null;
             }
             return this.name.getText();
@@ -133,8 +122,7 @@ namespace m4m.framework
          * 获取资源唯一id
          * @version m4m 1.0
          */
-        getGUID(): number
-        {
+        getGUID(): number {
             return this.id.getID();
         }
 
@@ -145,12 +133,9 @@ namespace m4m.framework
          * 释放资源
          * @version m4m 1.0
          */
-        dispose()
-        {
-            for (let id in this.statedMapUniforms)
-            {
-                switch (this.defaultMapUniform[id].type)
-                {
+        dispose() {
+            for (let id in this.statedMapUniforms) {
+                switch (this.defaultMapUniform[id].type) {
                     case render.UniformTypeEnum.Texture:
                     case render.UniformTypeEnum.CubeTexture:
                         if (this.statedMapUniforms[id] != null)
@@ -167,8 +152,7 @@ namespace m4m.framework
          * 引用计数加一
          * @version m4m 1.0
          */
-        use()
-        {
+        use() {
             sceneMgr.app.getAssetMgr().use(this);
         }
         /**
@@ -178,8 +162,7 @@ namespace m4m.framework
          * 引用计数减一
          * @version m4m 1.0
          */
-        unuse(disposeNow: boolean = false)
-        {
+        unuse(disposeNow: boolean = false) {
             sceneMgr.app.getAssetMgr().unuse(this, disposeNow);
         }
 
@@ -190,20 +173,16 @@ namespace m4m.framework
          * 计算资源字节大小
          * @version m4m 1.0
          */
-        caclByteLength(): number
-        {
+        caclByteLength(): number {
             let total = 0;
-            if (this.shader)
-            {
+            if (this.shader) {
                 total += this.shader.caclByteLength();
             }
-            for (let k in this.statedMapUniforms)
-            {
+            for (let k in this.statedMapUniforms) {
                 let type = this.defaultMapUniform[k].type;
                 let value = this.statedMapUniforms[k].value;
                 let defaultValue = this.defaultMapUniform[k].value;
-                switch (type)
-                {
+                switch (type) {
                     case render.UniformTypeEnum.Float:
                         total += 4;
                         break;
@@ -224,12 +203,10 @@ namespace m4m.framework
                         break;
                     case render.UniformTypeEnum.Texture:
                     case render.UniformTypeEnum.CubeTexture:
-                        if (value != null)
-                        {
+                        if (value != null) {
                             total += value.caclByteLength();
                         }
-                        else if (defaultValue != null)
-                        {
+                        else if (defaultValue != null) {
                             total += defaultValue.caclByteLength();
                         }
                         break;
@@ -254,18 +231,14 @@ namespace m4m.framework
             glstate_lightmapRGBAF16: true
         }
 
-        uploadUnifoms(pass: render.glDrawPass, context: renderContext, lastMatSame = false)
-        {
+        uploadUnifoms(pass: render.glDrawPass, context: renderContext, lastMatSame = false) {
             render.shaderUniform.texindex = 0;
             let udMap = this.uniformDirtyMap;
             let uTEnum = render.UniformTypeEnum;
-            for (let key in pass.mapuniforms)
-            {
+            for (let key in pass.mapuniforms) {
                 let unifom = pass.mapuniforms[key];
-                if (lastMatSame && !material.sameMatPassMap[unifom.name] && !udMap[unifom.name])
-                {
-                    if (uTEnum.Texture == unifom.type || uTEnum.CubeTexture == unifom.type)
-                    {
+                if (lastMatSame && !material.sameMatPassMap[unifom.name] && !udMap[unifom.name]) {
+                    if (uTEnum.Texture == unifom.type || uTEnum.CubeTexture == unifom.type) {
                         render.shaderUniform.texindex++;
                     }
                     continue;
@@ -274,25 +247,19 @@ namespace m4m.framework
 
                 let func = render.shaderUniform.applyuniformFunc[unifom.type];
                 let unifomValue: any;
-                if (uniformSetter.autoUniformDic[unifom.name] != null)
-                {
+                if (uniformSetter.autoUniformDic[unifom.name] != null) {
                     let autoFunc = uniformSetter.autoUniformDic[unifom.name];
                     unifomValue = autoFunc(context);
-                } else
-                {
-                    if (this.statedMapUniforms[unifom.name] != null)
-                    {
+                } else {
+                    if (this.statedMapUniforms[unifom.name] != null) {
                         unifomValue = this.statedMapUniforms[unifom.name];
-                    } else if (this.defaultMapUniform[unifom.name])
-                    {
+                    } else if (this.defaultMapUniform[unifom.name]) {
                         unifomValue = this.defaultMapUniform[unifom.name].value;
-                    } else
-                    {
+                    } else {
                         console.error("Uniform don't be setted or have def value. uniform:" + unifom.name + "mat:" + this.getName());
                     }
                 }
-                if (unifom.type == render.UniformTypeEnum.Texture && !unifomValue.glTexture)
-                {
+                if (unifom.type == render.UniformTypeEnum.Texture && !unifomValue.glTexture) {
                     error.push(new Error(`material [${this.name}] uploadunifrom fail! glTexture is null!! `));
                     continue;
                 }
@@ -325,26 +292,20 @@ namespace m4m.framework
          * @param darr 数组对象
          * @param ignoreMap 忽略列表
          */
-        uploadInstanceAtteribute(pass: render.glDrawPass, darr: m4m.math.ExtenArray<Float32Array>)
-        {
+        uploadInstanceAtteribute(pass: render.glDrawPass, darr: m4m.math.ExtenArray<Float32Array>) {
             let attmap = pass.program.mapCustomAttrib;
-            for (let key in attmap)
-            {
+            for (let key in attmap) {
                 let arr = this.instanceAttribValMap[key];
-                if (!arr)
-                {
+                if (!arr) {
                     let att = pass.program.mapCustomAttrib[key];
                     // let oldLen = setContainer.length;
                     // setContainer.length = oldLen + att.size;
                     // setContainer.fill(0,oldLen);
-                    for (let i = 0, len = att.size; i < len; i++)
-                    {
+                    for (let i = 0, len = att.size; i < len; i++) {
                         darr.push(0);
                     }
-                } else
-                {
-                    for (let i = 0, len = arr.length; i < len; i++)
-                    {
+                } else {
+                    for (let i = 0, len = arr.length; i < len; i++) {
                         darr.push(arr[i]);
                     }
                 }
@@ -356,17 +317,14 @@ namespace m4m.framework
         //     this.instanceAttribValMap[id] = arr;
         // }
 
-        private getInstanceAttribValue(id: string)
-        {
-            if (this.instanceAttribValMap[id] == null)
-            {
+        private getInstanceAttribValue(id: string) {
+            if (this.instanceAttribValMap[id] == null) {
                 this.instanceAttribValMap[id] = [];
             }
             return this.instanceAttribValMap[id];
         }
 
-        private isNotBuildinAttribId(id: string)
-        {
+        private isNotBuildinAttribId(id: string) {
             return !render.glProgram.isBuildInAttrib(id);
         }
 
@@ -378,12 +336,10 @@ namespace m4m.framework
          * @param shader shader实例
          * @version m4m 1.0
          */
-        setShader(shader: shader)
-        {
+        setShader(shader: shader) {
             this.shader = shader;
             this.defaultMapUniform = shader.defaultMapUniform;
-            if (this._enableGpuInstancing)
-            {
+            if (this._enableGpuInstancing) {
                 this.getShaderGuid(shader);
                 this.refreshGpuInstancingGUID();
             }
@@ -426,8 +382,7 @@ namespace m4m.framework
          * 获取shader的layer
          * @version m4m 1.0
          */
-        getLayer()
-        {
+        getLayer() {
             return this.shader.layer;
         }
         private queue: number = 0;
@@ -438,12 +393,10 @@ namespace m4m.framework
          * 获取shader的queue
          * @version m4m 1.0
          */
-        getQueue()
-        {
+        getQueue() {
             return this.queue;
         }
-        setQueue(queue: number)
-        {
+        setQueue(queue: number) {
             this.queue = queue;
         }
         /**
@@ -453,8 +406,7 @@ namespace m4m.framework
          * 获取shader
          * @version m4m 1.0
          */
-        getShader()
-        {
+        getShader() {
             return this.shader;
         }
         @m4m.reflect.Field("shader")
@@ -471,22 +423,17 @@ namespace m4m.framework
         /**
          * @private
          */
-        setFloat(_id: string, _number: number)
-        {
-            if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float)
-            {
-                if (this.statedMapUniforms[_id] != _number)
-                {
+        setFloat(_id: string, _number: number) {
+            if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float) {
+                if (this.statedMapUniforms[_id] != _number) {
                     this.uniformDirtyMap[_id] = true;
                 }
                 this.statedMapUniforms[_id] = _number;
-            } else
-            {
+            } else {
                 console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
             }
 
-            if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id))
-            {
+            if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id)) {
                 let arr = this.getInstanceAttribValue(_id);
                 arr[0] = _number;
                 // this.setInstanceAttribValue(_id,[_number]);
@@ -495,25 +442,19 @@ namespace m4m.framework
         /**
          * @private
          */
-        setFloatv(_id: string, _numbers: Float32Array)
-        {
-            if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Floatv)
-            {
+        setFloatv(_id: string, _numbers: Float32Array) {
+            if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Floatv) {
                 this.statedMapUniforms[_id] = _numbers;
                 this.uniformDirtyMap[_id] = true;
-            } else
-            {
+            } else {
                 console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
             }
 
-            if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id))
-            {
+            if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id)) {
 
-                if (_numbers.length == 1 || _numbers.length == 4)
-                {
+                if (_numbers.length == 1 || _numbers.length == 4) {
                     let arr = this.getInstanceAttribValue(_id);
-                    for (let i = 0, len = _numbers.length; i < len; i++)
-                    {
+                    for (let i = 0, len = _numbers.length; i < len; i++) {
                         arr[i] = _numbers[i];
                     }
                 }
@@ -528,19 +469,15 @@ namespace m4m.framework
         /**
          * @private
          */
-        setVector4(_id: string, _vector4: math.vector4)
-        {
-            if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float4)
-            {
+        setVector4(_id: string, _vector4: math.vector4) {
+            if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float4) {
                 this.statedMapUniforms[_id] = _vector4;
                 this.uniformDirtyMap[_id] = true;
-            } else
-            {
+            } else {
                 console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
             }
 
-            if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id))
-            {
+            if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id)) {
                 let arr = this.getInstanceAttribValue(_id);
                 arr[0] = _vector4.x;
                 arr[1] = _vector4.y;
@@ -552,22 +489,17 @@ namespace m4m.framework
         /**
          * @private
          */
-        setVector4v(_id: string, _vector4v: Float32Array)
-        {
-            if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float4v)
-            {
+        setVector4v(_id: string, _vector4v: Float32Array) {
+            if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float4v) {
                 this.statedMapUniforms[_id] = _vector4v;
                 this.uniformDirtyMap[_id] = true;
-
-            } else
-            {
+                _vector4v.length
+            } else {
                 console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
             }
-            if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id))
-            {
+            if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id)) {
                 let arr = this.getInstanceAttribValue(_id);
-                for (let i = 0, len = _vector4v.length; i < len; i++)
-                {
+                for (let i = 0, len = _vector4v.length; i < len; i++) {
                     arr[i] = _vector4v[i];
                 }
 
@@ -581,51 +513,41 @@ namespace m4m.framework
         /**
          * @private
          */
-        setMatrix(_id: string, _matrix: math.matrix)
-        {
-            if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float4x4)
-            {
+        setMatrix(_id: string, _matrix: math.matrix) {
+            if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float4x4) {
                 this.statedMapUniforms[_id] = _matrix;
                 this.uniformDirtyMap[_id] = true;
 
-            } else
-            {
+            } else {
                 console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
             }
         }
         /**
          * @private
          */
-        setMatrixv(_id: string, _matrixv: Float32Array)
-        {
-            if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float4x4v)
-            {
+        setMatrixv(_id: string, _matrixv: Float32Array) {
+            if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float4x4v) {
                 this.statedMapUniforms[_id] = _matrixv;
                 this.uniformDirtyMap[_id] = true;
 
-            } else
-            {
+            } else {
                 console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
             }
         }
         /**
          * @private
          */
-        setTexture(_id: string, _texture: m4m.framework.texture, resname: string = "")
-        {
+        setTexture(_id: string, _texture: m4m.framework.texture, resname: string = "") {
             // if((this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Texture) || _id == "_LightmapTex"){
-            if (!(this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Texture) && _id != "_LightmapTex")
-            {
+            if (!(this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Texture) && _id != "_LightmapTex") {
                 console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
                 return;
             }
 
             let oldTex = this.statedMapUniforms[_id] as m4m.framework.texture;
-            if (oldTex != null)
-            {
+            if (oldTex != null) {
                 if (oldTex == _texture) return;
-                if (this.statedMapUniforms[_id].defaultAsset)
-                {
+                if (this.statedMapUniforms[_id].defaultAsset) {
                     oldTex = null;
                     // this.statedMapUniforms[_id].unuse();
                 }
@@ -633,29 +555,24 @@ namespace m4m.framework
             }
             // let old;
             this.statedMapUniforms[_id] = _texture;
-            if (_texture != null)
-            {
-                if (!_texture.defaultAsset)
-                {
+            if (_texture != null) {
+                if (!_texture.defaultAsset) {
                     _texture.use();
                 }
                 //图片的尺寸信息(1/width,1/height,width,height)
                 let _texelsizeName = _id + "_TexelSize";
                 let _gltexture = _texture.glTexture;
-                if (_gltexture != null && this.defaultMapUniform[_texelsizeName] != null)
-                {
+                if (_gltexture != null && this.defaultMapUniform[_texelsizeName] != null) {
                     this.setVector4(_texelsizeName, new math.vector4(1.0 / _gltexture.width, 1.0 / _gltexture.height, _gltexture.width, _gltexture.height));
                 }
                 this.uniformDirtyMap[_id] = true;
 
-                if (this._enableGpuInstancing)
-                {
+                if (this._enableGpuInstancing) {
                     this.getTexGuid(this);   //贴图使用唯一标识ID，gupInstance 使用
                     this.refreshGpuInstancingGUID();
                 }
 
-            } else
-            {
+            } else {
                 console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
             }
 
@@ -671,12 +588,10 @@ namespace m4m.framework
         }
 
         //贴图使用唯一标识ID，gupInstance 使用
-        private getTexGuid(mat: material)
-        {
+        private getTexGuid(mat: material) {
             let staMap = mat.statedMapUniforms;
             this._textureGUID = "";
-            for (let key in staMap)
-            {
+            for (let key in staMap) {
                 let val = staMap[key];
                 if (val.getGUID == null) continue;
                 let guid = (val as m4m.framework.texture).getGUID();
@@ -684,54 +599,42 @@ namespace m4m.framework
             }
         }
 
-        private getShaderGuid(sh: m4m.framework.shader)
-        {
+        private getShaderGuid(sh: m4m.framework.shader) {
             if (!sh) return;
-            if (!sh.passes["instance"] && !sh.passes["instance_fog"])
-            {
+            if (!sh.passes["instance"] && !sh.passes["instance_fog"]) {
                 console.warn(`shader ${sh.getName()} , has not "instance" pass when enable gpuInstance on the material ${this.getName()}.`);
-            } else
-            {
+            } else {
                 this._shaderGUID = "" + sh.getGUID();
             }
         }
 
-        private refreshGpuInstancingGUID()
-        {
-            if (!this._shaderGUID)
-            {
+        private refreshGpuInstancingGUID() {
+            if (!this._shaderGUID) {
                 this.gpuInstancingGUID = "";
                 return;
             }
             this.gpuInstancingGUID = `${this._shaderGUID}_${this._textureGUID}`;
         }
 
-        setCubeTexture(_id: string, _texture: m4m.framework.texture)
-        {
-            if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.CubeTexture)
-            {
-                if (this.statedMapUniforms[_id] != null && (!this.statedMapUniforms[_id].defaultAsset))
-                {
+        setCubeTexture(_id: string, _texture: m4m.framework.texture) {
+            if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.CubeTexture) {
+                if (this.statedMapUniforms[_id] != null && (!this.statedMapUniforms[_id].defaultAsset)) {
                     this.statedMapUniforms[_id].unuse();
                 }
                 this.statedMapUniforms[_id] = _texture;
-                if (_texture != null)
-                {
-                    if (!_texture.defaultAsset)
-                    {
+                if (_texture != null) {
+                    if (!_texture.defaultAsset) {
                         _texture.use();
                     }
                     //图片的尺寸信息(1/width,1/height,width,height)
                     let _texelsizeName = _id + "_TexelSize";
                     let _gltexture = _texture.glTexture;
-                    if (_gltexture != null && this.defaultMapUniform[_texelsizeName] != null)
-                    {
+                    if (_gltexture != null && this.defaultMapUniform[_texelsizeName] != null) {
                         this.setVector4(_texelsizeName, new math.vector4(1.0 / _gltexture.width, 1.0 / _gltexture.height, _gltexture.width, _gltexture.height));
                     }
                 }
                 this.uniformDirtyMap[_id] = true;
-            } else
-            {
+            } else {
                 console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
             }
         }
@@ -753,28 +656,24 @@ namespace m4m.framework
          * @param instanceCount 批量渲染时绘制数量
          * @version m4m 1.0
          */
-        draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype: string = "base", drawInstanceInfo: DrawInstanceInfo = undefined)
-        {
+        draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype: string = "base", drawInstanceInfo: DrawInstanceInfo = undefined) {
             let matGUID = this.getGUID();
             let meshGUID = mesh.getGUID();
             let LastMatSame = matGUID == material.lastDrawMatID;
             let LastMeshSame = meshGUID == material.lastDrawMeshID;
 
             let drawPasses = this.shader.passes[basetype + context.drawtype];
-            if (drawPasses == undefined)
-            {
+            if (drawPasses == undefined) {
                 basetype = basetype.indexOf("fog") != -1 ? "base_fog" : "base";
                 drawPasses = this.shader.passes[basetype + context.drawtype];
-                if (drawPasses == undefined)
-                {
+                if (drawPasses == undefined) {
                     drawPasses = this.shader.passes["base" + context.drawtype];
                     if (drawPasses == undefined)
                         return;
                 }
             }
             var instanceCount = (drawInstanceInfo && drawInstanceInfo.instanceCount) || 1;
-            for (var i = 0, l = drawPasses.length; i < l; i++)
-            {
+            for (var i = 0, l = drawPasses.length; i < l; i++) {
                 mesh.glMesh.bindVboBuffer(context.webgl);
                 var pass = drawPasses[i];
                 pass.use(context.webgl);
@@ -789,25 +688,19 @@ namespace m4m.framework
                 // }
 
                 DrawCallInfo.inc.add();
-                if (sm.useVertexIndex < 0)
-                {
-                    if (sm.line)
-                    {
+                if (sm.useVertexIndex < 0) {
+                    if (sm.line) {
                         mesh.glMesh.drawArrayLines(context.webgl, sm.start, sm.size, instanceCount);
                     }
-                    else
-                    {
+                    else {
                         mesh.glMesh.drawArrayTris(context.webgl, sm.start, sm.size, instanceCount);
                     }
                 }
-                else
-                {
-                    if (sm.line)
-                    {
+                else {
+                    if (sm.line) {
                         mesh.glMesh.drawElementLines(context.webgl, sm.start, sm.size, instanceCount);
                     }
-                    else
-                    {
+                    else {
                         mesh.glMesh.drawElementTris(context.webgl, sm.start, sm.size, instanceCount);
                     }
                 }
@@ -828,12 +721,10 @@ namespace m4m.framework
          * @param json json数据
          * @version m4m 1.0
          */
-        Parse(assetmgr: assetMgr, json: any, bundleName: string = null)
-        {
+        Parse(assetmgr: assetMgr, json: any, bundleName: string = null) {
             var shaderName = json["shader"];
             var shader = assetmgr.getShader(shaderName) as m4m.framework.shader;
-            if (shader == null)
-            {
+            if (shader == null) {
                 //                 let shaders = [];
                 //                 for(let k in assetmgr.mapShader)
                 //                 {
@@ -846,29 +737,24 @@ namespace m4m.framework
             }
             this.setShader(shader);
             var queue = json["queue"];
-            if (queue)
-            {
+            if (queue) {
                 this.queue = queue;
             }
 
             var mapUniform = json["mapUniform"];
-            for (var i in mapUniform)
-            {
+            for (var i in mapUniform) {
                 var jsonChild = mapUniform[i];
                 var _uniformType: render.UniformTypeEnum = jsonChild["type"] as render.UniformTypeEnum;
                 if (_uniformType == null) continue;
-                switch (_uniformType)
-                {
+                switch (_uniformType) {
                     case render.UniformTypeEnum.Texture:
                     case render.UniformTypeEnum.CubeTexture:
                         var _value: string = jsonChild["value"];
                         var _texture: m4m.framework.texture = assetmgr.getAssetByName(_value, bundleName) as m4m.framework.texture;
-                        if (_texture == null)
-                        {
+                        if (_texture == null) {
                             console.error("Material Mapuniform Texture 无效(" + _value + ")！shadername：" + shaderName + " bundleName: " + bundleName);
                             //_texture = assetmgr.getDefaultTexture("grid");
-                        } else
-                        {
+                        } else {
                             this.setTexture(i, _texture, _value);
                         }
                         break;
@@ -878,17 +764,14 @@ namespace m4m.framework
                         break;
                     case render.UniformTypeEnum.Float4:
                         var tempValue = jsonChild["value"];
-                        try
-                        {
+                        try {
                             let values = tempValue.match(RegexpUtil.vector4Regexp);
-                            if (values != null)
-                            {
+                            if (values != null) {
                                 var _float4: math.vector4 = new math.vector4(parseFloat(values[1]), parseFloat(values[2]), parseFloat(values[3]), parseFloat(values[4]));
                                 this.setVector4(i, _float4);
                             }
                         }
-                        catch (e)
-                        {
+                        catch (e) {
                             //数据不合法就不提交了
                             console.error("Material Mapuniform float4 无效:value (" + tempValue + ")！shadername：" + shaderName + " bundleName: " + bundleName);
                         }
@@ -908,50 +791,59 @@ namespace m4m.framework
          * 克隆
          * @version m4m 1.0
          */
-        public clone(): material
-        {
+        public clone(): material {
             let mat: material = new material(this.getName());
             mat.setShader(this.shader);
             mat._enableGpuInstancing = this._enableGpuInstancing;
-            for (var i in this.statedMapUniforms)
-            {
-                var _uniformType: render.UniformTypeEnum = this.defaultMapUniform[i].type;
-                let value = this.statedMapUniforms[i];
-                switch (_uniformType)
-                {
-                    case render.UniformTypeEnum.Texture:
-                        mat.setTexture(i, value);
-                        break;
-                    case render.UniformTypeEnum.CubeTexture:
-                        mat.setCubeTexture(i, value);
-                        break;
-                    case render.UniformTypeEnum.Float:
-                        mat.setFloat(i, value);
-                        break;
-                    case render.UniformTypeEnum.Float4:
-                        mat.setVector4(i, value);
-                        break;
-                    default:
-                        break;
+            mat.defaultMapUniform = this.defaultMapUniform;
+            mat.queue = this.queue;
+            for (let key in this.uniformDirtyMap) {
+                mat.uniformDirtyMap[key] = this.uniformDirtyMap[key];
+            }
+            for (var i in this.statedMapUniforms) {
+                let srcSta = this.statedMapUniforms[i];
+                if (srcSta == null) continue;
+                let typeStr = typeof (srcSta);
+                if (typeStr != "object") {
+                    mat.statedMapUniforms[i] = srcSta;
+                } else {
+                    if (srcSta.use != null) {
+                        //是资源、texture
+                        mat.statedMapUniforms[i] = srcSta;
+                    } else if (srcSta.length != null) {
+                        //arry
+                        mat.statedMapUniforms[i] = new Float32Array(srcSta);
+                    } else if (srcSta.x != null) {
+                        //vec4
+                        mat.statedMapUniforms[i] = new math.vector4();
+                        math.vec4Clone(srcSta, mat.statedMapUniforms[i]);
+                    } else if (srcSta.rawData != null) {
+                        //matrix
+                        mat.statedMapUniforms[i] = new math.matrix();
+                        math.matrixClone(srcSta, mat.statedMapUniforms[i]);
+                    }
+                }
+            }
+            if (mat._enableGpuInstancing) {
+                for (let key in this.instanceAttribValMap) {
+                    let arr = this.instanceAttribValMap[key];
+                    mat.instanceAttribValMap[key] = arr.concat();//copy
                 }
             }
             return mat;
         }
 
-        public save(): string
-        {
+        public save(): string {
             let obj: any = {};
             obj["shader"] = this.shader.getName();
             obj["srcshader"] = "";
             obj["mapUniform"] = {};
-            for (let item in this.statedMapUniforms)
-            {
+            for (let item in this.statedMapUniforms) {
                 let __type = this.defaultMapUniform[item].type;
                 let val = this.statedMapUniforms;
                 let jsonValue = {};
                 jsonValue["type"] = __type;
-                switch (__type)
-                {
+                switch (__type) {
                     case render.UniformTypeEnum.CubeTexture:
                     case render.UniformTypeEnum.Texture:
                         jsonValue["value"] = `${val[item].name.name}`;

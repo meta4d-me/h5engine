@@ -245,7 +245,8 @@ class HDR_sample implements IState
         gui.add(this, 'dec');
         //
         gui.add(this, "_HDR", this.HDRList).name("天空盒");
-        gui.add(this, "Model", this.ModelList).name("模型名");
+        gui.add(this, "Model", this.ModelList).name("快捷选择");
+        gui.add(this, "Model").listen().name("模型名");
         gui.add(this, "enableLight").name("开启灯光");
         gui.add(this, "toLoad").name("加载");
     }
@@ -275,6 +276,14 @@ class HDR_sample implements IState
                     break;
                 }
             }
+        if(!model){
+            model = {
+                gltfFolder: `res/pbrRes/${this._Model}/`,
+                file: `${this._Model}.gltf`,
+                scale: 1,
+                cb: root => { }
+            }
+        }
         this.toLoadGLTF([model]);
     }
 

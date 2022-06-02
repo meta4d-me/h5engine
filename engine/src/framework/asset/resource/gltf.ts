@@ -411,6 +411,7 @@ namespace m4m.framework
                     mf.glMesh.uploadIndexSubData(ctx, 0, ebo);
                     //light Map
                     let lightMapTexST = null;
+                    let outMat : material = materials[material];
                     if (hasLightMap && extensions && extensions.gd_linfo)
                     {
                         if (extensions.gd_linfo.so)
@@ -424,11 +425,14 @@ namespace m4m.framework
                         let lightMapTex = lightMapTexs[texIdx];
                         if (lightMapTex)
                         {
-                            let mat = materials[material];
-                            mat.setTexture("_LightmapTex", lightMapTex);
+                            if(outMat.statedMapUniforms["_LightmapTex"]){
+                                outMat = outMat.clone();      //公用材质但lightmap 不同，需要clone一个新材质
+                            }
+                            outMat.setTexture("_LightmapTex", lightMapTex);
+                            outMat = outMat;
                         }
                     }
-                    return { m: mf, mat: materials[material], lTexST: lightMapTexST };
+                    return { m: mf, mat: outMat, lTexST: lightMapTexST };
                 });
             });
 
