@@ -4436,6 +4436,12 @@ var HDR_sample = (function () {
                 cb: function (root) { }
             },
             {
+                gltfFolder: 'res/pbrRes/002LightMap/',
+                file: '002LightMap.gltf',
+                scale: 1,
+                cb: function (root) { }
+            },
+            {
                 gltfFolder: 'res/pbrRes/FlightHelmet/glTF/',
                 file: 'FlightHelmet.gltf',
                 scale: 20,
