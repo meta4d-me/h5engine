@@ -15978,7 +15978,14 @@ var m4m;
                 t2d.width = this.pixelHeight;
                 t2d.height = this.pixelWidth;
                 t2d.format = m4m.render.TextureFormatEnum.FLOAT16;
+                //额外处理
+                var webgl = framework.sceneMgr.app.webgl;
+                webgl.bindTexture(webgl.TEXTURE_2D, t2d.texture);
+                //纹理 Y 翻转
+                webgl.pixelStorei(webgl.UNPACK_FLIP_Y_WEBGL, 0);
                 t2d.uploadByteArray(_mipmap, _linear, w, h, f16, _repeat, false, false, _premultiplyAlpha);
+                //结束
+                webgl.bindTexture(webgl.TEXTURE_2D, null);
                 return result;
             };
             RAWParse.HEADER_SIZE_X = 7;
@@ -21059,7 +21066,7 @@ var m4m;
                 if (specFactor === void 0) { specFactor = 1; }
                 if (irrFactor === void 0) { irrFactor = 1; }
                 return __awaiter(this, void 0, void 0, function () {
-                    var load, defaltScene, extensionsUsed, loadImg, samplers, _v, images, textures, sceneExtensions, gd_linfo_scene, hasLightMap, lightMapTexs, maps, extrasCfg, materials, views, accessors, meshes, nodes, scene, parseNode, roots;
+                    var load, defaltScene, extensionsUsed, hasKHR_texture_transform, loadImg, samplers, _v, images, textures, sceneExtensions, gd_linfo_scene, hasLightMap, lightMapTexs, maps, extrasCfg, materials, views, accessors, meshes, nodes, scene, parseNode, roots;
                     var _this = this;
                     return __generator(this, function (_w) {
                         switch (_w.label) {
@@ -21075,6 +21082,7 @@ var m4m;
                                 }); };
                                 defaltScene = (_a = this.data.scene) !== null && _a !== void 0 ? _a : 0;
                                 extensionsUsed = (_b = this.data.extensionsUsed) !== null && _b !== void 0 ? _b : [];
+                                hasKHR_texture_transform = extensionsUsed.indexOf("KHR_texture_transform") != -1;
                                 loadImg = function (url) { return new Promise(function (res) {
                                     m4m.io.loadImg(folder + url, function (img, err) {
                                         if (!err)
@@ -21100,8 +21108,10 @@ var m4m;
                                         var img = images[source];
                                         var tex = new m4m.framework.texture(img.src);
                                         var glt = new m4m.render.glTexture2D(ctx, m4m.render.TextureFormatEnum.RGB);
-                                        var samp = __assign({ minFilter: ctx.NEAREST, magFilter: ctx.NEAREST, wrapS: ctx.REPEAT, wrapT: ctx.REPEAT }, samplers[sampler]);
+                                        var samp = __assign({ minFilter: ctx.NEAREST, magFilter: ctx.LINEAR, wrapS: ctx.REPEAT, wrapT: ctx.REPEAT }, samplers[sampler]);
                                         glt.uploadImage(img, false, false, false, false, false, false); // bind texture
+                                        //额外设置
+                                        ctx.bindTexture(ctx.TEXTURE_2D, glt.texture);
                                         ctx.texParameteri(ctx.TEXTURE_2D, ctx.TEXTURE_MAG_FILTER, samp.magFilter);
                                         ctx.texParameteri(ctx.TEXTURE_2D, ctx.TEXTURE_MIN_FILTER, samp.minFilter);
                                         ctx.texParameteri(ctx.TEXTURE_2D, ctx.TEXTURE_WRAP_S, samp.wrapS);
@@ -21131,7 +21141,7 @@ var m4m;
                             case 5:
                                 extrasCfg = (_o = (_m = this.data.extras) === null || _m === void 0 ? void 0 : _m.clayViewerConfig) === null || _o === void 0 ? void 0 : _o.materials;
                                 materials = (_p = this.data.materials) === null || _p === void 0 ? void 0 : _p.map(function (m) {
-                                    var _a, _b, _c, _d, _e, _f, _g;
+                                    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
                                     var mat = new framework.material(m.name);
                                     var matCfg;
                                     var cfgs = extrasCfg === null || extrasCfg === void 0 ? void 0 : extrasCfg.filter(function (e) { return e.name === m.name; });
@@ -21147,9 +21157,10 @@ var m4m;
                                     if (irrSH) {
                                         mat.setCubeTexture('u_diffuse', irrSH);
                                     }
-                                    if (m.normalTexture) {
-                                        mat.setTexture("uv_MetallicRoughness", textures[m.normalTexture.index]);
-                                    }
+                                    // if (m.normalTexture)
+                                    // {
+                                    //     mat.setTexture("uv_MetallicRoughness", textures[m.normalTexture.index]);
+                                    // }
                                     if (m.occlusionTexture) {
                                         mat.setTexture("uv_AO", textures[m.occlusionTexture.index]);
                                     }
@@ -21169,21 +21180,29 @@ var m4m;
                                         _bColor[2] = _clayViewerColor[2];
                                     }
                                     mat.setVector4('CustomBasecolor', new m4m.math.vector4(_bColor[0], _bColor[1], _bColor[2], _bColor[3]));
-                                    mat.setFloat('CustomMetallic', (_c = matCfg === null || matCfg === void 0 ? void 0 : matCfg.metalness) !== null && _c !== void 0 ? _c : (_d = m.pbrMetallicRoughness) === null || _d === void 0 ? void 0 : _d.metallicFactor);
-                                    mat.setFloat('CustomRoughness', (_e = matCfg === null || matCfg === void 0 ? void 0 : matCfg.roughness) !== null && _e !== void 0 ? _e : (_f = m.pbrMetallicRoughness) === null || _f === void 0 ? void 0 : _f.roughnessFactor);
+                                    mat.setFloat('CustomMetallic', (_e = (_c = matCfg === null || matCfg === void 0 ? void 0 : matCfg.metalness) !== null && _c !== void 0 ? _c : (_d = m.pbrMetallicRoughness) === null || _d === void 0 ? void 0 : _d.metallicFactor) !== null && _e !== void 0 ? _e : 1);
+                                    mat.setFloat('CustomRoughness', (_h = (_f = matCfg === null || matCfg === void 0 ? void 0 : matCfg.roughness) !== null && _f !== void 0 ? _f : (_g = m.pbrMetallicRoughness) === null || _g === void 0 ? void 0 : _g.roughnessFactor) !== null && _h !== void 0 ? _h : 1);
                                     // console.log(matCfg.name);
                                     // console.table({...m.pbrMetallicRoughness});
                                     // console.table(matCfg);
                                     // if (matCfg && matCfg.length > 0) {
                                     // mat.setFloatv("uvRepeat", new Float32Array([matCfg[0]?.uvRepeat[0] ?? 1, matCfg[0]?.uvRepeat[1] ?? 1]));
-                                    mat.setFloat("uvRepeat", (_g = matCfg === null || matCfg === void 0 ? void 0 : matCfg.uvRepeat[0]) !== null && _g !== void 0 ? _g : 1);
+                                    // mat.setFloat("uvRepeat", matCfg?.uvRepeat[0] ?? 1);
                                     // } else {
                                     // mat.setFloat("uvRepeat", 1);
                                     // }
+                                    var extenKHR_tex_t;
                                     if (m.pbrMetallicRoughness) {
-                                        var _h = m.pbrMetallicRoughness, baseColorFactor = _h.baseColorFactor, baseColorTexture = _h.baseColorTexture, metallicFactor = _h.metallicFactor, roughnessFactor = _h.roughnessFactor, metallicRoughnessTexture = _h.metallicRoughnessTexture;
+                                        var _p = m.pbrMetallicRoughness, baseColorFactor = _p.baseColorFactor, baseColorTexture = _p.baseColorTexture, metallicFactor = _p.metallicFactor, roughnessFactor = _p.roughnessFactor, metallicRoughnessTexture = _p.metallicRoughnessTexture;
                                         if (baseColorTexture) {
                                             mat.setTexture("uv_Basecolor", uvChecker !== null && uvChecker !== void 0 ? uvChecker : textures[baseColorTexture.index]);
+                                            //extensions
+                                            var bcTexExten = baseColorTexture.extensions;
+                                            if (bcTexExten) {
+                                                if (hasKHR_texture_transform && bcTexExten.KHR_texture_transform) {
+                                                    extenKHR_tex_t = bcTexExten.KHR_texture_transform;
+                                                }
+                                            }
                                         }
                                         if (metallicRoughnessTexture) {
                                             mat.setTexture("uv_MetallicRoughness", textures[metallicRoughnessTexture.index]);
@@ -21192,6 +21211,27 @@ var m4m;
                                     if (m.occlusionTexture) {
                                         mat.setTexture("uv_AO", textures[m.occlusionTexture.index]);
                                     }
+                                    //tex transfrom
+                                    var tex_ST = new m4m.math.vector4(1, 1, 0, 0);
+                                    // clay-viewer 的配置优先
+                                    var cViewScale = (_j = matCfg === null || matCfg === void 0 ? void 0 : matCfg.uvRepeat[0]) !== null && _j !== void 0 ? _j : 1;
+                                    if (cViewScale != 1) {
+                                        tex_ST.x = cViewScale;
+                                        tex_ST.y = cViewScale;
+                                    }
+                                    else {
+                                        if (extenKHR_tex_t) {
+                                            if (extenKHR_tex_t.scale) {
+                                                tex_ST.x *= (_k = extenKHR_tex_t.scale[0]) !== null && _k !== void 0 ? _k : 1;
+                                                tex_ST.y *= (_l = extenKHR_tex_t.scale[1]) !== null && _l !== void 0 ? _l : 1;
+                                            }
+                                            if (extenKHR_tex_t.offset) {
+                                                tex_ST.z = (_m = extenKHR_tex_t.offset[0]) !== null && _m !== void 0 ? _m : 0;
+                                                tex_ST.w = (_o = extenKHR_tex_t.offset[1]) !== null && _o !== void 0 ? _o : 0;
+                                            }
+                                        }
+                                    }
+                                    mat.setFloat("uvRepeat", tex_ST.x); //之后 用 tex_ST 代替 uvRepeat
                                     return mat;
                                 });
                                 views = (_q = this.data.bufferViews) === null || _q === void 0 ? void 0 : _q.map(function (_a) {
@@ -71159,9 +71199,9 @@ var m4m;
                 this.mirroredU = mirroredU;
                 this.mirroredV = mirroredV;
                 this.loaded = true;
+                this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
                 this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, premultiply ? 1 : 0);
                 this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 1);
-                this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
                 var formatGL = this.webgl.RGBA;
                 if (this.format == TextureFormatEnum.RGB)
                     formatGL = this.webgl.RGB;
@@ -71215,6 +71255,7 @@ var m4m;
                     this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.CLAMP_TO_EDGE);
                 }
                 //this.img = null;
+                this.webgl.bindTexture(this.webgl.TEXTURE_2D, null);
             };
             glTexture2D.prototype.uploadByteArray = function (mipmap, linear, width, height, data, repeat, mirroredU, mirroredV, premultiplyAlpha, flipY, dataType) {
                 if (repeat === void 0) { repeat = false; }
@@ -71234,6 +71275,7 @@ var m4m;
                 this.mirroredU = mirroredU;
                 this.mirroredV = mirroredV;
                 this.loaded = true;
+                this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
                 if (premultiplyAlpha) {
                     this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
                 }
@@ -71243,7 +71285,6 @@ var m4m;
                 if (flipY) {
                     // this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 1);
                 }
-                this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
                 var formatGL = this.webgl.RGBA;
                 if (this.format == TextureFormatEnum.RGB)
                     formatGL = this.webgl.RGB;
@@ -71304,6 +71345,7 @@ var m4m;
                     this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.CLAMP_TO_EDGE);
                     this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.CLAMP_TO_EDGE);
                 }
+                this.webgl.bindTexture(this.webgl.TEXTURE_2D, null);
             };
             glTexture2D.prototype.caclByteLength = function () {
                 var pixellen = 1;

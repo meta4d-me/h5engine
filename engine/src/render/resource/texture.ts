@@ -257,11 +257,11 @@
             this.mirroredU = mirroredU;
             this.mirroredV = mirroredV;
             this.loaded = true;
+            this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
             this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, premultiply ? 1 : 0);
             this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 1);
 
 
-            this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
             var formatGL = this.webgl.RGBA;
             if (this.format == TextureFormatEnum.RGB)
                 formatGL = this.webgl.RGB;
@@ -323,7 +323,7 @@
                 this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.CLAMP_TO_EDGE);
             }
             //this.img = null;
-
+            this.webgl.bindTexture(this.webgl.TEXTURE_2D, null);
         }
         uploadByteArray(mipmap: boolean, linear: boolean, width: number, height: number, data: Uint8Array | Uint16Array | Float32Array, repeat: boolean = false, mirroredU: boolean = false, mirroredV: boolean = false, premultiplyAlpha = true, flipY = true, dataType: number = this.webgl.UNSIGNED_BYTE): void {
             this.width = width;
@@ -337,6 +337,7 @@
             this.mirroredU = mirroredU;
             this.mirroredV = mirroredV;
             this.loaded = true;
+            this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
             if (premultiplyAlpha) {
                 this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
             } else {
@@ -345,7 +346,6 @@
             if (flipY) {
                 // this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 1);
             }
-            this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
             var formatGL = this.webgl.RGBA;
             if (this.format == TextureFormatEnum.RGB)
                 formatGL = this.webgl.RGB;
@@ -416,6 +416,8 @@
                 this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.CLAMP_TO_EDGE);
                 this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.CLAMP_TO_EDGE);
             }
+
+            this.webgl.bindTexture(this.webgl.TEXTURE_2D, null);
         }
 
         webgl: WebGLRenderingContext;

@@ -50,7 +50,15 @@ namespace m4m.framework {
             t2d.width = this.pixelHeight;
             t2d.height = this.pixelWidth;
             t2d.format = render.TextureFormatEnum.FLOAT16;
+            //额外处理
+            let webgl = sceneMgr.app.webgl;
+            webgl.bindTexture(webgl.TEXTURE_2D, t2d.texture);
+            //纹理 Y 翻转
+            webgl.pixelStorei(webgl.UNPACK_FLIP_Y_WEBGL, 0 );
             t2d.uploadByteArray(_mipmap, _linear, w, h, f16, _repeat, false, false, _premultiplyAlpha);
+            //结束
+            webgl.bindTexture(webgl.TEXTURE_2D, null);
+
 
             return result;
         }
