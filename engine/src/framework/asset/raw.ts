@@ -29,7 +29,7 @@ namespace m4m.framework {
          * @param _repeat 
          * @returns 
          */
-        public static parseByAtt(gl: WebGLRenderingContext, arrayBuffer: ArrayBuffer, _mipmap = false, _linear = true, _premultiplyAlpha = true, _repeat = false) {
+        public static parseByAtt(gl: WebGLRenderingContext, arrayBuffer: ArrayBuffer, _mipmap = true, _linear = true, _premultiplyAlpha = false, _repeat = false) {
             var reader = new io.binReader(arrayBuffer);
             var w = reader.readUInt16();
             var h = reader.readUInt16();

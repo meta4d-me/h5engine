@@ -225,6 +225,8 @@ void main() {
     // finalColor += lightBRDF(light_2.xyz - v_pos, c) * vec3(0.6, 0.6, 0.4);
     // finalColor += ((1.0 - F) * (1.0 - c.Metallic) * c.Basecolor.rgb + indirectSpecular) * c.AO.rgb; // IBL+PBR
 
+    //有lightMap 时，用lightmap 替代 间接光照的贡献
+#ifndef LIGHTMAP
     // vec3 brdf = sRGBtoLINEAR(texture2D(brdf, clamp(vec2(c.NoV, 1. - c.roughness), vec2(0), vec2(1)))).rgb;
     vec2 brdf = DFGApprox(c.NoV, c.roughness);
     #ifdef TEXTURE_LOD
@@ -235,8 +237,6 @@ void main() {
     vec3 IBLspecular = 1.0 * IBLColor * (c.f0 * brdf.x + brdf.y);
     finalColor += IBLspecular * specularIntensity;
 
-#ifndef LIGHTMAP
-    //有lightMap 时，用lightmap 替代 间接光照的贡献
     #ifdef TEXTURE_LOD
         finalColor += c.diffuse.rgb * decoRGBE(textureCubeLodEXT(u_diffuse, c.R, lod)) * diffuseIntensity;
     #else
@@ -246,17 +246,22 @@ void main() {
     // finalColor += sRGBtoLINEAR(texture2D(uv_Emissive, xlv_TEXCOORD0 * uvRepeat)).rgb;
 
     finalColor *= u_Exposure * texture2D(uv_AO, xlv_TEXCOORD0 * uvRepeat).r;
-    finalColor = toneMapACES(finalColor);
 
 #ifdef LIGHTMAP
     lowp vec4 lightmap = texture2D(_LightmapTex, lightmap_TEXCOORD);
+    vec3 lightMapColor;
     if(glstate_lightmapRGBAF16 == 1.0){
         // finalColor.xyz *= lightmap.xyz;
-        finalColor.xyz += c.diffuse.rgb * lightmap.xyz;
+        lightMapColor = lightmap.rgb;
     }else{
-        finalColor.xyz *= decode_hdr(lightmap);
+        // finalColor.xyz *= decode_hdr(lightmap);
+        lightMapColor = decode_hdr(lightmap);
     }
+
+    finalColor.xyz += c.diffuse.rgb * lightMapColor;
 #endif
+
+    finalColor = toneMapACES(finalColor);
 
 #ifdef FOG
     finalColor.xyz = mix(glstate_fog_color.rgb, finalColor.rgb, factor);

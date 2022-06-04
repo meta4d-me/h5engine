@@ -15956,9 +15956,9 @@ var m4m;
              * @returns
              */
             RAWParse.parseByAtt = function (gl, arrayBuffer, _mipmap, _linear, _premultiplyAlpha, _repeat) {
-                if (_mipmap === void 0) { _mipmap = false; }
+                if (_mipmap === void 0) { _mipmap = true; }
                 if (_linear === void 0) { _linear = true; }
-                if (_premultiplyAlpha === void 0) { _premultiplyAlpha = true; }
+                if (_premultiplyAlpha === void 0) { _premultiplyAlpha = false; }
                 if (_repeat === void 0) { _repeat = false; }
                 var reader = new m4m.io.binReader(arrayBuffer);
                 var w = reader.readUInt16();
