@@ -1,0 +1,6 @@
+[submodule "examples/wasmBoy"]
+	path = examples/wasmBoy
+	url = http://heziwen@pwd.cafegame.cn:7990/scm/engine/wasmboy.git
+[submodule "examples/engineExample"]
+	path = examples/engineExample
+	url = http://heziwen@pwd.cafegame.cn:7990/scm/engine/engineexample.git

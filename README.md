@@ -1,4 +1,4 @@
-#engine
+# engine
 2017 02 01
 重构，将数学库移出核心层
 将原来的数学库打散，将对象池 和 数据结构放在渲染层
@@ -32,3 +32,13 @@ webgl api设计太不友好，
 最底层的一些功能，加载
 
 
+### 目录结构
+* enginesource
+&emsp;|---src&emsp;//引擎源码
+&emsp;|---lib&emsp;//引擎编译发布
+&emsp;|---examples&emsp;//样例
+&emsp;&emsp;|---engineExample&emsp;(git submodule)&emsp;//引擎样例
+&emsp;&emsp;&emsp;|---code&emsp;//引擎样例源码
+&emsp;&emsp;&emsp;|---exampleResource&emsp;(git submodule)&emsp;//样例资源
+&emsp;&emsp;&emsp;|---lib&emsp;//样例lib
+&emsp;&emsp;|---wasmBoy&emsp;(git submodule)&emsp;//gameboy pbr渲染 + GB模拟器

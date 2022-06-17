@@ -1,11 +1,2 @@
-/m4m_engine/m4m_engine/obj
-/m4m_engine/m4m_engine/bin
-/m4m_engine/m4m_engine/m4m_engine.csproj.user
-/m4m_engine/m4m_engine/lib_launcher
-/m4m_engine/m4m/tools/
-/m4m_engine/m4m/build.js
-/m4m_engine/m4m/.vscode/launch.json
-/m4m_engine/threading/bin/
-/m4m_engine/obj
 .vs
 .vscode
