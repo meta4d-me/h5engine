@@ -1,9 +1,0 @@
-{
-    "shader":"diffuse.shader.json",
-    "mapUniform":{
-        "_MainTex":{
-            "type":0,
-            "value":"0000_male_body_d.imgdesc.json"
-            }
-        }
-    }
