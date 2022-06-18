@@ -1,7 +1,6 @@
 /// <reference path="../../../io/reflect.ts" />
 
-namespace m4m.framework
-{
+namespace m4m.framework {
     /**
      * @public
      * @language zh_CN
@@ -10,8 +9,7 @@ namespace m4m.framework
      * @version m4m 1.0
      */
     @reflect.node2DComponent
-    export class inputField implements I2DComponent, I2DPointListener
-    {
+    export class inputField implements I2DComponent, I2DPointListener {
         static readonly ClassName: string = "inputField";
         private static readonly helpV2: m4m.math.vector2 = new m4m.math.vector2();
         private static _isIos: boolean;
@@ -34,12 +32,10 @@ namespace m4m.framework
          * @version m4m 1.0
          */
         @m4m.reflect.Field("reference", null, "image2D")
-        get frameImage()
-        {
+        get frameImage() {
             return this._frameImage;
         }
-        set frameImage(frameImg: image2D)
-        {
+        set frameImage(frameImg: image2D) {
             this._frameImage = frameImg;
         }
 
@@ -53,22 +49,19 @@ namespace m4m.framework
         public onTextSubmit: (text: string) => void;
 
         /** 选择区域的开始位置 */
-        get selectionStart()
-        {
+        get selectionStart() {
             if (this.inputElement) return this.inputElement.selectionStart;
             return 0;
         }
 
         /** 选择区域的结束位置 */
-        get selectionEnd()
-        {
+        get selectionEnd() {
             if (this.inputElement) return this.inputElement.selectionEnd;
             return 0;
         }
 
         /** 选择区域的方向 ， forward ：从前往后 backward ：从后往前 */
-        get selectionDirection()
-        {
+        get selectionDirection() {
             if (this.inputElement) return this.inputElement.selectionDirection;
             return "forward";
         }
@@ -80,22 +73,18 @@ namespace m4m.framework
          * 文字内容
          * @version m4m 1.0
          */
-        get text(): string
-        {
+        get text(): string {
             return this._text;
         }
-        set text(val: string)
-        {
+        set text(val: string) {
             if (val == this._text) return;
             val = val == null ? "" : val;
             this._text = val;
             if (this.inputElement) this.inputElement.value = val;
             if (this._textLable) this._textLable.text = val;
-            if (this.beFocus)
-            {
+            if (this.beFocus) {
                 this.showEle();
-            } else
-            {
+            } else {
                 this.showLable();
             }
         }
@@ -103,8 +92,7 @@ namespace m4m.framework
         /**
          * 清除输入文本
          */
-        public clearText()
-        {
+        public clearText() {
             this._text = "";
             this.inputElement.value = this._text;
             this._textLable.text = this._text;
@@ -120,8 +108,7 @@ namespace m4m.framework
          */
         @m4m.reflect.Field("number")
         get characterLimit() { return this._charlimit; }
-        set characterLimit(charlimit: number)
-        {
+        set characterLimit(charlimit: number) {
             this._charlimit = parseInt(`${charlimit}`);
             this._charlimit = isNaN(this._charlimit) || this._charlimit < 0 ? 0 : this._charlimit;
         }
@@ -136,14 +123,12 @@ namespace m4m.framework
          */
         @m4m.reflect.Field("number")
         get LineType() { return this._lineType; }
-        set LineType(_lineType: lineType)
-        {
+        set LineType(_lineType: lineType) {
             if (this._lineType == _lineType) return;
             let newIsSin = _lineType == lineType.SingleLine;
             let oldIsSin = this._lineType == lineType.SingleLine;
             this._lineType = _lineType;
-            if (newIsSin != oldIsSin && this.inputElement)
-            {
+            if (newIsSin != oldIsSin && this.inputElement) {
                 let oldVal = this.inputElement.value;
                 this.removeEle();
                 this.initEle();
@@ -161,8 +146,7 @@ namespace m4m.framework
         */
         @m4m.reflect.Field("number")
         get ContentType() { return this._contentType; }
-        set ContentType(contentType: contentType)
-        {
+        set ContentType(contentType: contentType) {
             this._contentType = contentType;
         }
 
@@ -175,12 +159,10 @@ namespace m4m.framework
          * @version m4m 1.0
          */
         @m4m.reflect.Field("reference", null, "label")
-        get TextLabel(): label
-        {
+        get TextLabel(): label {
             return this._textLable;
         }
-        set TextLabel(textLabel: label)
-        {
+        set TextLabel(textLabel: label) {
             if (textLabel == this._textLable) return;
             if (textLabel) { textLabel.text = this._text; }
             this._textLable = textLabel;
@@ -195,12 +177,10 @@ namespace m4m.framework
          * @version m4m 1.0
          */
         @m4m.reflect.Field("reference", null, "label")
-        get PlaceholderLabel(): label
-        {
+        get PlaceholderLabel(): label {
             return this._placeholderLabel;
         }
-        set PlaceholderLabel(placeholderLabel: label)
-        {
+        set PlaceholderLabel(placeholderLabel: label) {
             if (placeholderLabel == this._placeholderLabel) return;
 
             if (placeholderLabel.text == null || placeholderLabel.text == "")
@@ -211,19 +191,16 @@ namespace m4m.framework
         /**
          * 刷新布局
          */
-        private layoutRefresh()
-        {
+        private layoutRefresh() {
             this.inputElmLayout();
 
-            if (this._placeholderLabel)
-            {
+            if (this._placeholderLabel) {
                 if (this._placeholderLabel.transform.width != this.transform.width)
                     this._placeholderLabel.transform.width = this.transform.width;
                 if (this._placeholderLabel.transform.height != this.transform.height)
                     this._placeholderLabel.transform.height = this.transform.height;
             }
-            if (this._textLable)
-            {
+            if (this._textLable) {
                 if (this._textLable.transform.width != this.transform.width)
                     this._textLable.transform.width = this.transform.width;
                 if (this._textLable.transform.height != this.transform.height)
@@ -237,8 +214,7 @@ namespace m4m.framework
         }
 
         /**设置 通用 样式 */
-        private setStyleEle(Ele: HTMLElement)
-        {
+        private setStyleEle(Ele: HTMLElement) {
             Ele.style.outline = "medium";
             Ele.style.background = "transparent";
             Ele.style.border = "0";
@@ -246,8 +222,7 @@ namespace m4m.framework
             Ele.style.display = "none"
         }
 
-        private createInputEle()
-        {
+        private createInputEle() {
             this.inputElement = <HTMLInputElement>document.createElement("Input");
             let inpEle = this.inputElement;
             this.setStyleEle(inpEle);
@@ -255,8 +230,7 @@ namespace m4m.framework
             inpEle.style["-moz-appearance"] = 'textfield';
         }
 
-        private createTextAreaEle()
-        {
+        private createTextAreaEle() {
             this.inputElement = <HTMLTextAreaElement>document.createElement("textarea");
             let inpEle = this.inputElement;
             this.setStyleEle(inpEle);
@@ -266,17 +240,14 @@ namespace m4m.framework
         }
 
         /** 初始化 html 元素 */
-        private initEle()
-        {
+        private initEle() {
             //ios fix thing
             this.ckIsIos();
 
             //create Ele
-            if (this._lineType == lineType.SingleLine)
-            {
+            if (this._lineType == lineType.SingleLine) {
                 this.createInputEle();
-            } else
-            {
+            } else {
                 this.createTextAreaEle();
             }
 
@@ -285,32 +256,26 @@ namespace m4m.framework
             inpEle.tabIndex = 0;
             inpEle.value = this._text;
             // inpEle.autofocus = true;
-            if (this.transform.canvas.scene)
-            {
+            if (this.transform.canvas.scene) {
                 let htmlCanv = <HTMLCanvasElement>this.transform.canvas.scene.webgl.canvas;
                 if (htmlCanv)
                     htmlCanv.parentElement.appendChild(inpEle);
             }
 
             //reg event
-            inpEle.onblur = (e) =>
-            {
+            inpEle.onblur = (e) => {
                 this.beFocus = false;
             }
 
-            inpEle.onfocus = (e) =>
-            {
+            inpEle.onfocus = (e) => {
                 this.beFocus = true;
             }
 
-            inpEle.onkeydown = (ev: KeyboardEvent) =>
-            {
-                if (ev.code == "Enter")
-                {
+            inpEle.onkeydown = (ev: KeyboardEvent) => {
+                if (ev.code == "Enter") {
                     let needSubmit = this._lineType != lineType.MultiLine_NewLine;
                     if (ev.ctrlKey) needSubmit = true; //ctr + Enter = 强制提交
-                    if (needSubmit)
-                    {
+                    if (needSubmit) {
                         inpEle.blur();
                         if (this.onTextSubmit) this.onTextSubmit(this._text);
                     }
@@ -327,21 +292,18 @@ namespace m4m.framework
             this.inputElmLayout();
         }
 
-        private updateEleStyle()
-        {
+        private updateEleStyle() {
             let inpEle = this.inputElement;
             if (!inpEle) return;
             //
-            if (this._textLable)
-            {
+            if (this._textLable) {
                 let fontSize = this._textLable.fontsize / window.devicePixelRatio;
                 inpEle.style.fontSize = `${fontSize}px`;
                 let cssColor = math.colorToCSS(this._textLable.color, false);
                 inpEle.style.color = cssColor;
                 // let _font = this._textLable.font;
                 // inpEle.style.fontFamily = 
-                switch (this._textLable.horizontalType)
-                {
+                switch (this._textLable.horizontalType) {
                     case HorizontalType.Left: inpEle.style.textAlign = "left"; break;
                     case HorizontalType.Center: inpEle.style.textAlign = "center"; break;
                     case HorizontalType.Right: inpEle.style.textAlign = "right"; break;
@@ -354,8 +316,7 @@ namespace m4m.framework
             inpEle.placeholder = placeholderStr;
         }
 
-        private removeEle()
-        {
+        private removeEle() {
             let inpEle = this.inputElement;
             if (!inpEle) return;
             inpEle.onfocus = null;
@@ -372,29 +333,23 @@ namespace m4m.framework
         /**
          * @private
          */
-        start()
-        {
+        start() {
             this.initEle();
         }
 
-        private ckIsIos()
-        {
+        private ckIsIos() {
             //ios 有保护 , focus 必须在 dom 事件帧触发。
-            if (inputField._isIos == null)
-            {
-                if (navigator && navigator.userAgent)
-                {
+            if (inputField._isIos == null) {
+                if (navigator && navigator.userAgent) {
                     let u = navigator.userAgent;
                     inputField._isIos = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
-                } else
-                {
+                } else {
                     inputField._isIos = false;
                 }
             }
         }
 
-        onPlay()
-        {
+        onPlay() {
 
         }
 
@@ -402,8 +357,7 @@ namespace m4m.framework
         * @private
         * inputElement 位置、宽高刷新
         */
-        private inputElmLayout()
-        {
+        private inputElmLayout() {
             if (this.inputElement == null) return;
             let pos = this.transform.getWorldTranslate();
             let cssStyle: CSSStyleDeclaration = this.inputElement.style;
@@ -428,54 +382,46 @@ namespace m4m.framework
          * @private
          * 输入文本刷新
          */
-        private textRefresh()
-        {
+        private textRefresh() {
             if (!this.beFocus || !this._textLable || !this._placeholderLabel || !this.inputElement || this._text == this.inputElement.value) return;
 
-            if(this.inputElement.maxLength != this._charlimit){
-                this.inputElement.maxLength = this._charlimit;
+            let realMaxLen = this._charlimit;
+            if (realMaxLen <= 0) { realMaxLen = -1; }
+            if (this.inputElement.maxLength != realMaxLen) {
+                this.inputElement.maxLength = realMaxLen;
                 return;
             }
 
             this._text = this.inputElement.value;
-            if (this._contentType == contentType.Custom)
-            {
+            if (this._contentType == contentType.Custom) {
                 if (this.customRegexStr != null && this.customRegexStr != "")
                     this._text = this._text.replace(this.customRegexStr, '');
-            } else
-            {
-                if (this._contentType == contentType.None)
-                {
+            } else {
+                if (this._contentType == contentType.None) {
 
                 }
                 //英文字母，数字，汉字，下划线
-                else if ((this._contentType & contentType.Number) && (this._contentType & contentType.Word) && (this._contentType & contentType.ChineseCharacter) && (this._contentType & contentType.Underline))
-                {
+                else if ((this._contentType & contentType.Number) && (this._contentType & contentType.Word) && (this._contentType & contentType.ChineseCharacter) && (this._contentType & contentType.Underline)) {
                     this._text = this._text.replace(/^[\u4E00-\u9FA5a-zA-Z0-9_]{3,20}$/ig, '');
                 }
                 //英文字母，数字，下划线
-                else if ((this._contentType & contentType.Number) && (this._contentType & contentType.Word) && (this._contentType & contentType.Underline))
-                {
+                else if ((this._contentType & contentType.Number) && (this._contentType & contentType.Word) && (this._contentType & contentType.Underline)) {
                     this._text = this._text.replace(/[^\w\.\/]/ig, '');
                 }
                 //数字，字符
-                else if ((this._contentType & contentType.Number) && (this._contentType & contentType.Word))
-                {
+                else if ((this._contentType & contentType.Number) && (this._contentType & contentType.Word)) {
                     this._text = this._text.replace(/[^(A-Za-z0-9)]/ig, '');
                 }
                 //汉字，字符
-                else if ((this._contentType & contentType.ChineseCharacter) && (this._contentType & contentType.Word))
-                {
+                else if ((this._contentType & contentType.ChineseCharacter) && (this._contentType & contentType.Word)) {
                     this._text = this._text.replace(/[^(A-Za-z\u4E00-\u9FA5)]/ig, '');
                 }
                 //数字
-                else if (this._contentType == contentType.Number)
-                {
+                else if (this._contentType == contentType.Number) {
                     this._text = this._text.replace(/\D+/g, '');
                 }
                 //汉字
-                else if (this._contentType == contentType.ChineseCharacter)
-                {
+                else if (this._contentType == contentType.ChineseCharacter) {
                     this._text = this._text.replace(/[^\u4E00-\u9FA5]/g, '');
                 }
 
@@ -483,8 +429,7 @@ namespace m4m.framework
 
             //记录过滤 后的text
             this.inputElement.value = this._text;
-            if (this._textLable)
-            {
+            if (this._textLable) {
                 this._textLable.text = this._text;
             }
         }
@@ -492,8 +437,7 @@ namespace m4m.framework
         /**
          * @private
          */
-        update(delta: number)
-        {
+        update(delta: number) {
             this.layoutRefresh();
             this.textRefresh();
         }
@@ -501,8 +445,7 @@ namespace m4m.framework
         /**
          * @private
          */
-        remove()
-        {
+        remove() {
             if (this._textLable) this._textLable.onAddRendererText = null;
             this._placeholderLabel = null;
             this._textLable = null;
@@ -514,57 +457,46 @@ namespace m4m.framework
         /**
          * @private
          */
-        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean)
-        {
+        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean) {
             // if(this._isIos) return;
-            if (oncap == false)
-            {
+            if (oncap == false) {
                 if (ev.type != event.PointEventEnum.PointDown) return;
                 var b = this.transform.ContainsCanvasPoint(new math.vector2(ev.x, ev.y));
                 this.setFocus(b);
             }
         }
 
-        private setFocus(isFocus: boolean)
-        {
-            if (isFocus)
-            {
+        private setFocus(isFocus: boolean) {
+            if (isFocus) {
                 this.showEle();
-                if (!this.beFocus)
-                {
+                if (!this.beFocus) {
                     this.inputElement.focus();
                 }
             }
-            else
-            {
+            else {
                 if (this.beFocus) this.inputElement.blur();
                 this.showLable();
             }
         }
 
         /** 显示 标签 */
-        private showLable()
-        {
+        private showLable() {
             if (this.inputElement) this.inputElement.style.display = "none";
 
-            if (this._textLable)
-            {
+            if (this._textLable) {
                 this._textLable.transform.visible = false;
                 if (this._placeholderLabel) this._placeholderLabel.transform.visible = false;
 
-                if (this._textLable.text != "")
-                {
+                if (this._textLable.text != "") {
                     this._textLable.transform.visible = true;
-                } else
-                {
+                } else {
                     if (this._placeholderLabel) this._placeholderLabel.transform.visible = true;
                 }
             }
         }
 
         /** 显示 html组件 */
-        private showEle()
-        {
+        private showEle() {
             //更新
             this.updateEleStyle();
 
@@ -582,8 +514,7 @@ namespace m4m.framework
      * 文本行显示方式
      * @version m4m 1.0
      */
-    export enum lineType
-    {
+    export enum lineType {
         /** 单行模式 */
         SingleLine,
         /** 多行模式 */
@@ -598,8 +529,7 @@ namespace m4m.framework
      * 文本内容类型
      * @version m4m 1.0
      */
-    export enum contentType
-    {
+    export enum contentType {
         None = 0,
         /** 数字*/
         Number = 1,
