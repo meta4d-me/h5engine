@@ -432,10 +432,11 @@ namespace m4m.framework
         {
             if (!this.beFocus || !this._textLable || !this._placeholderLabel || !this.inputElement || this._text == this.inputElement.value) return;
 
-            if(this._charlimit > 0 && this.inputElement.maxLength != this._charlimit){
+            if(this.inputElement.maxLength != this._charlimit){
                 this.inputElement.maxLength = this._charlimit;
+                return;
             }
-            
+
             this._text = this.inputElement.value;
             if (this._contentType == contentType.Custom)
             {
