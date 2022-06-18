@@ -432,19 +432,10 @@ namespace m4m.framework
         {
             if (!this.beFocus || !this._textLable || !this._placeholderLabel || !this.inputElement || this._text == this.inputElement.value) return;
 
-            if (this._charlimit > 0 && this.inputElement.value.length >= this._charlimit)
-            {
-                if (this.inputElement.value != this._text)
-                    if (this.inputElement.value.length > this._text.length)
-                    {
-                        this.inputElement.value = this._text;
-                    } else
-                    {
-                        this._text = this.inputElement.value;
-                    }
-                return;
+            if(this._charlimit > 0 && this.inputElement.maxLength != this._charlimit){
+                this.inputElement.maxLength = this._charlimit;
             }
-
+            
             this._text = this.inputElement.value;
             if (this._contentType == contentType.Custom)
             {

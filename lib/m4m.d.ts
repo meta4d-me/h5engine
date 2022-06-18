@@ -1,6 +1,6 @@
 declare namespace m4m {
     class version {
-        static readonly VERSION = "0.0.1";
+        static readonly VERSION = "0.0.2";
     }
 }
 declare namespace m4m.framework {
