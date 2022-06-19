@@ -145,7 +145,7 @@ namespace m4m.framework {
             const textures: texture[] = await Promise.all(this.data.textures?.map(({ sampler, source }) => {
                 const img = images[source];
                 const tex = new m4m.framework.texture(img.src);
-                const glt = new m4m.render.glTexture2D(ctx, m4m.render.TextureFormatEnum.RGB);
+                const glt = new m4m.render.glTexture2D(ctx, m4m.render.TextureFormatEnum.RGBA);
                 const samp = {
                     minFilter: ctx.NEAREST,
                     magFilter: ctx.LINEAR,
@@ -263,17 +263,17 @@ namespace m4m.framework {
                 }else{
                     if(extenKHR_tex_t){
                         if(extenKHR_tex_t.scale){
-                            tex_ST.x *= extenKHR_tex_t.scale[0] ?? 1; 
-                            tex_ST.y *= extenKHR_tex_t.scale[1] ?? 1; 
+                            tex_ST.x *= extenKHR_tex_t.scale[0] ?? 1;
+                            tex_ST.y *= extenKHR_tex_t.scale[1] ?? 1;
                         }
                         if(extenKHR_tex_t.offset){
-                            tex_ST.z = extenKHR_tex_t.offset[0] ?? 0; 
-                            tex_ST.w = extenKHR_tex_t.offset[1] ?? 0; 
+                            tex_ST.z = extenKHR_tex_t.offset[0] ?? 0;
+                            tex_ST.w = extenKHR_tex_t.offset[1] ?? 0;
                         }
                     }
                 }
 
-                mat.setFloat("uvRepeat", tex_ST.x);     //之后 用 tex_ST 代替 uvRepeat
+                mat.setVector4("uvRepeat", tex_ST);     //之后 用 tex_ST 代替 uvRepeat
 
                 return mat;
             });

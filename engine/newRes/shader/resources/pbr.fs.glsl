@@ -16,7 +16,7 @@ precision mediump float;
 
 uniform float diffuseIntensity;
 uniform float specularIntensity;
-uniform float uvRepeat;
+uniform vec4 uvRepeat;
 
 uniform lowp float glstate_lightcount;
 // uniform lowp vec4 glstate_vec4_lightposs[8];
@@ -160,14 +160,14 @@ st_core init() {
     st_core temp;
 
     // PBR Material
-    temp.diffuse = (sRGBtoLINEAR(texture2D(uv_Basecolor, xlv_TEXCOORD0 * uvRepeat)) * CustomBasecolor);
+    temp.diffuse = (sRGBtoLINEAR(texture2D(uv_Basecolor, xlv_TEXCOORD0 * uvRepeat.xy + uvRepeat.zw)) * CustomBasecolor);
 
-    vec3 rm = texture2D(uv_MetallicRoughness, xlv_TEXCOORD0 * uvRepeat).rgb;
+    vec3 rm = texture2D(uv_MetallicRoughness, xlv_TEXCOORD0 * uvRepeat.xy + uvRepeat.zw).rgb;
     temp.roughness = clamp(rm.g, 0.04, 1.0) * CustomRoughness;
     temp.alphaRoughness = temp.roughness * temp.roughness;
     temp.metallic = clamp(rm.b, 0.0, 1.0) * CustomMetallic;
 
-    // vec4 AO = sRGBtoLINEAR(texture2D(uv_AO, xlv_TEXCOORD0 * uvRepeat));
+    // vec4 AO = sRGBtoLINEAR(texture2D(uv_AO, xlv_TEXCOORD0 * uvRepeat.xy + uvRepeat.zw));
 
     vec3 f0 = vec3(0.04);
     temp.f0 = mix(f0, temp.diffuse.xyz, temp.metallic);
@@ -176,8 +176,8 @@ st_core init() {
     // temp.diffuse/=PI;
 
     temp.V = normalize(glstate_eyepos.xyz - v_pos);
-    // mat3 TBN = cotangent_frame(temp.N, temp.V, xlv_TEXCOORD0 * uvRepeat);
-    vec3 normalAddation = texture2D(uv_Normal, xlv_TEXCOORD0 * uvRepeat).rgb * 2. - 1.;
+    // mat3 TBN = cotangent_frame(temp.N, temp.V, xlv_TEXCOORD0 * uvRepeat.xy + uvRepeat.zw);
+    vec3 normalAddation = texture2D(uv_Normal, xlv_TEXCOORD0 * uvRepeat.xy + uvRepeat.zw).rgb * 2. - 1.;
     temp.N = normalize(TBN * normalAddation);
 
     temp.NoV = clamp(abs(dot(temp.N, temp.V)), 0.001, 1.0);
@@ -243,9 +243,9 @@ void main() {
         finalColor += c.diffuse.rgb * decoRGBE(textureCube(u_diffuse, c.R)) * diffuseIntensity;
     #endif
 #endif
-    // finalColor += sRGBtoLINEAR(texture2D(uv_Emissive, xlv_TEXCOORD0 * uvRepeat)).rgb;
+    // finalColor += sRGBtoLINEAR(texture2D(uv_Emissive, xlv_TEXCOORD0 * uvRepeat.xy + uvRepeat.zw)).rgb;
 
-    finalColor *= u_Exposure * texture2D(uv_AO, xlv_TEXCOORD0 * uvRepeat).r;
+    finalColor *= u_Exposure * texture2D(uv_AO, xlv_TEXCOORD0 * uvRepeat.xy + uvRepeat.zw).r;
     finalColor = toneMapACES(finalColor);
 
 #ifdef LIGHTMAP
