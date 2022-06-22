@@ -47,12 +47,19 @@ namespace m4m.framework {
 
         /** 用户 按回车键时提交 回调函数 */
         public onTextSubmit: (text: string) => void;
+        /** 用户 聚焦输入框 回调函数 */
+        public onfocus: () => void;
+        /** 用户 从输入框移出焦点 回调函数 */
+        public onblur: () => void;
 
         /** 选择区域的开始位置 */
         get selectionStart() {
             if (this.inputElement) return this.inputElement.selectionStart;
             return 0;
         }
+
+        /** 输入框是否是聚焦的 */
+        get isFocus() { return this.beFocus; }
 
         /** 选择区域的结束位置 */
         get selectionEnd() {
@@ -265,10 +272,12 @@ namespace m4m.framework {
             //reg event
             inpEle.onblur = (e) => {
                 this.beFocus = false;
+                if (this.onblur) this.onblur();
             }
 
             inpEle.onfocus = (e) => {
                 this.beFocus = true;
+                if (this.onfocus) this.onfocus();
             }
 
             inpEle.onkeydown = (ev: KeyboardEvent) => {
@@ -369,13 +378,14 @@ namespace m4m.framework {
             if (realX + "px" == cssStyle.left && realY + "px" == cssStyle.top && w + "px" == cssStyle.width && h + "px" == cssStyle.height)
                 return;
 
-            let scale = sceneMgr.app.canvasClientHeight / this.transform.canvas.pixelHeight;
+            let scalex = sceneMgr.app.canvasClientWidth / this.transform.canvas.pixelWidth;
+            let scaley = sceneMgr.app.canvasClientHeight / this.transform.canvas.pixelHeight;
             cssStyle.position = "absolute";
-            cssStyle.left = realX * scale + "px";
-            cssStyle.top = realY * scale + "px";
+            cssStyle.left = realX * scalex + "px";
+            cssStyle.top = realY * scaley + "px";
 
-            cssStyle.width = w * scale + "px";
-            cssStyle.height = h * scale + "px";
+            cssStyle.width = w * scalex + "px";
+            cssStyle.height = h * scaley + "px";
         }
 
         /**
@@ -383,14 +393,18 @@ namespace m4m.framework {
          * 输入文本刷新
          */
         private textRefresh() {
-            if (!this.beFocus || !this._textLable || !this._placeholderLabel || !this.inputElement || this._text == this.inputElement.value) return;
+
+            if (!this.inputElement) return;
 
             let realMaxLen = this._charlimit;
             if (realMaxLen <= 0) { realMaxLen = -1; }
             if (this.inputElement.maxLength != realMaxLen) {
+                //刷输入限制
                 this.inputElement.maxLength = realMaxLen;
                 return;
             }
+
+            if (!this.beFocus || !this._textLable || !this._placeholderLabel || this._text == this.inputElement.value) return;
 
             this._text = this.inputElement.value;
             if (this._contentType == contentType.Custom) {
@@ -452,6 +466,9 @@ namespace m4m.framework {
             this.transform = null;
             this._frameImage = null;
             this.removeEle();
+            this.onTextSubmit = null;
+            this.onblur = null;
+            this.onfocus = null;
         }
 
         /**

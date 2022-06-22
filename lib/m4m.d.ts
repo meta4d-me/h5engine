@@ -2767,8 +2767,14 @@ declare namespace m4m.framework {
         private _lastAddRTextFID;
         /** 用户 按回车键时提交 回调函数 */
         onTextSubmit: (text: string) => void;
+        /** 用户 聚焦输入框 回调函数 */
+        onfocus: () => void;
+        /** 用户 从输入框移出焦点 回调函数 */
+        onblur: () => void;
         /** 选择区域的开始位置 */
         get selectionStart(): number;
+        /** 输入框是否是聚焦的 */
+        get isFocus(): boolean;
         /** 选择区域的结束位置 */
         get selectionEnd(): number;
         /** 选择区域的方向 ， forward ：从前往后 backward ：从后往前 */
