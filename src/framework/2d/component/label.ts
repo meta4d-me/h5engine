@@ -814,6 +814,7 @@ namespace m4m.framework {
         public get imageTextAtlas() { return this._imageTextAtlas; }
         public set imageTextAtlas(val: atlas) {
             if (val == this._imageTextAtlas) return;
+            this._richDrity = true;
             this._imageTextAtlas = val;
             if (this._imageTextAtlas) {
                 this._imageTextAtlasName = this._imageTextAtlas.getName();
@@ -1143,6 +1144,7 @@ namespace m4m.framework {
             let optStack: IRichTextOpt[] = [];
             let blockDatas: { text: string, opts: IRichTextOpt[] }[] = this._richTextBlocks;
             blockDatas.length = 0;
+            let atlas = this._imageTextAtlas;
 
             let genBlockFun = () => {
                 let str = strStack.shift();
@@ -1209,10 +1211,14 @@ namespace m4m.framework {
 
                     if (isValid) { strStack.pop(); }    //选项有效 弹栈
                 } else if (char == "]" && imgStart) {
-                    let str = strStack.pop();
+                    let str = strStack[strStack.length - 1];
                     let imgStr = str.substring(1, str.length - 1);
+                    let isValid = atlas && atlas.sprites[imgStr];//图集中是否能找到 该sprite
                     let imgOpt = new richOptImage(imgStr);
-                    blockDatas.push({ text: str, opts: [imgOpt] });
+                    if (isValid) {
+                        strStack.pop();
+                        blockDatas.push({ text: str, opts: [imgOpt] });
+                    }
                     imgStart = false;
                 }
             }
@@ -1354,7 +1360,7 @@ namespace m4m.framework {
     }
 
     /**
-     * 富文本选项 加粗
+     * 富文本选项 文本图
      */
     class richOptImage implements IRichTextOpt {
         constructor(imgSrc: string) {
