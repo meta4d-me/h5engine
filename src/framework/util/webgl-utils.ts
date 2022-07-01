@@ -128,7 +128,7 @@ namespace m4m.framework{
         if (!window.cancelAnimationFrame) {
             var tempwin = window as any;
             window.cancelAnimationFrame = (tempwin.cancelRequestAnimationFrame ||
-                                        window.webkitCancelAnimationFrame || tempwin.webkitCancelRequestAnimationFrame ||
+                                        tempwin.webkitCancelAnimationFrame || tempwin.webkitCancelRequestAnimationFrame ||
                                         tempwin.mozCancelAnimationFrame || tempwin.mozCancelRequestAnimationFrame ||
                                         tempwin.msCancelAnimationFrame || tempwin.msCancelRequestAnimationFrame ||
                                         tempwin.oCancelAnimationFrame || tempwin.oCancelRequestAnimationFrame ||
