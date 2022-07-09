@@ -12,7 +12,7 @@ namespace m4m.framework {
     export class inputField implements I2DComponent, I2DPointListener {
         static readonly ClassName: string = "inputField";
         private static readonly helpV2: m4m.math.vector2 = new m4m.math.vector2();
-        private static _isIos: boolean;
+        private static _isMobile: boolean;
 
         /**
          * @public
@@ -44,6 +44,8 @@ namespace m4m.framework {
         private inputElement: HTMLInputElement | HTMLTextAreaElement;
         private _text: string = "";
         private _lastAddRTextFID = 0;
+        private _inputStop: boolean = false;
+        private _eventsHandle: { [eventKey: string]: Function } = {};
 
         /** 用户 按回车键时提交 回调函数 */
         public onTextSubmit: (text: string) => void;
@@ -51,6 +53,8 @@ namespace m4m.framework {
         public onfocus: () => void;
         /** 用户 从输入框移出焦点 回调函数 */
         public onblur: () => void;
+        /** 用户 从输入框移出 回调函数 */
+        public onmouseout: () => void;
 
         /** 选择区域的开始位置 */
         get selectionStart() {
@@ -249,7 +253,7 @@ namespace m4m.framework {
         /** 初始化 html 元素 */
         private initEle() {
             //ios fix thing
-            this.ckIsIos();
+            this.ckIsMobile();
 
             //create Ele
             if (this._lineType == lineType.SingleLine) {
@@ -269,34 +273,54 @@ namespace m4m.framework {
                     htmlCanv.parentElement.appendChild(inpEle);
             }
 
-            //reg event
-            inpEle.onblur = (e) => {
+            let eventsH = this._eventsHandle;
+
+            //事件 handle 绑定函数
+            eventsH.compositionstart = (e) => {
+                this._inputStop = true;
+            }
+
+            eventsH.compositionend = (e) => {
+                this._inputStop = false;
+                this.textRefresh();
+            }
+
+            eventsH.blur = (e) => {
+                if (inputField._isMobile && this._inputStop) {
+                    if (eventsH.compositionend) eventsH.compositionend();
+                }
                 this.beFocus = false;
                 if (this.onblur) this.onblur();
             }
 
-            inpEle.onfocus = (e) => {
+            eventsH.focus = (e) => {
                 this.beFocus = true;
                 if (this.onfocus) this.onfocus();
             }
 
-            inpEle.onkeydown = (ev: KeyboardEvent) => {
-                if (ev.code == "Enter") {
+            eventsH.mouseout = (e) => {
+                if (this.onmouseout) this.onmouseout();
+            }
+
+            eventsH.keydown = (ev: KeyboardEvent) => {
+                if (this._inputStop) return;
+                if (ev.code == "Enter" || (ev as any).keyCode == 13) {
                     let needSubmit = this._lineType != lineType.MultiLine_NewLine;
                     if (ev.ctrlKey) needSubmit = true; //ctr + Enter = 强制提交
                     if (needSubmit) {
-                        inpEle.blur();
+                        // inpEle.blur();
+                        this.setFocus(false);
                         if (this.onTextSubmit) this.onTextSubmit(this._text);
                     }
                 }
                 // console.error(`code:${ev.code}`);
             }
 
-            // inpEle.addEventListener('compositionstart', () => { console.log("compositionstart") });
-            // inpEle.addEventListener('compositionend', () => { console.log("compositionend") });
-            // inpEle.addEventListener('input', () => { console.log("input") });
-            // inpEle.addEventListener('keydown', () => { console.log("keydown") });
-            // inpEle.addEventListener('touchstart', () => { console.log("touchstart") });
+            //reg all event
+            for (let key in eventsH) {
+                let fun = eventsH[key];
+                inpEle.addEventListener(key, fun as any);
+            }
 
             this.inputElmLayout();
         }
@@ -328,9 +352,12 @@ namespace m4m.framework {
         private removeEle() {
             let inpEle = this.inputElement;
             if (!inpEle) return;
-            inpEle.onfocus = null;
-            inpEle.onclick = null;
-            inpEle.onblur = null;
+            //unreg all event
+            for (let key in this._eventsHandle) {
+                let fun = this._eventsHandle[key];
+                inpEle.removeEventListener(key, fun as any);
+            }
+            //remove
             inpEle.disabled = false;
             inpEle.value = "";
             inpEle.style.display = "none";
@@ -346,14 +373,13 @@ namespace m4m.framework {
             this.initEle();
         }
 
-        private ckIsIos() {
-            //ios 有保护 , focus 必须在 dom 事件帧触发。
-            if (inputField._isIos == null) {
+        private ckIsMobile() {
+            if (inputField._isMobile == null) {
                 if (navigator && navigator.userAgent) {
-                    let u = navigator.userAgent;
-                    inputField._isIos = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
+                    let u = navigator.userAgent.toLowerCase();
+                    inputField._isMobile = /mobile|iphone|ipad|android/.test(u);
                 } else {
-                    inputField._isIos = false;
+                    inputField._isMobile = false;
                 }
             }
         }
@@ -393,8 +419,7 @@ namespace m4m.framework {
          * 输入文本刷新
          */
         private textRefresh() {
-
-            if (!this.inputElement) return;
+            if (this._inputStop || !this.inputElement) return;
 
             let realMaxLen = this._charlimit;
             if (realMaxLen <= 0) { realMaxLen = -1; }
@@ -404,7 +429,7 @@ namespace m4m.framework {
                 return;
             }
 
-            if (!this.beFocus || !this._textLable || !this._placeholderLabel || this._text == this.inputElement.value) return;
+            if (!this._textLable || !this._placeholderLabel || this._text == this.inputElement.value) return;
 
             this._text = this.inputElement.value;
             if (this._contentType == contentType.Custom) {
@@ -469,6 +494,7 @@ namespace m4m.framework {
             this.onTextSubmit = null;
             this.onblur = null;
             this.onfocus = null;
+            this.onmouseout = null;
         }
 
         /**
@@ -483,7 +509,11 @@ namespace m4m.framework {
             }
         }
 
-        private setFocus(isFocus: boolean) {
+        /**
+         * 设置 输入聚焦状态
+         * @param isFocus 是否聚焦 
+         */
+        setFocus(isFocus: boolean) {
             if (isFocus) {
                 this.showEle();
                 if (!this.beFocus) {

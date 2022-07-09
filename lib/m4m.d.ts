@@ -2741,7 +2741,7 @@ declare namespace m4m.framework {
     class inputField implements I2DComponent, I2DPointListener {
         static readonly ClassName: string;
         private static readonly helpV2;
-        private static _isIos;
+        private static _isMobile;
         /**
          * @public
          * @language zh_CN
@@ -2765,12 +2765,16 @@ declare namespace m4m.framework {
         private inputElement;
         private _text;
         private _lastAddRTextFID;
+        private _inputStop;
+        private _eventsHandle;
         /** 用户 按回车键时提交 回调函数 */
         onTextSubmit: (text: string) => void;
         /** 用户 聚焦输入框 回调函数 */
         onfocus: () => void;
         /** 用户 从输入框移出焦点 回调函数 */
         onblur: () => void;
+        /** 用户 从输入框移出 回调函数 */
+        onmouseout: () => void;
         /** 选择区域的开始位置 */
         get selectionStart(): number;
         /** 输入框是否是聚焦的 */
@@ -2858,7 +2862,7 @@ declare namespace m4m.framework {
          * @private
          */
         start(): void;
-        private ckIsIos;
+        private ckIsMobile;
         onPlay(): void;
         /**
         * @private
@@ -2882,7 +2886,11 @@ declare namespace m4m.framework {
          * @private
          */
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
-        private setFocus;
+        /**
+         * 设置 输入聚焦状态
+         * @param isFocus 是否聚焦
+         */
+        setFocus(isFocus: boolean): void;
         /** 显示 标签 */
         private showLable;
         /** 显示 html组件 */
