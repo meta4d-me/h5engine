@@ -5874,7 +5874,37 @@ declare namespace m4m.framework {
         hexToRgb: (hex: any) => any;
         buffers: bin[];
         load(mgr: assetMgr, ctx: WebGLRenderingContext, folder: string, brdf: texture, env: texture, irrSH: texture, exposure?: any, specFactor?: number, irrFactor?: number, uvChecker?: texture): Promise<transform>;
+        /**
+         * 获取实时灯光列表详细
+         */
+        getRealtimeLights(): gltfRealtimeLight[];
     }
+    /** 灯光阴影质量 */
+    enum ShadowQualityType {
+        None = 0,
+        Low = 1,
+        Medium = 2,
+        High = 3
+    }
+    /** gltf 实时灯光 */
+    type gltfRealtimeLight = {
+        /** 光灯类型 */
+        type: LightTypeEnum;
+        /** 影响范围 */
+        range: number;
+        /** 聚光灯张角度 */
+        spotAngle: number;
+        /** 阴影质量 */
+        shadowQuality: ShadowQualityType;
+        /** 光照强度 */
+        intensity: number;
+        /** 灯光颜色 */
+        color: number[];
+        /** 灯光角度 [x,y] */
+        angles: number[];
+        /** 灯光位置 [x,y,z] */
+        pos: number[];
+    };
     class Accessor {
         static types: {
             SCALAR: number;

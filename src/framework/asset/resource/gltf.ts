@@ -254,21 +254,21 @@ namespace m4m.framework {
                 }
 
                 //tex transfrom
-                let tex_ST = new math.vector4(1 , 1 , 0, 0);
+                let tex_ST = new math.vector4(1, 1, 0, 0);
                 // clay-viewer 的配置优先
                 let cViewScale = matCfg?.uvRepeat[0] ?? 1;
-                if(cViewScale != 1){
+                if (cViewScale != 1) {
                     tex_ST.x = cViewScale;
                     tex_ST.y = cViewScale;
-                }else{
-                    if(extenKHR_tex_t){
-                        if(extenKHR_tex_t.scale){
-                            tex_ST.x *= extenKHR_tex_t.scale[0] ?? 1; 
-                            tex_ST.y *= extenKHR_tex_t.scale[1] ?? 1; 
+                } else {
+                    if (extenKHR_tex_t) {
+                        if (extenKHR_tex_t.scale) {
+                            tex_ST.x *= extenKHR_tex_t.scale[0] ?? 1;
+                            tex_ST.y *= extenKHR_tex_t.scale[1] ?? 1;
                         }
-                        if(extenKHR_tex_t.offset){
-                            tex_ST.z = extenKHR_tex_t.offset[0] ?? 0; 
-                            tex_ST.w = extenKHR_tex_t.offset[1] ?? 0; 
+                        if (extenKHR_tex_t.offset) {
+                            tex_ST.z = extenKHR_tex_t.offset[0] ?? 0;
+                            tex_ST.w = extenKHR_tex_t.offset[1] ?? 0;
                         }
                     }
                 }
@@ -478,7 +478,48 @@ namespace m4m.framework {
             roots.forEach(r => scene.addChild(r));
             return scene;
         }
+
+        /**
+         * 获取实时灯光列表详细
+         */
+        getRealtimeLights(): gltfRealtimeLight[] {
+            let extUsed = this.data.extensionsUsed as string[];
+            if (!extUsed || extUsed.indexOf("gd_realtime_lights") == -1) return;
+            let scenes = this.data.scenes;
+            if (!scenes || !scenes[0].extensions) return;
+            let gd_realtime_lights = scenes[0].extensions.gd_realtime_lights;
+            if (!gd_realtime_lights || !gd_realtime_lights.lightInfos) return;
+            return gd_realtime_lights.lightInfos;
+        }
     }
+
+    /** 灯光阴影质量 */
+    export enum ShadowQualityType {
+        None,
+        Low,
+        Medium,
+        High,
+    }
+
+    /** gltf 实时灯光 */
+    export type gltfRealtimeLight = {
+        /** 光灯类型 */
+        type: LightTypeEnum,
+        /** 影响范围 */
+        range: number,
+        /** 聚光灯张角度 */
+        spotAngle: number,
+        /** 阴影质量 */
+        shadowQuality: ShadowQualityType,
+        /** 光照强度 */
+        intensity: number,
+        /** 灯光颜色 */
+        color: number[],
+        /** 灯光角度 [x,y] */
+        angles: number[],
+        /** 灯光位置 [x,y,z] */
+        pos: number[],
+    };
 
     export class Accessor {
         static types = {
