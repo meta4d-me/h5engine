@@ -5792,7 +5792,7 @@ declare namespace m4m.framework {
      * json资源
      * @version m4m 1.0
      */
-    class gltf implements IAsset {
+    export class gltf implements IAsset {
         data: any;
         static readonly ClassName: string;
         private name;
@@ -5880,14 +5880,14 @@ declare namespace m4m.framework {
         getRealtimeLights(): gltfRealtimeLight[];
     }
     /** 灯光阴影质量 */
-    enum ShadowQualityType {
+    export enum ShadowQualityType {
         None = 0,
         Low = 1,
         Medium = 2,
         High = 3
     }
     /** gltf 实时灯光 */
-    type gltfRealtimeLight = {
+    export type gltfRealtimeLight = {
         /** 光灯类型 */
         type: LightTypeEnum;
         /** 影响范围 */
@@ -5905,7 +5905,8 @@ declare namespace m4m.framework {
         /** 灯光位置 [x,y,z] */
         pos: number[];
     };
-    class Accessor {
+    type AccTypedArray = Int8Array | Uint8Array | Int16Array | Uint16Array | Uint32Array | Float32Array;
+    export class Accessor {
         static types: {
             SCALAR: number;
             VEC1: number;
@@ -5936,13 +5937,14 @@ declare namespace m4m.framework {
             max?: any[];
             min?: any[];
         }, name?: string);
-        get data(): any;
+        get data(): AccTypedArray | AccTypedArray[];
         static newFloat32Array(acc: Accessor): Float32Array;
-        static getSubChunks(acc: any, data: any): any[];
-        static getFloat32Blocks(acc: Accessor): any[];
+        static getSubChunks(acc: Accessor, data: AccTypedArray): AccTypedArray[];
+        static getFloat32Blocks(acc: Accessor): AccTypedArray[];
         static newTypedArray(acc: Accessor): Int8Array | Uint8Array | Int16Array | Uint16Array | Uint32Array | Float32Array;
-        static getData(acc: Accessor): any[] | Int8Array | Uint8Array | Int16Array | Uint16Array | Uint32Array | Float32Array;
+        static getData(acc: Accessor): Int8Array | Uint8Array | Int16Array | Uint16Array | Uint32Array | Float32Array | AccTypedArray[];
     }
+    export {};
 }
 declare namespace m4m.framework {
     /**
