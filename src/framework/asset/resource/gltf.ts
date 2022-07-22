@@ -292,12 +292,13 @@ namespace m4m.framework {
                 return primitives.map(({ attributes, indices, material, extensions }) => {
                     const mf = new mesh(folder + name);
                     const mdata = mf.data = new m4m.render.meshData();
-                    const vert = mdata.pos = [];
-                    const uv1 = mdata.uv = [];
-                    const normal = mdata.normal = [];
-                    const tangent = mdata.tangent = [];
+                    const vert: m4m.math.vector3[] = mdata.pos = [];
+                    const uv1: m4m.math.vector2[] = mdata.uv = [];
+                    const uv2: m4m.math.vector2[] = mdata.uv2 = [];
+                    const normal: m4m.math.vector3[] = mdata.normal = [];
+                    const tangent: m4m.math.vector3[] = mdata.tangent = [];
                     // const colors = mdata.color = [];
-                    const attr: any = {};
+                    const attr: { [k: string]: Accessor } = {};
                     for (let k in attributes) {
                         attr[k] = new Accessor(accessors[attributes[k]], k);
                     }
@@ -330,59 +331,67 @@ namespace m4m.framework {
                     mf.glMesh.initBuffer(ctx, vf, vcount, m4m.render.MeshTypeEnum.Dynamic);
 
                     const eboAcc = new Accessor(accessors[indices], "indices");
-                    const ebo = eboAcc.data;
+                    const ebo = eboAcc.data as Uint16Array;
                     mdata.trisindex = Array.from(ebo);
 
                     for (let i = 0; i < vcount; i++) {
-                        let uvFliped0;
                         if (attr.TEXCOORD_0?.size != null) {
-                            uvFliped0 = [...attr.TEXCOORD_0.data[i]];
-                            uvFliped0[1] = uvFliped0[1] * -1 + 1;
-                            uv1[i] = new m4m.math.vector2(...uvFliped0);
+                            let uvFliped0 = attr.TEXCOORD_0.data[i];
+                            uv1[i] = new m4m.math.vector2(uvFliped0[0], uvFliped0[1] * -1 + 1);
                         }
 
-                        let uvFliped1;
                         if (attr.TEXCOORD_1?.size != null) {
-                            uvFliped1 = [...attr.TEXCOORD_1.data[i]];
-                            uvFliped1[1] = uvFliped1[1] * -1 + 1;
-                            uv1[i] = new m4m.math.vector2(...uvFliped1);
+                            let uvFliped1 = attr.TEXCOORD_1.data[i];
+                            uv2[i] = new m4m.math.vector2(uvFliped1[0], uvFliped1[1] * -1 + 1);
                         }
 
-                        if (attr.POSITION?.size != null)
-                            vert[i] = new m4m.math.vector3(...attr.POSITION.data[i]);
+                        if (attr.POSITION?.size != null) {
+                            let _posArr = attr.POSITION.data[i];
+                            vert[i] = new m4m.math.vector3(_posArr[0], _posArr[1], _posArr[2]);
+                        }
 
-                        if (attr.NORMAL?.size != null)
-                            normal[i] = new m4m.math.vector3(...attr.NORMAL.data[i]);
+                        if (attr.NORMAL?.size != null) {
+                            let _normalArr = attr.NORMAL.data[i];
+                            normal[i] = new m4m.math.vector3(_normalArr[0], _normalArr[1], _normalArr[2]);
+                        }
 
-                        if (attr.TANGENT?.size != null)
-                            tangent[i] = new m4m.math.vector3(...attr.TANGENT.data[i]);
+                        if (attr.TANGENT?.size != null) {
+                            let _tangentArr = attr.TANGENT.data[i];
+                            tangent[i] = new m4m.math.vector3(_tangentArr[0], _tangentArr[1], _tangentArr[2]);
+                            //处理 w 分量 , w 存入 xyz 中。
+                        }
 
                         const cur = vbo.subarray(i * bs); // offset
                         let bit = 0;
                         if (attr.POSITION?.size != null) {
                             const position = cur.subarray(bit, bit += 3);
-                            position.set(attr.POSITION.data[i]);
+                            position.set(attr.POSITION.data[i] as AccTypedArray);
                         }
 
                         // const color = cur.subarray(3, 7);
                         if (attr.NORMAL?.size != null) {
                             const n = cur.subarray(bit, bit += 3);
-                            n.set(attr.NORMAL.data[i]);
+                            n.set(attr.NORMAL.data[i] as AccTypedArray);
                         }
 
                         if (attr.TANGENT?.size != null) {
                             const tan = cur.subarray(bit, bit += 3);
-                            tan.set(attr.TANGENT.data[i].slice(0, 3));
+                            const t = tangent[i];
+                            tan.set([t.x, t.y, t.z]);
                         }
 
                         if (attr.TEXCOORD_0?.size != null) {
-                            const uv = cur.subarray(bit, bit += 2);
-                            uv.set(uvFliped0);
+                            const _uv = cur.subarray(bit, bit += 2);
+                            let u = uv1[i];
+                            _uv[0] = u.x;
+                            _uv[1] = u.y;
                         }
 
                         if (attr.TEXCOORD_1?.size != null) {
-                            const uv = cur.subarray(bit, bit += 2);
-                            uv.set(uvFliped1);
+                            const _uv2 = cur.subarray(bit, bit += 2);
+                            let u = uv2[i];
+                            _uv2[0] = u.x;
+                            _uv2[1] = u.y;
                         }
 
                         // const tangent = cur.subarray(7, 9);
@@ -521,6 +530,7 @@ namespace m4m.framework {
         pos: number[],
     };
 
+    type AccTypedArray = Int8Array | Uint8Array | Int16Array | Uint16Array | Uint32Array | Float32Array;
     export class Accessor {
         static types = {
             "SCALAR": 1,
@@ -541,7 +551,7 @@ namespace m4m.framework {
         max: number[];
         min: number[];
         size: number;
-        private _data: any;
+        private _data: AccTypedArray | AccTypedArray[];
         constructor({ bufferView, byteOffset = 0, componentType, normalized = false, count, type, max = [], min = [] }, name = '') {
             this.attribute = name;
             this.bufferView = bufferView;
@@ -561,8 +571,8 @@ namespace m4m.framework {
         static newFloat32Array(acc: Accessor) {
             return new Float32Array(acc.bufferView.rawBuffer, acc.byteOffset + acc.bufferView.byteOffset, acc.size * acc.count);
         }
-        static getSubChunks(acc, data) {
-            let blocks = [];
+        static getSubChunks(acc: Accessor, data: AccTypedArray) {
+            let blocks: AccTypedArray[] = [];
             for (let i = 0; i < acc.count; i++) {
                 let offset = i * acc.size;
                 blocks.push(data.subarray(offset, offset + acc.size));
