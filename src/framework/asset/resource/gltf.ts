@@ -357,8 +357,13 @@ namespace m4m.framework {
 
                         if (attr.TANGENT?.size != null) {
                             let _tangentArr = attr.TANGENT.data[i];
-                            tangent[i] = new m4m.math.vector3(_tangentArr[0], _tangentArr[1], _tangentArr[2]);
-                            //处理 w 分量 , w 存入 xyz 中。
+                            let t = new m4m.math.vector3(_tangentArr[0], _tangentArr[1], _tangentArr[2]);
+                            //处理 w 分量 , w 存入 xyz 中, w 只因为为1 或 -1 ,表示为切向方向性。
+                            //将w 平移2 , 映射为 -1 -> 1 , 1 -> 3 ，这样保障 normalize 后 xyz 一致
+                            let w = _tangentArr[3] + 2;
+                            //将w 乘入 xyz , x = x * w , y = y * w , y = y * w 
+                            m4m.math.vec3ScaleByNum(t, w, t);
+                            tangent[i] = t;
                         }
 
                         const cur = vbo.subarray(i * bs); // offset
@@ -377,7 +382,9 @@ namespace m4m.framework {
                         if (attr.TANGENT?.size != null) {
                             const tan = cur.subarray(bit, bit += 3);
                             const t = tangent[i];
-                            tan.set([t.x, t.y, t.z]);
+                            tan[0] = t.x;
+                            tan[1] = t.y;
+                            tan[2] = t.z;
                         }
 
                         if (attr.TEXCOORD_0?.size != null) {
