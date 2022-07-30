@@ -145,7 +145,11 @@ namespace m4m.framework {
             const textures: texture[] = await Promise.all(this.data.textures?.map(({ sampler, source }) => {
                 const img = images[source];
                 const tex = new m4m.framework.texture(img.src);
-                const glt = new m4m.render.glTexture2D(ctx, m4m.render.TextureFormatEnum.RGB);
+                let format = m4m.render.TextureFormatEnum.RGBA;
+                if(img.src.length > 4 && img.src.substr(img.src.length - 4) == ".jpg"){
+                    format = m4m.render.TextureFormatEnum.RGB;
+                }
+                const glt = new m4m.render.glTexture2D(ctx, format);
                 const samp = {
                     minFilter: ctx.NEAREST,
                     magFilter: ctx.LINEAR,
@@ -188,7 +192,19 @@ namespace m4m.framework {
                 let matCfg;
                 let cfgs = extrasCfg?.filter(e => e.name === m.name);
                 if (cfgs?.length > 0) matCfg = cfgs[0];
-                mat.setShader(mgr.getShader("pbr.shader.json"));
+                let pbrSH: shader;
+                let alphaMode = m.alphaMode ?? "OPAQUE";
+                let alphaCutoff = m.alphaCutoff ?? 0.5;
+                let shaderRes = "pbr.shader.json";
+                switch (alphaMode) {
+                    case "OPAQUE": alphaCutoff = 0; break;
+                    case "MASK": break;
+                    case "BLEND": shaderRes = `pbr_blend.shader.json`; break;
+                }
+                pbrSH = mgr.getShader(shaderRes);
+                mat.setShader(pbrSH);
+                mat.setFloat("alphaCutoff", alphaCutoff);
+
                 if (brdf) {
                     mat.setTexture('brdf', brdf);
                 }
@@ -357,8 +373,13 @@ namespace m4m.framework {
 
                         if (attr.TANGENT?.size != null) {
                             let _tangentArr = attr.TANGENT.data[i];
-                            tangent[i] = new m4m.math.vector3(_tangentArr[0], _tangentArr[1], _tangentArr[2]);
-                            //处理 w 分量 , w 存入 xyz 中。
+                            let t = new m4m.math.vector3(_tangentArr[0], _tangentArr[1], _tangentArr[2]);
+                            //处理 w 分量 , w 存入 xyz 中, w 只因为为1 或 -1 ,表示为切向方向性。
+                            //将w 平移2 , 映射为 -1 -> 1 , 1 -> 3 ，这样保障 normalize 后 xyz 一致
+                            let w = _tangentArr[3] + 2;
+                            //将w 乘入 xyz , x = x * w , y = y * w , y = y * w 
+                            m4m.math.vec3ScaleByNum(t, w, t);
+                            tangent[i] = t;
                         }
 
                         const cur = vbo.subarray(i * bs); // offset
@@ -377,7 +398,9 @@ namespace m4m.framework {
                         if (attr.TANGENT?.size != null) {
                             const tan = cur.subarray(bit, bit += 3);
                             const t = tangent[i];
-                            tan.set([t.x, t.y, t.z]);
+                            tan[0] = t.x;
+                            tan[1] = t.y;
+                            tan[2] = t.z;
                         }
 
                         if (attr.TEXCOORD_0?.size != null) {
