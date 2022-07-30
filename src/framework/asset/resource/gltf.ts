@@ -145,7 +145,11 @@ namespace m4m.framework {
             const textures: texture[] = await Promise.all(this.data.textures?.map(({ sampler, source }) => {
                 const img = images[source];
                 const tex = new m4m.framework.texture(img.src);
-                const glt = new m4m.render.glTexture2D(ctx, m4m.render.TextureFormatEnum.RGB);
+                let format = m4m.render.TextureFormatEnum.RGBA;
+                if(img.src.length > 4 && img.src.substr(img.src.length - 4) == ".jpg"){
+                    format = m4m.render.TextureFormatEnum.RGB;
+                }
+                const glt = new m4m.render.glTexture2D(ctx, format);
                 const samp = {
                     minFilter: ctx.NEAREST,
                     magFilter: ctx.LINEAR,
@@ -188,7 +192,19 @@ namespace m4m.framework {
                 let matCfg;
                 let cfgs = extrasCfg?.filter(e => e.name === m.name);
                 if (cfgs?.length > 0) matCfg = cfgs[0];
-                mat.setShader(mgr.getShader("pbr.shader.json"));
+                let pbrSH: shader;
+                let alphaMode = m.alphaMode ?? "OPAQUE";
+                let alphaCutoff = m.alphaCutoff ?? 0.5;
+                let shaderRes = "pbr.shader.json";
+                switch (alphaMode) {
+                    case "OPAQUE": alphaCutoff = 0; break;
+                    case "MASK": break;
+                    case "BLEND": shaderRes = `pbr_blend.shader.json`; break;
+                }
+                pbrSH = mgr.getShader(shaderRes);
+                mat.setShader(pbrSH);
+                mat.setFloat("alphaCutoff", alphaCutoff);
+
                 if (brdf) {
                     mat.setTexture('brdf', brdf);
                 }
