@@ -4,7 +4,7 @@ namespace m4m.framework
     export class EffectElementEmission implements IEffectElement
     {
         //---------------------------private hierachy---------------------------------------------------------
-        public webgl: WebGLRenderingContext;
+        public webgl: WebGL2RenderingContext;
         public gameObject: gameObject;
         public effectSys: TestEffectSystem;
         public active: boolean = true;//激活状态

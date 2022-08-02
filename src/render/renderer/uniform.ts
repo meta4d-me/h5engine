@@ -4,7 +4,7 @@ namespace m4m.render
     {
         static texindex:number=0;
         static applyuniformFunc:{[type:number]:(location,value)=>void}={};
-        static webgl:WebGLRenderingContext;
+        static webgl:WebGL2RenderingContext;
         static initApplyUnifmFunc()
         {
             this.applyuniformFunc[UniformTypeEnum.Float]=(location,value)=>{//number

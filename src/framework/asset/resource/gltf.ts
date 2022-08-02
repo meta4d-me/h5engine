@@ -120,7 +120,7 @@ namespace m4m.framework {
                 .map(x => parseInt(x, 16) / 255);
 
         buffers: bin[];
-        async load(mgr: assetMgr, ctx: WebGLRenderingContext, folder: string, brdf: texture, env: texture, irrSH: texture, exposure?, specFactor = 1, irrFactor = 1, uvChecker?: texture) {
+        async load(mgr: assetMgr, ctx: WebGL2RenderingContext, folder: string, brdf: texture, env: texture, irrSH: texture, exposure?, specFactor = 1, irrFactor = 1, uvChecker?: texture) {
             if (!this.data) {
                 console.error(`load fail , data is Null.`);
                 return;

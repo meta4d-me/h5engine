@@ -3,14 +3,14 @@ namespace m4m.framework {
      * @private
      */
     export class renderContext {
-        constructor(webgl: WebGLRenderingContext) {
+        constructor(webgl: WebGL2RenderingContext) {
             this.webgl = webgl;
         }
 
 
 
         drawtype: string;
-        webgl: WebGLRenderingContext;
+        webgl: WebGL2RenderingContext;
         viewPortPixel: m4m.math.rect = new m4m.math.rect(0, 0, 0, 0);//像素的viewport
         eyePos: m4m.math.vector4 = new m4m.math.vector4();
 
@@ -276,7 +276,7 @@ namespace m4m.framework {
                 }
             }
         }
-        addRenderer(renderer: IRenderer, webgl: WebGLRenderingContext) {
+        addRenderer(renderer: IRenderer, webgl: WebGL2RenderingContext) {
             var idx = renderer.layer;
             // let layer = renderer.layer;
             // var idx = 0;
@@ -299,7 +299,7 @@ namespace m4m.framework {
             }
         }
 
-        addStaticInstanceRenderer(renderer: IRendererGpuIns, webgl: WebGLRenderingContext, isStatic: boolean) {
+        addStaticInstanceRenderer(renderer: IRendererGpuIns, webgl: WebGL2RenderingContext, isStatic: boolean) {
             if (!isStatic) return;
             let go = renderer.gameObject;
             if (!go || !go.transform.needGpuInstancBatcher || !renderer.isGpuInstancing || !renderer.isGpuInstancing()) return;

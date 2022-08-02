@@ -548,7 +548,7 @@ namespace m4m.framework
         private static bin = ".bin";
         app: m4m.framework.application;
         shaderPool: m4m.render.shaderPool;
-        webgl: WebGLRenderingContext;
+        webgl: WebGL2RenderingContext;
         mapRes: { [id: number]: any } = {};
         constructor(app: application)
         {

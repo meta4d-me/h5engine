@@ -383,7 +383,7 @@ namespace m4m.framework
          * @param webgl webgl实例
          * @version m4m 1.0
          */
-        Parse(inData: ArrayBuffer | any, webgl: WebGLRenderingContext)
+        Parse(inData: ArrayBuffer | any, webgl: WebGL2RenderingContext)
         {
             return new Promise<IAsset>((reslove, reject) =>
             {

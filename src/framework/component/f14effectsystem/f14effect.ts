@@ -36,7 +36,7 @@ namespace m4m.framework
         public layers: F14Layer[] = [];
         //--------------------------------------------------------------------
         public VF: number = m4m.render.VertexFormatMask.Position | render.VertexFormatMask.Color | render.VertexFormatMask.UV0;
-        public webgl: WebGLRenderingContext;
+        public webgl: WebGL2RenderingContext;
 
         private _f14eff: f14eff;
 

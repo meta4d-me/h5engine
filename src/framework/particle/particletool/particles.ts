@@ -55,7 +55,7 @@ namespace m4m.framework
      */
     export class EmissionElement
     {
-        public webgl: WebGLRenderingContext;
+        public webgl: WebGL2RenderingContext;
         public gameObject: gameObject;
         public effectSys: effectSystem;
         public ParticleMgr: Particles;

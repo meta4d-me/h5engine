@@ -5,7 +5,8 @@ namespace m4m.framework
         private static debuginfo;
         private static getExtension()
         {
-            this.debuginfo= sceneMgr.app.webgl.getExtension('WEBGL_debug_renderer_info');
+            // this.debuginfo= sceneMgr.app.webgl.getExtension('WEBGL_debug_renderer_info');
+            this.debuginfo= sceneMgr.app.webgl.extensions.WEBGL_debug_renderer_info;
             if(this.debuginfo==null)
             {
                 console.warn("extension(WEBGL_debug_renderer_info) not support!");

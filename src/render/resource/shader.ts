@@ -1,5 +1,4 @@
-namespace m4m.render
-{
+namespace m4m.render {
     /**
      * @public
      * @language zh_CN
@@ -7,8 +6,7 @@ namespace m4m.render
      * uniform类型枚举
      * @version m4m 1.0
      */
-    export enum UniformTypeEnum
-    {
+    export enum UniformTypeEnum {
         Texture = 0,
         Float = 1,
         Floatv = 2,
@@ -21,15 +19,13 @@ namespace m4m.render
     /**
      * @private
      */
-    export class uniform
-    {
+    export class uniform {
         name: string;
         type: UniformTypeEnum;
         location: WebGLUniformLocation;
         //默认值跟着类型走即可
     }
-    export class attribute
-    {
+    export class attribute {
         name: string;
         // type: number;  //webgl.FLOAT、webgl.FLOAT_VEC2、webgl.FLOAT_VEC3、webgl.FLOAT_VEC4
         size: number;  //只 支持 1~4
@@ -38,18 +34,15 @@ namespace m4m.render
     /**
      * @private
      */
-    export enum ShaderTypeEnum
-    {
+    export enum ShaderTypeEnum {
         VS,
         FS,
     }
     /**
      * @private
      */
-    export class glShader
-    {
-        constructor(name: string, type: ShaderTypeEnum, shader: WebGLShader, code: string)
-        {
+    export class glShader {
+        constructor(name: string, type: ShaderTypeEnum, shader: WebGLShader, code: string) {
             this.name = name;
             this.type = type;
             this.shader = shader;
@@ -130,30 +123,28 @@ namespace m4m.render
     /**
      * @private
      */
-    export class glProgram
-    {
-        private static buildInAtrribute : {[id:string]:string}= {
-            "_glesVertex":"posPos",
-            "_glesColor":"posColor",
-            "_glesMultiTexCoord0":"posUV0",
-            "_glesMultiTexCoord1":"posUV2",
-            "_glesNormal":"posNormal",
-            "_glesTangent":"posTangent",
-            "_glesBlendIndex4":"posBlendIndex4",
-            "_glesBlendWeight4":"posBlendWeight4",
-            "_glesColorEx":"posColorEx"
+    export class glProgram {
+        private static buildInAtrribute: { [id: string]: string } = {
+            "_glesVertex": "posPos",
+            "_glesColor": "posColor",
+            "_glesMultiTexCoord0": "posUV0",
+            "_glesMultiTexCoord1": "posUV2",
+            "_glesNormal": "posNormal",
+            "_glesTangent": "posTangent",
+            "_glesBlendIndex4": "posBlendIndex4",
+            "_glesBlendWeight4": "posBlendWeight4",
+            "_glesColorEx": "posColorEx"
         }
 
         /**
          * 是否是引擎系统内建的 attrib ID
          * @param attribID 
          */
-        static isBuildInAttrib(attribID: string){
+        static isBuildInAttrib(attribID: string) {
             return this.buildInAtrribute[attribID] != null;
         }
 
-        constructor(vs: glShader, fs: glShader, program: WebGLProgram)
-        {
+        constructor(vs: glShader, fs: glShader, program: WebGLProgram) {
             this.vs = vs;
             this.fs = fs;
             this.program = program;
@@ -162,12 +153,11 @@ namespace m4m.render
         /** attribute map */
         mapAttrib: { [id: string]: attribute } = {};
         /** 自定义 attribute map */
-        mapCustomAttrib : { [id: string]: attribute } = {};
+        mapCustomAttrib: { [id: string]: attribute } = {};
 
-        private _strideInsAttrib : number = 0;
-        get strideInsAttrib() {return this._strideInsAttrib;}
-        initAttribute(webgl: WebGLRenderingContext)
-        {
+        private _strideInsAttrib: number = 0;
+        get strideInsAttrib() { return this._strideInsAttrib; }
+        initAttribute(webgl: WebGL2RenderingContext) {
             // //绑定vbo和shader顶点格式，这部分应该要区分材质改变与参数改变，可以少切换一些状态
             // this.posPos = webgl.getAttribLocation(this.program, "_glesVertex");
             // this.posColor = webgl.getAttribLocation(this.program, "_glesColor");
@@ -184,38 +174,37 @@ namespace m4m.render
 
             let attributesLen = webgl.getProgramParameter(this.program, webgl.ACTIVE_ATTRIBUTES);
             let attMap = glProgram.buildInAtrribute;
-            for (let i = 0; i < attributesLen; i++)
-            {
+            for (let i = 0; i < attributesLen; i++) {
                 let attributeInfo = webgl.getActiveAttrib(this.program, i);
                 if (!attributeInfo) break;
 
                 let att = new attribute();
                 let name = attributeInfo.name;
                 att.name = name;
-                switch(attributeInfo.type){
-                    case webgl.FLOAT : att.size = 1; break;
-                    case webgl.FLOAT_VEC2 : att.size = 2; break;
-                    case webgl.FLOAT_VEC3 : att.size = 3; break;
-                    case webgl.FLOAT_VEC4 : att.size = 4; break;
+                switch (attributeInfo.type) {
+                    case webgl.FLOAT: att.size = 1; break;
+                    case webgl.FLOAT_VEC2: att.size = 2; break;
+                    case webgl.FLOAT_VEC3: att.size = 3; break;
+                    case webgl.FLOAT_VEC4: att.size = 4; break;
                 }
                 att.location = webgl.getAttribLocation(this.program, name);
                 this.mapAttrib[name] = att;
-                if(!attMap[name]){
+                if (!attMap[name]) {
                     this.mapCustomAttrib[name] = att;
-                    this._strideInsAttrib += att.size * 4; 
+                    this._strideInsAttrib += att.size * 4;
                 }
             }
 
             //设置 引擎内建的attribute 地址
-            for(let key in attMap){
+            for (let key in attMap) {
                 let val = attMap[key];
                 this[val] = this.tryGetLocation(key);
             }
         }
 
-        private tryGetLocation(id:string){
+        private tryGetLocation(id: string) {
             let att = this.mapAttrib[id];
-            if(!att) return -1;
+            if (!att) return -1;
             return att.location;
         }
 
@@ -238,23 +227,19 @@ namespace m4m.render
 
 
         mapUniform: { [id: string]: uniform } = {};
-        use(webgl: WebGLRenderingContext)
-        {
+        use(webgl: WebGL2RenderingContext) {
             webgl.useProgram(this.program);
         }
 
-        initUniforms(webgl: WebGLRenderingContext)
-        {
+        initUniforms(webgl: WebGL2RenderingContext) {
             var numUniforms = webgl.getProgramParameter(this.program, webgl.ACTIVE_UNIFORMS);
-            for (var i = 0; i < numUniforms; i++)
-            {
+            for (var i = 0; i < numUniforms; i++) {
                 var uniformInfo = webgl.getActiveUniform(this.program, i);
                 if (!uniformInfo) break;
 
                 var name = uniformInfo.name;
                 // remove the array suffix.
-                if (name.substr(-3) === "[0]")
-                {
+                if (name.substr(-3) === "[0]") {
                     name = name.substr(0, name.length - 3);
                 }
 
@@ -267,39 +252,30 @@ namespace m4m.render
                 _uniform.location = location;
                 this.mapUniform[name] = _uniform;
 
-                if (type === webgl.FLOAT && isArray)
-                {
+                if (type === webgl.FLOAT && isArray) {
                     _uniform.type = UniformTypeEnum.Floatv;
                 }
-                else if (type === webgl.FLOAT)
-                {
+                else if (type === webgl.FLOAT) {
                     _uniform.type = UniformTypeEnum.Float;
                 }
-                else if (type === webgl.FLOAT_VEC4 && isArray)
-                {
+                else if (type === webgl.FLOAT_VEC4 && isArray) {
                     _uniform.type = UniformTypeEnum.Float4v;
                 }
-                else if (type === webgl.FLOAT_VEC4)
-                {
+                else if (type === webgl.FLOAT_VEC4) {
                     _uniform.type = UniformTypeEnum.Float4;
                 }
-                else if (type === webgl.FLOAT_MAT4 && isArray)
-                {
+                else if (type === webgl.FLOAT_MAT4 && isArray) {
                     _uniform.type = UniformTypeEnum.Float4x4v;
                 }
-                else if (type === webgl.FLOAT_MAT4)
-                {
+                else if (type === webgl.FLOAT_MAT4) {
                     _uniform.type = UniformTypeEnum.Float4x4;
                 }
-                else if (type === webgl.SAMPLER_2D)
-                {
+                else if (type === webgl.SAMPLER_2D) {
                     _uniform.type = UniformTypeEnum.Texture;
                 }
-                else if (type === webgl.SAMPLER_CUBE)
-                {
+                else if (type === webgl.SAMPLER_CUBE) {
                     _uniform.type = UniformTypeEnum.CubeTexture;
-                } else
-                {
+                } else {
                     console.log("Unifrom parse Erorr : not have this type!");
                 }
             }
@@ -309,35 +285,27 @@ namespace m4m.render
     /**
      * @private
      */
-    export class shaderPool
-    {
+    export class shaderPool {
         mapVS: { [id: string]: glShader } = {};
         mapFS: { [id: string]: glShader } = {};
         mapProgram: { [id: string]: glProgram } = {};
-        disposeVS(webgl: WebGLRenderingContext, id: string)
-        {
+        disposeVS(webgl: WebGL2RenderingContext, id: string) {
             webgl.deleteShader(this.mapVS[id].shader);
         }
-        disposeFS(webgl: WebGLRenderingContext, id: string)
-        {
+        disposeFS(webgl: WebGL2RenderingContext, id: string) {
             webgl.deleteShader(this.mapFS[id].shader);
         }
-        disposeProgram(webgl: WebGLRenderingContext, id: string)
-        {
+        disposeProgram(webgl: WebGL2RenderingContext, id: string) {
             webgl.deleteProgram(this.mapProgram[id].program);
         }
-        disposeAll(webgl: WebGLRenderingContext)
-        {
-            for (var key in this.mapVS)
-            {
+        disposeAll(webgl: WebGL2RenderingContext) {
+            for (var key in this.mapVS) {
                 this.disposeVS(webgl, key);
             }
-            for (var key in this.mapFS)
-            {
+            for (var key in this.mapFS) {
                 this.disposeFS(webgl, key);
             }
-            for (var key in this.mapProgram)
-            {
+            for (var key in this.mapProgram) {
                 this.disposeProgram(webgl, key);
             }
             this.mapVS = {};
@@ -345,17 +313,15 @@ namespace m4m.render
             this.mapProgram = {};
         }
         //编译并扫描 attribute 和 uniform
-        compileVS(webgl: WebGLRenderingContext, name: string, code: string): glShader
-        {
+        compileVS(webgl: WebGL2RenderingContext, name: string, code: string): glShader {
             var vs = webgl.createShader(webgl.VERTEX_SHADER);
             webgl.shaderSource(vs, code);
             webgl.compileShader(vs);
             var r1 = webgl.getShaderParameter(vs, webgl.COMPILE_STATUS);
-            if (r1 == false)
-            {
+            if (r1 == false) {
                 var error = webgl.getShaderInfoLog(vs);
                 webgl.deleteShader(vs);
-                console.error(code,'Failed to compile shader: ' + error);
+                console.error(code, 'Failed to compile shader: ' + error);
 
                 return null;
             }
@@ -364,17 +330,15 @@ namespace m4m.render
             return s;
         }
         //编译并扫描 attribute 和 uniform
-        compileFS(webgl: WebGLRenderingContext, name: string, code: string): glShader
-        {
+        compileFS(webgl: WebGL2RenderingContext, name: string, code: string): glShader {
             var fs = webgl.createShader(webgl.FRAGMENT_SHADER);
             webgl.shaderSource(fs, code);
             webgl.compileShader(fs);
             var r1 = webgl.getShaderParameter(fs, webgl.COMPILE_STATUS);
-            if (r1 == false)
-            {
+            if (r1 == false) {
                 var error = webgl.getShaderInfoLog(fs);
                 webgl.deleteShader(fs);
-                console.error(code,'Failed to compile shader: ' + error);
+                console.error(code, 'Failed to compile shader: ' + error);
                 return null;
             }
 
@@ -383,8 +347,7 @@ namespace m4m.render
             return s;
         }
         //link 并寻找出 attribute pos 和 uniform组
-        linkProgram(webgl: WebGLRenderingContext, nameVS: string, nameFS: string): glProgram
-        {
+        linkProgram(webgl: WebGL2RenderingContext, nameVS: string, nameFS: string): glProgram {
             var program = webgl.createProgram();
 
             webgl.attachShader(program, this.mapVS[nameVS].shader);
@@ -392,8 +355,7 @@ namespace m4m.render
 
             webgl.linkProgram(program);
             var r3 = webgl.getProgramParameter(program, webgl.LINK_STATUS);
-            if (r3 == false)
-            {
+            if (r3 == false) {
                 console.error("vs:" + nameVS + "   fs:" + nameFS + "a webgl program error:" + webgl.getProgramInfoLog(program));
                 webgl.deleteProgram(program);
                 return null;
@@ -427,10 +389,16 @@ namespace m4m.render
         mapVSString: { [id: string]: string } = {};
         mapFSString: { [id: string]: string } = {};
 
-        linkProgrambyPassType(webgl: WebGLRenderingContext, type: string, nameVS: string, nameFS: string, globalMacros: string[]): glProgram
-        {
+        linkProgrambyPassType(webgl: WebGL2RenderingContext, type: string, nameVS: string, nameFS: string, globalMacros: string[]): glProgram {
             let vsStr = this.mapVSString[nameVS];
             let fsStr = this.mapFSString[nameFS];
+
+            const es300Tag = `#version 300 es \n`;
+            const es300Reg = /#version +300 +es[\r|\n]+/;
+            let vsIsES300 = es300Reg.test(vsStr);
+            let fsIsES300 = es300Reg.test(fsStr);
+            if (vsIsES300) { vsStr = vsStr.replace(es300Reg, ""); }
+            if (fsIsES300) { fsStr = fsStr.replace(es300Reg, ""); }
 
             // Handle global macros
             for (let i = 0; i < globalMacros.length; i++) {
@@ -438,44 +406,40 @@ namespace m4m.render
                 fsStr = `#define ${globalMacros[i]}\n${fsStr}`;
             }
 
-            if (type == "base")
-            {
+            if (type == "base") {
 
-            } else if (type == "base_fog" || type == "fog")
-            {
+            } else if (type == "base_fog" || type == "fog") {
                 vsStr = "#define FOG \n" + vsStr;
                 fsStr = "#define FOG \n" + fsStr;
-            }else if (type == "instance" )
-            {
+            } else if (type == "instance") {
                 vsStr = "#define INSTANCE \n" + vsStr;
                 fsStr = "#define INSTANCE \n" + fsStr;
             }
-            else if (type == "instance_fog" )
-            {
-                vsStr = "#define FOG \n"+ "#define INSTANCE \n" + vsStr;
-                fsStr = "#define FOG \n"+ "#define INSTANCE \n" + fsStr;
-            } 
-            else if (type == "skin")
-            {
+            else if (type == "instance_fog") {
+                vsStr = "#define FOG \n" + "#define INSTANCE \n" + vsStr;
+                fsStr = "#define FOG \n" + "#define INSTANCE \n" + fsStr;
+            }
+            else if (type == "skin") {
                 vsStr = "#define SKIN \n" + vsStr;
                 fsStr = "#define SKIN \n" + fsStr;
-            } else if (type == "skin_fog")
-            {
+            } else if (type == "skin_fog") {
                 vsStr = "#define SKIN \n" + "#define FOG \n" + vsStr;
                 fsStr = "#define SKIN \n" + "#define FOG \n" + fsStr;
-            } else if (type == "lightmap")
-            {
+            } else if (type == "lightmap") {
                 vsStr = "#define LIGHTMAP \n" + vsStr;
                 fsStr = "#define LIGHTMAP \n" + fsStr;
-            } else if (type == "lightmap_fog")
-            {
+            } else if (type == "lightmap_fog") {
                 vsStr = "#define LIGHTMAP \n" + "#define FOG \n" + vsStr;
                 fsStr = "#define LIGHTMAP \n" + "#define FOG \n" + fsStr;
-            } else if (type == "quad")
-            {
+            } else if (type == "quad") {
                 vsStr = "#define QUAD \n" + vsStr;
                 fsStr = "#define QUAD \n" + fsStr;
             }
+
+            //检查 添加 es300 标记
+            if (vsIsES300) { vsStr = es300Tag + vsStr; }
+            if (fsIsES300) { fsStr = es300Tag + fsStr; }
+
             this.compileVS(webgl, nameVS + type, vsStr);
             this.compileFS(webgl, nameFS + type, fsStr);
 

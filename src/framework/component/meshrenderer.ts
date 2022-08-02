@@ -65,10 +65,10 @@ namespace m4m.framework {
         instanceArray: m4m.math.ReuseArray<IRendererGpuIns>;
         helpDArray: m4m.math.ExtenArray<Float32Array>;
         private attSuccess: boolean = false;
-        initBuffer(gl: WebGLRenderingContext): void {
+        initBuffer(gl: WebGL2RenderingContext): void {
 
         }
-        activeAttributes(gl: WebGLRenderingContext, pass: render.glDrawPass): void {
+        activeAttributes(gl: WebGL2RenderingContext, pass: render.glDrawPass): void {
             if (!this.instanceArray && !this.cacheBuffers) return;
             let cacheBuffer: m4m.math.ExtenArray<Float32Array>;
             if (this.bufferIdMap) {
@@ -111,7 +111,7 @@ namespace m4m.framework {
 
             this.attSuccess = true;
         }
-        disableAttributes(gl: WebGLRenderingContext, pass: render.glDrawPass): void {
+        disableAttributes(gl: WebGL2RenderingContext, pass: render.glDrawPass): void {
             if (this.attSuccess) {
                 gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
                 let attMap = pass.program.mapCustomAttrib;
@@ -506,8 +506,8 @@ namespace m4m.framework {
             return drawtype;
         }
 
-        private static _vbos: [WebGLRenderingContext, WebGLBuffer][] = [];
-        private static _getVBO(gl: WebGLRenderingContext) {
+        private static _vbos: [WebGL2RenderingContext, WebGLBuffer][] = [];
+        private static _getVBO(gl: WebGL2RenderingContext) {
             for (let i = 0, n = this._vbos.length; i < n; i++) {
                 if (this._vbos[i][0] == gl)
                     return this._vbos[i][1];

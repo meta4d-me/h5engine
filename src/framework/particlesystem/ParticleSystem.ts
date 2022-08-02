@@ -722,8 +722,8 @@ namespace m4m.framework
             }
         }
 
-        private _vbos: [WebGLRenderingContext, WebGLBuffer][] = [];
-        private _getVBO(gl: WebGLRenderingContext)
+        private _vbos: [WebGL2RenderingContext, WebGLBuffer][] = [];
+        private _getVBO(gl: WebGL2RenderingContext)
         {
             for (let i = 0, n = this._vbos.length; i < n; i++)
             {

@@ -305,7 +305,7 @@ namespace m4m.framework {
 
         private boneSamplerTexindex = -1;
         updateBoneTexture(context: renderContext) {
-            let ctx: WebGLRenderingContext = context.webgl;
+            let ctx: WebGL2RenderingContext = context.webgl;
             if (!this.boneMatricesTexture) {
                 this.boneMatricesTexture = new m4m.framework.texture('bone_matrices'+Math.random());
                 this.boneMatricesTexture.glTexture = new m4m.render.glTexture2D(ctx, render.TextureFormatEnum.RGBA, false, false) as m4m.render.glTexture2D;
@@ -345,7 +345,7 @@ namespace m4m.framework {
                 false,
                 false,
                 false,
-                WebGLRenderingContext.FLOAT
+                WebGL2RenderingContext.FLOAT
             );
         }
 

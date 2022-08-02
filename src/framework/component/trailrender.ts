@@ -75,7 +75,7 @@ namespace m4m.framework
         }
 
         private app: application;
-        private webgl: WebGLRenderingContext;
+        private webgl: WebGL2RenderingContext;
 
         private camerapositon: m4m.math.vector3;
           /**

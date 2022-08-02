@@ -124,7 +124,7 @@
     }
 
     //构建mesh 并返回
-    private createMesh(meshData: m4m.render.meshData, webgl: WebGLRenderingContext): m4m.framework.mesh {
+    private createMesh(meshData: m4m.render.meshData, webgl: WebGL2RenderingContext): m4m.framework.mesh {
         var _mesh = new m4m.framework.mesh();
         // _mesh.setName("NavMesh" + ".mesh.bin");
         _mesh.data = meshData;

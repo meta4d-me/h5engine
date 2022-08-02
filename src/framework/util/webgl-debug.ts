@@ -100,7 +100,7 @@ namespace m4m.framework{
     
     /**
      * Initializes this module. Safe to call more than once.
-     * @param {!WebGLRenderingContext} ctx A WebGL context. If
+     * @param {!WebGL2RenderingContext} ctx A WebGL context. If
      *    you have more than one context it doesn't matter which one
      *    you pass in, it is only used to pull out constants.
      */
@@ -174,14 +174,14 @@ namespace m4m.framework{
      * gl.getError after every command and calls a function if the
      * result is not gl.NO_ERROR.
      *
-     * @param {!WebGLRenderingContext} ctx The webgl context to
+     * @param {!WebGL2RenderingContext} ctx The webgl context to
      *        wrap.
      * @param {!function(err, funcName, args): void} opt_onErrorFunc
      *        The function to call when gl.getError returns an
      *        error. If not specified the default function calls
      *        console.log with a message.
      */
-    public makeDebugContext(ctx:WebGLRenderingContext, opt_onErrorFunc:(err, funcName, args)=>void = null) :WebGLRenderingContext{
+    public makeDebugContext(ctx:WebGL2RenderingContext, opt_onErrorFunc:(err, funcName, args)=>void = null) :WebGL2RenderingContext{
         this.init(ctx);
       
         opt_onErrorFunc = opt_onErrorFunc ||
@@ -252,7 +252,7 @@ namespace m4m.framework{
 
         console.error(" i am ---makeDebugContext-");
 
-        return wrapper as WebGLRenderingContext;
+        return wrapper as WebGL2RenderingContext;
     }
     
     private resetToInitialState(ctx){

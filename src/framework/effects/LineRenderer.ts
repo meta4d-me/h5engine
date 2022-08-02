@@ -486,7 +486,7 @@ namespace m4m.framework
             data.color = [];
         }
 
-        static uploadMesh(_mesh: mesh, webgl: WebGLRenderingContext)
+        static uploadMesh(_mesh: mesh, webgl: WebGL2RenderingContext)
         {
             var vf = m4m.render.VertexFormatMask.Position | m4m.render.VertexFormatMask.Normal | m4m.render.VertexFormatMask.Tangent | m4m.render.VertexFormatMask.Color | m4m.render.VertexFormatMask.UV0;
             _mesh.data.originVF = vf;

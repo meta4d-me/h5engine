@@ -10,7 +10,7 @@ class HdrParser
      */
     public textDecoder = new TextDecoder();
 
-    constructor(private gl: WebGLRenderingContext) {
+    constructor(private gl: WebGL2RenderingContext) {
     }
 
     public parseRGBE(raw: ArrayBuffer)

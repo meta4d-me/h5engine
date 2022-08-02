@@ -25,7 +25,7 @@ namespace m4m.framework
             assetmgr.mapDefaultMesh[this.circleline] = this.createDefaultMesh(this.circleline, m4m.render.meshData.genCircleLineCCW(1), assetmgr.webgl);
         }
 
-        private static createDefaultMesh(name: string, meshData: render.meshData, webgl: WebGLRenderingContext): mesh
+        private static createDefaultMesh(name: string, meshData: render.meshData, webgl: WebGL2RenderingContext): mesh
         {
             var _mesh: m4m.framework.mesh = new m4m.framework.mesh(name + ".mesh.bin");
             _mesh.defaultAsset = true;

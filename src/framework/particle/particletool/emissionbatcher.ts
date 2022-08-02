@@ -6,7 +6,7 @@ namespace m4m.framework
     export class EmissionBatcher
     {
         public emissionElement: EmissionElement;
-        private webgl: WebGLRenderingContext;
+        private webgl: WebGL2RenderingContext;
         public gameObject: gameObject;
         public data: Emission;
         public mesh: mesh;
