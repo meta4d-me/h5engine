@@ -4994,7 +4994,6 @@ declare namespace m4m.framework {
 }
 declare namespace m4m.framework {
     class defShader {
-        static shader0: string;
         static vscode: string;
         static fscode: string;
         static fscode2: string;
@@ -5008,12 +5007,10 @@ declare namespace m4m.framework {
         static fscodefontUI: string;
         static vscodeuifontmask: string;
         static fscodeuifontmask: string;
-        static diffuseShader: string;
         static vsdiffuse: string;
         static fsdiffuse: string;
         static vsline: string;
         static fsline: string;
-        static materialShader: string;
         static vsmaterialcolor: string;
         static vslinetrail: string;
         static linetrailShader: string;
