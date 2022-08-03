@@ -42,7 +42,6 @@ namespace m4m.framework {
         private initExtensions(gl: WebGL2RenderingContext) {
             this.EXT_color_buffer_half_float = gl.getExtension("EXT_color_buffer_half_float");
             this.EXT_texture_filter_anisotropic = gl.getExtension('EXT_texture_filter_anisotropic') || gl.getExtension('MOZ_EXT_texture_filter_anisotropic') || gl.getExtension('WEBKIT_EXT_texture_filter_anisotropic');
-            // this.OES_texture_float = gl.getExtension("OES_texture_float");
             // this.OES_texture_float_linear = gl.getExtension("OES_texture_float_linear");
             this.OES_texture_half_float_linear = gl.getExtension("OES_texture_half_float_linear");
             this.EXT_color_buffer_float = gl.getExtension("EXT_color_buffer_float");

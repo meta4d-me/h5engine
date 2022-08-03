@@ -13,7 +13,8 @@
         PVRTC2_RGB = 4,
         PVRTC2_RGBA = 4,
         KTX = 5,
-        FLOAT16 = 6,
+        FLOAT16,
+        FLOAT32,
         ASTC_RGBA_4x4,
         ASTC_RGBA_5x4,
         ASTC_RGBA_5x5,
@@ -238,16 +239,17 @@
             this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, premultiply ? 1 : 0);
             this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 1);
 
+            let texF = this.getGLFormat();
 
-            var formatGL = this.webgl.RGBA;
-            if (this.format == TextureFormatEnum.RGB)
-                formatGL = this.webgl.RGB;
-            else if (this.format == TextureFormatEnum.Gray)
-                formatGL = this.webgl.LUMINANCE;
+            // var formatGL = this.webgl.RGBA;
+            // if (this.format == TextureFormatEnum.RGB)
+            //     formatGL = this.webgl.RGB;
+            // else if (this.format == TextureFormatEnum.Gray)
+            //     formatGL = this.webgl.LUMINANCE;
             this.webgl.texImage2D(this.webgl.TEXTURE_2D,
                 0,
-                formatGL,
-                formatGL,
+                texF.internalformatGL,
+                texF.formatGL,
                 //最后这个type，可以管格式
                 this.webgl.UNSIGNED_BYTE
                 , img);
@@ -323,24 +325,15 @@
             if (flipY) {
                 // this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 1);
             }
-            var formatGL = this.webgl.RGBA;
-            if (this.format == TextureFormatEnum.RGB)
-                formatGL = this.webgl.RGB;
-            else if (this.format == TextureFormatEnum.FLOAT16) {
-                formatGL = this.webgl.RGBA;
-                // var ext = this.webgl.getExtension('OES_texture_half_float');
-                // if (ext == null) throw "nit support oes";
-                // dataType = ext.HALF_FLOAT_OES;
-            }
-            else if (this.format == TextureFormatEnum.Gray)
-                formatGL = this.webgl.LUMINANCE;
+            let texF = this.getGLFormat();
+
             this.webgl.texImage2D(this.webgl.TEXTURE_2D,
                 0,
-                formatGL,
+                texF.internalformatGL,
                 width,
                 height,
                 0,
-                formatGL,
+                texF.formatGL,
                 //最后这个type，可以管格式
                 dataType,
                 data);
@@ -448,6 +441,34 @@
         }
         isFrameBuffer(): boolean {
             return false;
+        }
+
+        private getGLFormat(): { internalformatGL: number, formatGL: number } {
+            let formatGL = this.webgl.RGBA;
+            let internalformatGL = formatGL;
+            switch (this.format) {
+                case TextureFormatEnum.RGB:
+                    formatGL = this.webgl.RGB;
+                    internalformatGL = formatGL;
+                    break;
+                case TextureFormatEnum.FLOAT16:
+                    formatGL = this.webgl.RGBA;
+                    internalformatGL = this.webgl.RGBA16F;
+                    // formatGL = this.webgl.RGBA;
+                    // var ext = this.webgl.getExtension('OES_texture_half_float');
+                    // if (ext == null) throw "nit support oes";
+                    // dataType = ext.HALF_FLOAT_OES;
+                    break;
+                case TextureFormatEnum.FLOAT32:
+                    formatGL = this.webgl.RGBA;
+                    internalformatGL = this.webgl.RGBA32F;
+                    break;
+                case TextureFormatEnum.Gray:
+                    formatGL = this.webgl.LUMINANCE;
+                    internalformatGL = formatGL;
+                    break;
+            }
+            return { internalformatGL, formatGL };
         }
         private static mapTexture: { [id: string]: glTexture2D } = {};
         static formGrayArray(webgl: WebGL2RenderingContext, array: number[] | Float32Array | Float64Array, width: number, height: number) {

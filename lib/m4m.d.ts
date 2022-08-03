@@ -9819,6 +9819,7 @@ declare namespace m4m.framework {
         initBoneMatrices(): void;
         initStaticPoseMatrices(): void;
         private boneSamplerTexindex;
+        private texID;
         updateBoneTexture(context: renderContext): void;
         tempMatrix: math.matrix;
         inverseRootBone: math.matrix;
@@ -22550,20 +22551,21 @@ declare namespace m4m.render {
         PVRTC2_RGBA = 4,
         KTX = 5,
         FLOAT16 = 6,
-        ASTC_RGBA_4x4 = 7,
-        ASTC_RGBA_5x4 = 8,
-        ASTC_RGBA_5x5 = 9,
-        ASTC_RGBA_6x5 = 10,
-        ASTC_RGBA_6x6 = 11,
-        ASTC_RGBA_8x5 = 12,
-        ASTC_RGBA_8x6 = 13,
-        ASTC_RGBA_8x8 = 14,
-        ASTC_RGBA_10x5 = 15,
-        ASTC_RGBA_10x6 = 16,
-        ASTC_RGBA_10x8 = 17,
-        ASTC_RGBA_10x10 = 18,
-        ASTC_RGBA_12x10 = 19,
-        ASTC_RGBA_12x12 = 20
+        FLOAT32 = 7,
+        ASTC_RGBA_4x4 = 8,
+        ASTC_RGBA_5x4 = 9,
+        ASTC_RGBA_5x5 = 10,
+        ASTC_RGBA_6x5 = 11,
+        ASTC_RGBA_6x6 = 12,
+        ASTC_RGBA_8x5 = 13,
+        ASTC_RGBA_8x6 = 14,
+        ASTC_RGBA_8x8 = 15,
+        ASTC_RGBA_10x5 = 16,
+        ASTC_RGBA_10x6 = 17,
+        ASTC_RGBA_10x8 = 18,
+        ASTC_RGBA_10x10 = 19,
+        ASTC_RGBA_12x10 = 20,
+        ASTC_RGBA_12x12 = 21
     }
     /**
      * @private
@@ -22638,6 +22640,7 @@ declare namespace m4m.render {
         getReader(redOnly?: boolean): textureReader;
         dispose(webgl: WebGL2RenderingContext): void;
         isFrameBuffer(): boolean;
+        private getGLFormat;
         private static mapTexture;
         static formGrayArray(webgl: WebGL2RenderingContext, array: number[] | Float32Array | Float64Array, width: number, height: number): glTexture2D;
         static staticTexture(webgl: WebGL2RenderingContext, name: string): glTexture2D;

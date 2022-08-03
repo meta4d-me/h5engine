@@ -51,6 +51,7 @@ namespace m4m.framework {
             t2d.width = this.pixelHeight;
             t2d.height = this.pixelWidth;
             t2d.format = render.TextureFormatEnum.FLOAT16;
+            t2d.mipmap = false;
             //额外处理
             let webgl = sceneMgr.app.webgl;
             webgl.bindTexture(webgl.TEXTURE_2D, t2d.texture);
