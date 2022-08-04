@@ -74,7 +74,7 @@
 //         /**
 //         * @private
 //         */
-//         public webgl: WebGLRenderingContext;
+//         public webgl: WebGL2RenderingContext;
 //         // private time: number = 0;
 
 //         private parser = new m4m.framework.EffectParser();

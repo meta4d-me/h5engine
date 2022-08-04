@@ -22,7 +22,7 @@ namespace m4m.framework {
         /**
          * @private
          */
-        initBuffer(webgl: WebGLRenderingContext, vf: render.VertexFormatMask, drawMode: render.DrawModeEnum) {
+        initBuffer(webgl: WebGL2RenderingContext, vf: render.VertexFormatMask, drawMode: render.DrawModeEnum) {
             this.mesh = new render.glMesh();
             this.mesh.initBuffer(webgl, vf, 128, render.MeshTypeEnum.Dynamic);
             this.dataForVbo = new Float32Array(128);
@@ -36,7 +36,7 @@ namespace m4m.framework {
         /**
          * @private
          */
-        begin(webgl: WebGLRenderingContext, pass: render.glDrawPass) {
+        begin(webgl: WebGL2RenderingContext, pass: render.glDrawPass) {
             // if (mat == this.curmaterial) return;
             //这明显是个bug,pass即使一样，也可能要重绘
             if (this.vboCount > 0)
@@ -51,7 +51,7 @@ namespace m4m.framework {
         /**
          * @private
          */
-        push(webgl: WebGLRenderingContext, vbodata: number[], ebodata: number[]) {
+        push(webgl: WebGL2RenderingContext, vbodata: number[], ebodata: number[]) {
             if (this.vboCount + vbodata.length > batcher2D.limitCount
                 ||
                 (ebodata != null && this.eboCount + ebodata.length > batcher2D.limitCount)) {
@@ -97,7 +97,7 @@ namespace m4m.framework {
         /**
          * @private
          */
-        end(webgl: WebGLRenderingContext) {
+        end(webgl: WebGL2RenderingContext) {
             if (this.vboCount == 0) return;
             this.mesh.uploadVertexData(webgl, this.dataForVbo);
             if (this.eboCount > 0) {
@@ -217,7 +217,7 @@ namespace m4m.framework {
          * webgl实例
          * @version m4m 1.0
          */
-        webgl: WebGLRenderingContext;
+        webgl: WebGL2RenderingContext;
 
         /**
          * @public

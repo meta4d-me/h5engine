@@ -50,7 +50,7 @@ namespace m4m.framework {
          * 全局webgl实例
          * @version m4m 1.0
          */
-        webgl: WebGLRenderingContext;
+        webgl: WebGL2RenderingContext;
         stats: Stats.Stats;
         container: HTMLDivElement;
         outcontainer: HTMLDivElement;
@@ -175,7 +175,7 @@ namespace m4m.framework {
          * @param div 绘制区域的dom
          * @version m4m 1.0
          */
-        start(div: HTMLDivElement, type: CanvasFixedType = CanvasFixedType.Free, val: number = 1200, webglDebug = false) {
+        start(div: HTMLDivElement, type: CanvasFixedType = CanvasFixedType.Free, val: number = 1200, webglDebug = false, opt_attribs: WebGLContextAttributes = null) {
             // var metas = document.getElementsByName("viewport") as NodeListOf<HTMLMetaElement>;
             // var meta: HTMLMetaElement;
             // if (!metas || metas.length < 1)
@@ -226,15 +226,15 @@ namespace m4m.framework {
 
             //init webgl;
 
-            // this.webgl = <WebGLRenderingContext>canvas.getContext('webgl') ||
-            //     <WebGLRenderingContext>canvas.getContext("experimental-webgl");
+            // this.webgl = <WebGL2RenderingContext>canvas.getContext('webgl') ||
+            //     <WebGL2RenderingContext>canvas.getContext("experimental-webgl");
 
             this.startForCanvas(canvas, type, val, webglDebug);
 
             //this.showDrawCall();
         }
 
-        startForCanvas(canvas: HTMLCanvasElement, type: CanvasFixedType = CanvasFixedType.Free, val: number = 1200, webglDebug = false) {
+        startForCanvas(canvas: HTMLCanvasElement, type: CanvasFixedType = CanvasFixedType.Free, val: number = 1200, webglDebug = false, opt_attribs: WebGLContextAttributes = null) {
             console.log("engine version: " + version.VERSION);
 
             this.ccWidth = this.ccWidth == undefined ? canvas.clientWidth : this.ccWidth;
@@ -243,7 +243,7 @@ namespace m4m.framework {
             this._timeScale = 1;
             sceneMgr.app = this;
             let tempWebGlUtil = new WebGLUtils();
-            this.webgl = tempWebGlUtil.setupWebGL(canvas);
+            this.webgl = tempWebGlUtil.setupWebGL(canvas, opt_attribs);
             // console.error(" i am ---tempWebGlUtil-" + webglDebug);
             if (this.webgl == null) {
                 console.error("Failed to get webgl at the application.start()");
@@ -622,8 +622,6 @@ namespace m4m.framework {
         getAssetMgr() {
             return this._assetmgr;
         }
-
-
 
         private _inputmgr: inputMgr
         private initInputMgr() {

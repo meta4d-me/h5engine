@@ -26,7 +26,7 @@ namespace m4m.framework
          * 全局的webgl实例
          * @version m4m 1.0
          */
-        webgl: WebGLRenderingContext;
+        webgl: WebGL2RenderingContext;
         /**
          * @private
          * @param app

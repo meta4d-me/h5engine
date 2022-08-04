@@ -61,7 +61,7 @@
         state_blendDestALpha: number = 0;
         //uniforms: { [id: string]: { change: boolean, location: WebGLUniformLocation, type: UniformTypeEnum, value: any } } = {};
         mapuniforms: { [id: string]: uniform };
-        //static mapUniformDic:{[type:number]:(webgl: WebGLRenderingContext, key: WebGLUniformLocation, value: any)=>void};
+        //static mapUniformDic:{[type:number]:(webgl: WebGL2RenderingContext, key: WebGLUniformLocation, value: any)=>void};
         //uniformallchange: boolean = false;
         setProgram(program: glProgram, uniformDefault: boolean = false)
         {
@@ -211,7 +211,7 @@
 
         private static lastPassID = -1;
 
-        use(webgl: WebGLRenderingContext)
+        use(webgl: WebGL2RenderingContext)
         {
             let ID = this.id.getID(); 
             let lastSame = glDrawPass.lastPassID == ID;
@@ -343,7 +343,7 @@
             // }
         }
 
-        // applyUniformSaved(webgl: WebGLRenderingContext)
+        // applyUniformSaved(webgl: WebGL2RenderingContext)
         // {
 
         //     var texindex = 0;//自动统计使用的贴图
@@ -396,37 +396,37 @@
         //     }
         //     this.uniformallchange = false;
         // }
-        // applyUniform_Float(webgl: WebGLRenderingContext, key: string, value: number)
+        // applyUniform_Float(webgl: WebGL2RenderingContext, key: string, value: number)
         // {
         //     var u = this.uniforms[key];
         //     webgl.uniform1f(u.location, value);
         // }
-        // applyUniform_Floatv(webgl: WebGLRenderingContext, key: string, value: Float32Array)
+        // applyUniform_Floatv(webgl: WebGL2RenderingContext, key: string, value: Float32Array)
         // {
         //     var u = this.uniforms[key];
         //     webgl.uniform1fv(u.location, value);
         // }
-        // applyUniform_Float4(webgl: WebGLRenderingContext, key: string, value: math.vector4)
+        // applyUniform_Float4(webgl: WebGL2RenderingContext, key: string, value: math.vector4)
         // {
         //     var u = this.uniforms[key];
         //     webgl.uniform4f(u.location, value.x, value.y, value.z, value.w);
         // }
-        // applyUniform_Float4v(webgl: WebGLRenderingContext, key: string, values: Float32Array)
+        // applyUniform_Float4v(webgl: WebGL2RenderingContext, key: string, values: Float32Array)
         // {
         //     var u = this.uniforms[key];
         //     webgl.uniform4fv(u.location, values);
         // }
-        // applyUniform_Float4x4(webgl: WebGLRenderingContext, key: string, value: math.matrix)
+        // applyUniform_Float4x4(webgl: WebGL2RenderingContext, key: string, value: math.matrix)
         // {
         //     var u = this.uniforms[key];
         //     webgl.uniformMatrix4fv(u.location, false, value.rawData);
         // }
-        // applyUniform_Float4x4v(webgl: WebGLRenderingContext, key: string, values: Float32Array)
+        // applyUniform_Float4x4v(webgl: WebGL2RenderingContext, key: string, values: Float32Array)
         // {
         //     var u = this.uniforms[key];
         //     webgl.uniformMatrix4fv(u.location, false, values);
         // }
-        // applyUniform_FloatTexture(webgl: WebGLRenderingContext, texindex: number, key: string, value: ITexture)
+        // applyUniform_FloatTexture(webgl: WebGL2RenderingContext, texindex: number, key: string, value: ITexture)
         // {
         //     var u = this.uniforms[key];
         //     var tex = value != null ? (value as ITexture).texture : null;
@@ -435,7 +435,7 @@
         //     webgl.uniform1i(u.location, texindex);
         // }
 
-        draw(webgl: WebGLRenderingContext, mesh: glMesh, drawmode: DrawModeEnum = DrawModeEnum.EboTri,
+        draw(webgl: WebGL2RenderingContext, mesh: glMesh, drawmode: DrawModeEnum = DrawModeEnum.EboTri,
             drawindexindex: number = 0, drawbegin: number = 0, drawcount: number = -1)
         {
             this.use(webgl);

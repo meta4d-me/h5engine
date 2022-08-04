@@ -18,7 +18,7 @@ namespace m4m.framework
          * @param arrayBuffer contents of the KTX container file
          * @param facesExpected should be either 1 or 6, based whether a cube texture or or
          */
-        static parse(gl: WebGLRenderingContext, arrayBuffer: ArrayBuffer, facesExpected = 1, loadMipmaps = true): m4m.render.glTexture2D
+        static parse(gl: WebGL2RenderingContext, arrayBuffer: ArrayBuffer, facesExpected = 1, loadMipmaps = true): m4m.render.glTexture2D
         {
             // Test that it is a ktx formatted file, based on the first 12 bytes, character representation is:
             // '´', 'K', 'T', 'X', ' ', '1', '1', 'ª', '\r', '\n', '\x1A', '\n'
@@ -41,7 +41,8 @@ namespace m4m.framework
                 return;
             }
 
-            gl.getExtension('WEBGL_compressed_texture_etc1');
+            // gl.getExtension('WEBGL_compressed_texture_etc1');
+            let etc1 = gl.extensions.WEBGL_compressed_texture_etc1;
 
             // load the reset of the header in native 32 bit uint
             var dataSize = Uint32Array.BYTES_PER_ELEMENT;

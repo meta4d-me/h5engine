@@ -148,7 +148,7 @@ namespace m4m.framework
         }
 
         private app: application;
-        private webgl: WebGLRenderingContext;
+        private webgl: WebGL2RenderingContext;
         update(delta: number)
         {
             var _time = this.app.getTotalTime();

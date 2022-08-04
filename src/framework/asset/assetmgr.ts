@@ -362,7 +362,7 @@
 //         /**
 //          * @private
 //          */
-//         webgl: WebGLRenderingContext;
+//         webgl: WebGL2RenderingContext;
 //         /**
 //          * @private
 //          */

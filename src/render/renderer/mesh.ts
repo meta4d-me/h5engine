@@ -55,7 +55,7 @@
      */
     export class glMesh
     {
-        initBuffer(webgl: WebGLRenderingContext, vf: VertexFormatMask, vertexCount: number, mode: MeshTypeEnum = MeshTypeEnum.Static)
+        initBuffer(webgl: WebGL2RenderingContext, vf: VertexFormatMask, vertexCount: number, mode: MeshTypeEnum = MeshTypeEnum.Static)
         {
             if (this.vbo != null)
                 throw new Error("you can only initbuffer once.");
@@ -80,7 +80,7 @@
             this.indexCounts = []
             this.ebos = [];
         }
-        addIndex(webgl: WebGLRenderingContext, indexcount: number): number
+        addIndex(webgl: WebGL2RenderingContext, indexcount: number): number
         {
             var index = this.ebos.length;
             var _ebo = webgl.createBuffer();
@@ -90,19 +90,19 @@
             this.indexCounts.push(indexcount);
             return index;
         }
-        resetVboSize(webgl: WebGLRenderingContext, vertexCount: number)
+        resetVboSize(webgl: WebGL2RenderingContext, vertexCount: number)
         {
             this.vertexCount = vertexCount;
             webgl.bindBuffer(webgl.ARRAY_BUFFER, this.vbo);
             webgl.bufferData(webgl.ARRAY_BUFFER, vertexCount * this.vertexByteSize, this.mode);
         }
-        resetEboSize(webgl: WebGLRenderingContext, eboindex: number, indexcount: number)
+        resetEboSize(webgl: WebGL2RenderingContext, eboindex: number, indexcount: number)
         {
             this.indexCounts[eboindex] = indexcount;
             webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, this.ebos[eboindex]);
             webgl.bufferData(webgl.ELEMENT_ARRAY_BUFFER, indexcount * 2, this.mode);
         }
-        dispose(webgl: WebGLRenderingContext)
+        dispose(webgl: WebGL2RenderingContext)
         {
             webgl.deleteBuffer(this.vbo);
             this.vbo = null;
@@ -128,17 +128,17 @@
         vertexCount: number;
         vertexByteSize: number;
         ebos: WebGLBuffer[];
-        eboDataType = WebGLRenderingContext.UNSIGNED_SHORT;
+        eboDataType = WebGL2RenderingContext.UNSIGNED_SHORT;
         indexCounts: number[];
         lineMode :number;
-        bindVboBuffer(webgl: WebGLRenderingContext)
+        bindVboBuffer(webgl: WebGL2RenderingContext)
         {
             webgl.bindBuffer(webgl.ARRAY_BUFFER, this.vbo);
         }
 
         bindIndex: number = -1;
         vertexFormat: VertexFormatMask = VertexFormatMask.Position;
-        bind(webgl: WebGLRenderingContext, shadercode: glProgram, bindEbo: number = 0)
+        bind(webgl: WebGL2RenderingContext, shadercode: glProgram, bindEbo: number = 0)
         {
             // webgl.bindBuffer(webgl.ARRAY_BUFFER, this.vbo);
             this.bindIndex = bindEbo;
@@ -285,32 +285,32 @@
             // webglkit.SetMaxVertexAttribArray(webgl, channel);
         }
 
-        uploadVertexSubData(webgl: WebGLRenderingContext, varray: Float32Array, offset: number = 0)
+        uploadVertexSubData(webgl: WebGL2RenderingContext, varray: Float32Array, offset: number = 0)
         {
             webgl.bindBuffer(webgl.ARRAY_BUFFER, this.vbo);
             webgl.bufferSubData(webgl.ARRAY_BUFFER, offset, varray);
         }
 
-        uploadVertexData(webgl: WebGLRenderingContext, varray: Float32Array)
+        uploadVertexData(webgl: WebGL2RenderingContext, varray: Float32Array)
         {
             webgl.bindBuffer(webgl.ARRAY_BUFFER, this.vbo);
             webgl.bufferData(webgl.ARRAY_BUFFER, varray,this.mode);
         }
 
-        uploadIndexSubData(webgl: WebGLRenderingContext, eboindex: number, data: Uint16Array, offset: number = 0)
+        uploadIndexSubData(webgl: WebGL2RenderingContext, eboindex: number, data: Uint16Array, offset: number = 0)
         {
             webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, this.ebos[eboindex]);
             webgl.bufferSubData(webgl.ELEMENT_ARRAY_BUFFER, offset, data);
         }
 
-        uploadIndexData(webgl: WebGLRenderingContext, eboindex: number, data: Uint16Array, dataType = WebGLRenderingContext.UNSIGNED_SHORT)
+        uploadIndexData(webgl: WebGL2RenderingContext, eboindex: number, data: Uint16Array, dataType = WebGL2RenderingContext.UNSIGNED_SHORT)
         {
             this.eboDataType = dataType;
             webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, this.ebos[eboindex]);
             webgl.bufferData(webgl.ELEMENT_ARRAY_BUFFER, data,this.mode);
         }
         //三角形应用vbo
-        drawArrayTris(webgl: WebGLRenderingContext, start: number = 0, count: number = -1, instanceCount = 1)
+        drawArrayTris(webgl: WebGL2RenderingContext, start: number = 0, count: number = -1, instanceCount = 1)
         {
             if (count < 0)
                 count = ((this.vertexCount / 3) | 0) * 3;
@@ -326,7 +326,7 @@
             }
         }
         //直线应用vbo
-        drawArrayLines(webgl: WebGLRenderingContext, start: number = 0, count: number = -1, instanceCount = 1)
+        drawArrayLines(webgl: WebGL2RenderingContext, start: number = 0, count: number = -1, instanceCount = 1)
         {
             if (count < 0)
                 count = ((this.vertexCount / 2) | 0) * 2;
@@ -340,7 +340,7 @@
                 webgl.drawArrays(webgl.LINES, start, count);
             }
         }
-        drawElementTris(webgl: WebGLRenderingContext, start: number = 0, count: number = -1, instanceCount = 1)
+        drawElementTris(webgl: WebGL2RenderingContext, start: number = 0, count: number = -1, instanceCount = 1)
         {
             if (count < 0)
                 count = ((this.indexCounts[this.bindIndex] / 3) | 0) * 3;
@@ -354,7 +354,7 @@
                 webgl.drawElements(webgl.TRIANGLES, count, this.eboDataType, start * 2);
             }
         }
-        drawElementLines(webgl: WebGLRenderingContext, start: number = 0, count: number = -1, instanceCount = 1)
+        drawElementLines(webgl: WebGL2RenderingContext, start: number = 0, count: number = -1, instanceCount = 1)
         {
             if (count < 0)
                 count = ((this.indexCounts[this.bindIndex] / 2) | 0) * 2;

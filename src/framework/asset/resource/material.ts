@@ -35,15 +35,15 @@ namespace m4m.framework {
          *
          * @param gl
          */
-        initBuffer(gl: WebGLRenderingContext): void;
+        initBuffer(gl: WebGL2RenderingContext): void;
         /**
          * 启用批量渲染相关顶点属性
          */
-        activeAttributes(gl: WebGLRenderingContext, pass: render.glDrawPass): void;
+        activeAttributes(gl: WebGL2RenderingContext, pass: render.glDrawPass): void;
         /**
          * 禁用批量渲染相关顶点属性
          */
-        disableAttributes(gl: WebGLRenderingContext, pass: render.glDrawPass): void;
+        disableAttributes(gl: WebGL2RenderingContext, pass: render.glDrawPass): void;
     }
 
 

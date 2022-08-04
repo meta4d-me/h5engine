@@ -21,8 +21,7 @@ namespace m4m.framework {
          */
         //renderLayer: CullingMask = CullingMask.default;
         get renderLayer() { return this.gameObject.layer; }
-        set renderLayer(layer: number)
-        {
+        set renderLayer(layer: number) {
             this.gameObject.layer = layer;
         }
         private issetq = false;
@@ -30,15 +29,13 @@ namespace m4m.framework {
         /**
          * 返回此组件的场景渲染层级排序依据queue大小
          */
-        get queue(): number
-        {
+        get queue(): number {
             return this._queue;
         }
         /**
          * 设置此组件的场景渲染层级排序number大小
          */
-        set queue(value: number)
-        {
+        set queue(value: number) {
             this._queue = value;
             this.issetq = true;
         }
@@ -58,22 +55,18 @@ namespace m4m.framework {
          * 返回mesh数据
          */
         @m4m.reflect.Field("mesh")
-        get mesh()
-        {
+        get mesh() {
             return this._mesh;
         }
         /**
          * 设置mesh数据
          */
-        set mesh(mesh: mesh)
-        {
-            if (this._mesh != null)
-            {
+        set mesh(mesh: mesh) {
+            if (this._mesh != null) {
                 this._mesh.unuse();
             }
             this._mesh = mesh;
-            if (this._mesh != null)
-            {
+            if (this._mesh != null) {
                 this._mesh.use();
             }
         }
@@ -100,10 +93,8 @@ namespace m4m.framework {
 
 
         _aabb: aabb;
-        get aabb()
-        {
-            if (!this._aabb)
-            {
+        get aabb() {
+            if (!this._aabb) {
                 // calculate aabb from bounds
                 const { size, center } = this;
                 let max = m4m.math.pool.new_vector3();
@@ -138,11 +129,11 @@ namespace m4m.framework {
 
 
         start() {
-            if(!this.ibmContainer)
+            if (!this.ibmContainer)
                 return;
             // Handle ibm
             this.ibm = []
-            for(let i = 0; i < this.ibmContainer.length / 4; i++) {
+            for (let i = 0; i < this.ibmContainer.length / 4; i++) {
                 // Column major
                 let data = [
                     this.ibmContainer[i * 4 + 0].x,
@@ -177,11 +168,9 @@ namespace m4m.framework {
         update(delta: number) {
             // this.updateBoneMatrix();
 
-            if (this.materials != null && this.materials.length > 0)
-            {
+            if (this.materials != null && this.materials.length > 0) {
                 let _mat = this.materials[0];
-                if (_mat)
-                {
+                if (_mat) {
                     this.layer = _mat.getLayer();
                     if (!this.issetq)
                         this._queue = _mat.getQueue();
@@ -195,7 +184,7 @@ namespace m4m.framework {
         }
 
         render(context: renderContext, assetmgr: assetMgr, camera: m4m.framework.camera) {
-            if(!this.ibm)
+            if (!this.ibm)
                 return;
 
             DrawCallInfo.inc.currentState = DrawCallEnum.SKinrender;
@@ -235,8 +224,7 @@ namespace m4m.framework {
          * @private
          */
         remove() {
-            this.materials.forEach(element =>
-            {
+            this.materials.forEach(element => {
                 if (element) element.unuse();
             });
             if (this.mesh)
@@ -255,7 +243,7 @@ namespace m4m.framework {
         }
 
 
-////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////
 
         useBoneTexture = true;
         // rootBone: transform;
@@ -304,11 +292,12 @@ namespace m4m.framework {
         }
 
         private boneSamplerTexindex = -1;
+        private texID = 0;
         updateBoneTexture(context: renderContext) {
-            let ctx: WebGLRenderingContext = context.webgl;
+            let ctx: WebGL2RenderingContext = context.webgl;
             if (!this.boneMatricesTexture) {
-                this.boneMatricesTexture = new m4m.framework.texture('bone_matrices'+Math.random());
-                this.boneMatricesTexture.glTexture = new m4m.render.glTexture2D(ctx, render.TextureFormatEnum.RGBA, false, false) as m4m.render.glTexture2D;
+                this.boneMatricesTexture = new m4m.framework.texture(`bone_matrices_${this.texID++}`);
+                this.boneMatricesTexture.glTexture = new m4m.render.glTexture2D(ctx, render.TextureFormatEnum.FLOAT32, false, false) as m4m.render.glTexture2D;
                 // Manually assign tex size
                 this.boneMatricesTexture.glTexture.width = this.boneMatrices.length / 4;
                 this.boneMatricesTexture.glTexture.height = 1;
@@ -324,14 +313,14 @@ namespace m4m.framework {
             mat.setFloat(f4skinnedMeshRenderer.boneSamplerTexelSize, 4 / this.boneMatrices.length);
 
             //处理uniform 同材质去重优化,贴图通道被污染
-            let basetype = this.gameObject.transform.scene.fog ?  "skin_fog" : "skin" ;
+            let basetype = this.gameObject.transform.scene.fog ? "skin_fog" : "skin";
             let drawType = context.drawtype;
             let shader = mat.getShader();
             let drawPasses = shader.passes[basetype + drawType][0];
-            if(this.boneSamplerTexindex == -1){
-                this.boneSamplerTexindex = ctx.getUniform(drawPasses.program.program , drawPasses.mapuniforms[f4skinnedMeshRenderer.boneSampler].location);
+            if (this.boneSamplerTexindex == -1) {
+                this.boneSamplerTexindex = ctx.getUniform(drawPasses.program.program, drawPasses.mapuniforms[f4skinnedMeshRenderer.boneSampler].location);
             }
-            ctx.activeTexture(render.webglkit.GetTextureNumber( this.boneSamplerTexindex ));
+            ctx.activeTexture(render.webglkit.GetTextureNumber(this.boneSamplerTexindex));
 
             // update data texture
             (this.boneMatricesTexture.glTexture as m4m.render.glTexture2D).uploadByteArray(
@@ -345,14 +334,14 @@ namespace m4m.framework {
                 false,
                 false,
                 false,
-                WebGLRenderingContext.FLOAT
+                ctx.FLOAT 
             );
         }
 
         tempMatrix = new m4m.math.matrix();
         inverseRootBone = new m4m.math.matrix();
         updateBoneMatrix() {
-            for(let i = 0; i < this.bones.length; i++) {
+            for (let i = 0; i < this.bones.length; i++) {
                 const bone = this.bones[i];
                 // tempMatrix = render object world inverse matrix ('M'VP)
                 // gameobject空间 抵消掉shader里的M
@@ -363,8 +352,7 @@ namespace m4m.framework {
             }
         }
 
-        matrixMultiplyToArray(lhs: m4m.math.matrix, rhs: m4m.math.matrix, out: Float32Array): void
-        {
+        matrixMultiplyToArray(lhs: m4m.math.matrix, rhs: m4m.math.matrix, out: Float32Array): void {
             var a00 = lhs.rawData[0], a01 = lhs.rawData[1], a02 = lhs.rawData[2], a03 = lhs.rawData[3];
             var a10 = lhs.rawData[4], a11 = lhs.rawData[5], a12 = lhs.rawData[6], a13 = lhs.rawData[7];
             var a20 = lhs.rawData[8], a21 = lhs.rawData[9], a22 = lhs.rawData[10], a23 = lhs.rawData[11];

@@ -5,15 +5,16 @@
      * @private
      */
     export enum TextureFormatEnum {
-        RGBA = 1,// WebGLRenderingContext.RGBA,
-        RGB = 2,//WebGLRenderingContext.RGB,
-        Gray = 3,//WebGLRenderingContext.LUMINANCE,
+        RGBA = 1,// WebGL2RenderingContext.RGBA,
+        RGB = 2,//WebGL2RenderingContext.RGB,
+        Gray = 3,//WebGL2RenderingContext.LUMINANCE,
         PVRTC4_RGB = 4,
         PVRTC4_RGBA = 4,
         PVRTC2_RGB = 4,
         PVRTC2_RGBA = 4,
         KTX = 5,
-        FLOAT16 = 6,
+        FLOAT16,
+        FLOAT32,
         ASTC_RGBA_4x4,
         ASTC_RGBA_5x4,
         ASTC_RGBA_5x5,
@@ -33,7 +34,7 @@
      * @private
      */
     export class textureReader {
-        constructor(webgl: WebGLRenderingContext, texRGBA: WebGLTexture, width: number, height: number, gray: boolean = false) {
+        constructor(webgl: WebGL2RenderingContext, texRGBA: WebGLTexture, width: number, height: number, gray: boolean = false) {
             this._gray = gray;
             this._width = width;
             this._height = height;
@@ -46,7 +47,7 @@
         }
 
         private _isDispose = false;
-        private webgl: WebGLRenderingContext;
+        private webgl: WebGL2RenderingContext;
         private _width: number;
         get width() { return this._width; }
         private _height: number;
@@ -116,7 +117,7 @@
         width: number;
         height: number;
         isFrameBuffer(): boolean;
-        dispose(webgl: WebGLRenderingContext);
+        dispose(webgl: WebGL2RenderingContext);
         caclByteLength(): number;
     }
     /**
@@ -125,7 +126,7 @@
     export class glRenderTarget implements ITexture {
         width: number;
         height: number;
-        constructor(webgl: WebGLRenderingContext, width: number, height: number, depth: boolean = false, stencil: boolean = false) {
+        constructor(webgl: WebGL2RenderingContext, width: number, height: number, depth: boolean = false, stencil: boolean = false) {
             this.width = width;
             this.height = height;
             this.fbo = webgl.createFramebuffer();
@@ -166,19 +167,19 @@
         fbo: WebGLFramebuffer;
         renderbuffer: WebGLRenderbuffer;
         texture: WebGLTexture;
-        use(webgl: WebGLRenderingContext) {
+        use(webgl: WebGL2RenderingContext) {
             webgl.bindFramebuffer(webgl.FRAMEBUFFER, this.fbo);
             webgl.bindRenderbuffer(webgl.RENDERBUFFER, this.renderbuffer);
             webgl.bindTexture(webgl.TEXTURE_2D, this.texture);
             //webgl.framebufferTexture2D(webgl.FRAMEBUFFER, webgl.COLOR_ATTACHMENT0, webgl.TEXTURE_2D, this.texture, 0);
 
         }
-        static useNull(webgl: WebGLRenderingContext) {
+        static useNull(webgl: WebGL2RenderingContext) {
             webgl.bindFramebuffer(webgl.FRAMEBUFFER, null);
             webgl.bindRenderbuffer(webgl.RENDERBUFFER, null);
 
         }
-        dispose(webgl: WebGLRenderingContext) {
+        dispose(webgl: WebGL2RenderingContext) {
             //if (this.texture == null && this.img != null)
             //    this.disposeit = true;
 
@@ -201,14 +202,13 @@
      * @private
      */
     export class glTexture2D implements ITexture {
-        public ext: any;
         private linear: boolean = true;
         private premultiply: boolean = true;
         private repeat: boolean = true;
         private mirroredU: boolean = true;
         private mirroredV: boolean = true;
 
-        constructor(webgl: WebGLRenderingContext, format: TextureFormatEnum = TextureFormatEnum.RGBA, mipmap: boolean = false, linear: boolean = true) {
+        constructor(webgl: WebGL2RenderingContext, format: TextureFormatEnum = TextureFormatEnum.RGBA, mipmap: boolean = false, linear: boolean = true) {
             this.webgl = webgl;
             this.format = format;
             this.linear = linear;
@@ -220,30 +220,8 @@
             //if (url == null)//不给定url 则 texture 不加载
             //    return;
             this.texture = webgl.createTexture();
-            // let extname = "WEBGL_compressed_texture_pvrtc";
-            // this.ext = this.webgl.getExtension(extname) || this.webgl.getExtension('WEBKIT_' + extname);
-            this.ext = this.getExt("WEBGL_compressed_texture_pvrtc");
         }
-        private getExt(name: string)//WEBGL_compressed_texture_pvrtc
-        {
-            // var browserPrefixes = [
-            //     "",
-            //     "MOZ_",
-            //     "OP_",
-            //     "WEBKIT_"
-            // ];
-            // for (var ii = 0; ii < browserPrefixes.length; ++ii)
-            // {
-            //     var prefixedName = browserPrefixes[ii] + name;
-            //     let ext = this.webgl.getExtension(prefixedName);
-            //     if (ext)
-            //     {
-            //         return ext;
-            //     }
-            // }
-            return this.webgl.getExtension(name) || this.webgl.getExtension(`MOZ_${name}`) ||
-                this.webgl.getExtension(`OP_${name}`) || this.webgl.getExtension(`WEBKIT_${name}`) || null;
-        }
+
         uploadImage(img: HTMLImageElement, mipmap: boolean, linear: boolean, premultiply: boolean = true, repeat: boolean = false, mirroredU: boolean = false, mirroredV: boolean = false): void {
             this.width = img.width;
             this.height = img.height;
@@ -261,16 +239,17 @@
             this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, premultiply ? 1 : 0);
             this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 1);
 
+            let texF = this.getGLFormat();
 
-            var formatGL = this.webgl.RGBA;
-            if (this.format == TextureFormatEnum.RGB)
-                formatGL = this.webgl.RGB;
-            else if (this.format == TextureFormatEnum.Gray)
-                formatGL = this.webgl.LUMINANCE;
+            // var formatGL = this.webgl.RGBA;
+            // if (this.format == TextureFormatEnum.RGB)
+            //     formatGL = this.webgl.RGB;
+            // else if (this.format == TextureFormatEnum.Gray)
+            //     formatGL = this.webgl.LUMINANCE;
             this.webgl.texImage2D(this.webgl.TEXTURE_2D,
                 0,
-                formatGL,
-                formatGL,
+                texF.internalformatGL,
+                texF.formatGL,
                 //最后这个type，可以管格式
                 this.webgl.UNSIGNED_BYTE
                 , img);
@@ -346,24 +325,15 @@
             if (flipY) {
                 // this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 1);
             }
-            var formatGL = this.webgl.RGBA;
-            if (this.format == TextureFormatEnum.RGB)
-                formatGL = this.webgl.RGB;
-            else if (this.format == TextureFormatEnum.FLOAT16) {
-                formatGL = this.webgl.RGBA;
-                var ext = this.webgl.getExtension('OES_texture_half_float');
-                if (ext == null) throw "nit support oes";
-                dataType = ext.HALF_FLOAT_OES;
-            }
-            else if (this.format == TextureFormatEnum.Gray)
-                formatGL = this.webgl.LUMINANCE;
+            let texF = this.getGLFormat();
+
             this.webgl.texImage2D(this.webgl.TEXTURE_2D,
                 0,
-                formatGL,
+                texF.internalformatGL,
                 width,
                 height,
                 0,
-                formatGL,
+                texF.formatGL,
                 //最后这个type，可以管格式
                 dataType,
                 data);
@@ -420,7 +390,7 @@
             this.webgl.bindTexture(this.webgl.TEXTURE_2D, null);
         }
 
-        webgl: WebGLRenderingContext;
+        webgl: WebGL2RenderingContext;
         //img: HTMLImageElement = null;
         loaded: boolean = false;
         texture: WebGLTexture;
@@ -460,7 +430,7 @@
             return this.reader;
         }
         //disposeit: boolean = false;
-        dispose(webgl: WebGLRenderingContext) {
+        dispose(webgl: WebGL2RenderingContext) {
             //if (this.texture == null && this.img != null)
             //    this.disposeit = true;
 
@@ -472,8 +442,36 @@
         isFrameBuffer(): boolean {
             return false;
         }
+
+        private getGLFormat(): { internalformatGL: number, formatGL: number } {
+            let formatGL = this.webgl.RGBA;
+            let internalformatGL = formatGL;
+            switch (this.format) {
+                case TextureFormatEnum.RGB:
+                    formatGL = this.webgl.RGB;
+                    internalformatGL = formatGL;
+                    break;
+                case TextureFormatEnum.FLOAT16:
+                    formatGL = this.webgl.RGBA;
+                    internalformatGL = this.webgl.RGBA16F;
+                    // formatGL = this.webgl.RGBA;
+                    // var ext = this.webgl.getExtension('OES_texture_half_float');
+                    // if (ext == null) throw "nit support oes";
+                    // dataType = ext.HALF_FLOAT_OES;
+                    break;
+                case TextureFormatEnum.FLOAT32:
+                    formatGL = this.webgl.RGBA;
+                    internalformatGL = this.webgl.RGBA32F;
+                    break;
+                case TextureFormatEnum.Gray:
+                    formatGL = this.webgl.LUMINANCE;
+                    internalformatGL = formatGL;
+                    break;
+            }
+            return { internalformatGL, formatGL };
+        }
         private static mapTexture: { [id: string]: glTexture2D } = {};
-        static formGrayArray(webgl: WebGLRenderingContext, array: number[] | Float32Array | Float64Array, width: number, height: number) {
+        static formGrayArray(webgl: WebGL2RenderingContext, array: number[] | Float32Array | Float64Array, width: number, height: number) {
             var mipmap = false;
             var linear = true;
             var t = new glTexture2D(webgl, TextureFormatEnum.RGBA, mipmap, linear);
@@ -494,7 +492,7 @@
             return t;
         }
 
-        static staticTexture(webgl: WebGLRenderingContext, name: string) {
+        static staticTexture(webgl: WebGL2RenderingContext, name: string) {
             var t = glTexture2D.mapTexture[name];
             if (t != undefined)
                 return t;
@@ -566,7 +564,7 @@
             return t;
         }
 
-        static particleTexture(webgl: WebGLRenderingContext, name = framework.defTexture.particle) {
+        static particleTexture(webgl: WebGL2RenderingContext, name = framework.defTexture.particle) {
             var t = glTexture2D.mapTexture[name];
             if (t != undefined)
                 return t;
@@ -604,7 +602,7 @@
     }
 
     export class glTextureCube implements ITexture {
-        constructor(webgl: WebGLRenderingContext, format: TextureFormatEnum = TextureFormatEnum.RGBA, mipmap: boolean = false, linear: boolean = true) {
+        constructor(webgl: WebGL2RenderingContext, format: TextureFormatEnum = TextureFormatEnum.RGBA, mipmap: boolean = false, linear: boolean = true) {
             this.webgl = webgl;
             this.format = format;
             this.mipmap = mipmap;
@@ -622,7 +620,7 @@
             Texture_POSITIVE_X: framework.texture,
             Texture_POSITIVE_Y: framework.texture,
             Texture_POSITIVE_Z: framework.texture,
-            min = WebGLRenderingContext.NEAREST, max = WebGLRenderingContext.NEAREST, mipmap: number = null
+            min = WebGL2RenderingContext.NEAREST, max = WebGL2RenderingContext.NEAREST, mipmap: number = null
         ) {
             let wrc = this.webgl;
 
@@ -757,7 +755,7 @@
 
         }
 
-        webgl: WebGLRenderingContext;
+        webgl: WebGL2RenderingContext;
         //img: HTMLImageElement = null;
         loaded: boolean = false;
         texture: WebGLTexture;
@@ -781,7 +779,7 @@
             return len;
         }
         //disposeit: boolean = false;
-        dispose(webgl: WebGLRenderingContext) {
+        dispose(webgl: WebGL2RenderingContext) {
             if (this.texture != null) {
                 webgl.deleteTexture(this.texture);
                 this.texture = null;
@@ -795,7 +793,7 @@
      * @private
      */
     export class WriteableTexture2D implements ITexture {
-        constructor(webgl: WebGLRenderingContext, format: TextureFormatEnum = TextureFormatEnum.RGBA, width: number, height: number, linear: boolean, premultiply: boolean = true, repeat: boolean = false, mirroredU: boolean = false, mirroredV: boolean = false) {
+        constructor(webgl: WebGL2RenderingContext, format: TextureFormatEnum = TextureFormatEnum.RGBA, width: number, height: number, linear: boolean, premultiply: boolean = true, repeat: boolean = false, mirroredU: boolean = false, mirroredV: boolean = false) {
             this.webgl = webgl;
 
             this.texture = webgl.createTexture();
@@ -890,14 +888,14 @@
         isFrameBuffer(): boolean {
             return false;
         }
-        webgl: WebGLRenderingContext;
+        webgl: WebGL2RenderingContext;
         texture: WebGLTexture;
         format: TextureFormatEnum;
         formatGL: number;
         width: number = 0;
         height: number = 0;
 
-        dispose(webgl: WebGLRenderingContext) {
+        dispose(webgl: WebGL2RenderingContext) {
             if (this.texture != null) {
                 webgl.deleteTexture(this.texture);
                 this.texture = null;

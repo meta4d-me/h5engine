@@ -19,14 +19,15 @@ namespace m4m.framework
 
         /**
          * 
-         * @param gl WebGLRenderingContext
+         * @param gl WebGL2RenderingContext
          * @param arrayBuffer contents of the ASTC container file
          */
-        static parse(gl: WebGLRenderingContext, arrayBuffer: ArrayBuffer): render.glTexture2D
+        static parse(gl: WebGL2RenderingContext, arrayBuffer: ArrayBuffer): render.glTexture2D
         {
             let result: render.glTexture2D;
 
-            let ext = gl.getExtension('WEBGL_compressed_texture_astc');
+            // let ext = gl.getExtension('WEBGL_compressed_texture_astc');
+            let ext = gl.extensions.WEBGL_compressed_texture_astc;
             if (!ext)
             {
                 console.error(`当前环境 不支持 ASTC 压缩纹理`);

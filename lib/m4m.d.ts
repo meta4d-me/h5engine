@@ -50,7 +50,7 @@ declare namespace m4m.framework {
          * 全局webgl实例
          * @version m4m 1.0
          */
-        webgl: WebGLRenderingContext;
+        webgl: WebGL2RenderingContext;
         stats: Stats.Stats;
         container: HTMLDivElement;
         outcontainer: HTMLDivElement;
@@ -131,8 +131,8 @@ declare namespace m4m.framework {
          * @param div 绘制区域的dom
          * @version m4m 1.0
          */
-        start(div: HTMLDivElement, type?: CanvasFixedType, val?: number, webglDebug?: boolean): void;
-        startForCanvas(canvas: HTMLCanvasElement, type?: CanvasFixedType, val?: number, webglDebug?: boolean): void;
+        start(div: HTMLDivElement, type?: CanvasFixedType, val?: number, webglDebug?: boolean, opt_attribs?: WebGLContextAttributes): void;
+        startForCanvas(canvas: HTMLCanvasElement, type?: CanvasFixedType, val?: number, webglDebug?: boolean, opt_attribs?: WebGLContextAttributes): void;
         markNotify(trans: any, type: NotifyType): void;
         private doNotify;
         /**
@@ -930,20 +930,20 @@ declare namespace m4m.framework {
         /**
          * @private
          */
-        initBuffer(webgl: WebGLRenderingContext, vf: render.VertexFormatMask, drawMode: render.DrawModeEnum): void;
+        initBuffer(webgl: WebGL2RenderingContext, vf: render.VertexFormatMask, drawMode: render.DrawModeEnum): void;
         /**
          * @private
          */
-        begin(webgl: WebGLRenderingContext, pass: render.glDrawPass): void;
+        begin(webgl: WebGL2RenderingContext, pass: render.glDrawPass): void;
         private static limitCount;
         /**
          * @private
          */
-        push(webgl: WebGLRenderingContext, vbodata: number[], ebodata: number[]): void;
+        push(webgl: WebGL2RenderingContext, vbodata: number[], ebodata: number[]): void;
         /**
          * @private
          */
-        end(webgl: WebGLRenderingContext): void;
+        end(webgl: WebGL2RenderingContext): void;
     }
     /**
      * @public
@@ -1020,7 +1020,7 @@ declare namespace m4m.framework {
          * webgl实例
          * @version m4m 1.0
          */
-        webgl: WebGLRenderingContext;
+        webgl: WebGL2RenderingContext;
         /**
          * @public
          * @language zh_CN
@@ -4365,10 +4365,10 @@ declare namespace m4m.framework {
         private static pixelHeight;
         /**
          *
-         * @param gl WebGLRenderingContext
+         * @param gl WebGL2RenderingContext
          * @param arrayBuffer contents of the ASTC container file
          */
-        static parse(gl: WebGLRenderingContext, arrayBuffer: ArrayBuffer): render.glTexture2D;
+        static parse(gl: WebGL2RenderingContext, arrayBuffer: ArrayBuffer): render.glTexture2D;
         private static decodeBuffer;
         private static getTextureFormat;
     }
@@ -4384,7 +4384,7 @@ declare class HdrParser {
      * @version m4m 1.0
      */
     textDecoder: TextDecoder;
-    constructor(gl: WebGLRenderingContext);
+    constructor(gl: WebGL2RenderingContext);
     parseRGBE(raw: ArrayBuffer): {
         width: number;
         height: number;
@@ -4408,50 +4408,35 @@ declare namespace m4m.framework {
          * @param arrayBuffer contents of the KTX container file
          * @param facesExpected should be either 1 or 6, based whether a cube texture or or
          */
-        static parse(gl: WebGLRenderingContext, arrayBuffer: ArrayBuffer, facesExpected?: number, loadMipmaps?: boolean): m4m.render.glTexture2D;
+        static parse(gl: WebGL2RenderingContext, arrayBuffer: ArrayBuffer, facesExpected?: number, loadMipmaps?: boolean): m4m.render.glTexture2D;
     }
 }
-declare class PvrParse {
-    private version;
-    private flags;
-    private pixelFormatH;
-    private pixelFormatL;
-    private channelType;
-    height: number;
-    width: number;
-    private depth;
-    private numFaces;
-    private mipMapCount;
-    private metaDataSize;
-    private gl;
-    constructor(gl: WebGLRenderingContext);
-    /**
-     * @public
-     * @language zh_CN
-     * @classdesc
-     * 解析pvr图片
-     * @param _buffer 图片二进制数据
-     * @version m4m 1.0
-     */
-    parse(_buffer: ArrayBuffer): m4m.render.glTexture2D;
-    private parseV3;
-}
-declare enum ChannelTypes {
-    UnsignedByteNorm = 0,
-    SignedByteNorm = 1,
-    UnsignedByte = 2,
-    SignedByte = 3,
-    UnsignedShortNorm = 4,
-    SignedShortNorm = 5,
-    UnsignedShort = 6,
-    SignedShort = 7,
-    UnsignedIntegerNorm = 8,
-    SignedIntegerNorm = 9,
-    UnsignedInteger = 10,
-    SignedInteger = 11,
-    SignedFloat = 12,
-    Float = 12,
-    UnsignedFloat = 13
+declare namespace m4m.framework {
+    class PvrParse {
+        private version;
+        private flags;
+        private pixelFormatH;
+        private pixelFormatL;
+        private channelType;
+        height: number;
+        width: number;
+        private depth;
+        private numFaces;
+        private mipMapCount;
+        private metaDataSize;
+        private gl;
+        constructor(gl: WebGL2RenderingContext);
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 解析pvr图片
+         * @param _buffer 图片二进制数据
+         * @version m4m 1.0
+         */
+        parse(_buffer: ArrayBuffer): m4m.render.glTexture2D;
+        private parseV3;
+    }
 }
 declare namespace m4m.framework {
     class RAWParse {
@@ -4464,10 +4449,10 @@ declare namespace m4m.framework {
         private static pixelHeight;
         /**
          *
-         * @param gl WebGLRenderingContext
+         * @param gl WebGL2RenderingContext
          * @param arrayBuffer contents of the ASTC container file
          */
-        static parse(gl: WebGLRenderingContext, arrayBuffer: ArrayBuffer): render.glTexture2D;
+        static parse(gl: WebGL2RenderingContext, arrayBuffer: ArrayBuffer): render.glTexture2D;
         /**
          * 解析纹理 通过参数
          * @param gl
@@ -4478,7 +4463,7 @@ declare namespace m4m.framework {
          * @param _repeat
          * @returns
          */
-        static parseByAtt(gl: WebGLRenderingContext, arrayBuffer: ArrayBuffer, _mipmap?: boolean, _linear?: boolean, _premultiplyAlpha?: boolean, _repeat?: boolean): render.glTexture2D;
+        static parseByAtt(gl: WebGL2RenderingContext, arrayBuffer: ArrayBuffer, _mipmap?: boolean, _linear?: boolean, _premultiplyAlpha?: boolean, _repeat?: boolean): render.glTexture2D;
     }
 }
 declare namespace m4m.framework {
@@ -4953,7 +4938,7 @@ declare namespace m4m.framework {
         private static bin;
         app: m4m.framework.application;
         shaderPool: m4m.render.shaderPool;
-        webgl: WebGLRenderingContext;
+        webgl: WebGL2RenderingContext;
         mapRes: {
             [id: number]: any;
         };
@@ -5009,7 +4994,6 @@ declare namespace m4m.framework {
 }
 declare namespace m4m.framework {
     class defShader {
-        static shader0: string;
         static vscode: string;
         static fscode: string;
         static fscode2: string;
@@ -5023,12 +5007,10 @@ declare namespace m4m.framework {
         static fscodefontUI: string;
         static vscodeuifontmask: string;
         static fscodeuifontmask: string;
-        static diffuseShader: string;
         static vsdiffuse: string;
         static fsdiffuse: string;
         static vsline: string;
         static fsline: string;
-        static materialShader: string;
         static vsmaterialcolor: string;
         static vslinetrail: string;
         static linetrailShader: string;
@@ -5873,7 +5855,7 @@ declare namespace m4m.framework {
         set realName(name: string);
         hexToRgb: (hex: any) => any;
         buffers: bin[];
-        load(mgr: assetMgr, ctx: WebGLRenderingContext, folder: string, brdf: texture, env: texture, irrSH: texture, exposure?: any, specFactor?: number, irrFactor?: number, uvChecker?: texture): Promise<transform>;
+        load(mgr: assetMgr, ctx: WebGL2RenderingContext, folder: string, brdf: texture, env: texture, irrSH: texture, exposure?: any, specFactor?: number, irrFactor?: number, uvChecker?: texture): Promise<transform>;
         /**
          * 获取实时灯光列表详细
          */
@@ -6740,9 +6722,9 @@ declare namespace m4m.framework {
         instanceArray: m4m.math.ReuseArray<IRendererGpuIns>;
         helpDArray: m4m.math.ExtenArray<Float32Array>;
         private attSuccess;
-        initBuffer(gl: WebGLRenderingContext): void;
-        activeAttributes(gl: WebGLRenderingContext, pass: render.glDrawPass): void;
-        disableAttributes(gl: WebGLRenderingContext, pass: render.glDrawPass): void;
+        initBuffer(gl: WebGL2RenderingContext): void;
+        activeAttributes(gl: WebGL2RenderingContext, pass: render.glDrawPass): void;
+        disableAttributes(gl: WebGL2RenderingContext, pass: render.glDrawPass): void;
         /** Disable 结束回调 */
         onDisableAttribute: (info: meshGpuInstanceDrawInfo) => any;
         private static _pool;
@@ -7171,15 +7153,15 @@ declare namespace m4m.framework {
          *
          * @param gl
          */
-        initBuffer(gl: WebGLRenderingContext): void;
+        initBuffer(gl: WebGL2RenderingContext): void;
         /**
          * 启用批量渲染相关顶点属性
          */
-        activeAttributes(gl: WebGLRenderingContext, pass: render.glDrawPass): void;
+        activeAttributes(gl: WebGL2RenderingContext, pass: render.glDrawPass): void;
         /**
          * 禁用批量渲染相关顶点属性
          */
-        disableAttributes(gl: WebGLRenderingContext, pass: render.glDrawPass): void;
+        disableAttributes(gl: WebGL2RenderingContext, pass: render.glDrawPass): void;
     }
     /**
      * @public
@@ -7494,7 +7476,7 @@ declare namespace m4m.framework {
          * @param webgl webgl实例
          * @version m4m 1.0
          */
-        Parse(inData: ArrayBuffer | any, webgl: WebGLRenderingContext): Promise<IAsset>;
+        Parse(inData: ArrayBuffer | any, webgl: WebGL2RenderingContext): Promise<IAsset>;
         parseCMesh(inData: any, webgl: any): void;
         /**
          * @public
@@ -9355,7 +9337,7 @@ declare namespace m4m.framework {
         /**
         * @private
         */
-        webgl: WebGLRenderingContext;
+        webgl: WebGL2RenderingContext;
         private parser;
         /**
         * @private
@@ -9606,7 +9588,7 @@ declare namespace m4m.framework {
         /**
         * @private
         */
-        webgl: WebGLRenderingContext;
+        webgl: WebGL2RenderingContext;
         private parser;
         /**
         * @private
@@ -9834,6 +9816,7 @@ declare namespace m4m.framework {
         initBoneMatrices(): void;
         initStaticPoseMatrices(): void;
         private boneSamplerTexindex;
+        private texID;
         updateBoneTexture(context: renderContext): void;
         tempMatrix: math.matrix;
         inverseRootBone: math.matrix;
@@ -10701,7 +10684,7 @@ declare namespace m4m.framework {
         data: F14EffectData;
         layers: F14Layer[];
         VF: number;
-        webgl: WebGLRenderingContext;
+        webgl: WebGL2RenderingContext;
         private _f14eff;
         /**
          * f14eff 资源
@@ -11536,7 +11519,7 @@ declare namespace m4m.framework {
          * @param mesh
          */
         static clearMesh(mesh: mesh): void;
-        static uploadMesh(_mesh: mesh, webgl: WebGLRenderingContext): void;
+        static uploadMesh(_mesh: mesh, webgl: WebGL2RenderingContext): void;
         /**
          * 计算网格
          *
@@ -14088,7 +14071,7 @@ declare namespace m4m.framework {
 }
 declare namespace m4m.framework {
     class EffectElementEmission implements IEffectElement {
-        webgl: WebGLRenderingContext;
+        webgl: WebGL2RenderingContext;
         gameObject: gameObject;
         effectSys: TestEffectSystem;
         active: boolean;
@@ -14675,7 +14658,7 @@ declare namespace m4m.framework {
      * @private
      */
     class EmissionElement {
-        webgl: WebGLRenderingContext;
+        webgl: WebGL2RenderingContext;
         gameObject: gameObject;
         effectSys: effectSystem;
         ParticleMgr: Particles;
@@ -18599,9 +18582,9 @@ declare namespace m4m.framework {
      * @private
      */
     class renderContext {
-        constructor(webgl: WebGLRenderingContext);
+        constructor(webgl: WebGL2RenderingContext);
         drawtype: string;
-        webgl: WebGLRenderingContext;
+        webgl: WebGL2RenderingContext;
         viewPortPixel: m4m.math.rect;
         eyePos: m4m.math.vector4;
         matrixView: m4m.math.matrix;
@@ -18691,8 +18674,8 @@ declare namespace m4m.framework {
         constructor();
         clear(): void;
         clearBatcher(): void;
-        addRenderer(renderer: IRenderer, webgl: WebGLRenderingContext): void;
-        addStaticInstanceRenderer(renderer: IRendererGpuIns, webgl: WebGLRenderingContext, isStatic: boolean): void;
+        addRenderer(renderer: IRenderer, webgl: WebGL2RenderingContext): void;
+        addStaticInstanceRenderer(renderer: IRendererGpuIns, webgl: WebGL2RenderingContext, isStatic: boolean): void;
         renderLayers: renderLayer[];
     }
     /**
@@ -18743,7 +18726,7 @@ declare namespace m4m.framework {
          * 全局的webgl实例
          * @version m4m 1.0
          */
-        webgl: WebGLRenderingContext;
+        webgl: WebGL2RenderingContext;
         /**
          * @private
          * @param app
@@ -20035,49 +20018,11 @@ declare namespace m4m.framework {
         static getEnumObjByType(enumType: string): any;
     }
 }
-interface WebGLRenderingContext {
+interface WebGL2RenderingContext {
     /**
      * 扩展
      */
     extensions: m4m.framework.GLExtension;
-    /**
-     * The WebGL2RenderingContext.vertexAttribDivisor() method of the WebGL 2 API modifies the rate at which generic vertex attributes advance when rendering multiple instances of primitives with gl.drawArraysInstanced() and gl.drawElementsInstanced().
-     *
-     * WebGL2 API的WebGL2RenderingContext.vertexAttribDivisor()方法在使用gl. drawarraysinstated()和gl. drawelementsinstated()呈现多个原语实例时，修改了通用顶点属性的提升速度。
-     *
-     * @param index A GLuint specifying the index of the generic vertex attributes. 指定一般顶点属性的索引的GLuint。
-     * @param divisor 指定将在通用属性的更新之间传递的实例数的GLuint。
-     *
-     * @see WebGL2RenderingContextBase.vertexAttribDivisor
-     * @see ANGLE_instanced_arrays.vertexAttribDivisorANGLE
-     * @see https://developer.mozilla.org/zh-CN/docs/Web/API/WebGL2RenderingContext/vertexAttribDivisor
-     */
-    vertexAttribDivisor(index: GLuint, divisor: GLuint): void;
-    /**
-     * The WebGL2RenderingContext.drawElementsInstanced() method of the WebGL 2 API renders primitives from array data like the gl.drawElements() method. In addition, it can execute multiple instances of a set of elements.
-     *
-     * WebGL2 API的webgl2renderingcontext . drawelementsinstance()方法呈现来自数组数据的原语，如gl.drawElements()方法。此外，它可以执行一组元素的多个实例。
-     *
-     * @param mode A GLenum specifying the type primitive to render. 指定要呈现的类型基元的GLenum。
-     * @param count A GLsizei specifying the number of elements to be rendered. 指定要呈现的元素数量的GLsizei。
-     * @param type A GLenum specifying the type of the values in the element array buffer. 指定元素数组缓冲区中值的类型的GLenum。
-     * @param offset A GLintptr specifying an offset in the element array buffer. Must be a valid multiple of the size of the given type. 指定元素数组缓冲区中的偏移量的GLintptr。必须是给定类型大小的有效倍数。
-     * @param instanceCount A GLsizei specifying the number of instances of the set of elements to execute. 指定要执行的元素集的实例数的GLsizei。
-     *
-     * @see WebGL2RenderingContextBase.drawElementsInstanced
-     */
-    drawElementsInstanced(mode: GLenum, count: GLsizei, type: GLenum, offset: GLintptr, instanceCount: GLsizei): void;
-    /**
-     * The WebGL2RenderingContext.drawArraysInstanced() method of the WebGL 2 API renders primitives from array data like the gl.drawArrays() method. In addition, it can execute multiple instances of the range of elements.
-     *
-     * WebGL2 API的webgl2renderingcontext . drawarraysinstance()方法呈现来自数组数据的原语，比如gl.drawArrays()方法。此外，它可以执行元素范围的多个实例。
-     *
-     * @param mode A GLenum specifying the type primitive to render. 指定要呈现的类型基元的GLenum。
-     * @param first A GLint specifying the starting index in the array of vector points. 在向量点数组中指定起始索引的位置。
-     * @param count A GLsizei specifying the number of indices to be rendered. 指定要呈现的索引数量的GLsizei。
-     * @param instanceCount A GLsizei specifying the number of instances of the range of elements to execute. 指定要执行的元素集的实例数的GLsizei。
-     */
-    drawArraysInstanced(mode: GLenum, first: GLint, count: GLsizei, instanceCount: GLsizei): void;
 }
 declare namespace m4m.framework {
     /**
@@ -20086,38 +20031,26 @@ declare namespace m4m.framework {
      * @author feng3d
      */
     class GLExtension {
-        ANGLE_instanced_arrays: ANGLE_instanced_arrays;
-        EXT_blend_minmax: EXT_blend_minmax;
         EXT_color_buffer_half_float: any;
-        EXT_frag_depth: EXT_frag_depth;
-        EXT_sRGB: EXT_sRGB;
-        EXT_shader_texture_lod: EXT_shader_texture_lod;
         EXT_texture_filter_anisotropic: EXT_texture_filter_anisotropic;
-        OES_element_index_uint: OES_element_index_uint;
-        OES_standard_derivatives: OES_standard_derivatives;
-        OES_texture_float: OES_texture_float;
-        OES_texture_float_linear: OES_texture_float_linear;
-        OES_texture_half_float: OES_texture_half_float;
         OES_texture_half_float_linear: OES_texture_half_float_linear;
-        OES_vertex_array_object: OES_vertex_array_object;
-        WEBGL_color_buffer_float: WEBGL_color_buffer_float;
-        WEBGL_compressed_texture_atc: any;
+        EXT_color_buffer_float: any;
+        WEBGL_compressed_texture_etc: any;
         WEBGL_compressed_texture_etc1: any;
         WEBGL_compressed_texture_pvrtc: any;
+        WEBGL_compressed_texture_astc: WEBGL_compressed_texture_astc;
         WEBGL_compressed_texture_s3tc: WEBGL_compressed_texture_s3tc;
+        WEBGL_compressed_texture_s3tc_srgb: WEBGL_compressed_texture_s3tc_srgb;
         WEBGL_debug_renderer_info: WEBGL_debug_renderer_info;
         WEBGL_debug_shaders: WEBGL_debug_shaders;
-        WEBGL_depth_texture: WEBGL_depth_texture;
-        WEBGL_draw_buffers: WEBGL_draw_buffers;
         WEBGL_lose_context: any;
-        constructor(gl: WebGLRenderingContext);
+        constructor(gl: WebGL2RenderingContext);
         private initExtensions;
         /**
          * 缓存GL查询
          * @param gl GL实例
          */
         private cacheGLQuery;
-        private wrap;
     }
 }
 declare namespace m4m.framework {
@@ -20899,7 +20832,7 @@ declare namespace m4m.framework {
         private glEnums;
         /**
          * Initializes this module. Safe to call more than once.
-         * @param {!WebGLRenderingContext} ctx A WebGL context. If
+         * @param {!WebGL2RenderingContext} ctx A WebGL context. If
          *    you have more than one context it doesn't matter which one
          *    you pass in, it is only used to pull out constants.
          */
@@ -20938,14 +20871,14 @@ declare namespace m4m.framework {
          * gl.getError after every command and calls a function if the
          * result is not gl.NO_ERROR.
          *
-         * @param {!WebGLRenderingContext} ctx The webgl context to
+         * @param {!WebGL2RenderingContext} ctx The webgl context to
          *        wrap.
          * @param {!function(err, funcName, args): void} opt_onErrorFunc
          *        The function to call when gl.getError returns an
          *        error. If not specified the default function calls
          *        console.log with a message.
          */
-        makeDebugContext(ctx: WebGLRenderingContext, opt_onErrorFunc?: (err: any, funcName: any, args: any) => void): WebGLRenderingContext;
+        makeDebugContext(ctx: WebGL2RenderingContext, opt_onErrorFunc?: (err: any, funcName: any, args: any) => void): WebGL2RenderingContext;
         private resetToInitialState;
         private makeLostContextSimulatingContext;
     }
@@ -20979,7 +20912,7 @@ declare namespace m4m.framework {
          *     creation attributes you want to pass in.
          * @param {function:(msg)} opt_onError An function to call
          *     if there is an error during creation.
-         * @return {WebGLRenderingContext} The created context.
+         * @return {WebGL2RenderingContext} The created context.
          */
         setupWebGL(canvas: Element, opt_attribs?: WebGLContextAttributes, opt_onError?: (msg: string) => void): any;
         /**
@@ -22253,7 +22186,7 @@ declare namespace m4m.render {
      */
     class webglkit {
         private static _maxVertexAttribArray;
-        static SetMaxVertexAttribArray(webgl: WebGLRenderingContext, count: number): void;
+        static SetMaxVertexAttribArray(webgl: WebGL2RenderingContext, count: number): void;
         private static _texNumber;
         static GetTextureNumber(index: number): number;
         static FUNC_ADD: number;
@@ -22276,7 +22209,7 @@ declare namespace m4m.render {
         static ALWAYS: number;
         static NEVER: number;
         static caps: caps;
-        static initConst(webgl: WebGLRenderingContext): void;
+        static initConst(webgl: WebGL2RenderingContext): void;
     }
 }
 declare namespace m4m.render {
@@ -22341,8 +22274,8 @@ declare namespace m4m.render {
         static resetLastState(): void;
         private static useStateMap;
         private static lastPassID;
-        use(webgl: WebGLRenderingContext): void;
-        draw(webgl: WebGLRenderingContext, mesh: glMesh, drawmode?: DrawModeEnum, drawindexindex?: number, drawbegin?: number, drawcount?: number): void;
+        use(webgl: WebGL2RenderingContext): void;
+        draw(webgl: WebGL2RenderingContext, mesh: glMesh, drawmode?: DrawModeEnum, drawindexindex?: number, drawbegin?: number, drawcount?: number): void;
         private getCurDrawState;
         private getCurBlendVal;
         private formate;
@@ -22394,11 +22327,11 @@ declare namespace m4m.render {
      * @private
      */
     class glMesh {
-        initBuffer(webgl: WebGLRenderingContext, vf: VertexFormatMask, vertexCount: number, mode?: MeshTypeEnum): void;
-        addIndex(webgl: WebGLRenderingContext, indexcount: number): number;
-        resetVboSize(webgl: WebGLRenderingContext, vertexCount: number): void;
-        resetEboSize(webgl: WebGLRenderingContext, eboindex: number, indexcount: number): void;
-        dispose(webgl: WebGLRenderingContext): void;
+        initBuffer(webgl: WebGL2RenderingContext, vf: VertexFormatMask, vertexCount: number, mode?: MeshTypeEnum): void;
+        addIndex(webgl: WebGL2RenderingContext, indexcount: number): number;
+        resetVboSize(webgl: WebGL2RenderingContext, vertexCount: number): void;
+        resetEboSize(webgl: WebGL2RenderingContext, eboindex: number, indexcount: number): void;
+        dispose(webgl: WebGL2RenderingContext): void;
         caclByteLength(): number;
         mode: number;
         vbo: WebGLBuffer;
@@ -22408,18 +22341,18 @@ declare namespace m4m.render {
         eboDataType: number;
         indexCounts: number[];
         lineMode: number;
-        bindVboBuffer(webgl: WebGLRenderingContext): void;
+        bindVboBuffer(webgl: WebGL2RenderingContext): void;
         bindIndex: number;
         vertexFormat: VertexFormatMask;
-        bind(webgl: WebGLRenderingContext, shadercode: glProgram, bindEbo?: number): void;
-        uploadVertexSubData(webgl: WebGLRenderingContext, varray: Float32Array, offset?: number): void;
-        uploadVertexData(webgl: WebGLRenderingContext, varray: Float32Array): void;
-        uploadIndexSubData(webgl: WebGLRenderingContext, eboindex: number, data: Uint16Array, offset?: number): void;
-        uploadIndexData(webgl: WebGLRenderingContext, eboindex: number, data: Uint16Array, dataType?: number): void;
-        drawArrayTris(webgl: WebGLRenderingContext, start?: number, count?: number, instanceCount?: number): void;
-        drawArrayLines(webgl: WebGLRenderingContext, start?: number, count?: number, instanceCount?: number): void;
-        drawElementTris(webgl: WebGLRenderingContext, start?: number, count?: number, instanceCount?: number): void;
-        drawElementLines(webgl: WebGLRenderingContext, start?: number, count?: number, instanceCount?: number): void;
+        bind(webgl: WebGL2RenderingContext, shadercode: glProgram, bindEbo?: number): void;
+        uploadVertexSubData(webgl: WebGL2RenderingContext, varray: Float32Array, offset?: number): void;
+        uploadVertexData(webgl: WebGL2RenderingContext, varray: Float32Array): void;
+        uploadIndexSubData(webgl: WebGL2RenderingContext, eboindex: number, data: Uint16Array, offset?: number): void;
+        uploadIndexData(webgl: WebGL2RenderingContext, eboindex: number, data: Uint16Array, dataType?: number): void;
+        drawArrayTris(webgl: WebGL2RenderingContext, start?: number, count?: number, instanceCount?: number): void;
+        drawArrayLines(webgl: WebGL2RenderingContext, start?: number, count?: number, instanceCount?: number): void;
+        drawElementTris(webgl: WebGL2RenderingContext, start?: number, count?: number, instanceCount?: number): void;
+        drawElementLines(webgl: WebGL2RenderingContext, start?: number, count?: number, instanceCount?: number): void;
     }
 }
 declare namespace m4m.render {
@@ -22478,7 +22411,7 @@ declare namespace m4m.render {
         static applyuniformFunc: {
             [type: number]: (location: any, value: any) => void;
         };
-        static webgl: WebGLRenderingContext;
+        static webgl: WebGL2RenderingContext;
         static initApplyUnifmFunc(): void;
     }
 }
@@ -22550,7 +22483,7 @@ declare namespace m4m.render {
         };
         private _strideInsAttrib;
         get strideInsAttrib(): number;
-        initAttribute(webgl: WebGLRenderingContext): void;
+        initAttribute(webgl: WebGL2RenderingContext): void;
         private tryGetLocation;
         vs: glShader;
         fs: glShader;
@@ -22567,8 +22500,8 @@ declare namespace m4m.render {
         mapUniform: {
             [id: string]: uniform;
         };
-        use(webgl: WebGLRenderingContext): void;
-        initUniforms(webgl: WebGLRenderingContext): void;
+        use(webgl: WebGL2RenderingContext): void;
+        initUniforms(webgl: WebGL2RenderingContext): void;
     }
     /**
      * @private
@@ -22583,20 +22516,20 @@ declare namespace m4m.render {
         mapProgram: {
             [id: string]: glProgram;
         };
-        disposeVS(webgl: WebGLRenderingContext, id: string): void;
-        disposeFS(webgl: WebGLRenderingContext, id: string): void;
-        disposeProgram(webgl: WebGLRenderingContext, id: string): void;
-        disposeAll(webgl: WebGLRenderingContext): void;
-        compileVS(webgl: WebGLRenderingContext, name: string, code: string): glShader;
-        compileFS(webgl: WebGLRenderingContext, name: string, code: string): glShader;
-        linkProgram(webgl: WebGLRenderingContext, nameVS: string, nameFS: string): glProgram;
+        disposeVS(webgl: WebGL2RenderingContext, id: string): void;
+        disposeFS(webgl: WebGL2RenderingContext, id: string): void;
+        disposeProgram(webgl: WebGL2RenderingContext, id: string): void;
+        disposeAll(webgl: WebGL2RenderingContext): void;
+        compileVS(webgl: WebGL2RenderingContext, name: string, code: string): glShader;
+        compileFS(webgl: WebGL2RenderingContext, name: string, code: string): glShader;
+        linkProgram(webgl: WebGL2RenderingContext, nameVS: string, nameFS: string): glProgram;
         mapVSString: {
             [id: string]: string;
         };
         mapFSString: {
             [id: string]: string;
         };
-        linkProgrambyPassType(webgl: WebGLRenderingContext, type: string, nameVS: string, nameFS: string, globalMacros: string[]): glProgram;
+        linkProgrambyPassType(webgl: WebGL2RenderingContext, type: string, nameVS: string, nameFS: string, globalMacros: string[]): glProgram;
     }
 }
 declare namespace m4m.render {
@@ -22615,26 +22548,27 @@ declare namespace m4m.render {
         PVRTC2_RGBA = 4,
         KTX = 5,
         FLOAT16 = 6,
-        ASTC_RGBA_4x4 = 7,
-        ASTC_RGBA_5x4 = 8,
-        ASTC_RGBA_5x5 = 9,
-        ASTC_RGBA_6x5 = 10,
-        ASTC_RGBA_6x6 = 11,
-        ASTC_RGBA_8x5 = 12,
-        ASTC_RGBA_8x6 = 13,
-        ASTC_RGBA_8x8 = 14,
-        ASTC_RGBA_10x5 = 15,
-        ASTC_RGBA_10x6 = 16,
-        ASTC_RGBA_10x8 = 17,
-        ASTC_RGBA_10x10 = 18,
-        ASTC_RGBA_12x10 = 19,
-        ASTC_RGBA_12x12 = 20
+        FLOAT32 = 7,
+        ASTC_RGBA_4x4 = 8,
+        ASTC_RGBA_5x4 = 9,
+        ASTC_RGBA_5x5 = 10,
+        ASTC_RGBA_6x5 = 11,
+        ASTC_RGBA_6x6 = 12,
+        ASTC_RGBA_8x5 = 13,
+        ASTC_RGBA_8x6 = 14,
+        ASTC_RGBA_8x8 = 15,
+        ASTC_RGBA_10x5 = 16,
+        ASTC_RGBA_10x6 = 17,
+        ASTC_RGBA_10x8 = 18,
+        ASTC_RGBA_10x10 = 19,
+        ASTC_RGBA_12x10 = 20,
+        ASTC_RGBA_12x12 = 21
     }
     /**
      * @private
      */
     class textureReader {
-        constructor(webgl: WebGLRenderingContext, texRGBA: WebGLTexture, width: number, height: number, gray?: boolean);
+        constructor(webgl: WebGL2RenderingContext, texRGBA: WebGLTexture, width: number, height: number, gray?: boolean);
         private _isDispose;
         private webgl;
         private _width;
@@ -22660,7 +22594,7 @@ declare namespace m4m.render {
         width: number;
         height: number;
         isFrameBuffer(): boolean;
-        dispose(webgl: WebGLRenderingContext): any;
+        dispose(webgl: WebGL2RenderingContext): any;
         caclByteLength(): number;
     }
     /**
@@ -22669,13 +22603,13 @@ declare namespace m4m.render {
     class glRenderTarget implements ITexture {
         width: number;
         height: number;
-        constructor(webgl: WebGLRenderingContext, width: number, height: number, depth?: boolean, stencil?: boolean);
+        constructor(webgl: WebGL2RenderingContext, width: number, height: number, depth?: boolean, stencil?: boolean);
         fbo: WebGLFramebuffer;
         renderbuffer: WebGLRenderbuffer;
         texture: WebGLTexture;
-        use(webgl: WebGLRenderingContext): void;
-        static useNull(webgl: WebGLRenderingContext): void;
-        dispose(webgl: WebGLRenderingContext): void;
+        use(webgl: WebGL2RenderingContext): void;
+        static useNull(webgl: WebGL2RenderingContext): void;
+        dispose(webgl: WebGL2RenderingContext): void;
         caclByteLength(): number;
         isFrameBuffer(): boolean;
     }
@@ -22683,17 +22617,15 @@ declare namespace m4m.render {
      * @private
      */
     class glTexture2D implements ITexture {
-        ext: any;
         private linear;
         private premultiply;
         private repeat;
         private mirroredU;
         private mirroredV;
-        constructor(webgl: WebGLRenderingContext, format?: TextureFormatEnum, mipmap?: boolean, linear?: boolean);
-        private getExt;
+        constructor(webgl: WebGL2RenderingContext, format?: TextureFormatEnum, mipmap?: boolean, linear?: boolean);
         uploadImage(img: HTMLImageElement, mipmap: boolean, linear: boolean, premultiply?: boolean, repeat?: boolean, mirroredU?: boolean, mirroredV?: boolean): void;
         uploadByteArray(mipmap: boolean, linear: boolean, width: number, height: number, data: Uint8Array | Uint16Array | Float32Array, repeat?: boolean, mirroredU?: boolean, mirroredV?: boolean, premultiplyAlpha?: boolean, flipY?: boolean, dataType?: number): void;
-        webgl: WebGLRenderingContext;
+        webgl: WebGL2RenderingContext;
         loaded: boolean;
         texture: WebGLTexture;
         format: TextureFormatEnum;
@@ -22703,18 +22635,19 @@ declare namespace m4m.render {
         caclByteLength(): number;
         reader: textureReader;
         getReader(redOnly?: boolean): textureReader;
-        dispose(webgl: WebGLRenderingContext): void;
+        dispose(webgl: WebGL2RenderingContext): void;
         isFrameBuffer(): boolean;
+        private getGLFormat;
         private static mapTexture;
-        static formGrayArray(webgl: WebGLRenderingContext, array: number[] | Float32Array | Float64Array, width: number, height: number): glTexture2D;
-        static staticTexture(webgl: WebGLRenderingContext, name: string): glTexture2D;
-        static particleTexture(webgl: WebGLRenderingContext, name?: string): glTexture2D;
+        static formGrayArray(webgl: WebGL2RenderingContext, array: number[] | Float32Array | Float64Array, width: number, height: number): glTexture2D;
+        static staticTexture(webgl: WebGL2RenderingContext, name: string): glTexture2D;
+        static particleTexture(webgl: WebGL2RenderingContext, name?: string): glTexture2D;
     }
     class glTextureCube implements ITexture {
-        constructor(webgl: WebGLRenderingContext, format?: TextureFormatEnum, mipmap?: boolean, linear?: boolean);
+        constructor(webgl: WebGL2RenderingContext, format?: TextureFormatEnum, mipmap?: boolean, linear?: boolean);
         uploadImages(Texture_NEGATIVE_X: framework.texture, Texture_NEGATIVE_Y: framework.texture, Texture_NEGATIVE_Z: framework.texture, Texture_POSITIVE_X: framework.texture, Texture_POSITIVE_Y: framework.texture, Texture_POSITIVE_Z: framework.texture, min?: number, max?: number, mipmap?: number): void;
         private upload;
-        webgl: WebGLRenderingContext;
+        webgl: WebGL2RenderingContext;
         loaded: boolean;
         texture: WebGLTexture;
         format: TextureFormatEnum;
@@ -22723,14 +22656,14 @@ declare namespace m4m.render {
         mipmap: boolean;
         linear: boolean;
         caclByteLength(): number;
-        dispose(webgl: WebGLRenderingContext): void;
+        dispose(webgl: WebGL2RenderingContext): void;
         isFrameBuffer(): boolean;
     }
     /**
      * @private
      */
     class WriteableTexture2D implements ITexture {
-        constructor(webgl: WebGLRenderingContext, format: TextureFormatEnum, width: number, height: number, linear: boolean, premultiply?: boolean, repeat?: boolean, mirroredU?: boolean, mirroredV?: boolean);
+        constructor(webgl: WebGL2RenderingContext, format: TextureFormatEnum, width: number, height: number, linear: boolean, premultiply?: boolean, repeat?: boolean, mirroredU?: boolean, mirroredV?: boolean);
         linear: boolean;
         premultiply: boolean;
         repeat: boolean;
@@ -22739,13 +22672,13 @@ declare namespace m4m.render {
         updateRect(data: Uint8Array, x: number, y: number, width: number, height: number): void;
         updateRectImg(data: ImageData | HTMLVideoElement | HTMLImageElement | HTMLCanvasElement, x: number, y: number): void;
         isFrameBuffer(): boolean;
-        webgl: WebGLRenderingContext;
+        webgl: WebGL2RenderingContext;
         texture: WebGLTexture;
         format: TextureFormatEnum;
         formatGL: number;
         width: number;
         height: number;
-        dispose(webgl: WebGLRenderingContext): void;
+        dispose(webgl: WebGL2RenderingContext): void;
         caclByteLength(): number;
     }
 }
