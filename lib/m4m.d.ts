@@ -4468,6 +4468,89 @@ declare namespace m4m.framework {
 }
 declare namespace m4m.framework {
     /**
+     * S3TC 压缩纹理解析
+     * .dds格式文件
+     * 参考
+     * https://developer.mozilla.org/en-US/docs/Web/API/WEBGL_compressed_texture_s3tc
+     * https://docs.microsoft.com/zh-cn/windows/win32/direct3ddds/dx-graphics-dds-pguide
+     * https://docs.microsoft.com/zh-cn/windows/win32/direct3ddds/dds-header
+     */
+    export class S3TCParse {
+        private static readonly headerLengthInt;
+        /**
+         *
+         * @param gl
+         * @param arrayBuffer
+         */
+        static parse(gl: WebGL2RenderingContext, arrayBuffer: ArrayBuffer): render.glTexture2D;
+        /**
+         * 获取S3TC 信息
+         * @param data 纹理的buffer数据对象
+         */
+        static getS3TCInfo(data: ArrayBufferView, ext: WEBGL_compressed_texture_s3tc): S3TCInfo;
+        private static FourCCToInt32;
+    }
+    /** S3TC 信息 */
+    class S3TCInfo {
+        /**
+         * 纹理宽度
+         */
+        width: number;
+        /**
+         * 纹理高度
+         */
+        height: number;
+        /**
+         * 纹理的mipmap数
+         * @see https://en.wikipedia.org/wiki/Mipmap
+         */
+        mipmapCount: number;
+        /**
+         * 纹理格式是否是已知的fourCC格式
+         * @see https://www.fourcc.org/
+         */
+        isFourCC: boolean;
+        /**
+         * 是否纹理是RGB格式. 例如 DXGI_FORMAT_B8G8R8X8_UNORM 格式
+         */
+        isRGB: boolean;
+        /**
+         * 是否是亮度格式
+         */
+        isLuminance: boolean;
+        /**
+         * 是否是cube 纹理
+         * @see https://docs.microsoft.com/en-us/windows/desktop/direct3ddds/dds-file-layout-for-cubic-environment-maps
+         */
+        isCube: boolean;
+        /**
+         * 是否是压缩格式.例如 FOURCC_DXT1
+         */
+        isCompressed: boolean;
+        /**
+         * 纹理的 dxgi格式
+         * @see https://docs.microsoft.com/en-us/windows/desktop/api/dxgiformat/ne-dxgiformat-dxgi_format
+         */
+        dxgiFormat: number;
+        /**
+         * 纹理格式 例如 UNSIGNED_INT, FLOAT
+         */
+        textureType: number;
+        /** compressedTexImage2D 时 传入 内部格式 */
+        internalformat: number;
+        /**
+         * blockBytes
+         */
+        blockBytes: number;
+        /**
+         * dataOffset
+         */
+        dataOffset: number;
+    }
+    export {};
+}
+declare namespace m4m.framework {
+    /**
      * @public
      * @language zh_CN
      * @classdesc
@@ -5066,7 +5149,7 @@ declare namespace m4m.framework {
 declare var WebGLTextureUtil: any;
 declare namespace m4m.framework {
     class AssetFactory_DDS implements IAssetFactory {
-        parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, bytes: ArrayBuffer): void;
+        parse(assetmgr: assetMgr, bundle: assetBundle, name: string, bytes: ArrayBuffer): texture;
     }
 }
 declare namespace m4m.framework {
