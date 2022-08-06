@@ -51,7 +51,12 @@ namespace m4m.framework {
 
             const ext = sceneMgr.app.webgl.extensions.WEBGL_compressed_texture_pvrtc;
 
-                this.flags = tool.readUInt32();//0:没有设置  0x02 ：alpha预乘
+            if (!ext) {
+                console.error(`当前环境 不支持 PVR 压缩纹理`);
+                return;
+            }
+
+            this.flags = tool.readUInt32();//0:没有设置  0x02 ：alpha预乘
             if (this.flags == 0)
                 this.gl.pixelStorei(this.gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 0);//开启预乘
             else
@@ -110,9 +115,9 @@ namespace m4m.framework {
             if (this.numFaces > 1)
                 target = this.gl.TEXTURE_CUBE_MAP;
 
-            //v3
-            this.gl.pixelStorei(this.gl.UNPACK_ALIGNMENT, 1);//对齐方式
-            this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, 0);//不对Y翻转
+            // //v3
+            // this.gl.pixelStorei(this.gl.UNPACK_ALIGNMENT, 1);//对齐方式
+            // this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, 0);//不对Y翻转  //压缩纹理 pixelStorei 状态不受影响
 
             this.gl.activeTexture(this.gl.TEXTURE0);
             this.gl.bindTexture(target, t2d.texture);

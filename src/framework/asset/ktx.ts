@@ -42,7 +42,12 @@ namespace m4m.framework
             }
 
             // gl.getExtension('WEBGL_compressed_texture_etc1');
-            let etc1 = gl.extensions.WEBGL_compressed_texture_etc1;
+            let ext = gl.extensions.WEBGL_compressed_texture_etc1;
+            if (!ext) {
+                console.error(`当前环境 不支持 ETC 压缩纹理`);
+                return;
+            }
+
 
             // load the reset of the header in native 32 bit uint
             var dataSize = Uint32Array.BYTES_PER_ELEMENT;
