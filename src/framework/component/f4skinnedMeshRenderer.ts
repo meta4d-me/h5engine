@@ -197,7 +197,7 @@ namespace m4m.framework {
                 context.matrix_bones = this.boneMatrices;
             }
             if (this._mesh && this.mesh.glMesh) {
-                this._mesh.glMesh.bindVboBuffer(context.webgl);
+                // this._mesh.glMesh.bindVboBuffer(context.webgl);
                 if (this._mesh.submesh != null) {
 
                     for (let i = 0; i < this._mesh.submesh.length; i++) {

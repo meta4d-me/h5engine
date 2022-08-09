@@ -597,7 +597,7 @@ namespace m4m.framework
             let subMeshs = mesh.submesh;
             if (subMeshs == null) return;
 
-            mesh.glMesh.bindVboBuffer(context.webgl);
+            // mesh.glMesh.bindVboBuffer(context.webgl);
 
             // 获取批量渲染扩展
             var isSupportDrawInstancedArrays = !!context.webgl.drawArraysInstanced;

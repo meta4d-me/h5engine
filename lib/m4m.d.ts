@@ -22444,8 +22444,6 @@ declare namespace m4m.render {
         resetEboSize(webgl: WebGL2RenderingContext, eboindex: number, indexcount: number): void;
         dispose(): void;
         caclByteLength(): number;
-        bindVboBuffer(webgl: WebGL2RenderingContext): void;
-        bind(webgl: WebGL2RenderingContext, shadercode: glProgram, bindEbo?: number): void;
         uploadVertexSubData(webgl: WebGL2RenderingContext, varray: Float32Array, offset?: number): void;
         uploadVertexData(webgl: WebGL2RenderingContext, varray: Float32Array): void;
         uploadIndexSubData(webgl: WebGL2RenderingContext, eboindex: number, data: Uint16Array, offset?: number): void;

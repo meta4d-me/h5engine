@@ -198,7 +198,7 @@ namespace m4m.framework
                 // let basemesh=this.activemeshlist[0].baseddata.mesh;
                 this.ElementMat.setVector4("_Main_Color",this.temptColorv4);
                 this.ElementMat.setVector4("_Main_Tex_ST", this.activemeshlist[0].tex_ST);
-                singlemesh.glMesh.bindVboBuffer(context.webgl);
+                // singlemesh.glMesh.bindVboBuffer(context.webgl);
                 this.ElementMat.draw(context, singlemesh,singlemesh.submesh[0]);
 
             }

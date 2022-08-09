@@ -322,7 +322,7 @@ namespace m4m.framework {
             let subMeshs = mesh.submesh;
             if (subMeshs == null) return;
 
-            mesh.glMesh.bindVboBuffer(context.webgl);
+            // mesh.glMesh.bindVboBuffer(context.webgl);
 
 
             let len = subMeshs.length;
