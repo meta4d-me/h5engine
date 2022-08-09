@@ -126,11 +126,11 @@ namespace m4m.render {
     export class glProgram {
         private static buildInAtrribute: { [id: string]: string } = {
             "_glesVertex": "posPos",
+            "_glesNormal": "posNormal",
+            "_glesTangent": "posTangent",
             "_glesColor": "posColor",
             "_glesMultiTexCoord0": "posUV0",
             "_glesMultiTexCoord1": "posUV2",
-            "_glesNormal": "posNormal",
-            "_glesTangent": "posTangent",
             "_glesBlendIndex4": "posBlendIndex4",
             "_glesBlendWeight4": "posBlendWeight4",
             "_glesColorEx": "posColorEx"

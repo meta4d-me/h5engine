@@ -259,6 +259,8 @@ namespace m4m.framework
 
             _mesh.glMesh.addIndex(webgl, i16.length);
             _mesh.glMesh.uploadIndexData(webgl, 0, i16);
+            _mesh.glMesh.initVAO();
+
             _mesh.submesh = [];
 
             {

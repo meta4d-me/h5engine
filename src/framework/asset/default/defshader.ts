@@ -4,9 +4,9 @@ namespace m4m.framework {
         static vscode: string = `#version 300 es
             precision mediump float;
 
-            in vec4 _glesVertex;
-            in vec4 _glesColor;
-            in vec4 _glesMultiTexCoord0;
+            layout(location = 0) in vec3 _glesVertex;
+            layout(location = 3) in vec4 _glesColor;
+            layout(location = 4) in vec4 _glesMultiTexCoord0;
             uniform highp mat4 glstate_matrix_mvp;
             out lowp vec4 xlv_COLOR;
             out highp vec2 xlv_TEXCOORD0;
@@ -79,9 +79,9 @@ namespace m4m.framework {
         static vscodeUI: string = `#version 300 es
             precision mediump float;
 
-            in vec4 _glesVertex;    
-            in vec4 _glesColor;                   
-            in vec4 _glesMultiTexCoord0;          
+            layout(location = 0) in vec3 _glesVertex;    
+            layout(location = 3) in vec4 _glesColor;                   
+            layout(location = 4) in vec4 _glesMultiTexCoord0;          
             uniform highp mat4 glstate_matrix_mvp;       
             out lowp vec4 xlv_COLOR;                 
             out highp vec2 xlv_TEXCOORD0;            
@@ -98,9 +98,9 @@ namespace m4m.framework {
         static vscodeMaskUI: string = `#version 300 es
             precision mediump float;
 
-            in vec4 _glesVertex;    
-            in vec4 _glesColor;                   
-            in vec4 _glesMultiTexCoord0;          
+            layout(location = 0) in vec3 _glesVertex;    
+            layout(location = 3) in vec4 _glesColor;                   
+            layout(location = 4) in vec4 _glesMultiTexCoord0;          
             uniform highp mat4 glstate_matrix_mvp;       
             out lowp vec4 xlv_COLOR;                 
             out highp vec2 xlv_TEXCOORD0;            
@@ -164,10 +164,10 @@ namespace m4m.framework {
         static vscodefontUI: string = `#version 300 es
             precision mediump float;
 
-            in vec4 _glesVertex;    
-            in vec4 _glesColor;                   
-            in vec4 _glesColorEx;                   
-            in vec4 _glesMultiTexCoord0;          
+            layout(location = 0) in vec3 _glesVertex;    
+            layout(location = 3) in vec4 _glesColor;                   
+            layout(location = 8) in vec4 _glesColorEx;                   
+            layout(location = 4) in vec4 _glesMultiTexCoord0;          
             uniform highp mat4 glstate_matrix_mvp;       
             out lowp vec4 xlv_COLOR;                 
             out lowp vec4 xlv_COLOREx;                                                  
@@ -238,10 +238,10 @@ namespace m4m.framework {
         static vscodeuifontmask: string = `#version 300 es
             precision mediump float;
 
-            in vec4 _glesVertex;    
-            in vec4 _glesColor;                   
-            in vec4 _glesColorEx;                   
-            in vec4 _glesMultiTexCoord0;          
+            layout(location = 0) in vec3 _glesVertex;    
+            layout(location = 3) in vec4 _glesColor;                   
+            layout(location = 8) in vec4 _glesColorEx;                   
+            layout(location = 4) in vec4 _glesMultiTexCoord0;          
             uniform highp mat4 glstate_matrix_mvp;       
             out lowp vec4 xlv_COLOR;                 
             out lowp vec4 xlv_COLOREx;                                                  
@@ -306,8 +306,8 @@ namespace m4m.framework {
         static vsdiffuse: string = `#version 300 es
             precision mediump float;
 
-            in vec4 _glesVertex;
-            in vec4 _glesMultiTexCoord0;
+            layout(location = 0) in vec3 _glesVertex;
+            layout(location = 4) in vec4 _glesMultiTexCoord0;
             uniform highp mat4 glstate_matrix_mvp;
             out highp vec2 xlv_TEXCOORD0;
             void main()
@@ -341,8 +341,8 @@ namespace m4m.framework {
         static vsline: string = `#version 300 es
             precision mediump float;
 
-            in vec4 _glesVertex;
-            in vec4 _glesColor;
+            layout(location = 0) in vec3 _glesVertex;
+            layout(location = 3) in vec4 _glesColor;
             uniform highp mat4 glstate_matrix_mvp;
             out lowp vec4 xlv_COLOR;
             void main()
@@ -369,7 +369,7 @@ namespace m4m.framework {
         static vsmaterialcolor: string = `#version 300 es
             precision mediump float;
 
-            in vec4 _glesVertex;
+            layout(location = 0) in vec3 _glesVertex;
             uniform vec4 _Color;
             uniform float _Alpha;
             uniform highp mat4 glstate_matrix_mvp;
@@ -387,9 +387,9 @@ namespace m4m.framework {
 
         static vslinetrail = `#version 300 es
             precision mediump float;
-            in vec4 _glesVertex;
-            in vec2 _glesMultiTexCoord0;
-            in vec4 _glesColor;
+            layout(location = 0) in vec3 _glesVertex;
+            layout(location = 4) in vec4 _glesMultiTexCoord0;
+            layout(location = 3) in vec4 _glesColor;
             
             uniform mat4 glstate_matrix_mvp;
             
@@ -398,8 +398,8 @@ namespace m4m.framework {
             
             void main() 
             {
-                gl_Position = glstate_matrix_mvp * _glesVertex;
-                xlv_TEXCOORD0 = _glesMultiTexCoord0;
+                gl_Position = glstate_matrix_mvp * vec4(_glesVertex , 1.0);
+                xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;
                 xlv_COLOR = _glesColor;
             }
         `;

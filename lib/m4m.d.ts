@@ -22366,7 +22366,7 @@ declare namespace m4m.render {
 }
 declare namespace m4m.render {
     /**
-     * @private
+     * 顶点格式类型
      */
     enum VertexFormatMask {
         Position = 1,
@@ -22378,6 +22378,20 @@ declare namespace m4m.render {
         BlendIndex4 = 64,
         BlendWeight4 = 128,
         ColorEX = 256
+    }
+    /**
+     * 顶点作色器中的地址
+     */
+    enum VertexLocation {
+        Position_L = 0,
+        Normal_L = 1,
+        Tangent_L = 2,
+        Color_L = 3,
+        UV0_L = 4,
+        UV1_L = 5,
+        BlendIndex4_L = 6,
+        BlendWeight4_L = 7,
+        ColorEX_L = 8
     }
     /**
      * @private
@@ -22410,32 +22424,50 @@ declare namespace m4m.render {
      * @private
      */
     class glMesh {
+        private static AttributeLocationMap;
+        private vao;
+        private mode;
+        private vbo;
+        private vertexCount;
+        private eboDataType;
+        private webgl;
+        vertexByteSize: number;
+        ebo: WebGLBuffer;
+        indexCount: number;
+        vertexFormat: VertexFormatMask;
+        constructor(webgl?: WebGL2RenderingContext);
+        /**
+         * 获取 顶点着色器中 Attribute (in) 的地址
+         * @param vf 顶点格式标记
+         * @returns Attribute (in) 的地址
+         */
+        static getAttributeLocation(vf: VertexFormatMask): number;
         initBuffer(webgl: WebGL2RenderingContext, vf: VertexFormatMask, vertexCount: number, mode?: MeshTypeEnum): void;
         addIndex(webgl: WebGL2RenderingContext, indexcount: number): number;
         resetVboSize(webgl: WebGL2RenderingContext, vertexCount: number): void;
         resetEboSize(webgl: WebGL2RenderingContext, eboindex: number, indexcount: number): void;
-        dispose(webgl: WebGL2RenderingContext): void;
+        dispose(): void;
         caclByteLength(): number;
-        mode: number;
-        vbo: WebGLBuffer;
-        vertexCount: number;
-        vertexByteSize: number;
-        ebos: WebGLBuffer[];
-        eboDataType: number;
-        indexCounts: number[];
-        lineMode: number;
         bindVboBuffer(webgl: WebGL2RenderingContext): void;
-        bindIndex: number;
-        vertexFormat: VertexFormatMask;
         bind(webgl: WebGL2RenderingContext, shadercode: glProgram, bindEbo?: number): void;
         uploadVertexSubData(webgl: WebGL2RenderingContext, varray: Float32Array, offset?: number): void;
         uploadVertexData(webgl: WebGL2RenderingContext, varray: Float32Array): void;
         uploadIndexSubData(webgl: WebGL2RenderingContext, eboindex: number, data: Uint16Array, offset?: number): void;
         uploadIndexData(webgl: WebGL2RenderingContext, eboindex: number, data: Uint16Array, dataType?: number): void;
+        /** 顶点数组绘制三角面 */
         drawArrayTris(webgl: WebGL2RenderingContext, start?: number, count?: number, instanceCount?: number): void;
+        /** 顶点数组绘制线段 */
         drawArrayLines(webgl: WebGL2RenderingContext, start?: number, count?: number, instanceCount?: number): void;
+        /** EBO 绘制三角面 */
         drawElementTris(webgl: WebGL2RenderingContext, start?: number, count?: number, instanceCount?: number): void;
+        /** EBO 绘制线段 */
         drawElementLines(webgl: WebGL2RenderingContext, start?: number, count?: number, instanceCount?: number): void;
+        /** 初始化VAO */
+        initVAO(): void;
+        /** 打开 VAO */
+        onVAO(): void;
+        /** 关闭 VAO */
+        offVAO(): void;
     }
 }
 declare namespace m4m.render {

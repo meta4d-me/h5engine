@@ -67,12 +67,12 @@ namespace m4m.framework
                 this.mesh.glMesh.uploadVertexData(this.effect.webgl, this.dataForVbo);
                 this.mesh.glMesh.addIndex(this.effect.webgl, this.dataForEbo.length);
                 this.mesh.glMesh.uploadIndexData(this.effect.webgl, 0, this.dataForEbo);
+                this.mesh.glMesh.initVAO();
                 
                 this.mesh.submesh = [];
                 {
                     var sm = new subMeshInfo();
                     sm.matIndex = 0;
-                    sm.useVertexIndex = 0;
                     sm.start = 0;
                     sm.size = this.dataForEbo.length;
                     sm.line = false;
@@ -96,12 +96,13 @@ namespace m4m.framework
             //this.mesh.glMesh.uploadVertexData(webgl, v32);
 
             this.mesh.glMesh.addIndex(this.effect.webgl, this.dataForEbo.length);
+            this.mesh.glMesh.initVAO();
+
             //this.mesh.glMesh.uploadIndexData(webgl, 0, i16);
             this.mesh.submesh = [];
             {
                 var sm = new subMeshInfo();
                 sm.matIndex = 0;
-                sm.useVertexIndex = 0;
                 sm.start = 0;
                 sm.size = this.dataForEbo.length;
                 sm.line = false;
@@ -180,8 +181,9 @@ namespace m4m.framework
                     newglmesh.uploadVertexData(this.effect.webgl, this.activemeshlist[0].dataforvbo);
                     // newglmesh.addIndex(this.effect.webgl, this.activemeshlist[0].dataforebo.length);
                     // newglmesh.uploadIndexData(this.effect.webgl, 0, this.activemeshlist[0].dataforebo);
-                    newglmesh.ebos=singlemesh.glMesh.ebos;
-                    newglmesh.indexCounts=singlemesh.glMesh.indexCounts;
+                    newglmesh.ebo=singlemesh.glMesh.ebo;
+                    newglmesh.indexCount=singlemesh.glMesh.indexCount;
+                    newglmesh.initVAO();
 
                     singlemesh.glMesh=newglmesh;
                     singlemesh.submesh[0].size = this.activemeshlist[0].dataforebo.length;

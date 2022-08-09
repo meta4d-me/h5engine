@@ -674,19 +674,23 @@ namespace m4m.framework {
             }
             var instanceCount = (drawInstanceInfo && drawInstanceInfo.instanceCount) || 1;
             for (var i = 0, l = drawPasses.length; i < l; i++) {
-                mesh.glMesh.bindVboBuffer(context.webgl);
-                var pass = drawPasses[i];
-                pass.use(context.webgl);
-                this.uploadUnifoms(pass, context, LastMatSame);
-                if (!LastMatSame || !LastMeshSame) mesh.glMesh.bind(context.webgl, pass.program, sm.useVertexIndex);
+                //顶点状态绑定
+                // mesh.glMesh.bindVboBuffer(context.webgl);
+                // if (!LastMatSame || !LastMeshSame) mesh.glMesh.bind(context.webgl, pass.program, sm.useVertexIndex);
+                mesh.glMesh.onVAO();
 
+                //drawInstance
                 drawInstanceInfo && drawInstanceInfo.initBuffer(context.webgl);
                 drawInstanceInfo && drawInstanceInfo.activeAttributes(context.webgl, pass);
-                //test code
-                // if(LastMatSame && LastMatSame){
-                //     console.log(`matGUID :${matGUID} , matName : ${this.name.getText()}`);
-                // }
 
+                //渲染状态 和 gl程序启用
+                var pass = drawPasses[i];
+                pass.use(context.webgl);
+
+                //unifoms 数据上传
+                this.uploadUnifoms(pass, context, LastMatSame);
+
+                //绘制call
                 DrawCallInfo.inc.add();
                 if (sm.useVertexIndex < 0) {
                     if (sm.line) {
@@ -704,7 +708,11 @@ namespace m4m.framework {
                         mesh.glMesh.drawElementTris(context.webgl, sm.start, sm.size, instanceCount);
                     }
                 }
+                
+                //顶点状态解绑
+                mesh.glMesh.offVAO();
                 drawInstanceInfo && drawInstanceInfo.disableAttributes(context.webgl, pass);
+
             }
 
             material.lastDrawMatID = matGUID;
