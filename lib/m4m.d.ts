@@ -22358,10 +22358,6 @@ declare namespace m4m.render {
         private static useStateMap;
         private static lastPassID;
         use(webgl: WebGL2RenderingContext): void;
-        draw(webgl: WebGL2RenderingContext, mesh: glMesh, drawmode?: DrawModeEnum, drawindexindex?: number, drawbegin?: number, drawcount?: number): void;
-        private getCurDrawState;
-        private getCurBlendVal;
-        private formate;
     }
 }
 declare namespace m4m.render {

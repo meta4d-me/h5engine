@@ -672,27 +672,27 @@ namespace m4m.framework {
                         return;
                 }
             }
-            var instanceCount = (drawInstanceInfo && drawInstanceInfo.instanceCount) || 1;
-            for (var i = 0, l = drawPasses.length; i < l; i++) {
+            let instanceCount = (drawInstanceInfo && drawInstanceInfo.instanceCount) || 1;
+            for (let i = 0, l = drawPasses.length; i < l; i++) {
+                //渲染状态 和 gl程序启用
+                let pass = drawPasses[i];
+                pass.use(context.webgl);
+                
                 //顶点状态绑定
+                //模型的状态属性绑定
                 // mesh.glMesh.bindVboBuffer(context.webgl);
                 // if (!LastMatSame || !LastMeshSame) mesh.glMesh.bind(context.webgl, pass.program, sm.useVertexIndex);
                 mesh.glMesh.onVAO();
-
-                //drawInstance
+                //drawInstance 的状态属性绑定
                 drawInstanceInfo && drawInstanceInfo.initBuffer(context.webgl);
                 drawInstanceInfo && drawInstanceInfo.activeAttributes(context.webgl, pass);
-
-                //渲染状态 和 gl程序启用
-                var pass = drawPasses[i];
-                pass.use(context.webgl);
 
                 //unifoms 数据上传
                 this.uploadUnifoms(pass, context, LastMatSame);
 
                 //绘制call
                 DrawCallInfo.inc.add();
-                if (sm.useVertexIndex < 0) {
+                if (sm.useVertexIndex < 0) {    //判断是否走 EBO
                     if (sm.line) {
                         mesh.glMesh.drawArrayLines(context.webgl, sm.start, sm.size, instanceCount);
                     }
@@ -709,10 +709,9 @@ namespace m4m.framework {
                     }
                 }
                 
-                //顶点状态解绑
-                mesh.glMesh.offVAO();
+                //顶点状态解绑 （drawInstance 的修改放置在中间 ，这样它不会影响 我们模型的VAO ）
                 drawInstanceInfo && drawInstanceInfo.disableAttributes(context.webgl, pass);
-
+                mesh.glMesh.offVAO();
             }
 
             material.lastDrawMatID = matGUID;
