@@ -19041,10 +19041,6 @@ declare namespace m4m.framework {
         /**
          * 刷新 GpuInstancBatcher
          * 被 batcher 条件[isStatic= true , visible = true , needGpuInstancBatcher = true , isGpuInstancing() = true]
-         */
-        /**
-         * 刷新 GpuInstancBatcher
-         * 被 batcher 条件[isStatic= true , visible = true , needGpuInstancBatcher = true , isGpuInstancing() = true]
          * @param rootNode 指定刷新节点（默认为 场景根节点）
          */
         refreshGpuInstancBatcher(rootNode?: m4m.framework.transform): void;
