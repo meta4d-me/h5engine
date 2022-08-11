@@ -597,7 +597,7 @@ namespace m4m.framework
             let subMeshs = mesh.submesh;
             if (subMeshs == null) return;
 
-            mesh.glMesh.bindVboBuffer(context.webgl);
+            // mesh.glMesh.bindVboBuffer(context.webgl);
 
             // 获取批量渲染扩展
             var isSupportDrawInstancedArrays = !!context.webgl.drawArraysInstanced;
@@ -682,7 +682,7 @@ namespace m4m.framework
                             gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
                             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
                         },
-                        activeAttributes: (gl, pass) =>
+                        activeAttributes: (gl, pass , mat: material) =>
                         {
                             let program = pass.program.program;
                             gl.bindBuffer(gl.ARRAY_BUFFER, vbo);

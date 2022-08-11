@@ -127,11 +127,12 @@
 
             _mesh.glMesh.addIndex(webgl, i16.length);
             _mesh.glMesh.uploadIndexData(webgl, 0, i16);
+            _mesh.glMesh.initVAO();
+
             _mesh.submesh = [];
             {
                 var sm = new subMeshInfo();
                 sm.matIndex = 0;
-                sm.useVertexIndex = 0;
                 sm.start = 0;
                 sm.size = i16.length;
                 sm.line = true;

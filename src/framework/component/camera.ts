@@ -60,7 +60,7 @@ namespace m4m.framework
             let mesh = scene.app.getAssetMgr().getDefaultMesh("quad");
             //画四边形
             context.drawtype = "";
-            mesh.glMesh.bindVboBuffer(context.webgl);
+            // mesh.glMesh.bindVboBuffer(context.webgl);
             this.material.draw(context, mesh, mesh.submesh[0], "quad");
 
             render.glRenderTarget.useNull(context.webgl);

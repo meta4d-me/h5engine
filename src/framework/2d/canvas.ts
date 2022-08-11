@@ -31,6 +31,7 @@ namespace m4m.framework {
                 this.mesh.addIndex(webgl, 128);
                 this.dataForEbo = new Uint16Array(128);
             }
+            this.mesh.initVAO();
         }
 
         /**
@@ -106,7 +107,10 @@ namespace m4m.framework {
 
             var vertexcount = (this.vboCount / (this.mesh.vertexByteSize / 4)) | 0;
             this.curPass.use(webgl);
-            this.mesh.bind(webgl, this.curPass.program, (this.drawMode == render.DrawModeEnum.EboLine || this.drawMode == render.DrawModeEnum.EboTri) ? 0 : -1);
+            //顶点状态绑定
+            // this.mesh.bind(webgl, this.curPass.program, (this.drawMode == render.DrawModeEnum.EboLine || this.drawMode == render.DrawModeEnum.EboTri) ? 0 : -1);
+            this.mesh.onVAO();
+            //绘制call
             DrawCallInfo.inc.add();
             if (this.drawMode == render.DrawModeEnum.EboLine) {
                 this.mesh.drawElementLines(webgl, 0, this.eboCount);
@@ -120,8 +124,12 @@ namespace m4m.framework {
             else if (this.drawMode == render.DrawModeEnum.VboTri) {
                 this.mesh.drawArrayTris(webgl, 0, vertexcount);
             }
+
             this.vboCount = 0;
             this.eboCount = 0;
+
+            //顶点状态解绑
+            this.mesh.offVAO();
         }
     }
 

@@ -51,12 +51,13 @@ namespace m4m.framework
             //this.mesh.glMesh.uploadVertexData(webgl, v32);
 
             this.mesh.glMesh.addIndex(this.effect.webgl, this.dataForEbo.length);
+            this.mesh.glMesh.initVAO();
+
             //this.mesh.glMesh.uploadIndexData(webgl, 0, i16);
             this.mesh.submesh = [];
             {
                 var sm = new subMeshInfo();
                 sm.matIndex = 0;
-                sm.useVertexIndex = 0;
                 sm.start = 0;
                 sm.size = this.dataForEbo.length;
                 sm.line = false;

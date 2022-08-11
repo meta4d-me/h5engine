@@ -433,6 +433,8 @@ namespace m4m.framework {
                     sm.line = false;
                     mf.submesh.push(sm);
                     mf.glMesh.uploadIndexSubData(ctx, 0, ebo);
+                    mf.glMesh.initVAO();
+                    
                     //light Map
                     let lightMapTexST = null;
                     let outMat: material = materials[material];

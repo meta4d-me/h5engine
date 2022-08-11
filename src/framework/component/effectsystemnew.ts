@@ -651,7 +651,6 @@
 //             {
 //                 var sm = new subMeshInfo();
 //                 sm.matIndex = 0;
-//                 sm.useVertexIndex = 0;
 //                 sm.start = 0;
 //                 sm.size = 0;
 //                 sm.line = false;

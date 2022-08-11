@@ -1,5 +1,4 @@
-namespace m4m.framework
-{
+namespace m4m.framework {
     /**
      * @public
      * @language zh_CN
@@ -8,18 +7,15 @@ namespace m4m.framework
      * @version m4m 1.0
      */
     @m4m.reflect.SerializeType
-    export class mesh implements IAsset
-    {
+    export class mesh implements IAsset {
         static readonly ClassName: string = "mesh";
         public maximun: math.vector3;
         public minimun: math.vector3;
         private name: constText;
         private id: resID = new resID();
         defaultAsset: boolean = false;
-        constructor(assetName: string = null)
-        {
-            if (!assetName)
-            {
+        constructor(assetName: string = null) {
+            if (!assetName) {
                 assetName = "mesh_" + this.getGUID();
             }
             this.name = new constText(assetName);
@@ -31,10 +27,8 @@ namespace m4m.framework
          * 获取资源名称
          * @version m4m 1.0
          */
-        getName(): string
-        {
-            if (!this.name)
-            {
+        getName(): string {
+            if (!this.name) {
                 return null;
             }
             return this.name.getText();
@@ -46,8 +40,7 @@ namespace m4m.framework
          * 获取资源唯一id
          * @version m4m 1.0
          */
-        getGUID(): number
-        {
+        getGUID(): number {
             return this.id.getID();
         }
         /**
@@ -57,8 +50,7 @@ namespace m4m.framework
          * 引用计数加一
          * @version m4m 1.0
          */
-        use()
-        {
+        use() {
             sceneMgr.app.getAssetMgr().use(this);
         }
         /**
@@ -68,8 +60,7 @@ namespace m4m.framework
          * 引用计数减一
          * @version m4m 1.0
          */
-        unuse(disposeNow: boolean = false)
-        {
+        unuse(disposeNow: boolean = false) {
             sceneMgr.app.getAssetMgr().unuse(this, disposeNow);
         }
         /**
@@ -79,9 +70,8 @@ namespace m4m.framework
          * 释放资源
          * @version m4m 1.0
          */
-        dispose()
-        {
-            this.glMesh.dispose(sceneMgr.app.getAssetMgr().webgl);
+        dispose() {
+            this.glMesh.dispose();
             this.data = null;
             delete this.submesh;
         }
@@ -92,12 +82,10 @@ namespace m4m.framework
          * 计算资源字节大小
          * @version m4m 1.0
          */
-        caclByteLength(): number
-        {
+        caclByteLength(): number {
             let total = 0;
             total += this.glMesh.caclByteLength();
-            if (this.data)
-            {
+            if (this.data) {
                 total += this.data.caclByteLength();
             }
             return total;
@@ -134,27 +122,23 @@ namespace m4m.framework
         // //分片加载状态变量
         private reading = false;
         // //分片加载器
-        private readProcess(read, data, objVF, vcount, vec10tpose, callback)
-        {
+        private readProcess(read, data, objVF, vcount, vec10tpose, callback) {
 
             if (this.reading) return;
 
             var tag = read.readUInt8();
             //end
-            if (tag == 255) 
-            {
+            if (tag == 255) {
                 callback();
                 return;
             }
             if (tag == 1)//pos
             {
-                if (data.pos == undefined)
-                {
+                if (data.pos == undefined) {
                     data.pos = [];
                     objVF.vf = objVF.vf | m4m.render.VertexFormatMask.Position;
                 }
-                for (var i = 0; i < vcount; i++)
-                {
+                for (var i = 0; i < vcount; i++) {
                     var _position = new m4m.math.vector3();
                     _position.x = read.readSingle();
                     _position.y = read.readSingle();
@@ -164,13 +148,11 @@ namespace m4m.framework
             }
             else if (tag == 2)//color
             {
-                if (data.color == undefined)
-                {
+                if (data.color == undefined) {
                     data.color = [];
                     objVF.vf = objVF.vf | m4m.render.VertexFormatMask.Color;
                 }
-                for (var i = 0; i < vcount; i++)
-                {
+                for (var i = 0; i < vcount; i++) {
                     var _color = new m4m.math.color();
                     _color.a = math.floatClamp(read.readUInt8() / 255, 0, 1.0);
                     _color.r = math.floatClamp(read.readUInt8() / 255, 0, 1.0);
@@ -181,13 +163,11 @@ namespace m4m.framework
             }
             else if (tag == 3)//normal
             {
-                if (data.normal == undefined)
-                {
+                if (data.normal == undefined) {
                     data.normal = [];
                     objVF.vf = objVF.vf | m4m.render.VertexFormatMask.Normal;
                 }
-                for (var i = 0; i < vcount; i++)
-                {
+                for (var i = 0; i < vcount; i++) {
                     var _normal = new m4m.math.vector3();
                     _normal.x = read.readSingle();
                     _normal.y = read.readSingle();
@@ -197,13 +177,11 @@ namespace m4m.framework
             }
             else if (tag == 4)//uv
             {
-                if (data.uv == undefined)
-                {
+                if (data.uv == undefined) {
                     data.uv = [];
                     objVF.vf = objVF.vf | m4m.render.VertexFormatMask.UV0;
                 }
-                for (var i = 0; i < vcount; i++)
-                {
+                for (var i = 0; i < vcount; i++) {
                     var uv = new m4m.math.vector2();
                     uv.x = read.readSingle();
                     uv.y = read.readSingle();
@@ -212,13 +190,11 @@ namespace m4m.framework
             }
             else if (tag == 5)//uv1
             {
-                if (data.uv2 == undefined)
-                {
+                if (data.uv2 == undefined) {
                     data.uv2 = [];
                     objVF.vf = objVF.vf | m4m.render.VertexFormatMask.UV1;
                 }
-                for (var i = 0; i < vcount; i++)
-                {
+                for (var i = 0; i < vcount; i++) {
                     var uv = new m4m.math.vector2();
                     uv.x = read.readSingle();
                     uv.y = read.readSingle();
@@ -229,8 +205,7 @@ namespace m4m.framework
             else if (tag == 6)//uv2
             {
                 //meshdata.vec2uvs2 = new Float32Array(vcount * 2);
-                for (var i = 0; i < vcount; i++)
-                {
+                for (var i = 0; i < vcount; i++) {
                     //meshdata.vec2uvs2[i * 2 + 0] =
                     read.readSingle();//u
                     //meshdata.vec2uvs2[i * 2 + 1] =
@@ -240,31 +215,28 @@ namespace m4m.framework
             }
             else if (tag == 7)//tangent
             {
-                if (data.tangent == undefined)
-                {
+                if (data.tangent == undefined) {
                     data.tangent = [];
                     objVF.vf = objVF.vf | m4m.render.VertexFormatMask.Tangent;
                 }
-                for (var i = 0; i < vcount; i++)
-                {
+                for (var i = 0; i < vcount; i++) {
 
                     var tangent = new m4m.math.vector3();
                     var x = read.readSingle();
                     var y = read.readSingle();
                     var z = read.readSingle();
                     var w = read.readSingle();
-                    tangent.x = x ;
-                    tangent.y = y ;
-                    tangent.z = z ;
-                    m4m.math.vec3Normalize(tangent , tangent);
-                    m4m.math.vec3ScaleByNum(tangent, w + 2 , tangent);
+                    tangent.x = x;
+                    tangent.y = y;
+                    tangent.z = z;
+                    m4m.math.vec3Normalize(tangent, tangent);
+                    m4m.math.vec3ScaleByNum(tangent, w + 2, tangent);
                     data.tangent.push(tangent);
                 }
             }
             else if (tag == 8)//uv3
             {
-                for (var i = 0; i < vcount; i++)
-                {
+                for (var i = 0; i < vcount; i++) {
                     //meshdata.vec2uvs2[i * 2 + 0] =
                     read.readSingle();//u
                     //meshdata.vec2uvs2[i * 2 + 1] =
@@ -276,8 +248,7 @@ namespace m4m.framework
             {
                 var tposelen = read.readUInt8();
                 //meshdata.vec10tpose = new Float32Array(tposelen * 10);
-                for (var i = 0; i < tposelen; i++)
-                {
+                for (var i = 0; i < tposelen; i++) {
                     vec10tpose[i * 10 + 0] = read.readSingle();//posx;
                     vec10tpose[i * 10 + 1] = read.readSingle();//posy;
                     vec10tpose[i * 10 + 2] = read.readSingle();//posz;
@@ -292,18 +263,15 @@ namespace m4m.framework
             }
             else if (tag == 17)//skinwidget;
             {
-                if (data.blendIndex == undefined)
-                {
+                if (data.blendIndex == undefined) {
                     data.blendIndex = [];
                     objVF.vf = objVF.vf | m4m.render.VertexFormatMask.BlendIndex4;
                 }
-                if (data.blendWeight == undefined)
-                {
+                if (data.blendWeight == undefined) {
                     data.blendWeight = [];
                     objVF.vf = objVF.vf | m4m.render.VertexFormatMask.BlendWeight4;
                 }
-                for (var i = 0; i < vcount; i++)
-                {
+                for (var i = 0; i < vcount; i++) {
                     var _boneIndex = new render.number4();
                     _boneIndex.v0 = read.readUInt32();
                     _boneIndex.v1 = read.readUInt32();
@@ -320,27 +288,22 @@ namespace m4m.framework
                     data.blendWeight.push(_boneWeight);
                 }
             }
-            else
-            {
+            else {
                 throw "notwrite" + tag;
             }
             this.reading = false;
-            setTimeout(() =>
-            {
-                this.readProcess(read, data, objVF, vcount, vec10tpose, () =>
-                {
+            setTimeout(() => {
+                this.readProcess(read, data, objVF, vcount, vec10tpose, () => {
                     callback();
                 });
             });
         }
         //分片加载完成
-        private readFinish(read, data, buf, objVF, webgl)
-        {
+        private readFinish(read, data, buf, objVF, webgl) {
             var subcount = read.readUInt8();
             data.trisindex = [];
             this.submesh = [];
-            for (var i = 0; i < subcount; i++)
-            {
+            for (var i = 0; i < subcount; i++) {
                 var _submeshinfo: subMeshInfo = new subMeshInfo();
 
                 // var tv = read.readUInt32();//代表之前submesh中的drawstyle
@@ -351,8 +314,7 @@ namespace m4m.framework
                 _submeshinfo.size = sublen;
                 _submeshinfo.matIndex = i;
                 this.submesh.push(_submeshinfo);
-                for (var j = 0; j < sublen; j++)
-                {
+                for (var j = 0; j < sublen; j++) {
                     var index = read.readUInt32();
                     data.trisindex.push(index);
                 }
@@ -370,6 +332,7 @@ namespace m4m.framework
             this.glMesh.uploadVertexData(webgl, vertexs);
             this.glMesh.addIndex(webgl, indices.length);
             this.glMesh.uploadIndexData(webgl, 0, indices);
+            this.glMesh.initVAO();
 
             // this.onReadFinish();
         }
@@ -383,16 +346,12 @@ namespace m4m.framework
          * @param webgl webgl实例
          * @version m4m 1.0
          */
-        Parse(inData: ArrayBuffer | any, webgl: WebGL2RenderingContext)
-        {
-            return new Promise<IAsset>((reslove, reject) =>
-            {
+        Parse(inData: ArrayBuffer | any, webgl: WebGL2RenderingContext) {
+            return new Promise<IAsset>((reslove, reject) => {
                 // console.error(`[解析资源] mesh 00  ${this.name.getText()}`);
-                try
-                {
+                try {
                     this.parseCMesh(inData, webgl);
-                } catch (error)
-                {
+                } catch (error) {
                     // console.error(`[解析资源] mesh 22  ${this.name.getText()} ${error.message}`);
                     reject(error.stack);
                     return;
@@ -402,8 +361,7 @@ namespace m4m.framework
             });
         }
 
-        parseCMesh(inData, webgl)
-        {
+        parseCMesh(inData, webgl) {
             // console.log(`parseCMesh:${this.name.getText()}`);
             var data: m4m.render.meshData = new m4m.render.meshData();
             var read: m4m.io.binReader = new m4m.io.binReader(inData);
@@ -411,15 +369,13 @@ namespace m4m.framework
             let vertexCount = read.readUInt32();
             let fmt = m4m.render.VertexFormatMask;
             data.pos = [];
-            for (let i = 0; i < vertexCount; ++i)
-            {
+            for (let i = 0; i < vertexCount; ++i) {
                 data.pos.push({
                     x: read.readSingle(),
                     y: read.readSingle(),
                     z: read.readSingle()
                 });
-                if (data.originVF & fmt.Normal)
-                {
+                if (data.originVF & fmt.Normal) {
                     data.normal = data.normal || [];
                     data.normal.push({
                         x: read.readSingle(),
@@ -427,8 +383,7 @@ namespace m4m.framework
                         z: read.readSingle()
                     });
                 }
-                if (data.originVF & fmt.Tangent)
-                {
+                if (data.originVF & fmt.Tangent) {
                     data.tangent = data.tangent || [];
                     data.tangent.push({
                         x: read.readSingle(),
@@ -437,8 +392,7 @@ namespace m4m.framework
                     });
                 }
 
-                if (data.originVF & fmt.Color)
-                {
+                if (data.originVF & fmt.Color) {
                     data.color = data.color || [];
                     data.color.push({
                         r: read.readSingle(),
@@ -447,24 +401,21 @@ namespace m4m.framework
                         a: read.readSingle()
                     });
                 }
-                if (data.originVF & fmt.UV0)
-                {
+                if (data.originVF & fmt.UV0) {
                     data.uv = data.uv || [];
                     data.uv.push({
                         x: read.readSingle(),
                         y: read.readSingle()
                     });
                 }
-                if (data.originVF & fmt.UV1)
-                {
+                if (data.originVF & fmt.UV1) {
                     data.uv2 = data.uv2 || [];
                     data.uv2.push({
                         x: read.readSingle(),
                         y: read.readSingle()
                     });
                 }
-                if (data.originVF & fmt.BlendIndex4)
-                {
+                if (data.originVF & fmt.BlendIndex4) {
                     data.blendIndex = data.blendIndex || [];
                     data.blendIndex.push({
                         v0: read.readUInt32(),
@@ -473,8 +424,7 @@ namespace m4m.framework
                         v3: read.readUInt32()
                     });
                 }
-                if (data.originVF & fmt.BlendWeight4)
-                {
+                if (data.originVF & fmt.BlendWeight4) {
                     data.blendWeight = data.blendWeight || [];
                     data.blendWeight.push({
                         v0: read.readSingle(),
@@ -483,8 +433,7 @@ namespace m4m.framework
                         v3: read.readSingle()
                     });
                 }
-                if (data.originVF & fmt.ColorEX)
-                {
+                if (data.originVF & fmt.ColorEX) {
                     data.colorex = data.colorex || [];
                     data.colorex.push({
                         r: read.readSingle(),
@@ -498,15 +447,13 @@ namespace m4m.framework
             var len = read.readUInt8();
             data.trisindex = [];
             this.submesh = [];
-            for (var i = 0; i < len; ++i)
-            {
+            for (var i = 0; i < len; ++i) {
                 var _submeshinfo: subMeshInfo = new subMeshInfo();
                 _submeshinfo.start = read.readUInt16();
                 _submeshinfo.size = read.readUInt32();
                 _submeshinfo.matIndex = i;//read.readUInt8();
                 this.submesh.push(_submeshinfo);
-                for (var j = 0; j < _submeshinfo.size; j++)
-                {
+                for (var j = 0; j < _submeshinfo.size; j++) {
                     data.trisindex.push(read.readUInt32());
                 }
 
@@ -521,6 +468,7 @@ namespace m4m.framework
             this.glMesh.uploadVertexData(webgl, vertexs);
             this.glMesh.addIndex(webgl, indices.length);
             this.glMesh.uploadIndexData(webgl, 0, indices);
+            this.glMesh.initVAO();
         }
 
         // parseTMesh(inData, webgl, reslove)
@@ -731,31 +679,24 @@ namespace m4m.framework
          * @param matrix 所在transform的矩阵
          * @version m4m 1.0
          */
-        intersects(ray: ray, matrix: m4m.math.matrix, outInfo: pickinfo): boolean
-        {
+        intersects(ray: ray, matrix: m4m.math.matrix, outInfo: pickinfo): boolean {
             let ishided = false;
             if (!this.submesh) return ishided;
             let lastDistance = Number.MAX_VALUE;
-            for (var i = 0; i < this.submesh.length; i++)
-            {
+            for (var i = 0; i < this.submesh.length; i++) {
                 var submesh = this.submesh[i];
-                if (submesh.line)
-                {
+                if (submesh.line) {
 
                 }
-                else
-                {
-                    if (submesh.useVertexIndex < 0)
-                    {
+                else {
+                    if (submesh.useVertexIndex < 0) {
                         //不使用index
                     }
-                    else
-                    {
+                    else {
                         var t0 = m4m.math.pool.new_vector3();
                         var t1 = m4m.math.pool.new_vector3();
                         var t2 = m4m.math.pool.new_vector3();
-                        for (var index = submesh.start; index < submesh.size; index += 3)
-                        {
+                        for (var index = submesh.start; index < submesh.size; index += 3) {
                             var p0 = this.data.pos[this.data.trisindex[index]];
                             var p1 = this.data.pos[this.data.trisindex[index + 1]];
                             var p2 = this.data.pos[this.data.trisindex[index + 2]];
@@ -766,11 +707,9 @@ namespace m4m.framework
 
                             let tempinfo = math.pool.new_pickInfo();
                             var bool = ray.intersectsTriangle(t0, t1, t2, tempinfo);
-                            if (bool)
-                            {
+                            if (bool) {
                                 if (tempinfo.distance < 0) continue;
-                                if (lastDistance > tempinfo.distance)
-                                {
+                                if (lastDistance > tempinfo.distance) {
                                     ishided = true;
                                     outInfo.cloneFrom(tempinfo);
                                     lastDistance = outInfo.distance;
@@ -800,8 +739,7 @@ namespace m4m.framework
          * 克隆mesh
          * @version m4m 1.0
          */
-        clone(): mesh
-        {
+        clone(): mesh {
             let _result = new mesh(this.getName());
             var vf = this.glMesh.vertexFormat;//顶点属性
             // var data: m4m.render.meshData = new m4m.render.meshData();
@@ -831,18 +769,15 @@ namespace m4m.framework
          * @param outMax 输出最大
          * @version m4m 1.0
          */
-        calcVectexMinMax(outMin: math.vector3, outMax: math.vector3)
-        {
+        calcVectexMinMax(outMin: math.vector3, outMax: math.vector3) {
             if (!outMin || !outMax) return;
-            if (!this._cacheMinP || !this._cacheMaxP)
-            {
+            if (!this._cacheMinP || !this._cacheMaxP) {
                 this._cacheMinP = new math.vector3();
                 this._cacheMaxP = new math.vector3();
                 let meshdata = this.data;
                 m4m.math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, this._cacheMinP);
                 m4m.math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, this._cacheMaxP);
-                for (var i = 0; i < meshdata.pos.length; i++)
-                {
+                for (var i = 0; i < meshdata.pos.length; i++) {
                     m4m.math.vec3Max(meshdata.pos[i], this._cacheMaxP, this._cacheMaxP);
                     m4m.math.vec3Min(meshdata.pos[i], this._cacheMinP, this._cacheMinP);
                 }
@@ -854,10 +789,9 @@ namespace m4m.framework
     /**
      * @private
      */
-    export class subMeshInfo
-    {
+    export class subMeshInfo {
         matIndex: number = 0;
-        useVertexIndex: number = 0;//-1 表示不用indexbuffer,>=0 表示第几个，
+        useVertexIndex: number = 0;//-1 表示不用indexbuffer,>=0 表示第几个，(备注,只会有 >=0 状态相同，调整成 ebo 只会有一个)
         //通常都是用第一个indexbuffer，只有用wireframe显示模式，使用第二个部分
         line: boolean = false;
         start: number = 0;

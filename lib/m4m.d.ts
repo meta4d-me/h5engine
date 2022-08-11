@@ -6806,8 +6806,8 @@ declare namespace m4m.framework {
         helpDArray: m4m.math.ExtenArray<Float32Array>;
         private attSuccess;
         initBuffer(gl: WebGL2RenderingContext): void;
-        activeAttributes(gl: WebGL2RenderingContext, pass: render.glDrawPass): void;
-        disableAttributes(gl: WebGL2RenderingContext, pass: render.glDrawPass): void;
+        activeAttributes(gl: WebGL2RenderingContext, pass: render.glDrawPass, mat: material): void;
+        disableAttributes(gl: WebGL2RenderingContext, pass: render.glDrawPass, mat: material): void;
         /** Disable 结束回调 */
         onDisableAttribute: (info: meshGpuInstanceDrawInfo) => any;
         private static _pool;
@@ -6893,9 +6893,9 @@ declare namespace m4m.framework {
          */
         get filter(): meshFilter;
         set filter(val: meshFilter);
-        private static readonly insOffsetMatrixStr;
-        private static insOffsetMtxIDMap;
-        private static GpuInsAttrignoreMap;
+        private static _InstanceOffsetMatrixLoc;
+        /** GPU Instance 偏移变化矩阵 */
+        private static get InstanceOffsetMatrixLoc();
         private static helpDArray;
         private static helpIMatrix;
         start(): void;
@@ -6916,8 +6916,14 @@ declare namespace m4m.framework {
          * @param tran transform
          * @param mat 材质对象
          * @param pass 绘制通道对象
+         * @returns 是否设置成功
          */
-        static setInstanceOffsetMatrix(tran: m4m.framework.transform, mat: material, pass: render.glDrawPass): void;
+        static setInstanceOffsetMatrix(tran: m4m.framework.transform, mat: material, pass: render.glDrawPass): boolean;
+        /**
+         * 是否有 InstanceOffsetMatrix 定义
+         * @param pass 绘制通道对象
+         */
+        static hasInstanceOffsetMatrix(pass: render.glDrawPass): boolean;
         private static _setInstanceOffsetMatrix;
         static instanceDrawType(): string;
         private static _vbos;
@@ -7240,11 +7246,11 @@ declare namespace m4m.framework {
         /**
          * 启用批量渲染相关顶点属性
          */
-        activeAttributes(gl: WebGL2RenderingContext, pass: render.glDrawPass): void;
+        activeAttributes(gl: WebGL2RenderingContext, pass: render.glDrawPass, mat: material): void;
         /**
          * 禁用批量渲染相关顶点属性
          */
-        disableAttributes(gl: WebGL2RenderingContext, pass: render.glDrawPass): void;
+        disableAttributes(gl: WebGL2RenderingContext, pass: render.glDrawPass, mat: material): void;
     }
     /**
      * @public
@@ -7324,19 +7330,22 @@ declare namespace m4m.framework {
         caclByteLength(): number;
         private static sameMatPassMap;
         uploadUnifoms(pass: render.glDrawPass, context: renderContext, lastMatSame?: boolean): void;
-        instanceAttribValMap: {
+        /** GPUinstance Attrib ID 数据 map  */
+        instanceAttribIDValMap: {
             [id: string]: number[];
         };
-        /** gpu instancing 使用值上传 */
         /**
          * 上传InstanceAtteribute 数据
          * @param pass 绘制通道
          * @param darr 数组对象
-         * @param ignoreMap 忽略列表
          */
         uploadInstanceAtteribute(pass: render.glDrawPass, darr: m4m.math.ExtenArray<Float32Array>): void;
+        /**
+         * 获取InstanceAtteribute 上传数据的大小
+         * @param pass 绘制通道
+         */
+        getInstanceAtteributeSize(pass: render.glDrawPass): number;
         private getInstanceAttribValue;
-        private isNotBuildinAttribId;
         /**
          * @public
          * @language zh_CN
@@ -7416,6 +7425,8 @@ declare namespace m4m.framework {
          * @private
          */
         setTexture(_id: string, _texture: m4m.framework.texture, resname?: string): void;
+        /** 设置 GPU instance attribute 的值 */
+        private setInsAttribVal;
         private getTexGuid;
         private getShaderGuid;
         private refreshGpuInstancingGUID;
@@ -19030,10 +19041,6 @@ declare namespace m4m.framework {
         /**
          * 刷新 GpuInstancBatcher
          * 被 batcher 条件[isStatic= true , visible = true , needGpuInstancBatcher = true , isGpuInstancing() = true]
-         */
-        /**
-         * 刷新 GpuInstancBatcher
-         * 被 batcher 条件[isStatic= true , visible = true , needGpuInstancBatcher = true , isGpuInstancing() = true]
          * @param rootNode 指定刷新节点（默认为 场景根节点）
          */
         refreshGpuInstancBatcher(rootNode?: m4m.framework.transform): void;
@@ -22358,15 +22365,11 @@ declare namespace m4m.render {
         private static useStateMap;
         private static lastPassID;
         use(webgl: WebGL2RenderingContext): void;
-        draw(webgl: WebGL2RenderingContext, mesh: glMesh, drawmode?: DrawModeEnum, drawindexindex?: number, drawbegin?: number, drawcount?: number): void;
-        private getCurDrawState;
-        private getCurBlendVal;
-        private formate;
     }
 }
 declare namespace m4m.render {
     /**
-     * @private
+     * 顶点格式类型
      */
     enum VertexFormatMask {
         Position = 1,
@@ -22378,6 +22381,33 @@ declare namespace m4m.render {
         BlendIndex4 = 64,
         BlendWeight4 = 128,
         ColorEX = 256
+    }
+    /**
+     * 顶点作色器中的地址 (最大 0 - 15)
+     */
+    enum VertexLocation {
+        /** 顶点位置坐标地址 */
+        Position_L = 0,
+        /** 顶点法线坐标地址 */
+        Normal_L = 1,
+        /** 顶点切线坐标地址 */
+        Tangent_L = 2,
+        /** 顶点颜色地址 */
+        Color_L = 3,
+        /** 顶点第一个纹理坐标地址 */
+        UV0_L = 4,
+        /** 顶点第二个纹理坐标地址 */
+        UV1_L = 5,
+        /** 顶点蒙皮索引 */
+        BlendIndex4_L = 6,
+        /** 顶点蒙皮权重 */
+        BlendWeight4_L = 7,
+        /** 顶点第二个颜色地址 */
+        ColorEX_L = 8,
+        /** GPUInstance 内建开始地址 */
+        GPUInstanceStart = 12,
+        /** GPUInstance 偏移(toWorld)矩阵  */
+        InstanceOffsetMatrix_L = 12
     }
     /**
      * @private
@@ -22410,32 +22440,48 @@ declare namespace m4m.render {
      * @private
      */
     class glMesh {
+        private static AttributeLocationMap;
+        private vao;
+        private mode;
+        private vbo;
+        private vertexCount;
+        private eboDataType;
+        private webgl;
+        vertexByteSize: number;
+        ebo: WebGLBuffer;
+        indexCount: number;
+        vertexFormat: VertexFormatMask;
+        constructor(webgl?: WebGL2RenderingContext);
+        /**
+         * 获取 顶点着色器中 Attribute (in) 的地址
+         * @param vf 顶点格式标记
+         * @returns Attribute (in) 的地址
+         */
+        static getAttributeLocation(vf: VertexFormatMask): number;
         initBuffer(webgl: WebGL2RenderingContext, vf: VertexFormatMask, vertexCount: number, mode?: MeshTypeEnum): void;
         addIndex(webgl: WebGL2RenderingContext, indexcount: number): number;
         resetVboSize(webgl: WebGL2RenderingContext, vertexCount: number): void;
         resetEboSize(webgl: WebGL2RenderingContext, eboindex: number, indexcount: number): void;
-        dispose(webgl: WebGL2RenderingContext): void;
+        dispose(): void;
         caclByteLength(): number;
-        mode: number;
-        vbo: WebGLBuffer;
-        vertexCount: number;
-        vertexByteSize: number;
-        ebos: WebGLBuffer[];
-        eboDataType: number;
-        indexCounts: number[];
-        lineMode: number;
-        bindVboBuffer(webgl: WebGL2RenderingContext): void;
-        bindIndex: number;
-        vertexFormat: VertexFormatMask;
-        bind(webgl: WebGL2RenderingContext, shadercode: glProgram, bindEbo?: number): void;
         uploadVertexSubData(webgl: WebGL2RenderingContext, varray: Float32Array, offset?: number): void;
         uploadVertexData(webgl: WebGL2RenderingContext, varray: Float32Array): void;
         uploadIndexSubData(webgl: WebGL2RenderingContext, eboindex: number, data: Uint16Array, offset?: number): void;
         uploadIndexData(webgl: WebGL2RenderingContext, eboindex: number, data: Uint16Array, dataType?: number): void;
+        /** 顶点数组绘制三角面 */
         drawArrayTris(webgl: WebGL2RenderingContext, start?: number, count?: number, instanceCount?: number): void;
+        /** 顶点数组绘制线段 */
         drawArrayLines(webgl: WebGL2RenderingContext, start?: number, count?: number, instanceCount?: number): void;
+        /** EBO 绘制三角面 */
         drawElementTris(webgl: WebGL2RenderingContext, start?: number, count?: number, instanceCount?: number): void;
+        /** EBO 绘制线段 */
         drawElementLines(webgl: WebGL2RenderingContext, start?: number, count?: number, instanceCount?: number): void;
+        /** 初始化VAO */
+        initVAO(): void;
+        /** 打开 VAO */
+        onVAO(): void;
+        /** 关闭 VAO */
+        offVAO(): void;
     }
 }
 declare namespace m4m.render {
@@ -22549,37 +22595,19 @@ declare namespace m4m.render {
      * @private
      */
     class glProgram {
-        private static buildInAtrribute;
-        /**
-         * 是否是引擎系统内建的 attrib ID
-         * @param attribID
-         */
-        static isBuildInAttrib(attribID: string): boolean;
         constructor(vs: glShader, fs: glShader, program: WebGLProgram);
-        /** attribute map */
-        mapAttrib: {
+        /** 全部 attribute 地址 map */
+        mapAllAttrLoc: {
+            [loc: number]: attribute;
+        };
+        /** 全部 attributeID map */
+        mapAllAttrID: {
             [id: string]: attribute;
         };
-        /** 自定义 attribute map */
-        mapCustomAttrib: {
-            [id: string]: attribute;
-        };
-        private _strideInsAttrib;
-        get strideInsAttrib(): number;
         initAttribute(webgl: WebGL2RenderingContext): void;
-        private tryGetLocation;
         vs: glShader;
         fs: glShader;
         program: WebGLProgram;
-        posPos: number;
-        posNormal: number;
-        posTangent: number;
-        posColor: number;
-        posUV0: number;
-        posUV2: number;
-        posBlendIndex4: number;
-        posBlendWeight4: number;
-        posColorEx: number;
         mapUniform: {
             [id: string]: uniform;
         };

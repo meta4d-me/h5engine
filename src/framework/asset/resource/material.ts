@@ -39,11 +39,11 @@ namespace m4m.framework {
         /**
          * 启用批量渲染相关顶点属性
          */
-        activeAttributes(gl: WebGL2RenderingContext, pass: render.glDrawPass): void;
+        activeAttributes(gl: WebGL2RenderingContext, pass: render.glDrawPass, mat: material): void;
         /**
          * 禁用批量渲染相关顶点属性
          */
-        disableAttributes(gl: WebGL2RenderingContext, pass: render.glDrawPass): void;
+        disableAttributes(gl: WebGL2RenderingContext, pass: render.glDrawPass, mat: material): void;
     }
 
 
@@ -267,49 +267,54 @@ namespace m4m.framework {
             }
         }
 
-        instanceAttribValMap: { [id: string]: number[] } = {};
-        /** gpu instancing 使用值上传 */
-        // uploadInstanceAtteribute(pass: render.glDrawPass,setContainer: number[]){
-        //     let attmap =  pass.program.mapCustomAttrib;
-        //     for(let key in attmap){
-        //         let arr = this.instanceAttribValMap[key];
-        //         if(!arr){
-        //             let att = pass.program.mapCustomAttrib[key];
-        //             let oldLen = setContainer.length;
-        //             setContainer.length = oldLen + att.size;
-        //             setContainer.fill(0,oldLen);
-        //         }else{
-        //             for(let i=0 , len = arr.length ; i < len ; i++){
-        //                 setContainer.push(arr[i]);
-        //             }
-        //         }
-        //     }
-        // }
+        /** GPUinstance Attrib ID 数据 map  */
+        instanceAttribIDValMap: { [id: string]: number[] } = {};
 
         /**
          * 上传InstanceAtteribute 数据
          * @param pass 绘制通道
          * @param darr 数组对象
-         * @param ignoreMap 忽略列表
          */
         uploadInstanceAtteribute(pass: render.glDrawPass, darr: m4m.math.ExtenArray<Float32Array>) {
-            let attmap = pass.program.mapCustomAttrib;
-            for (let key in attmap) {
-                let arr = this.instanceAttribValMap[key];
-                if (!arr) {
-                    let att = pass.program.mapCustomAttrib[key];
-                    // let oldLen = setContainer.length;
-                    // setContainer.length = oldLen + att.size;
-                    // setContainer.fill(0,oldLen);
-                    for (let i = 0, len = att.size; i < len; i++) {
-                        darr.push(0);
-                    }
-                } else {
-                    for (let i = 0, len = arr.length; i < len; i++) {
-                        darr.push(arr[i]);
-                    }
+            // let attmap = pass.program.mapInstanceAttribID;
+            let attmap = pass.program.mapAllAttrID;
+            for (let id in attmap) {
+                //通过地址获取 ID
+                let arr = this.instanceAttribIDValMap[id];
+                if (!arr) continue;
+                // let att = attmap[id];
+                // if (!arr) {
+                //     for (let i = 0, len = att.size; i < len; i++) {
+                //         darr.push(0);
+                //     }
+                // } else {
+                //     InsSize += att.size;
+                //     for (let i = 0, len = arr.length; i < len; i++) {
+                //         darr.push(arr[i]);
+                //     }
+                // }
+                for (let i = 0, len = arr.length; i < len; i++) {
+                    darr.push(arr[i]);
                 }
             }
+        }
+
+        /**
+         * 获取InstanceAtteribute 上传数据的大小
+         * @param pass 绘制通道
+         */
+        getInstanceAtteributeSize(pass: render.glDrawPass) {
+            // let attmap = pass.program.mapInstanceAttribID;
+            let attmap = pass.program.mapAllAttrID;
+            let InsSize = 0;
+            for (let id in attmap) {
+                //通过地址获取 ID
+                let arr = this.instanceAttribIDValMap[id];
+                if (!arr) continue;
+                let att = attmap[id];
+                InsSize += att.size;
+            }
+            return InsSize;
         }
 
         // private setInstanceAttribValue(id:string,arr:number[]){
@@ -318,15 +323,15 @@ namespace m4m.framework {
         // }
 
         private getInstanceAttribValue(id: string) {
-            if (this.instanceAttribValMap[id] == null) {
-                this.instanceAttribValMap[id] = [];
+            if (this.instanceAttribIDValMap[id] == null) {
+                this.instanceAttribIDValMap[id] = [];
             }
-            return this.instanceAttribValMap[id];
+            return this.instanceAttribIDValMap[id];
         }
 
-        private isNotBuildinAttribId(id: string) {
-            return !render.glProgram.isBuildInAttrib(id);
-        }
+        // private isNotBuildinAttribId(id: string) {
+        //     return !render.glProgram.isBuildInAttrib(id);
+        // }
 
         /**
          * @public
@@ -433,10 +438,10 @@ namespace m4m.framework {
                 console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
             }
 
-            if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id)) {
+            // if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id)) {
+            if (this._enableGpuInstancing) {
                 let arr = this.getInstanceAttribValue(_id);
-                arr[0] = _number;
-                // this.setInstanceAttribValue(_id,[_number]);
+                arr[0] = _number ?? 0;
             }
         }
         /**
@@ -450,20 +455,9 @@ namespace m4m.framework {
                 console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
             }
 
-            if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id)) {
-
-                if (_numbers.length == 1 || _numbers.length == 4) {
-                    let arr = this.getInstanceAttribValue(_id);
-                    for (let i = 0, len = _numbers.length; i < len; i++) {
-                        arr[i] = _numbers[i];
-                    }
-                }
-
-                // let arr : number [] = []
-                // _numbers.forEach((v,i)=>{
-                //     arr.push(v);
-                // });
-                // this.setInstanceAttribValue(_id,arr);
+            // if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id)) {
+            if (this._enableGpuInstancing && _numbers) {
+                this.setInsAttribVal(_id, _numbers.length, _numbers);
             }
         }
         /**
@@ -477,13 +471,17 @@ namespace m4m.framework {
                 console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
             }
 
-            if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id)) {
+            // if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id)) {
+            if (this._enableGpuInstancing) {
                 let arr = this.getInstanceAttribValue(_id);
-                arr[0] = _vector4.x;
-                arr[1] = _vector4.y;
-                arr[2] = _vector4.z;
-                arr[3] = _vector4.w;
-                // this.setInstanceAttribValue(_id,[_vector4.x,_vector4.y,_vector4.z,_vector4.w]);
+                if (_vector4) {
+                    arr[0] = _vector4.x;
+                    arr[1] = _vector4.y;
+                    arr[2] = _vector4.z;
+                    arr[3] = _vector4.w;
+                } else {
+                    for (let i = 0; i < 4; i++) arr[i] = 0;
+                }
             }
         }
         /**
@@ -497,17 +495,9 @@ namespace m4m.framework {
             } else {
                 console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
             }
-            if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id)) {
-                let arr = this.getInstanceAttribValue(_id);
-                for (let i = 0, len = _vector4v.length; i < len; i++) {
-                    arr[i] = _vector4v[i];
-                }
-
-                // let arr : number [] = []
-                // _vector4v.forEach((v)=>{
-                //     arr.push(v);
-                // });
-                // this.setInstanceAttribValue(_id,arr);
+            // if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id)) {
+            if (this._enableGpuInstancing) {
+                this.setInsAttribVal(_id, 4, _vector4v);
             }
         }
         /**
@@ -517,9 +507,13 @@ namespace m4m.framework {
             if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float4x4) {
                 this.statedMapUniforms[_id] = _matrix;
                 this.uniformDirtyMap[_id] = true;
-
             } else {
                 console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
+            }
+
+            if (this._enableGpuInstancing) {
+                let data = _matrix ? _matrix.rawData : null;
+                this.setInsAttribVal(_id, 16, data);
             }
         }
         /**
@@ -533,7 +527,13 @@ namespace m4m.framework {
             } else {
                 console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
             }
+
+            if (this._enableGpuInstancing) {
+                this.setInsAttribVal(_id, 16, _matrixv);
+            }
         }
+
+
         /**
          * @private
          */
@@ -585,6 +585,16 @@ namespace m4m.framework {
             //     console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
             // }
 
+        }
+
+        /** 设置 GPU instance attribute 的值 */
+        private setInsAttribVal(id: string, len: number, data: ArrayLike<number>) {
+            let arr = this.getInstanceAttribValue(id);
+            if (data) {
+                for (let i = 0; i < len; i++) arr[i] = data[i] ?? 0;
+            } else {
+                for (let i = 0; i < len; i++) arr[i] = 0;
+            }
         }
 
         //贴图使用唯一标识ID，gupInstance 使用
@@ -672,23 +682,27 @@ namespace m4m.framework {
                         return;
                 }
             }
-            var instanceCount = (drawInstanceInfo && drawInstanceInfo.instanceCount) || 1;
-            for (var i = 0, l = drawPasses.length; i < l; i++) {
-                mesh.glMesh.bindVboBuffer(context.webgl);
-                var pass = drawPasses[i];
+            let instanceCount = (drawInstanceInfo && drawInstanceInfo.instanceCount) || 1;
+            for (let i = 0, l = drawPasses.length; i < l; i++) {
+                //渲染状态 和 gl程序启用
+                let pass = drawPasses[i];
                 pass.use(context.webgl);
-                this.uploadUnifoms(pass, context, LastMatSame);
-                if (!LastMatSame || !LastMeshSame) mesh.glMesh.bind(context.webgl, pass.program, sm.useVertexIndex);
 
+                //顶点状态绑定
+                //模型的状态属性绑定
+                // mesh.glMesh.bindVboBuffer(context.webgl);
+                // if (!LastMatSame || !LastMeshSame) mesh.glMesh.bind(context.webgl, pass.program, sm.useVertexIndex);
+                mesh.glMesh.onVAO();
+                //drawInstance 的状态属性绑定
                 drawInstanceInfo && drawInstanceInfo.initBuffer(context.webgl);
-                drawInstanceInfo && drawInstanceInfo.activeAttributes(context.webgl, pass);
-                //test code
-                // if(LastMatSame && LastMatSame){
-                //     console.log(`matGUID :${matGUID} , matName : ${this.name.getText()}`);
-                // }
+                drawInstanceInfo && drawInstanceInfo.activeAttributes(context.webgl, pass, this);
 
+                //unifoms 数据上传
+                this.uploadUnifoms(pass, context, LastMatSame);
+
+                //绘制call
                 DrawCallInfo.inc.add();
-                if (sm.useVertexIndex < 0) {
+                if (sm.useVertexIndex < 0) {    //判断是否走 EBO
                     if (sm.line) {
                         mesh.glMesh.drawArrayLines(context.webgl, sm.start, sm.size, instanceCount);
                     }
@@ -704,7 +718,10 @@ namespace m4m.framework {
                         mesh.glMesh.drawElementTris(context.webgl, sm.start, sm.size, instanceCount);
                     }
                 }
-                drawInstanceInfo && drawInstanceInfo.disableAttributes(context.webgl, pass);
+
+                //顶点状态解绑 （drawInstance 的修改放置在中间 ，这样它不会影响 我们模型的VAO ）
+                drawInstanceInfo && drawInstanceInfo.disableAttributes(context.webgl, pass, this);
+                mesh.glMesh.offVAO();
             }
 
             material.lastDrawMatID = matGUID;
@@ -825,9 +842,9 @@ namespace m4m.framework {
                 }
             }
             if (mat._enableGpuInstancing) {
-                for (let key in this.instanceAttribValMap) {
-                    let arr = this.instanceAttribValMap[key];
-                    mat.instanceAttribValMap[key] = arr.concat();//copy
+                for (let key in this.instanceAttribIDValMap) {
+                    let arr = this.instanceAttribIDValMap[key];
+                    mat.instanceAttribIDValMap[key] = arr.concat();//copy
                 }
             }
             return mat;

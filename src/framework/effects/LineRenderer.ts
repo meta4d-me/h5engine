@@ -461,7 +461,7 @@ namespace m4m.framework
             let subMeshs = mesh.submesh;
             if (subMeshs == null) return;
 
-            mesh.glMesh.bindVboBuffer(context.webgl);
+            // mesh.glMesh.bindVboBuffer(context.webgl);
 
             material.draw(context, mesh, subMeshs[0]);
         }
@@ -499,12 +499,13 @@ namespace m4m.framework
 
             _mesh.glMesh.addIndex(webgl, i16.length);
             _mesh.glMesh.uploadIndexData(webgl, 0, i16);
+            _mesh.glMesh.initVAO();
+
             _mesh.submesh = [];
 
             {
                 var sm = new m4m.framework.subMeshInfo();
                 sm.matIndex = 0;
-                sm.useVertexIndex = 0;
                 sm.start = 0;
                 sm.size = i16.length;
                 sm.line = false;

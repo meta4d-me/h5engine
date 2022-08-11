@@ -435,73 +435,73 @@
         //     webgl.uniform1i(u.location, texindex);
         // }
 
-        draw(webgl: WebGL2RenderingContext, mesh: glMesh, drawmode: DrawModeEnum = DrawModeEnum.EboTri,
-            drawindexindex: number = 0, drawbegin: number = 0, drawcount: number = -1)
-        {
-            this.use(webgl);
-            //bind attribute &vbo
+        // draw(webgl: WebGL2RenderingContext, mesh: glMesh, drawmode: DrawModeEnum = DrawModeEnum.EboTri,
+        //     drawindexindex: number = 0, drawbegin: number = 0, drawcount: number = -1)
+        // {
+        //     this.use(webgl);
+        //     //bind attribute &vbo
 
-            mesh.bind(webgl, this.program, drawindexindex);
-            if (drawmode == DrawModeEnum.VboTri)
-            {
-                mesh.drawArrayTris(webgl, drawbegin, drawcount);
-            }
-            else if (drawmode == DrawModeEnum.VboLine)
-            {
-                mesh.drawArrayLines(webgl, drawbegin, drawcount);
-            }
-            else if (drawmode == DrawModeEnum.EboTri)
-            {
-                mesh.drawElementTris(webgl, drawbegin, drawcount);
-            }
-            else if (drawmode == DrawModeEnum.EboLine)
-            {
-                mesh.drawElementLines(webgl, drawbegin, drawcount);
-            }
-        }
+        //     mesh.bind(webgl, this.program, drawindexindex);
+        //     if (drawmode == DrawModeEnum.VboTri)
+        //     {
+        //         mesh.drawArrayTris(webgl, drawbegin, drawcount);
+        //     }
+        //     else if (drawmode == DrawModeEnum.VboLine)
+        //     {
+        //         mesh.drawArrayLines(webgl, drawbegin, drawcount);
+        //     }
+        //     else if (drawmode == DrawModeEnum.EboTri)
+        //     {
+        //         mesh.drawElementTris(webgl, drawbegin, drawcount);
+        //     }
+        //     else if (drawmode == DrawModeEnum.EboLine)
+        //     {
+        //         mesh.drawElementLines(webgl, drawbegin, drawcount);
+        //     }
+        // }
 
-        private getCurDrawState(): string
-        {
-            let res: string = "";
-            res = this.formate(this.state_showface.toString(), res);
+        // private getCurDrawState(): string
+        // {
+        //     let res: string = "";
+        //     res = this.formate(this.state_showface.toString(), res);
 
-            res = this.formate(this.state_zwrite.toString(), res);
+        //     res = this.formate(this.state_zwrite.toString(), res);
 
-            res = this.formate(this.state_ztest.toString(), res);
-            if (this.state_ztest)
-            {
-                res = this.formate(this.state_ztest_method.toString(), res);
-            } else
-            {
-                res = this.formate("ztestnone", res);
-            }
+        //     res = this.formate(this.state_ztest.toString(), res);
+        //     if (this.state_ztest)
+        //     {
+        //         res = this.formate(this.state_ztest_method.toString(), res);
+        //     } else
+        //     {
+        //         res = this.formate("ztestnone", res);
+        //     }
 
-            res = this.formate(this.state_blend.toString(), res);
-            if (this.state_blend)
-            {
-                res = this.formate(this.state_blendEquation.toString(), res);
-            } else
-            {
-                res = this.formate("blendnone", res);
-            }
-            // console.log(res);
-            return res;
-        }
+        //     res = this.formate(this.state_blend.toString(), res);
+        //     if (this.state_blend)
+        //     {
+        //         res = this.formate(this.state_blendEquation.toString(), res);
+        //     } else
+        //     {
+        //         res = this.formate("blendnone", res);
+        //     }
+        //     // console.log(res);
+        //     return res;
+        // }
 
-        private getCurBlendVal(): string
-        {
-            let res: string = "";
-            res = this.formate(this.state_blendSrcRGB.toString(), res);
-            res = this.formate(this.state_blendDestRGB.toString(), res);
-            res = this.formate(this.state_blendSrcAlpha.toString(), res);
-            res = this.formate(this.state_blendDestALpha.toString(), res);
-            return res;
-        }
+        // private getCurBlendVal(): string
+        // {
+        //     let res: string = "";
+        //     res = this.formate(this.state_blendSrcRGB.toString(), res);
+        //     res = this.formate(this.state_blendDestRGB.toString(), res);
+        //     res = this.formate(this.state_blendSrcAlpha.toString(), res);
+        //     res = this.formate(this.state_blendDestALpha.toString(), res);
+        //     return res;
+        // }
 
-        private formate(str: string, out: string)
-        {
-            return out += str + "_";
-        }
+        // private formate(str: string, out: string)
+        // {
+        //     return out += str + "_";
+        // }
 
 
 

@@ -33,7 +33,6 @@ namespace m4m.framework
             {
                 var sm = new subMeshInfo();
                 sm.matIndex = 0;
-                sm.useVertexIndex = 0;
                 sm.start = 0;
                 sm.size = 0;
                 sm.line = false;
@@ -44,6 +43,8 @@ namespace m4m.framework
             this.dataForEbo = new Uint16Array(128);
             this.mesh.glMesh.initBuffer(this.webgl, this.emission.vf, 128, render.MeshTypeEnum.Dynamic);
             this.mesh.glMesh.addIndex(this.webgl, this.dataForEbo.length);
+            this.mesh.glMesh.initVAO();
+
         }
         public curVerCount: number = 0;
         public curIndexCount: number = 0;

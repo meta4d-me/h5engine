@@ -821,10 +821,6 @@ namespace m4m.framework
             }
         }
 
-        /** 
-         * 刷新 GpuInstancBatcher
-         * 被 batcher 条件[isStatic= true , visible = true , needGpuInstancBatcher = true , isGpuInstancing() = true]
-         */
         /**
          * 刷新 GpuInstancBatcher
          * 被 batcher 条件[isStatic= true , visible = true , needGpuInstancBatcher = true , isGpuInstancing() = true]

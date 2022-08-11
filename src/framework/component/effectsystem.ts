@@ -442,9 +442,11 @@ namespace m4m.framework
                     if (subEffectBatcher.state === EffectBatcherState.NotInitedStateType)
                     {
                         mesh.glMesh.initBuffer(context.webgl, this.vf, subEffectBatcher.curTotalVertexCount);
-                        if (mesh.glMesh.ebos.length == 0)
+                        if (!mesh.glMesh.ebo)
                         {
                             mesh.glMesh.addIndex(context.webgl, subEffectBatcher.dataForEbo.length);
+                            mesh.glMesh.initVAO();
+
                         }
                         else
                         {
@@ -684,7 +686,6 @@ namespace m4m.framework
                 {
                     var sm = new subMeshInfo();
                     sm.matIndex = 0;
-                    sm.useVertexIndex = 0;
                     sm.start = 0;
                     sm.size = 0;
                     sm.line = false;
