@@ -68,7 +68,7 @@ namespace m4m.framework {
         initBuffer(gl: WebGL2RenderingContext): void {
 
         }
-        activeAttributes(gl: WebGL2RenderingContext, pass: render.glDrawPass): void {
+        activeAttributes(gl: WebGL2RenderingContext, pass: render.glDrawPass, mat: material): void {
             if (!this.instanceArray && !this.cacheBuffers) return;
             let cacheBuffer: m4m.math.ExtenArray<Float32Array>;
             if (this.bufferIdMap) {
@@ -96,27 +96,47 @@ namespace m4m.framework {
             }
 
             gl.bufferData(gl.ARRAY_BUFFER, dataArr, gl.STATIC_DRAW);
-
+            //
+            //stride(vbo 数据步长) 获取
+            let strideInsAttrib = mat.getInstanceAtteributeSize(pass) * 4;
+            //
             let offset = 0;
-            let attMap = pass.program.mapCustomAttrib;
-            for (let key in attMap) {
-                let att = attMap[key];
-                let location = att.location;
-                if (location == -1) break;
-                gl.enableVertexAttribArray(location);
-                gl.vertexAttribPointer(location, att.size, gl.FLOAT, false, pass.program.strideInsAttrib, offset);
-                gl.vertexAttribDivisor(location, 1);
-                offset += att.size * 4;
+            // const attMap = pass.program.mapInstanceAttribID;
+            const attMap = pass.program.mapAllAttrID;
+            const valMap = mat.instanceAttribIDValMap;
+            const dataType = gl.FLOAT;        //缓冲区中的 数据类型
+            const dataByteSize = 4;           //缓冲区中的 数据字节长度
+            const pointerMaxSize = 4;         //vertexAttribPointer 最大尺寸
+            for (let id in attMap) {
+                if (!valMap[id]) continue;
+                let att = attMap[id];
+                let loc = att.location;
+                if (loc == -1) break;
+                let subCount = Math.ceil(att.size / pointerMaxSize);    //vertexAttribPointer() 只能是 1 , 2 , 3 , 4 , 大于4 会拆分成多个地址
+                let realSize = att.size <= pointerMaxSize ? att.size : Math.ceil(att.size / subCount);
+                while (subCount > 0) {
+                    subCount--;
+                    gl.enableVertexAttribArray(loc);
+                    // gl.vertexAttribPointer(location, att.size, gl.FLOAT, false, pass.program.strideInsAttrib, offset);
+                    gl.vertexAttribPointer(loc, realSize, dataType, false, strideInsAttrib, offset);
+                    gl.vertexAttribDivisor(loc, 1);
+                    // offset += att.size * 4;
+                    offset += realSize * dataByteSize;
+                    loc++;
+                }
             }
 
             this.attSuccess = true;
         }
-        disableAttributes(gl: WebGL2RenderingContext, pass: render.glDrawPass): void {
+        disableAttributes(gl: WebGL2RenderingContext, pass: render.glDrawPass, mat: material): void {
             if (this.attSuccess) {
                 gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
-                let attMap = pass.program.mapCustomAttrib;
-                for (let key in attMap) {
-                    let att = attMap[key];
+                // let attMap = pass.program.mapInstanceAttribID;
+                const valMap = mat.instanceAttribIDValMap;
+                const attMap = pass.program.mapAllAttrID;
+                for (let id in attMap) {
+                    if (!valMap[id]) continue;
+                    let att = attMap[id];
                     let location = att.location;
                     if (location == -1) break;
                     gl.vertexAttribDivisor(location, 0);
@@ -157,7 +177,6 @@ namespace m4m.framework {
         static del_info(info: meshGpuInstanceDrawInfo) {
             this._pool.push(info);
         }
-
     }
 
     /**
@@ -266,10 +285,17 @@ namespace m4m.framework {
         }
         set filter(val) { this._filter = val; }
 
+        // private static readonly insOffsetMatrixStr = "instance_offset_matrix_";
+        // private static GpuInsAttrignoreMap = { "instance_offset_matrix_0": true, "instance_offset_matrix_1": true, "instance_offset_matrix_2": true, "instance_offset_matrix_3": true };
+        // private static insOffsetMtxIDMap = [`instance_offset_matrix_0`, `instance_offset_matrix_1`, `instance_offset_matrix_2`, `instance_offset_matrix_3`];
 
-        private static readonly insOffsetMatrixStr = "instance_offset_matrix_";
-        private static insOffsetMtxIDMap = [`instance_offset_matrix_0`, `instance_offset_matrix_1`, `instance_offset_matrix_2`, `instance_offset_matrix_3`];
-        private static GpuInsAttrignoreMap = { "instance_offset_matrix_0": true, "instance_offset_matrix_1": true, "instance_offset_matrix_2": true, "instance_offset_matrix_3": true };
+        private static _InstanceOffsetMatrixLoc: render.VertexLocation;
+        /** GPU Instance 偏移变化矩阵 */
+        private static get InstanceOffsetMatrixLoc() {
+            if (this._InstanceOffsetMatrixLoc == null) { this._InstanceOffsetMatrixLoc = render.VertexLocation.InstanceOffsetMatrix_L; };
+            return this._InstanceOffsetMatrixLoc;
+        };
+
         private static helpDArray = new m4m.math.ExtenArray<Float32Array>(Float32Array);
         private static helpIMatrix = new m4m.math.matrix();
 
@@ -475,24 +501,37 @@ namespace m4m.framework {
          * @param tran transform
          * @param mat 材质对象
          * @param pass 绘制通道对象
+         * @returns 是否设置成功
          */
-        static setInstanceOffsetMatrix(tran: m4m.framework.transform, mat: material, pass: render.glDrawPass) {
-            if (!pass.program.mapAttrib[this.insOffsetMtxIDMap[0]]) return;
-            this._setInstanceOffsetMatrix(tran, mat);
+        static setInstanceOffsetMatrix(tran: m4m.framework.transform, mat: material, pass: render.glDrawPass): boolean {
+            if (!this.hasInstanceOffsetMatrix(pass)) return false;
+            this._setInstanceOffsetMatrix(tran, mat, pass);
+            return true;
         }
 
-        private static _setInstanceOffsetMatrix(tran: m4m.framework.transform, mat: material) {
+        /**
+         * 是否有 InstanceOffsetMatrix 定义
+         * @param pass 绘制通道对象
+         */
+        static hasInstanceOffsetMatrix(pass: render.glDrawPass) {
+            let locMap = pass.program.mapAllAttrLoc;
+            return locMap[this.InstanceOffsetMatrixLoc] != null;
+        }
+
+        private static _setInstanceOffsetMatrix(tran: m4m.framework.transform, mat: material, pass: render.glDrawPass) {
             let _wmat = tran.getWorldMatrix();
-            let len = 4;
             let rawdata = _wmat.rawData;
-            for (let i = 0; i < len; i++) {
-                let id = this.insOffsetMtxIDMap[i];
-                let arr = mat.instanceAttribValMap[id];
-                if (!arr) arr = mat.instanceAttribValMap[id] = [];
-                arr[0] = rawdata[0 + 4 * i];
-                arr[1] = rawdata[1 + 4 * i];
-                arr[2] = rawdata[2 + 4 * i];
-                arr[3] = rawdata[3 + 4 * i];
+            let allLocMap = pass.program.mapAllAttrLoc;
+            let valMap = mat.instanceAttribIDValMap;
+            //
+            let loc = this.InstanceOffsetMatrixLoc;
+            let att = allLocMap[loc];
+            let id = att.name;
+            let arr = valMap[id];
+            if (!arr) arr = valMap[id] = [];
+            //复制数据
+            for (let i = 0, len = rawdata.length; i < len; i++) {
+                arr[i] = rawdata[i];
             }
         }
 

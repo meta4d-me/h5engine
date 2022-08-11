@@ -682,7 +682,7 @@ namespace m4m.framework
                             gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
                             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
                         },
-                        activeAttributes: (gl, pass) =>
+                        activeAttributes: (gl, pass , mat: material) =>
                         {
                             let program = pass.program.program;
                             gl.bindBuffer(gl.ARRAY_BUFFER, vbo);

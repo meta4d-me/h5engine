@@ -15,18 +15,34 @@
     }
 
     /**
-     * 顶点作色器中的地址
+     * 顶点作色器中的地址 (最大 0 - 15)
      */
     export enum VertexLocation {
+        /** 顶点位置坐标地址 */
         Position_L = 0,
+        /** 顶点法线坐标地址 */
         Normal_L = 1,
+        /** 顶点切线坐标地址 */
         Tangent_L = 2,
+        /** 顶点颜色地址 */
         Color_L = 3,
+        /** 顶点第一个纹理坐标地址 */
         UV0_L = 4,
+        /** 顶点第二个纹理坐标地址 */
         UV1_L = 5,
+        /** 顶点蒙皮索引 */
         BlendIndex4_L = 6,
+        /** 顶点蒙皮权重 */
         BlendWeight4_L = 7,
+        /** 顶点第二个颜色地址 */
         ColorEX_L = 8,
+
+        //mesh 拓展预览位置 ....
+
+        /** GPUInstance 内建开始地址 */
+        GPUInstanceStart = 12,
+        /** GPUInstance 偏移(toWorld)矩阵  */
+        InstanceOffsetMatrix_L = 12,
     }
 
     /**

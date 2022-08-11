@@ -51,98 +51,18 @@ namespace m4m.render {
         name: string;
         type: ShaderTypeEnum;
         shader: WebGLShader;
-        //mapUniform: { [id: string]: { name: string, type: UniformTypeEnum } } = {};
-
-        // private _scanUniform(txt: string)
-        // {
-        //     var lines1 = txt.split(";");
-        //     for (var ii in lines1)
-        //     {
-        //         var lines = lines1[ii].split("\n");
-
-        //         for (var i in lines)
-        //         {
-        //             var line = lines[i];
-
-        //             var words = line.match(new RegExp("([_a-zA-Z0-9]+)|([/=;]+)", "g"));
-        //             if (words != null && words.length >= 3 && words[0] == "uniform")
-        //             {
-        //                 var t = words[1];
-        //                 var n = words[2];
-
-        //                 if (t == "highp" || t == "lowp" || t == "mediump")
-        //                 {
-        //                     t = words[2];
-        //                     n = words[3];
-        //                 }
-        //                 var info: { name: string, type: UniformTypeEnum } = { name: n, type: UniformTypeEnum.Float };
-        //                 this.mapUniform[n] = info;
-        //                 //info.name = n;
-        //                 if (t == "sampler2D")
-        //                 {
-        //                     info.type = UniformTypeEnum.Texture;
-        //                     //info.defvalue = null;
-        //                 }
-        //                 else if (t == "float" && line.indexOf("[") >= 0 && line.indexOf("]") >= 0)
-        //                 {
-        //                     info.type = UniformTypeEnum.Floatv;
-        //                 }
-        //                 else if (t == "float")
-        //                 {
-        //                     info.type = UniformTypeEnum.Float;
-        //                     //info.defvalue = 0;
-        //                 }
-        //                 else if (t == "vec4" && line.indexOf("[") >= 0 && line.indexOf("]") >= 0)
-        //                 {
-        //                     info.type = UniformTypeEnum.Float4v;
-        //                 }
-        //                 else if (t == "vec4")
-        //                 {
-        //                     info.type = UniformTypeEnum.Float4;
-        //                     //info.defvalue = new TSM.vec4(0, 0, 0, 0);
-        //                 }
-        //                 else if (t == "mat4" && line.indexOf("[") >= 0 && line.indexOf("]") >= 0)
-        //                 {
-        //                     info.type = UniformTypeEnum.Float4x4v;
-        //                 }
-        //                 else if (t == "mat4")
-        //                 {
-        //                     info.type = UniformTypeEnum.Float4x4;
-        //                     //info.defvalue = TSM.mat4.identity;
-        //                 }
-        //                 else
-        //                 {
-        //                     throw new Error("uniform type:"+t+" not defined.");
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
-
     }
     /**
      * @private
      */
     export class glProgram {
-        private static buildInAtrribute: { [id: string]: string } = {
-            "_glesVertex": "posPos",
-            "_glesNormal": "posNormal",
-            "_glesTangent": "posTangent",
-            "_glesColor": "posColor",
-            "_glesMultiTexCoord0": "posUV0",
-            "_glesMultiTexCoord1": "posUV2",
-            "_glesBlendIndex4": "posBlendIndex4",
-            "_glesBlendWeight4": "posBlendWeight4",
-            "_glesColorEx": "posColorEx"
-        }
-
-        /**
-         * 是否是引擎系统内建的 attrib ID
-         * @param attribID 
-         */
-        static isBuildInAttrib(attribID: string) {
-            return this.buildInAtrribute[attribID] != null;
-        }
+        // /**
+        //  * 是否是引擎系统内建的 attrib ID
+        //  * @param attribID 
+        //  */
+        // static isBuildInAttrib(attribID: string) {
+        //     return this.buildInAtrribute[attribID] != null;
+        // }
 
         constructor(vs: glShader, fs: glShader, program: WebGLProgram) {
             this.vs = vs;
@@ -150,30 +70,18 @@ namespace m4m.render {
             this.program = program;
         }
 
-        /** attribute map */
-        mapAttrib: { [id: string]: attribute } = {};
-        /** 自定义 attribute map */
-        mapCustomAttrib: { [id: string]: attribute } = {};
+        /** 全部 attribute 地址 map */
+        mapAllAttrLoc: { [loc: number]: attribute } = {};
+        /** 全部 attributeID map */
+        mapAllAttrID: { [id: string]: attribute } = {};
+        // /** GPU Instance attribute ID map */
+        // mapInstanceAttribID: { [id: string]: attribute } = {};
 
-        private _strideInsAttrib: number = 0;
-        get strideInsAttrib() { return this._strideInsAttrib; }
+        // private _strideInsAttrib: number = 0;
+        // get strideInsAttrib() { return this._strideInsAttrib; }
         initAttribute(webgl: WebGL2RenderingContext) {
-            // //绑定vbo和shader顶点格式，这部分应该要区分材质改变与参数改变，可以少切换一些状态
-            // this.posPos = webgl.getAttribLocation(this.program, "_glesVertex");
-            // this.posColor = webgl.getAttribLocation(this.program, "_glesColor");
-            // this.posUV0 = webgl.getAttribLocation(this.program, "_glesMultiTexCoord0");
-            // this.posUV2 = webgl.getAttribLocation(this.program, "_glesMultiTexCoord1");//猜测
-            // this.posNormal = webgl.getAttribLocation(this.program, "_glesNormal");//未测试
-            // this.posTangent = webgl.getAttribLocation(this.program, "_glesTangent");
-            // this.posBlendIndex4 = webgl.getAttribLocation(this.program, "_glesBlendIndex4");//未测试
-            // this.posBlendWeight4 = webgl.getAttribLocation(this.program, "_glesBlendWeight4");//未测试
-            // this.posColorEx = webgl.getAttribLocation(this.program, "_glesColorEx");
-
-
-            // this["xxx"] = webgl.getAttribLocation(this.program, "xxx");
-
             let attributesLen = webgl.getProgramParameter(this.program, webgl.ACTIVE_ATTRIBUTES);
-            let attMap = glProgram.buildInAtrribute;
+            // let attMap = glProgram.buildInAtrribute;
             for (let i = 0; i < attributesLen; i++) {
                 let attributeInfo = webgl.getActiveAttrib(this.program, i);
                 if (!attributeInfo) break;
@@ -182,49 +90,67 @@ namespace m4m.render {
                 let name = attributeInfo.name;
                 att.name = name;
                 switch (attributeInfo.type) {
+                    case webgl.INT:
                     case webgl.FLOAT: att.size = 1; break;
+                    case webgl.INT_VEC2:
                     case webgl.FLOAT_VEC2: att.size = 2; break;
+                    case webgl.INT_VEC3:
                     case webgl.FLOAT_VEC3: att.size = 3; break;
-                    case webgl.FLOAT_VEC4: att.size = 4; break;
+                    case webgl.INT_VEC4:
+                    case webgl.FLOAT_VEC4:
+                    case webgl.FLOAT_MAT2: att.size = 4; break;
+                    case webgl.FLOAT_MAT2x3:
+                    case webgl.FLOAT_MAT3x2: att.size = 6; break;
+                    case webgl.FLOAT_MAT2x4:
+                    case webgl.FLOAT_MAT4x2: att.size = 8; break;
+                    case webgl.FLOAT_MAT3: att.size = 9; break;
+                    case webgl.FLOAT_MAT3x4:
+                    case webgl.FLOAT_MAT4x3: att.size = 12; break;
+                    case webgl.FLOAT_MAT4: att.size = 16; break;
+                    default: att.size = 0; break;
                 }
                 att.location = webgl.getAttribLocation(this.program, name);
-                this.mapAttrib[name] = att;
-                if (!attMap[name]) {
-                    this.mapCustomAttrib[name] = att;
-                    this._strideInsAttrib += att.size * 4;
-                }
+                //加入all map 
+                this.mapAllAttrLoc[att.location] = att;
+                this.mapAllAttrID[name] = att;
+                // //加入instance map
+                // if (att.location >= VertexLocation.GPUInstanceStart) {
+                //     this.mapInstanceAttribID[name] = att;
+                //     // this._strideInsAttrib += att.size * 4;
+                // }
             }
 
-            //设置 引擎内建的attribute 地址
-            for (let key in attMap) {
-                let val = attMap[key];
-                this[val] = this.tryGetLocation(key);
-            }
+            // //设置 引擎内建的attribute 地址
+            // for (let key in attMap) {
+            //     let val = attMap[key];
+            //     this[val] = this.tryGetLocation(key);
+            // }
+
+            //使用了 layout 模式，只需要筛选 自定义的attrib
+
         }
 
-        private tryGetLocation(id: string) {
-            let att = this.mapAttrib[id];
-            if (!att) return -1;
-            return att.location;
-        }
+        // private tryGetLocation(id: string) {
+        //     let att = this.mapAttrib[id];
+        //     if (!att) return -1;
+        //     return att.location;
+        // }
 
         vs: glShader;
         fs: glShader;
         program: WebGLProgram;
 
-        //pos可以穷尽
-        posPos: number = -1;
-        posNormal: number = -1;
-        posTangent: number = -1;
-        //可以有双color
-        posColor: number = -1;
-        posUV0: number = -1;
-        posUV2: number = -1;
-        posBlendIndex4: number = -1;
-        posBlendWeight4: number = -1;
-
-        posColorEx: number = -1;
-
+        // //old 顶点地址-------------------------
+        // posPos: number = -1;
+        // posNormal: number = -1;
+        // posTangent: number = -1;
+        // posColor: number = -1;
+        // posUV0: number = -1;
+        // posUV2: number = -1;
+        // posBlendIndex4: number = -1;
+        // posBlendWeight4: number = -1;
+        // posColorEx: number = -1;
+        // //------------------------------------
 
         mapUniform: { [id: string]: uniform } = {};
         use(webgl: WebGL2RenderingContext) {
@@ -362,22 +288,6 @@ namespace m4m.render {
             }
             var name = nameVS + "_" + nameFS;
             var glp = new glProgram(this.mapVS[nameVS], this.mapFS[nameFS], program);
-            // //合并uniform
-            // for (var key in this.mapVS[nameVS].mapUniform)
-            // {
-            //     var u = this.mapVS[nameVS].mapUniform[key];
-            //     glp.mapUniform[key] = { name: u.name, type: u.type, location: null };
-            // }
-            // for (var key in this.mapFS[nameFS].mapUniform)
-            // {
-            //     var u = this.mapFS[nameFS].mapUniform[key];
-            //     glp.mapUniform[key] = { name: u.name, type: u.type, location: null };
-            // }
-
-            // for (var key in glp.mapUniform)
-            // {
-            //     glp.mapUniform[key].location = webgl.getUniformLocation(program, key);
-            // }
             //----------
             glp.initUniforms(webgl);
             glp.initAttribute(webgl);
