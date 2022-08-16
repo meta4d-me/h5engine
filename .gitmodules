@@ -1,9 +1,12 @@
 [submodule "examples/wasmBoy"]
 	path = examples/wasmBoy
 	url = http://pwd.cafegame.cn:7990/scm/engine/wasmboy.git
+	branch = master
 [submodule "examples/engineExample"]
 	path = examples/engineExample
 	url = http://pwd.cafegame.cn:7990/scm/engine/engineexample.git
+	branch = master
 [submodule "docs"]
 	path = docs
 	url = http://pwd.cafegame.cn:7990/scm/engine/enginedocs.git
+	branch = master
