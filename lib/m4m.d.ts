@@ -22714,7 +22714,7 @@ declare namespace m4m.render {
     class glRenderTarget implements ITexture {
         width: number;
         height: number;
-        constructor(webgl: WebGL2RenderingContext, width: number, height: number, depth?: boolean, stencil?: boolean);
+        constructor(webgl: WebGL2RenderingContext, width: number, height: number, depth?: boolean, stencil?: boolean, fbo?: WebGLFramebuffer);
         fbo: WebGLFramebuffer;
         renderbuffer: WebGLRenderbuffer;
         texture: WebGLTexture;
