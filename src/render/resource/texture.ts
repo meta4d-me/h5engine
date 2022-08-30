@@ -126,10 +126,10 @@
     export class glRenderTarget implements ITexture {
         width: number;
         height: number;
-        constructor(webgl: WebGL2RenderingContext, width: number, height: number, depth: boolean = false, stencil: boolean = false) {
+        constructor(webgl: WebGL2RenderingContext, width: number, height: number, depth: boolean = false, stencil: boolean = false, fbo: WebGLFramebuffer = null) {
             this.width = width;
             this.height = height;
-            this.fbo = webgl.createFramebuffer();
+            this.fbo = fbo ? fbo : webgl.createFramebuffer();
             webgl.bindFramebuffer(webgl.FRAMEBUFFER, this.fbo);
             if (depth || stencil) {
                 this.renderbuffer = webgl.createRenderbuffer();
