@@ -333,7 +333,7 @@ namespace m4m.framework
         {
             let ishided = false;
             let lastDistance = Number.MAX_VALUE;
-            if (this.player != null && this.player.gameObject)
+            if (this.player != null && this.player.gameObject && this.mesh && this.mesh.data)
             {
                 let mvpmat = this.player.gameObject.transform.getWorldMatrix();
                 let data = this.mesh.data;
