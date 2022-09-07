@@ -260,6 +260,45 @@ namespace m4m.framework
             if(_r == null) return "";
             return _r[0];
         }
+
+        /**
+         * 解码成 文本字符串
+         * @param array 数组
+         * @returns 文本字符串
+         */
+        static decodeText( array ) {
+
+            if ( typeof TextDecoder !== 'undefined' ) {
+    
+                return new TextDecoder().decode( array );
+    
+            }
+    
+            // Avoid the String.fromCharCode.apply(null, array) shortcut, which
+            // throws a "maximum call stack size exceeded" error for large arrays.
+    
+            let s = '';
+    
+            for ( let i = 0, il = array.length; i < il; i ++ ) {
+    
+                // Implicitly assumes little-endian.
+                s += String.fromCharCode( array[ i ] );
+    
+            }
+    
+            try {
+    
+                // merges multi-byte utf-8 characters.
+    
+                return decodeURIComponent( escape( s ) );
+    
+            } catch ( e ) { // see #16358
+    
+                return s;
+    
+            }
+    
+        }
     }
 
 }

@@ -4340,12 +4340,36 @@ declare namespace m4m.framework {
     interface IAsset {
         bundle?: assetBundle;
         defaultAsset: boolean;
+        /** 获取资源名称
+         * @return 资源名称
+         */
         getName(): string;
+        /**
+         * 获取资源唯一id
+         * @return 资源唯一id
+         */
         getGUID(): number;
+        /**
+         * 引用计数加一
+         */
         use(): void;
+        /**
+         * 引用计数减一
+         * @param disposeNow 是否直接释放资源
+         */
         unuse(disposeNow?: boolean): void;
+        /**
+         * 释放资源
+         */
         dispose(): any;
+        /**
+         * 计算资源字节大小
+         * @return 资源字节大小
+         */
         caclByteLength(): number;
+        /**
+         * 初始化
+         */
         init?(): any;
     }
 }
@@ -4737,8 +4761,12 @@ declare namespace m4m.framework {
          * HDR贴图
          */
         HDR = 30,
-        GLTF = 31,
-        BIN = 32
+        /** 二进制文件 */
+        BIN = 31,
+        /** gltf 模型资源 */
+        GLTF = 32,
+        /** gltf 二进制 资源 */
+        GLB = 33
     }
     /**
      * @public
@@ -5165,6 +5193,11 @@ declare namespace m4m.framework {
 declare namespace m4m.framework {
     class AssetFactory_Font implements IAssetFactory {
         parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, txt: string): font;
+    }
+}
+declare namespace m4m.framework {
+    class AssetFactory_GLB implements IAssetFactory {
+        parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, data: ArrayBuffer): gltf;
     }
 }
 declare namespace m4m.framework {
@@ -20610,6 +20643,12 @@ declare namespace m4m.framework {
          * @returns
          */
         static GetSuffix(filePath: string): string;
+        /**
+         * 解码成 文本字符串
+         * @param array 数组
+         * @returns 文本字符串
+         */
+        static decodeText(array: any): string;
     }
 }
 declare namespace m4m.framework {
