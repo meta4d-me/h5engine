@@ -11,6 +11,13 @@ namespace m4m.framework {
     @m4m.reflect.SerializeType
     export class gltf implements IAsset {
         static readonly ClassName: string = "gltf";
+        /** 必要依赖 已支持 记录字典容器 */
+        static readonly requiredSupportedMap: { [key: string]: boolean } = {
+            "KHR_texture_transform": true,
+            "gd_realtime_lights": true,
+            "gd_linfo": true,
+            "gd_linfo_scene": true,
+        };
 
         @m4m.reflect.Field("constText")
         private name: constText;
@@ -133,6 +140,14 @@ namespace m4m.framework {
             const defaltScene = this.data.scene ?? 0;
             const extensionsUsed = this.data.extensionsUsed as string[] ?? [];
             const hasKHR_texture_transform = extensionsUsed.indexOf("KHR_texture_transform") != -1;
+            //检查 extensionsRequired
+            const extensionsRequired: string[] = this.data.extensionsRequired ?? [];
+            for (let i = 0, len = extensionsRequired.length; i < len; i++) {
+                let key = extensionsRequired[i];
+                if(!gltf.requiredSupportedMap[key]) {
+                    console.warn(`extensionsRequired of "${key}" not suppered!`);
+                }
+            }
 
             const loadImg = (url) => new Promise<HTMLImageElement>((res) => {
                 m4m.io.loadImg(folder + url, (img, err) => {

@@ -5893,6 +5893,10 @@ declare namespace m4m.framework {
     export class gltf implements IAsset {
         data: any;
         static readonly ClassName: string;
+        /** 必要依赖 已支持 记录字典容器 */
+        static readonly requiredSupportedMap: {
+            [key: string]: boolean;
+        };
         private name;
         private id;
         /**
