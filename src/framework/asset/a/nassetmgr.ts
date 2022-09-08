@@ -102,6 +102,8 @@ namespace m4m.framework
                     return AssetTypeEnum.HDR;
                 case ".gltf":
                     return AssetTypeEnum.GLTF;
+                case ".glb":
+                    return AssetTypeEnum.GLB;
                 case ".bin":
                     return AssetTypeEnum.BIN;
             }
@@ -144,6 +146,7 @@ namespace m4m.framework
             case e.HDR:
             case e.RAW:
             case e.BIN:
+            case e.GLB:
                 return "arraybuffer";
             default:
                 // throw Error(`无法识别类型 enum:${AssetTypeEnum[type]},type:${type}`);

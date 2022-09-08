@@ -404,7 +404,7 @@ namespace m4m.framework
                 if (this.light == null)
                 {
                     this.light = comp as any;
-                    console.warn("add light:" + this.transform.name);
+                    //console.warn("add light:" + this.transform.name);
                 }
                 else
                 {

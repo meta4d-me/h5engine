@@ -10,7 +10,14 @@ namespace m4m.framework {
      */
     @m4m.reflect.SerializeType
     export class gltf implements IAsset {
-        static readonly ClassName: string = "json";
+        static readonly ClassName: string = "gltf";
+        /** 必要依赖 已支持 记录字典容器 */
+        static readonly requiredSupportedMap: { [key: string]: boolean } = {
+            "KHR_texture_transform": true,
+            "gd_realtime_lights": true,
+            "gd_linfo": true,
+            "gd_linfo_scene": true,
+        };
 
         @m4m.reflect.Field("constText")
         private name: constText;
@@ -23,7 +30,7 @@ namespace m4m.framework {
          * @version m4m 1.0
          */
         defaultAsset: boolean = false;
-        constructor(assetName: string = null, public data) {
+        constructor(assetName: string = null, public data: any) {
             if (!assetName) {
                 assetName = "json_" + this.getGUID();
             }
@@ -133,20 +140,76 @@ namespace m4m.framework {
             const defaltScene = this.data.scene ?? 0;
             const extensionsUsed = this.data.extensionsUsed as string[] ?? [];
             const hasKHR_texture_transform = extensionsUsed.indexOf("KHR_texture_transform") != -1;
+            //检查 extensionsRequired
+            const extensionsRequired: string[] = this.data.extensionsRequired ?? [];
+            for (let i = 0, len = extensionsRequired.length; i < len; i++) {
+                let key = extensionsRequired[i];
+                if(!gltf.requiredSupportedMap[key]) {
+                    console.warn(`extensionsRequired of "${key}" not suppered!`);
+                }
+            }
 
-            const loadImg = (url) => new Promise((res) => {
+            const loadImg = (url) => new Promise<HTMLImageElement>((res) => {
                 m4m.io.loadImg(folder + url, (img, err) => {
                     if (!err) res(img);
                 });
             });
+
+            const getImgByBin = (view, mimeType: string) => {
+                const bufferView = new Uint8Array(view.rawBuffer, view.byteOffset ?? 0, view.byteLength);
+                const blob = new Blob([bufferView], {
+                    type: mimeType
+                });
+                let sourceURI = URL.createObjectURL(blob);
+
+                return new Promise<HTMLImageElement>((res) => {
+                    m4m.io.loadImg(sourceURI, (img, err) => {
+                        if (!err) res(img);
+                    });
+                });
+            }
             const samplers = this.data.samplers ?? [];
-            this.buffers = await Promise.all(this.data?.buffers?.map(({ uri }) => load(uri)) ?? []);
-            const images: HTMLImageElement[] = await Promise.all(this.data?.images?.map(({ uri }) => loadImg(uri)) ?? []);
+            //buffers
+            let currBufLen = 0;
+            let glbBin = this.buffers ? this.buffers[0] : null;
+            let bufCount = 0;
+            this.buffers = await Promise.all(this.data.buffers?.map(({ byteLength, uri }) => {
+                if (uri) { return load(uri); }
+                else if (glbBin) {
+                    const buf = glbBin.data.slice(currBufLen, currBufLen + byteLength);
+                    currBufLen += byteLength;
+                    const _bin = new bin(`${glbBin.getName()}_${bufCount}`, buf);
+                    bufCount++;
+                    return _bin;
+                }
+            }) ?? []);
+
+            //bufferView
+            const views = this.data.bufferViews?.map(({ buffer = 0, byteOffset = 0, byteLength = 0, byteStride = 0 }) => {
+                // return {byteStride ,dv: new DataView(this.buffers[buffer].data, byteOffset, byteLength)};
+                return { byteOffset, byteLength, byteStride, rawBuffer: this.buffers[buffer].data };
+            });
+            //accessors
+            const accessors = this.data?.accessors?.map(acc => {
+                return {
+                    ...acc,
+                    bufferView: views[acc.bufferView],
+                }
+            });
+            //images
+            const images: HTMLImageElement[] = await Promise.all(this.data?.images?.map(({ uri, mimeType, bufferView }) => {
+                if (uri) { return loadImg(uri); }
+                else {
+                    const view = views[bufferView];
+                    return getImgByBin(view, mimeType);
+                }
+            }) ?? []);
+
             const textures: texture[] = await Promise.all(this.data.textures?.map(({ sampler, source }) => {
                 const img = images[source];
                 const tex = new m4m.framework.texture(img.src);
                 let format = m4m.render.TextureFormatEnum.RGBA;
-                if(img.src.length > 4 && img.src.substr(img.src.length - 4) == ".jpg"){
+                if (img.src.length > 4 && img.src.substr(img.src.length - 4) == ".jpg") {
                     format = m4m.render.TextureFormatEnum.RGB;
                 }
                 const glt = new m4m.render.glTexture2D(ctx, format);
@@ -201,6 +264,9 @@ namespace m4m.framework {
                     case "MASK": break;
                     case "BLEND": shaderRes = `pbr_blend.shader.json`; break;
                 }
+                // //-------test
+                // shaderRes = `shader/def`;
+                // //----------
                 pbrSH = mgr.getShader(shaderRes);
                 mat.setShader(pbrSH);
                 mat.setFloat("alphaCutoff", alphaCutoff);
@@ -293,16 +359,7 @@ namespace m4m.framework {
 
                 return mat;
             });
-            const views = this.data.bufferViews?.map(({ buffer = 0, byteOffset = 0, byteLength = 0, byteStride = 0 }) => {
-                // return {byteStride ,dv: new DataView(this.buffers[buffer].data, byteOffset, byteLength)};
-                return { byteOffset, byteLength, byteStride, rawBuffer: this.buffers[buffer].data };
-            });
-            const accessors = this.data?.accessors?.map(acc => {
-                return {
-                    ...acc,
-                    bufferView: views[acc.bufferView],
-                }
-            });
+
 
             const meshes = this.data.meshes?.map(({ name, primitives }) => {
                 return primitives.map(({ attributes, indices, material, extensions }) => {
@@ -434,7 +491,7 @@ namespace m4m.framework {
                     mf.submesh.push(sm);
                     mf.glMesh.uploadIndexSubData(ctx, 0, ebo);
                     mf.glMesh.initVAO();
-                    
+
                     //light Map
                     let lightMapTexST = null;
                     let outMat: material = materials[material];
