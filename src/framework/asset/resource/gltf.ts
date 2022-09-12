@@ -144,7 +144,7 @@ namespace m4m.framework {
             const extensionsRequired: string[] = this.data.extensionsRequired ?? [];
             for (let i = 0, len = extensionsRequired.length; i < len; i++) {
                 let key = extensionsRequired[i];
-                if(!gltf.requiredSupportedMap[key]) {
+                if (!gltf.requiredSupportedMap[key]) {
                     console.warn(`extensionsRequired of "${key}" not suppered!`);
                 }
             }
@@ -246,7 +246,20 @@ namespace m4m.framework {
             if (hasLightMap) {
                 //加载lightmap 纹理
                 let maps = gd_linfo_scene.maps;
-                lightMapTexs = await Promise.all(maps.map((path) => { return load(path) as Promise<texture>; }));
+                lightMapTexs = await Promise.all(maps.map((path) => {
+                    const bufferViewIdx = Number.parseInt(path);
+                    if (isNaN(bufferViewIdx)) {
+                        return load(path) as Promise<texture>;
+                    } else {
+                        const view = views[bufferViewIdx];
+                        const bOffset = view.byteOffset ?? 0;
+                        const buffer = (view.rawBuffer as ArrayBuffer).slice(bOffset, bOffset + view.byteLength);
+                        // const bufferView = new Uint8Array(view.rawBuffer, view.byteOffset ?? 0, view.byteLength);
+                        let _texture = new texture(`Lightmap-${bufferViewIdx}_comp_light.raw`);
+                        _texture.glTexture = RAWParse.parse(ctx, buffer);
+                        return _texture;
+                    }
+                }));
             }
 
             const extrasCfg = this.data.extras?.clayViewerConfig?.materials as any[];
