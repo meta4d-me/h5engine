@@ -271,15 +271,22 @@ namespace m4m.framework {
                 let pbrSH: shader;
                 let alphaMode = m.alphaMode ?? "OPAQUE";
                 let alphaCutoff = m.alphaCutoff ?? 0.5;
-                let shaderRes = "pbr.shader.json";
+                let doubleSided = m.doubleSided ?? false;
+                let shaderRes = "pbr";
                 switch (alphaMode) {
                     case "OPAQUE": alphaCutoff = 0; break;
                     case "MASK": break;
-                    case "BLEND": shaderRes = `pbr_blend.shader.json`; break;
+                    case "BLEND": shaderRes += `_blend`; break;
+                }
+
+                if (doubleSided) {
+                    shaderRes += `_2sided`;
                 }
                 // //-------test
                 // shaderRes = `shader/def`;
                 // //----------
+
+                shaderRes += `.shader.json`;
                 pbrSH = mgr.getShader(shaderRes);
                 mat.setShader(pbrSH);
                 mat.setFloat("alphaCutoff", alphaCutoff);
@@ -315,9 +322,17 @@ namespace m4m.framework {
                     _bColor[1] = _clayViewerColor[1];
                     _bColor[2] = _clayViewerColor[2];
                 }
+                let _eColor = m.emissiveFactor ?? [0, 0, 0];
+                // //test--------
+                // _eColor[0] = 3;
+                // _eColor[1] = 0;
+                // _eColor[2] = 0;
+                // //------------
+                //
                 mat.setVector4('CustomBasecolor', new math.vector4(_bColor[0], _bColor[1], _bColor[2], _bColor[3]));
                 mat.setFloat('CustomMetallic', matCfg?.metalness ?? m.pbrMetallicRoughness?.metallicFactor ?? 1);
                 mat.setFloat('CustomRoughness', matCfg?.roughness ?? m.pbrMetallicRoughness?.roughnessFactor ?? 1);
+                mat.setVector4('CustomEmissiveColor', new math.vector4(_eColor[0], _eColor[1], _eColor[2], 1));
                 // console.log(matCfg.name);
                 // console.table({...m.pbrMetallicRoughness});
                 // console.table(matCfg);
@@ -346,6 +361,10 @@ namespace m4m.framework {
                 }
                 if (m.occlusionTexture) {
                     mat.setTexture("uv_AO", textures[m.occlusionTexture.index]);
+                }
+
+                if (m.emissiveTexture) {
+                    mat.setTexture("uv_Emissive", textures[m.emissiveTexture.index]);
                 }
 
                 //tex transfrom
