@@ -261,7 +261,7 @@ namespace m4m.framework {
                 }
 
                 if (!unifomValue) {
-                    error.push(new Error(`material [${this.name}] uploadunifrom fail! unifom Value is null!! `));
+                    error.push(new Error(`material [${this.name}], unifrom [${unifom.name}] uploadunifrom fail! unifom Value is null!! `));
                     continue;
                 }
 
