@@ -259,6 +259,12 @@ namespace m4m.framework {
                         console.error("Uniform don't be setted or have def value. uniform:" + unifom.name + "mat:" + this.getName());
                     }
                 }
+
+                if (!unifomValue) {
+                    error.push(new Error(`material [${this.name}] uploadunifrom fail! unifom Value is null!! `));
+                    continue;
+                }
+
                 if (unifom.type == render.UniformTypeEnum.Texture && !unifomValue.glTexture) {
                     error.push(new Error(`material [${this.name}] uploadunifrom fail! glTexture is null!! `));
                     continue;
