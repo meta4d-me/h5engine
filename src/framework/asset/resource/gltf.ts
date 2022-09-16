@@ -402,6 +402,8 @@ namespace m4m.framework {
                     const uv2: m4m.math.vector2[] = mdata.uv2 = [];
                     const normal: m4m.math.vector3[] = mdata.normal = [];
                     const tangent: m4m.math.vector3[] = mdata.tangent = [];
+                    const blendIndex4: m4m.math.vector4[] = mdata.blendIndex = [];
+                    const blendWeight4: m4m.math.vector4[] = mdata.blendWeight = [];
                     // const colors = mdata.color = [];
                     const attr: { [k: string]: Accessor } = {};
                     for (let k in attributes) {
@@ -415,7 +417,9 @@ namespace m4m.framework {
                         // + (attr.COLOR?.size ?? 0)
                         + (attr.TANGENT?.size ? 3 : 0) // 引擎里的Tangent是vec3，而不是vec4
                         + (attr.TEXCOORD_0?.size ?? 0)
-                        + (attr.TEXCOORD_1?.size ?? 0);
+                        + (attr.TEXCOORD_1?.size ?? 0)
+                        + (attr.JOINTS_0?.size ?? 0)
+                        + (attr.WEIGHTS_0?.size ?? 0);
                     const vbo = new Float32Array(vcount * bs);
 
                     mf.glMesh = new m4m.render.glMesh();
@@ -431,6 +435,10 @@ namespace m4m.framework {
                         vf |= m4m.render.VertexFormatMask.UV0;
                     if (attr.TEXCOORD_1?.size)
                         vf |= m4m.render.VertexFormatMask.UV1;
+                    if (attr.JOINTS_0?.size)
+                        vf |= m4m.render.VertexFormatMask.BlendIndex4;
+                    if (attr.WEIGHTS_0?.size)
+                        vf |= m4m.render.VertexFormatMask.BlendWeight4;
                     // | m4m.render.VertexFormatMask.BlendIndex4
                     // | m4m.render.VertexFormatMask.BlendWeight4;
                     mf.glMesh.initBuffer(ctx, vf, vcount, m4m.render.MeshTypeEnum.Dynamic);
@@ -471,6 +479,16 @@ namespace m4m.framework {
                             tangent[i] = t;
                         }
 
+                        if (attr.JOINTS_0?.size != null) {
+                            let _dataArr = attr.JOINTS_0.data[i];
+                            blendIndex4[i] = new m4m.math.vector4(_dataArr[0], _dataArr[1], _dataArr[2], _dataArr[3]);
+                        }
+
+                        if (attr.WEIGHTS_0?.size != null) {
+                            let _dataArr = attr.WEIGHTS_0.data[i];
+                            blendWeight4[i] = new m4m.math.vector4(_dataArr[0], _dataArr[1], _dataArr[2], _dataArr[3]);
+                        }
+
                         const cur = vbo.subarray(i * bs); // offset
                         let bit = 0;
                         if (attr.POSITION?.size != null) {
@@ -504,6 +522,24 @@ namespace m4m.framework {
                             let u = uv2[i];
                             _uv2[0] = u.x;
                             _uv2[1] = u.y;
+                        }
+
+                        if (attr.JOINTS_0?.size != null) {
+                            const _subArr = cur.subarray(bit, bit += 4);
+                            let value = blendIndex4[i];
+                            _subArr[0] = value.x;
+                            _subArr[1] = value.y;
+                            _subArr[2] = value.z;
+                            _subArr[3] = value.w;
+                        }
+
+                        if (attr.WEIGHTS_0?.size != null) {
+                            const _subArr = cur.subarray(bit, bit += 4);
+                            let value = blendWeight4[i];
+                            _subArr[0] = value.x;
+                            _subArr[1] = value.y;
+                            _subArr[2] = value.z;
+                            _subArr[3] = value.w;
                         }
 
                         // const tangent = cur.subarray(7, 9);
@@ -547,9 +583,14 @@ namespace m4m.framework {
                 });
             });
 
-            const nodes = this.data.nodes?.map(({ name, mesh, matrix, rotation, scale, translation, skin, camera, children }) => {
+            let idToNode: { [id: number]: m4m.framework.transform } = {};
+            let meshNodes = [];
+            const nodes = this.data.nodes?.map((node, index) => {
+                let { name, mesh, matrix, rotation, scale, translation, skin, camera, children } = node;
                 const n = new m4m.framework.transform();
                 n.name = name;
+                idToNode[index] = n;
+
                 if (matrix != null) {
                     n.getLocalMatrix().rawData = matrix;
                     math.matrixDecompose(n.getLocalMatrix(), n.localScale, n.localRotate, n.localTranslate);
@@ -567,25 +608,7 @@ namespace m4m.framework {
                 }
                 n.markDirty();
                 if (mesh != null) {
-                    const child = meshes[mesh].map(({ m, mat, lTexST }) => {
-                        const texST: number[] = lTexST;
-                        const submesh = new m4m.framework.transform();
-
-                        const mf = submesh.gameObject.addComponent("meshFilter") as meshFilter;
-                        mf.mesh = m;
-                        const renderer = submesh.gameObject.addComponent("meshRenderer") as meshRenderer;
-                        renderer.materials = [mat];
-                        if (texST) {
-                            renderer.lightmapIndex = -2;    //标记该节点使用非全局lightmap
-                            math.vec4Set(renderer.lightmapScaleOffset, texST[0], texST[1], texST[2], texST[3]);
-                        }
-                        // renderer.materials.push(mat);
-                        // renderer.materials.push(new framework.material());
-                        // renderer.materials[0].setShader(mgr.getShader("shader/def"));
-                        // renderer.materials[0].setShader(mgr.getShader("simple.shader.json"));
-                        return submesh;
-                    });
-                    child.forEach(c => n.addChild(c));
+                    meshNodes.push(index);
                 }
                 return { n, children };
             });
@@ -598,6 +621,76 @@ namespace m4m.framework {
                 return n;
             }
             const roots = this.data.scenes[defaltScene].nodes.map(parseNode);
+
+            //解析meshnode
+            meshNodes.forEach(nodeId => {
+                let { mesh, skin } = this.data.nodes[nodeId];
+                let parent = idToNode[nodeId];
+                meshes[mesh].forEach(({ m, mat, lTexST }) => {
+                    const texST: number[] = lTexST;
+                    const submesh = new m4m.framework.transform();
+                    if (skin != null) {
+                        let comp = submesh.gameObject.addComponent("skinMeshRender") as skinMeshRender;
+                        comp.mesh = m;
+                        comp.materials = [mat];
+
+                        let skinData = this.data.skins?.[skin];
+                        if (skinData == null) {
+                            console.error(`gltf解析出错，无法找到[skin =${skin}]的SKIN数据`);
+                        } else {
+                            let { inverseBindMatrices, skeleton, joints } = skinData;
+                            comp.bones = joints.map(index => idToNode[index])
+                            if (inverseBindMatrices != null) {
+                                let accessor = new Accessor(accessors[inverseBindMatrices], "inverseBindMatrices");
+                                let matrices = accessor.data;
+                                matrices.forEach((el, index) => {
+                                    comp.inverseBindMatrices[index] = new m4m.math.matrix(el);
+                                });
+                                if (skeleton) {
+                                    comp.rootBone = idToNode[skeleton];
+                                } else {
+                                    comp.rootBone = scene;
+                                }
+                            }
+                        }
+                    } else {
+                        const mf = submesh.gameObject.addComponent("meshFilter") as meshFilter;
+                        mf.mesh = m;
+                        const renderer = submesh.gameObject.addComponent("meshRenderer") as meshRenderer;
+                        renderer.materials = [mat];
+                        if (texST) {
+                            renderer.lightmapIndex = -2;    //标记该节点使用非全局lightmap
+                            math.vec4Set(renderer.lightmapScaleOffset, texST[0], texST[1], texST[2], texST[3]);
+                        }
+                    };
+                    parent.addChild(submesh);
+                });
+            });
+
+            //解析animations
+            if (this.data.animations != null) {
+                let clips = (this.data.animations as any[]).map(({ name, channels, samplers }) => {
+                    let clip = new m4m.framework.GLTFanimationClip();
+                    clip.name = name;
+                    channels.forEach(({ sampler, target }) => {
+                        let { input, output } = samplers[sampler];
+                        let { node, path } = target;
+                        const channel = new m4m.framework.animationChannel();
+                        channel.targetName = idToNode[node].name;
+                        channel.propertyName = path;
+
+                        let inputAccessor = new Accessor(accessors[input], "sampler_input");
+                        channel.times = inputAccessor.data as any;
+
+                        let outputAccessor = new Accessor(accessors[output], "sampler_output");
+                        channel.values = outputAccessor.data as any;
+                    });
+                    return clip;
+                });
+                let comp = scene.gameObject.addComponent("animation") as animation;
+                comp.animationClips = clips
+            }
+
             roots.forEach(r => scene.addChild(r));
             return scene;
         }
