@@ -260,13 +260,13 @@ namespace m4m.framework {
                     }
                 }
 
-                if (!unifomValue) {
-                    error.push(new Error(`material [${this.name}], unifrom [${unifom.name}] uploadunifrom fail! unifom Value is null!! `));
+                if (unifomValue == null) {
+                    error.push(new Error(`material [${this.name.getText()}], unifrom [${unifom.name}] uploadunifrom fail! unifom Value is null!! `));
                     continue;
                 }
 
                 if (unifom.type == render.UniformTypeEnum.Texture && !unifomValue.glTexture) {
-                    error.push(new Error(`material [${this.name}] uploadunifrom fail! glTexture is null!! `));
+                    error.push(new Error(`material [${this.name.getText()}] uploadunifrom fail! glTexture is null!! `));
                     continue;
                 }
                 func(unifom.location, unifomValue);
