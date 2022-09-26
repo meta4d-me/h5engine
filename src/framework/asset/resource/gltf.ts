@@ -681,9 +681,25 @@ namespace m4m.framework {
 
                         let inputAccessor = new Accessor(accessors[input], "sampler_input");
                         channel.times = inputAccessor.data as any;
+                        if (channel.times[channel.times.length - 1] > clip.totalTime) {
+                            clip.totalTime = channel.times[channel.times.length - 1];
+                        }
 
                         let outputAccessor = new Accessor(accessors[output], "sampler_output");
-                        channel.values = outputAccessor.data as any;
+                        switch (path) {
+                            case animationChannelTargetPath.TRANSLATION:
+                            case animationChannelTargetPath.SCALE:
+                                channel.values = (outputAccessor.data as any).map(el => new m4m.math.vector3(el[0], el[1], el[2]));
+                                break;
+                            case animationChannelTargetPath.ROTATION:
+                                channel.values = (outputAccessor.data as any).map(el => new m4m.math.quaternion(el[0], el[1], el[2], el[3]));
+                                break;
+                            default:
+                                console.warn("unknown AnimationChannelTargetPath", path);
+                                break;
+                        }
+
+                        clip.channels.push(channel);
                     });
                     return clip;
                 });

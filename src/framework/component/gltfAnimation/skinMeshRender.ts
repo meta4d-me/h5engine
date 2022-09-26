@@ -143,15 +143,31 @@ namespace m4m.framework {
                         this._queue = _mat.getQueue();
                 }
             }
+            let inverseRootMat = m4m.math.pool.new_matrix();
+            let rootMat = this.rootBone.getWorldMatrix();
+            m4m.math.matrixInverse(rootMat, inverseRootMat);
 
             let temptMat = m4m.math.pool.new_matrix();
+            let temptScale = m4m.math.pool.new_vector3();
+            let temptRot = m4m.math.pool.new_quaternion();
+            let temptPos = m4m.math.pool.new_quaternion();
+
             for (let i = 0; i < this.bones.length; i++) {
                 let boneWorldMatrix = this.bones[i].getWorldMatrix();
                 m4m.math.matrixMultiply(boneWorldMatrix, this.inverseBindMatrices[i], temptMat);
-                temptMat.rawData.forEach((el, index) => {
-                    this.boneMatrices[i * 16 + index] = el;
-                })
+                m4m.math.matrixMultiply(inverseRootMat, temptMat, temptMat);
+                m4m.math.matrixDecompose(temptMat, temptScale, temptRot, temptPos);
+
+                this.boneMatrices[i * 8 + 0] = temptRot.x;
+                this.boneMatrices[i * 8 + 1] = temptRot.y;
+                this.boneMatrices[i * 8 + 2] = temptRot.z;
+                this.boneMatrices[i * 8 + 3] = temptRot.w;
+                this.boneMatrices[i * 8 + 4] = temptPos.x;
+                this.boneMatrices[i * 8 + 5] = temptPos.y;
+                this.boneMatrices[i * 8 + 6] = temptPos.z;
+                this.boneMatrices[i * 8 + 7] = temptScale.x;
             }
+            m4m.math.pool.delete_matrix(inverseRootMat);
             m4m.math.pool.delete_matrix(temptMat);
         }
 
@@ -160,7 +176,7 @@ namespace m4m.framework {
             DrawCallInfo.inc.currentState = DrawCallEnum.SKinrender;
             context.updateLightMask(this.gameObject.layer);
             context.updateModel(this.rootBone);
-            context.matrix_bones = this.boneMatrices;
+            context.vec4_bones = this.boneMatrices;
             if (this._mesh && this.mesh.glMesh) {
                 if (this._mesh.submesh != null) {
                     for (let i = 0; i < this._mesh.submesh.length; i++) {

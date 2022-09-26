@@ -88,6 +88,7 @@ namespace m4m.framework {
                     this.beReady = false;
                     break;
                 }
+                this.channelInsArr.push(ins);
             }
             this.beReady = true;
         }
