@@ -143,14 +143,14 @@ namespace m4m.framework {
                         this._queue = _mat.getQueue();
                 }
             }
-            let inverseRootMat = m4m.math.pool.new_matrix();
+            let inverseRootMat = Tempt.getMatrix();
             let rootMat = this.rootBone.getWorldMatrix();
             m4m.math.matrixInverse(rootMat, inverseRootMat);
 
-            let temptMat = m4m.math.pool.new_matrix();
-            let temptScale = m4m.math.pool.new_vector3();
-            let temptRot = m4m.math.pool.new_quaternion();
-            let temptPos = m4m.math.pool.new_quaternion();
+            let temptMat = Tempt.getMatrix(1);
+            let temptScale = Tempt.getVec3();
+            let temptRot = Tempt.getQuaternion();
+            let temptPos = Tempt.getVec3(1);
 
             for (let i = 0; i < this.bones.length; i++) {
                 let boneWorldMatrix = this.bones[i].getWorldMatrix();
@@ -167,8 +167,6 @@ namespace m4m.framework {
                 this.boneMatrices[i * 8 + 6] = temptPos.z;
                 this.boneMatrices[i * 8 + 7] = temptScale.x;
             }
-            m4m.math.pool.delete_matrix(inverseRootMat);
-            m4m.math.pool.delete_matrix(temptMat);
         }
 
         render(context: renderContext, assetMgr: assetMgr, camera: m4m.framework.camera) {
@@ -211,6 +209,38 @@ namespace m4m.framework {
          */
         clone() {
 
+        }
+    }
+    export class Tempt {
+        private static vec3Arr = [];
+        private static quaternionArr = [];
+        private static matrixArr = [];
+
+        static getVec3(index = 0) {
+            let obj = this.vec3Arr[index];
+            if (obj == null) {
+                obj = new m4m.math.vector3();
+                this.vec3Arr[index] = obj;
+            }
+            return obj
+        }
+
+        static getQuaternion(index = 0) {
+            let obj = this.quaternionArr[index];
+            if (obj == null) {
+                obj = new m4m.math.quaternion();
+                this.quaternionArr[index] = obj;
+            }
+            return obj
+        }
+
+        static getMatrix(index = 0) {
+            let obj = this.matrixArr[index];
+            if (obj == null) {
+                obj = new m4m.math.matrix();
+                this.matrixArr[index] = obj;
+            }
+            return obj
         }
     }
 }
