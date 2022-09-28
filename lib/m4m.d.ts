@@ -7094,6 +7094,13 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         intersects(ray: ray, outInfo: pickinfo): boolean;
+        /**
+         * 默认类型
+         */
+        static technicalType: "BONE_ARR" | "BONE_TEXTURE";
+        /**使用骨骼数据数组还是骨骼贴图 ,初始化读取默认类型数值*/
+        technicalType: "BONE_ARR" | "BONE_TEXTURE";
+        private _boneTex;
         update(delta: number): void;
         render(context: renderContext, assetmgr: assetMgr, camera: m4m.framework.camera): void;
         /**
@@ -7104,6 +7111,12 @@ declare namespace m4m.framework {
          * @private
          */
         clone(): void;
+    }
+    class boneMatricesTexture {
+        private static texID;
+        private _tex;
+        get tex(): texture;
+        updateTexture(context: renderContext, boneMatrix: Float32Array): void;
     }
 }
 declare namespace m4m.framework {
@@ -11389,6 +11402,170 @@ declare namespace m4m.framework {
         firtstFrame: number;
         constructor(firstFrame: number);
         parse(json: any, assetmgr: assetMgr, assetbundle: string): void;
+    }
+}
+declare namespace m4m.framework {
+    class animation implements INodeComponent {
+        static readonly ClassName: string;
+        onPlay(): void;
+        start(): void;
+        update(delta: number): void;
+        gameObject: gameObject;
+        remove(): void;
+        clone(): void;
+        animationClips: GLTFanimationClip[];
+        private currentClip;
+        play(clipName: string, options?: playOptions): void;
+    }
+    interface playOptions {
+        /** 播放速度，默认：1 */
+        speed?: number;
+        /** 是否循环播放，默认：true */
+        beLoop?: boolean;
+        /** 帧率，默认：30 */
+        frameRate?: number;
+    }
+    class GLTFanimationClip {
+        name: string;
+        totalTime: number;
+        channels: animationChannel[];
+    }
+    class animationChannel {
+        targetName: string;
+        propertyName: animationChannelTargetPath;
+        /** 关键帧时间 */
+        times: number[];
+        values: any[];
+        get startTime(): number;
+        get endTime(): number;
+    }
+    enum animationChannelTargetPath {
+        TRANSLATION = "translation",
+        ROTATION = "rotation",
+        SCALE = "scale",
+        WEIGHTS = "weights"
+    }
+    class clipInstance {
+        readonly clip: GLTFanimationClip;
+        readonly beReady: boolean;
+        private channelInsArr;
+        private speed;
+        private localTime;
+        private beLoop;
+        private frameRate;
+        private totalFrame;
+        private curFrame;
+        constructor(clip: GLTFanimationClip, root: transform, options?: playOptions);
+        private _bePlaying;
+        get bePlaying(): boolean;
+        update(deltaTime: number): void;
+        /** 指定动画时间*/
+        setTime(time: number): void;
+        reset(): void;
+    }
+    class channelInstance {
+        channel: animationChannel;
+        private setFunc;
+        private lerpFunc;
+        private temptLastStartIndex;
+        readonly beReady: any;
+        constructor(channel: animationChannel, root: transform);
+        jumpToStart(): void;
+        execute(currentFrame: number, frameRate: number): void;
+    }
+}
+declare namespace m4m.framework {
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 蒙皮网格渲染组件
+     * @version m4m 1.0
+     */
+    class skinMeshRender implements IRenderer {
+        static readonly ClassName: string;
+        constructor();
+        /**
+         * 挂载的gameobject
+         */
+        gameObject: gameObject;
+        /**
+         * 场景渲染层级（common、transparent、overlay）
+         */
+        layer: RenderLayerEnum;
+        /**
+         * 渲染mask层级（和相机相对应）
+         */
+        get renderLayer(): number;
+        set renderLayer(layer: number);
+        private issetq;
+        _queue: number;
+        /**
+         * 返回此组件的场景渲染层级排序依据queue大小
+         */
+        get queue(): number;
+        /**
+         * 设置此组件的场景渲染层级排序number大小
+         */
+        set queue(value: number);
+        /**
+         * 材质数组
+         */
+        materials: material[];
+        private _mesh;
+        /**
+         * 返回mesh数据
+         */
+        get mesh(): mesh;
+        /**
+         * 设置mesh数据
+         */
+        set mesh(mesh: mesh);
+        /**
+         * @private
+         */
+        bones: transform[];
+        /**
+         * @private
+         */
+        rootBone: transform;
+        /**
+         * @private
+         */
+        center: math.vector3;
+        /**
+         * @private
+         */
+        size: math.vector3;
+        /**
+         * 最大骨骼数量
+         * @version m4m 1.0
+         */
+        maxBoneCount: number;
+        private boneMatrices;
+        inverseBindMatrices: m4m.math.matrix[];
+        _aabb: aabb;
+        get aabb(): aabb;
+        onPlay(): void;
+        start(): void;
+        update(delta: number): void;
+        render(context: renderContext, assetMgr: assetMgr, camera: m4m.framework.camera): void;
+        /**
+         * @private
+         */
+        remove(): void;
+        /**
+         * @private
+         */
+        clone(): void;
+    }
+    class Tempt {
+        private static vec3Arr;
+        private static quaternionArr;
+        private static matrixArr;
+        static getVec3(index?: number): any;
+        static getQuaternion(index?: number): any;
+        static getMatrix(index?: number): any;
     }
 }
 declare namespace m4m.framework {

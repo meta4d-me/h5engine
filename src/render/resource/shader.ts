@@ -330,10 +330,17 @@ namespace m4m.render {
                 fsStr = "#define FOG \n" + "#define INSTANCE \n" + fsStr;
             }
             else if (type == "skin") {
-                vsStr = "#define SKIN \n" + vsStr;
+                vsStr = "#define SKIN \n" + "#define SKIN_BONE_ARR \n" + vsStr;
                 fsStr = "#define SKIN \n" + fsStr;
             } else if (type == "skin_fog") {
-                vsStr = "#define SKIN \n" + "#define FOG \n" + vsStr;
+                vsStr = "#define SKIN \n" + "#define SKIN_BONE_ARR \n" + "#define FOG \n" + vsStr;
+                fsStr = "#define SKIN \n" + "#define FOG \n" + fsStr;
+            }
+            else if (type == "skinTex") {
+                vsStr = "#define SKIN \n" + "#define SKIN_BONE_TEX \n" + vsStr;
+                fsStr = "#define SKIN \n" + fsStr;
+            } else if (type == "skinTex_fog") {
+                vsStr = "#define SKIN \n" + "#define SKIN_BONE_TEX \n" + "#define FOG \n" + vsStr;
                 fsStr = "#define SKIN \n" + "#define FOG \n" + fsStr;
             } else if (type == "lightmap") {
                 vsStr = "#define LIGHTMAP \n" + vsStr;
