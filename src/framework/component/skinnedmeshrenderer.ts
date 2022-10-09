@@ -392,31 +392,36 @@ namespace m4m.framework {
                 }
             }
 
-            if (this.player != null && this.player.gameObject && this.player.frameDirty) {
+            if (this.technicalType == "BONE_ARR" && this.player != null && this.player.gameObject && this.player.frameDirty) {
                 this.player.fillPoseData(this._skeletonMatrixData, this.bones);
             }
 
         }
-
+        //bonecount,frameid,framecount
+        private _skinTexMeta = new m4m.math.vector4();
         render(context: renderContext, assetmgr: assetMgr, camera: m4m.framework.camera) {
             DrawCallInfo.inc.currentState = DrawCallEnum.SKinrender;
 
             let skinStr = "skin"
-            if (this.technicalType == "BONE_TEXTURE") {
-                skinStr = "skinTex"
-                if (this._boneTex == null) this._boneTex = new boneMatricesTexture();
-                this._boneTex.updateTexture(context, this._skeletonMatrixData);
-                this.materials.forEach(el => {
-                    if (el != null) {
-                        el.setTexture("boneSampler", this._boneTex.tex);
-                        el.setFloat("boneCount", this.maxBoneCount);
-                    }
-                })
-            }
-
             if (this.player != null && this.player.gameObject) {
                 context.updateLightMask(this.gameObject.layer);
                 context.updateModel(this.player.gameObject.transform);
+
+                if (this.technicalType == "BONE_TEXTURE" && this.player.currentAniclip != null && this._mesh) {
+                    let tex = this.player.currentAniclip.getFramesDataTex(context, this._mesh.getGUID(), this.bones);
+                    if (tex) {
+                        skinStr = "skinTex"
+                        this.materials.forEach(el => {
+                            if (el != null) {
+                                el.setTexture("_SkinTex", tex);
+                                this._skinTexMeta.x = this.bones.length;
+                                this._skinTexMeta.y = this.player.PlayFrameID;
+                                this._skinTexMeta.z = this.player.currentAniclip.frameCount;
+                                el.setVector4("_SkinTexMeta", this._skinTexMeta);
+                            }
+                        })
+                    }
+                }
             }
             context.vec4_bones = this._skeletonMatrixData;
             if (this._mesh && this.mesh.glMesh) {

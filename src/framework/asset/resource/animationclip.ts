@@ -1,7 +1,6 @@
 /// <reference path="../../../io/reflect.ts" />
 
-namespace m4m.framework
-{
+namespace m4m.framework {
     /**
      * @public
      * @language zh_CN
@@ -10,8 +9,7 @@ namespace m4m.framework
      * @version m4m 1.0
      */
     @m4m.reflect.SerializeType
-    export class animationClip implements IAsset
-    {
+    export class animationClip implements IAsset {
         static readonly ClassName: string = "animationClip";
 
         @m4m.reflect.Field("constText")
@@ -25,10 +23,8 @@ namespace m4m.framework
          * @version m4m 1.0
          */
         defaultAsset: boolean = false;
-        constructor(assetName: string = null)
-        {
-            if (!assetName)
-            {
+        constructor(assetName: string = null) {
+            if (!assetName) {
                 assetName = "animationClip_" + this.getGUID();
             }
             this.name = new constText(assetName);
@@ -40,8 +36,7 @@ namespace m4m.framework
          * 获取资源名称
          * @version m4m 1.0
          */
-        getName(): string
-        {
+        getName(): string {
             return this.name.getText();
         }
         /**
@@ -51,8 +46,7 @@ namespace m4m.framework
          * 获取资源唯一id
          * @version m4m 1.0
          */
-        getGUID(): number
-        {
+        getGUID(): number {
             return this.id.getID();
         }
         /**
@@ -62,8 +56,7 @@ namespace m4m.framework
          * 引用计数加一
          * @version m4m 1.0
          */
-        use()
-        {
+        use() {
             sceneMgr.app.getAssetMgr().use(this);
         }
         /**
@@ -73,8 +66,7 @@ namespace m4m.framework
          * 引用计数减一
          * @version m4m 1.0
          */
-        unuse(disposeNow: boolean = false)
-        {
+        unuse(disposeNow: boolean = false) {
             sceneMgr.app.getAssetMgr().unuse(this, disposeNow);
         }
         /**
@@ -84,8 +76,7 @@ namespace m4m.framework
          * 释放资源
          * @version m4m 1.0
          */
-        dispose()
-        {
+        dispose() {
             this.bones.length = 0;
             this.subclips.length = 0;
             delete this.frames;
@@ -98,16 +89,13 @@ namespace m4m.framework
          * 计算资源字节大小
          * @version m4m 1.0
          */
-        caclByteLength(): number
-        {
+        caclByteLength(): number {
             let total = 0;
-            for (let k in this.bones)
-            {
+            for (let k in this.bones) {
                 total += math.caclStringByteLength(this.bones[k]);
             }
 
-            for (let k in this.frames)
-            {
+            for (let k in this.frames) {
                 total += this.frames[k].byteLength;
 
                 total += math.caclStringByteLength(k);
@@ -126,15 +114,11 @@ namespace m4m.framework
          * @param buf buffer数组
          * @version m4m 1.0
          */
-        Parse(buf: ArrayBuffer): Promise<animationClip>
-        {
-            return new Promise((resolve, reject) =>
-            {
-                try
-                {
+        Parse(buf: ArrayBuffer): Promise<animationClip> {
+            return new Promise((resolve, reject) => {
+                try {
                     var read: m4m.io.binReader = new m4m.io.binReader(buf);
-                    if (read.readByte() == 0xFD)
-                    {
+                    if (read.readByte() == 0xFD) {
                         //版本3，当前版本
                         read.readStringUtf8();
                         this.fps = read.readFloat();
@@ -143,8 +127,7 @@ namespace m4m.framework
                         this.loop = read.readBoolean();
                         this.boneCount = read.readInt();
                         this.bones = [];
-                        for (let i = 0; i < this.boneCount; i++)
-                        {
+                        for (let i = 0; i < this.boneCount; i++) {
                             let bonename = read.readStringUtf8();
                             this.bones.push(bonename);
                             this.indexDic[bonename] = i;
@@ -153,8 +136,7 @@ namespace m4m.framework
 
                         this.subclipCount = read.readInt();
                         this.subclips = [];
-                        for (let i = 0; i < this.subclipCount; i++)
-                        {
+                        for (let i = 0; i < this.subclipCount; i++) {
                             let _subClip = new subClip();
                             _subClip.name = read.readStringUtf8();
                             _subClip.loop = read.readBoolean();
@@ -167,25 +149,21 @@ namespace m4m.framework
                         const bs = this.hasScaled ? 8 : 7;
                         let minVals = [];
                         let maxVals = [];
-                        if (optimizeSize)
-                        {
-                            for (let i = 0; i < bs; i++)
-                            {
+                        if (optimizeSize) {
+                            for (let i = 0; i < bs; i++) {
                                 minVals.push(read.readFloat());
                                 maxVals.push(read.readFloat());
                             }
                         }
 
-                        for (let i = 0; i < this.frameCount; i++)
-                        {
+                        for (let i = 0; i < this.frameCount; i++) {
                             let _fid = read.readInt().toString();
                             let _key = read.readBoolean();
                             let _frame = new Float32Array(this.boneCount * bs + 1);
                             _frame[0] = _key ? 1 : 0;
 
                             let _boneInfo = new PoseBoneMatrix();
-                            for (let i = 0; i < this.boneCount; i++)
-                            {
+                            for (let i = 0; i < this.boneCount; i++) {
                                 _boneInfo.load(read, this.hasScaled, optimizeSize ? { maxVals, minVals } : null);
                                 _frame[i * bs + 1] = _boneInfo.r.x;
                                 _frame[i * bs + 2] = _boneInfo.r.y;
@@ -194,16 +172,14 @@ namespace m4m.framework
                                 _frame[i * bs + 5] = _boneInfo.t.x;
                                 _frame[i * bs + 6] = _boneInfo.t.y;
                                 _frame[i * bs + 7] = _boneInfo.t.z;
-                                if (this.hasScaled)
-                                {
+                                if (this.hasScaled) {
                                     _frame[i * bs + 8] = _boneInfo.s;
                                 }
                             }
                             this.frames[_fid] = _frame;
                         }
 
-                    } else
-                    {
+                    } else {
                         //重新开始读
                         read.seek(0)
                         // var _name =
@@ -239,8 +215,7 @@ namespace m4m.framework
 
                         this.boneCount = read.readInt();
                         this.bones = [];
-                        for (let i = 0; i < this.boneCount; i++)
-                        {
+                        for (let i = 0; i < this.boneCount; i++) {
                             let bonename = read.readStringUtf8();
                             this.bones.push(bonename);
                             this.indexDic[bonename] = i;
@@ -249,8 +224,7 @@ namespace m4m.framework
 
                         this.subclipCount = read.readInt();
                         this.subclips = [];
-                        for (let i = 0; i < this.subclipCount; i++)
-                        {
+                        for (let i = 0; i < this.subclipCount; i++) {
                             let _subClip = new subClip();
                             _subClip.name = read.readStringUtf8();
                             _subClip.loop = read.readBoolean();
@@ -263,25 +237,21 @@ namespace m4m.framework
                         const bs = this.hasScaled ? 8 : 7;
                         let minVals = [];
                         let maxVals = [];
-                        if (optimizeSize)
-                        {
-                            for (let i = 0; i < 8; i++)
-                            {
+                        if (optimizeSize) {
+                            for (let i = 0; i < 8; i++) {
                                 minVals.push(read.readFloat());
                                 maxVals.push(read.readFloat());
                             }
                         }
 
-                        for (let i = 0; i < this.frameCount; i++)
-                        {
+                        for (let i = 0; i < this.frameCount; i++) {
                             let _fid = read.readInt().toString();
                             let _key = read.readBoolean();
                             let _frame = new Float32Array(this.boneCount * bs + 1);
                             _frame[0] = _key ? 1 : 0;
 
                             let _boneInfo = new PoseBoneMatrix();
-                            for (let i = 0; i < this.boneCount; i++)
-                            {
+                            for (let i = 0; i < this.boneCount; i++) {
                                 _boneInfo.load(read, this.hasScaled, optimizeSize ? { maxVals, minVals } : null);
                                 _frame[i * bs + 1] = _boneInfo.r.x;
                                 _frame[i * bs + 2] = _boneInfo.r.y;
@@ -290,16 +260,14 @@ namespace m4m.framework
                                 _frame[i * bs + 5] = _boneInfo.t.x;
                                 _frame[i * bs + 6] = _boneInfo.t.y;
                                 _frame[i * bs + 7] = _boneInfo.t.z;
-                                if (this.hasScaled)
-                                {
+                                if (this.hasScaled) {
                                     _frame[i * bs + 8] = _boneInfo.s;
                                 }
                             }
                             this.frames[_fid] = _frame;
                         }
                     }
-                } catch (error)
-                {
+                } catch (error) {
                     reject(error.stack);
                     return;
                 }
@@ -340,8 +308,7 @@ namespace m4m.framework
          * 播放时长
          * @version m4m 1.0
          */
-        get time()
-        {
+        get time() {
             if (!this.frameCount || !this.fps) return 0;
             return this.frameCount / this.fps;
         }
@@ -377,15 +344,60 @@ namespace m4m.framework
          * @private
          */
         subclips: subClip[];
+        private _framesTex: { [meshID: number]: m4m.framework.texture } = {};
+        getFramesDataTex(ctx: renderContext, meshID: number, bones: transform[]) {
+            let tex = this._framesTex[meshID];
+            if (tex) return tex;
+            tex = new m4m.framework.texture();
+            tex.glTexture = new m4m.render.glTexture2D(ctx.webgl, render.TextureFormatEnum.FLOAT32, false, false) as m4m.render.glTexture2D;
+            tex.glTexture.width = bones.length * 2;
+            tex.glTexture.height = this.frameCount;
 
+            let pixelCount = 0;
+            const bs = this.hasScaled ? 8 : 7;
+            let texData = [];
+            for (let i = 0; i < this.frameCount; i++) {
+                let frameData = this.frames[i];
+                if (frameData == null) {
+                    console.error(`动画资源${this.name}(frameCount=${this.frameCount})的第${i}帧没有数据`);
+                    return null;
+                }
+                for (let k = 0; k < bones.length; k++) {
+                    let index = this.indexDic[bones[k].name];
+                    texData[pixelCount++] = frameData[index * bs + 1];
+                    texData[pixelCount++] = frameData[index * bs + 2];
+                    texData[pixelCount++] = frameData[index * bs + 3];
+                    texData[pixelCount++] = frameData[index * bs + 4];
+                    texData[pixelCount++] = frameData[index * bs + 5];
+                    texData[pixelCount++] = frameData[index * bs + 6];
+                    texData[pixelCount++] = frameData[index * bs + 7];
+                    texData[pixelCount++] = this.hasScaled ? frameData[index * bs + 8] : 1;
+                }
+            }
+
+            (tex.glTexture as m4m.render.glTexture2D).uploadByteArray(
+                false,
+                false,
+                bones.length * 2,
+                this.frameCount,
+                new Float32Array(texData),
+                false,
+                false,
+                false,
+                false,
+                false,
+                ctx.webgl.FLOAT
+            );
+            this._framesTex[meshID] = tex;
+            return tex;
+        }
     }
 
     /**
      * @private
      */
     @reflect.SerializeType
-    export class PoseBoneMatrix
-    {
+    export class PoseBoneMatrix {
         static readonly ClassName: string = "PoseBoneMatrix";
 
         @reflect.Field("vector3")
@@ -394,13 +406,11 @@ namespace m4m.framework
         r: math.quaternion;
         @reflect.Field("scale")
         s: math.float;
-        static caclByteLength(): number
-        {
+        static caclByteLength(): number {
             let total = 12 + 16;
             return total;
         }
-        Clone(): PoseBoneMatrix
-        {
+        Clone(): PoseBoneMatrix {
             var p = new PoseBoneMatrix();
             p.t = new math.vector3();
             p.r = new math.quaternion();
@@ -408,10 +418,8 @@ namespace m4m.framework
             math.quatClone(this.r, p.r);
             return p;
         }
-        load(read: io.binReader, hasScaled = false, optimizeSize: { minVals: number[], maxVals: number[] } = null)
-        {
-            if (!optimizeSize)
-            {
+        load(read: io.binReader, hasScaled = false, optimizeSize: { minVals: number[], maxVals: number[] } = null) {
+            if (!optimizeSize) {
                 {
                     var x = read.readSingle();
                     var y = read.readSingle();
@@ -426,13 +434,11 @@ namespace m4m.framework
                     this.t = new math.vector3(x, y, z);
                 }
                 {
-                    if (hasScaled)
-                    {
+                    if (hasScaled) {
                         this.s = read.readSingle();
                     }
                 }
-            } else
-            {
+            } else {
                 let { minVals, maxVals } = optimizeSize;
                 {
                     //原始16byte优化为=》quat存储4 *（1.5 byte）12个位= 6 byte
@@ -463,8 +469,7 @@ namespace m4m.framework
                     this.t = new math.vector3(x, y, z);
                 }
                 {
-                    if (hasScaled)
-                    {
+                    if (hasScaled) {
                         //scale.x 原始4byte优化为=》1byte
                         let byte1 = read.readByte();
                         this.s = minVals[7] + byte1 * (maxVals[7] - minVals[7]) / 0xff;
@@ -473,22 +478,19 @@ namespace m4m.framework
             }
         }
 
-        static createDefault(): PoseBoneMatrix
-        {
+        static createDefault(): PoseBoneMatrix {
             var pt = new PoseBoneMatrix();
             pt.r = new math.quaternion(0, 0, 0, 1);
             pt.t = new math.vector3(0, 0, 0);
             return pt;
         }
-        copyFrom(src: PoseBoneMatrix)
-        {
+        copyFrom(src: PoseBoneMatrix) {
             // this.r.rawData.set(src.r.rawData);
             // this.t.rawData.set(src.t.rawData);
             math.quatClone(src.r, this.r);
             math.vec3Clone(src.t, this.t);
         }
-        copyFromData(src: Float32Array, seek: number)
-        {
+        copyFromData(src: Float32Array, seek: number) {
             this.r.x = src[seek + 0];
             this.r.y = src[seek + 1];
             this.r.z = src[seek + 2];
@@ -499,16 +501,14 @@ namespace m4m.framework
             // TODO:
             // this.s = src[seek + 7];
         }
-        invert()
-        {
+        invert() {
             math.quatInverse(this.r, this.r)
             math.quatTransformVector(this.r, this.t, this.t);
             this.t.x *= -1;
             this.t.y *= -1;
             this.t.z *= -1;
         }
-        lerpInWorld(_tpose: PoseBoneMatrix, from: PoseBoneMatrix, to: PoseBoneMatrix, v: number)
-        {
+        lerpInWorld(_tpose: PoseBoneMatrix, from: PoseBoneMatrix, to: PoseBoneMatrix, v: number) {
             ////预乘之后，插值奇慢
             // var tpose = new math.matrix();
 
@@ -530,8 +530,7 @@ namespace m4m.framework
 
             PoseBoneMatrix.sMultiply(outLerp, itpose, this);
         }
-        lerpInWorldWithData(_tpose: PoseBoneMatrix, from: PoseBoneMatrix, todata: Float32Array, toseek: number, v: number)
-        {
+        lerpInWorldWithData(_tpose: PoseBoneMatrix, from: PoseBoneMatrix, todata: Float32Array, toseek: number, v: number) {
             ////预乘之后，插值奇慢
             // var tpose = new math.matrix();
 
@@ -553,8 +552,7 @@ namespace m4m.framework
 
             PoseBoneMatrix.sMultiply(outLerp, itpose, this);
         }
-        static sMultiply(left: PoseBoneMatrix, right: PoseBoneMatrix, target: PoseBoneMatrix = null): PoseBoneMatrix
-        {
+        static sMultiply(left: PoseBoneMatrix, right: PoseBoneMatrix, target: PoseBoneMatrix = null): PoseBoneMatrix {
             if (target == null)
                 target = PoseBoneMatrix.createDefault();
             var dir = math.pool.new_vector3();
@@ -571,8 +569,7 @@ namespace m4m.framework
             math.pool.delete_vector3(dirtran);
             return target;
         }
-        static sMultiplytpose(left: PoseBoneMatrix, right: tPoseInfo, target: PoseBoneMatrix = null): PoseBoneMatrix
-        {
+        static sMultiplytpose(left: PoseBoneMatrix, right: tPoseInfo, target: PoseBoneMatrix = null): PoseBoneMatrix {
             if (target == null)
                 target = PoseBoneMatrix.createDefault();
             var dir = math.pool.new_vector3();
@@ -590,8 +587,7 @@ namespace m4m.framework
             return target;
         }
 
-        static sMultiplyDataAndMatrix(leftdata: Float32Array, leftseek: number, right: PoseBoneMatrix, target: PoseBoneMatrix = null): PoseBoneMatrix
-        {
+        static sMultiplyDataAndMatrix(leftdata: Float32Array, leftseek: number, right: PoseBoneMatrix, target: PoseBoneMatrix = null): PoseBoneMatrix {
             if (target == null)
                 target = PoseBoneMatrix.createDefault();
             var dir = math.pool.new_vector3();
@@ -608,8 +604,7 @@ namespace m4m.framework
             math.pool.delete_vector3(dirtran);
             return target;
         }
-        static sLerp(left: PoseBoneMatrix, right: PoseBoneMatrix, v: number, target: PoseBoneMatrix = null): PoseBoneMatrix
-        {
+        static sLerp(left: PoseBoneMatrix, right: PoseBoneMatrix, v: number, target: PoseBoneMatrix = null): PoseBoneMatrix {
             if (target == null)
                 target = PoseBoneMatrix.createDefault();
             target.t.x = left.t.x * (1 - v) + right.t.x * v;
@@ -621,18 +616,14 @@ namespace m4m.framework
         }
 
         private static poolmats: PoseBoneMatrix[] = [];
-        static recycle(mat: PoseBoneMatrix)
-        {
+        static recycle(mat: PoseBoneMatrix) {
             this.poolmats.push(mat);
         }
-        static create(): PoseBoneMatrix
-        {
+        static create(): PoseBoneMatrix {
             let item = this.poolmats.pop();
-            if (item)
-            {
+            if (item) {
                 return item;
-            } else
-            {
+            } else {
                 item = PoseBoneMatrix.createDefault();
                 return item;
             }
@@ -642,14 +633,12 @@ namespace m4m.framework
     /**
      * @private
      */
-    export class subClip
-    {
+    export class subClip {
         name: string;
         loop: boolean;
         startframe: number;
         endframe: number;
-        static caclByteLength(): number
-        {
+        static caclByteLength(): number {
             let total = 0;
             total += math.caclStringByteLength(this.name);
             total += 1;

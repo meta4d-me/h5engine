@@ -5452,6 +5452,8 @@ declare namespace m4m.framework {
          * @private
          */
         subclips: subClip[];
+        private _framesTex;
+        getFramesDataTex(ctx: renderContext, meshID: number, bones: transform[]): texture;
     }
     /**
      * @private
@@ -7102,6 +7104,7 @@ declare namespace m4m.framework {
         technicalType: "BONE_ARR" | "BONE_TEXTURE";
         private _boneTex;
         update(delta: number): void;
+        private _skinTexMeta;
         render(context: renderContext, assetmgr: assetMgr, camera: m4m.framework.camera): void;
         /**
          * @private
