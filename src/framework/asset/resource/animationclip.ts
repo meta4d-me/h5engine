@@ -356,7 +356,7 @@ namespace m4m.framework {
             let pixelCount = 0;
             const bs = this.hasScaled ? 8 : 7;
             let texData = [];
-            for (let i = 0; i < this.frameCount; i++) {
+            for (let i = this.frameCount - 1; i >= 0; i--) {
                 let frameData = this.frames[i];
                 if (frameData == null) {
                     console.error(`动画资源${this.name}(frameCount=${this.frameCount})的第${i}帧没有数据`);
