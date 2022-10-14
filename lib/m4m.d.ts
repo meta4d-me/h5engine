@@ -12500,11 +12500,11 @@ declare namespace m4m.framework {
         private devicePixelRatio;
         /**
          * 计算校准html 输入坐标点
-         * @param clientX 输入x
-         * @param clientY 输入y
+         * @param offsetX 输入x
+         * @param offsetY 输入y
          * @param out 返回pointinfo
          */
-        CalcuPoint(clientX: number, clientY: number, out: pointinfo): void;
+        CalcuPoint(offsetX: number, offsetY: number, out: pointinfo): void;
     }
 }
 declare namespace m4m.io {

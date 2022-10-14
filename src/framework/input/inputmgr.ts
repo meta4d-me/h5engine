@@ -157,12 +157,13 @@ namespace m4m.framework {
             this._point.touch = true;
             this._point.multiTouch = true;
             let lastTouche: pointinfo;
+            const rect = this.app.webgl.canvas.getBoundingClientRect();
             for (var i = 0; i < ev.changedTouches.length; i++) {
                 var touch = ev.changedTouches[i];
                 var id = touch.identifier;
                 this.tryAddTouchP(id);
                 this._touches[id].touch = true;
-                this.CalcuPoint(touch.clientX, touch.clientY, this._touches[id]);
+                this.CalcuPoint(touch.clientX - rect.left, touch.clientY - rect.top, this._touches[id]);
 
                 // this._touches[id].x = touch.clientX;
                 // this._touches[id].y = touch.clientY;
@@ -186,12 +187,13 @@ namespace m4m.framework {
             this._point.touch = true;
             this._point.multiTouch = true;
             let lastTouche: pointinfo;
+            const rect = this.app.webgl.canvas.getBoundingClientRect();
             for (var i = 0; i < ev.changedTouches.length; i++) {
                 var touch = ev.changedTouches[i];
                 var id = touch.identifier;
                 this.tryAddTouchP(id);
                 this._touches[id].touch = true;
-                this.CalcuPoint(touch.clientX, touch.clientY, this._touches[id]);
+                this.CalcuPoint(touch.clientX - rect.left, touch.clientY - rect.top, this._touches[id]);
                 // this._touches[id].x = touch.clientX;
                 // this._touches[id].y = touch.clientY;
 
@@ -229,7 +231,7 @@ namespace m4m.framework {
         }
         private _touchcancel(ev: TouchEvent) {
             ev.preventDefault();
-            
+
             this._touchend(ev);
 
             this.HtmlNativeEventer.Emit("touchcancel", ev);
@@ -237,14 +239,14 @@ namespace m4m.framework {
 
         //key
         private _keydown(ev: KeyboardEvent) {
-            
+
             this.keyboardMap[ev.keyCode] = true;
             this.keyDownCode = ev.keyCode;
 
             this.HtmlNativeEventer.Emit("keydown", ev);
         }
         private _keyup(ev: KeyboardEvent) {
-            
+
             delete this.keyboardMap[ev.keyCode];
             this.keyUpCode = ev.keyCode;
 
@@ -252,14 +254,14 @@ namespace m4m.framework {
         }
         //
         private _blur(ev) {
-            
+
             this._point.touch = false;
             //清理 keys 状态
             let _map = this.keyboardMap;
             for (let key in _map) {
                 _map[key] = false;
             }
-            
+
             this.HtmlNativeEventer.Emit("blur", ev);
         }
 
@@ -513,14 +515,14 @@ namespace m4m.framework {
         private devicePixelRatio = window.devicePixelRatio || 1;
         /**
          * 计算校准html 输入坐标点
-         * @param clientX 输入x
-         * @param clientY 输入y
+         * @param offsetX 输入x
+         * @param offsetY 输入y
          * @param out 返回pointinfo 
          */
-        CalcuPoint(clientX: number, clientY: number, out: pointinfo) {
-            if (!out || !this.app || isNaN(clientX) || isNaN(clientY)) return;
-            this.tempV2_0.x = clientX * this.devicePixelRatio / this.app.scaleFromPandding;
-            this.tempV2_0.y = clientY * this.devicePixelRatio / this.app.scaleFromPandding;
+        CalcuPoint(offsetX: number, offsetY: number, out: pointinfo) {
+            if (!out || !this.app || isNaN(offsetX) || isNaN(offsetY)) return;
+            this.tempV2_0.x = offsetX * this.devicePixelRatio / this.app.scaleFromPandding;
+            this.tempV2_0.y = offsetY * this.devicePixelRatio / this.app.scaleFromPandding;
             m4m.math.vec2Clone(this.tempV2_0, this.tempV2_1);
 
             if (this.app.shouldRotate) {
