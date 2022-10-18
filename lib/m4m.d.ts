@@ -8979,6 +8979,10 @@ declare namespace m4m.framework {
         private static helprect;
         private projectMatrixDirty;
         /**
+         * 后处理渲染颜色清理优先使用雾颜色
+         */
+        postClearUseFogColor: boolean;
+        /**
          * 相机剔除时，计算 z 轴上的平面 （far & near plane）
          */
         cullZPlane: boolean;

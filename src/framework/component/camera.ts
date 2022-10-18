@@ -136,6 +136,11 @@ namespace m4m.framework
         private projectMatrixDirty = true;
 
         /**
+         * 后处理渲染颜色清理优先使用雾颜色
+         */
+        public postClearUseFogColor = true;
+
+        /**
          * 相机剔除时，计算 z 轴上的平面 （far & near plane）
          */
         cullZPlane: boolean = true;
@@ -1095,7 +1100,7 @@ namespace m4m.framework
                     {
                         context.webgl.depthMask(true);//zwrite 會影響clear depth，這個查了好一陣
                         m4m.render.glDrawPass.lastZWrite = true;
-                        if (scene.fog)
+                        if (this.postClearUseFogColor && scene.fog)
                         {
                             context.webgl.clearColor(scene.fog._Color.x, scene.fog._Color.y, scene.fog._Color.z, scene.fog._Color.w);
                         } else
@@ -1115,7 +1120,7 @@ namespace m4m.framework
                     }
                     else if (this.clearOption_Color)
                     {
-                        if (scene.fog)
+                        if (this.postClearUseFogColor && scene.fog)
                         {
                             context.webgl.clearColor(scene.fog._Color.x, scene.fog._Color.y, scene.fog._Color.z, scene.fog._Color.w);
                         } else
