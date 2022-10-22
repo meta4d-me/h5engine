@@ -397,8 +397,9 @@ namespace m4m.framework {
             }
 
         }
-        //bonecount,frameid,framecount
-        private _skinTexMeta = new m4m.math.vector4();
+        //beCross=0,boneCount,frameId,frameCount
+        //beCross=1,boneCount,fromFrameId,fromFrameCount,toFrameId,toFrameCount
+        private _skinTexMeta = new Float32Array(6);
         render(context: renderContext, assetmgr: assetMgr, camera: m4m.framework.camera) {
             DrawCallInfo.inc.currentState = DrawCallEnum.SKinrender;
 
@@ -408,18 +409,40 @@ namespace m4m.framework {
                 context.updateModel(this.player.gameObject.transform);
 
                 if (this.technicalType == "BONE_TEXTURE" && this.player.currentAniclip != null && this._mesh) {
-                    let tex = this.player.currentAniclip.getFramesDataTex(context, this._mesh.getGUID(), this.bones);
-                    if (tex) {
-                        skinStr = "skinTex"
-                        this.materials.forEach(el => {
-                            if (el != null) {
-                                el.setTexture("_SkinTex", tex);
-                                this._skinTexMeta.x = this.bones.length;
-                                this._skinTexMeta.y = this.player.PlayFrameID;
-                                this._skinTexMeta.z = this.player.currentAniclip.frameCount;
-                                el.setVector4("_SkinTexMeta", this._skinTexMeta);
-                            }
-                        })
+                    if (this.player.beCrossing && this.player.crossFromClip) {
+                        let fromTex = this.player.crossFromClip.getFramesDataTex(context, this._mesh.getGUID(), this.bones);
+                        let toTex = this.player.currentAniclip.getFramesDataTex(context, this._mesh.getGUID(), this.bones);
+                        if (fromTex && toTex) {
+                            skinStr = "skinTex"
+                            this.materials.forEach(el => {
+                                if (el != null) {
+                                    el.setTexture("_SkinTexCrossFrom", fromTex);
+                                    el.setTexture("_SkinTex", toTex);
+                                    this._skinTexMeta[1] = this.bones.length;
+                                    this._skinTexMeta[2] = this.player.PlayFrameID;
+                                    this._skinTexMeta[3] = this.player.currentAniclip.frameCount;
+                                    this._skinTexMeta[4] = this.player.crossingPercentage;
+                                    this._skinTexMeta[5] = this.player.crossFromClipFrameId;
+                                    this._skinTexMeta[6] = this.player.crossFromClip.frameCount;
+                                    el.setFloatv("_SkinTexMeta", this._skinTexMeta);
+                                }
+                            })
+                        }
+                    } else {
+                        let tex = this.player.currentAniclip.getFramesDataTex(context, this._mesh.getGUID(), this.bones);
+                        if (tex) {
+                            skinStr = "skinTex"
+                            this.materials.forEach(el => {
+                                if (el != null) {
+                                    el.setTexture("_SkinTex", tex);
+                                    this._skinTexMeta[1] = this.bones.length;
+                                    this._skinTexMeta[2] = this.player.PlayFrameID;
+                                    this._skinTexMeta[3] = this.player.currentAniclip.frameCount;
+                                    this._skinTexMeta[4] = 1;
+                                    el.setFloatv("_SkinTexMeta", this._skinTexMeta);
+                                }
+                            })
+                        }
                     }
                 }
             }

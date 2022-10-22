@@ -32,6 +32,7 @@ namespace m4m.framework {
         private bePlay: boolean = false;
         speed: number = 1.0;
         private beCross: boolean = false;
+        get beCrossing() { return this.beCross }
         private beRevert: boolean = false;
 
         private _playTimer: number = 0;
@@ -40,6 +41,7 @@ namespace m4m.framework {
         private crossTotalTime: number = 0;
         private crossRestTimer: number = 0;
         private crossPercentage: number = 0;
+        get crossingPercentage() { return this.crossPercentage }
 
         private curFrame: Float32Array;
         private lastFrame: { [key: string]: PoseBoneMatrix };
@@ -384,6 +386,8 @@ namespace m4m.framework {
         //private tempPoseMat:PoseBoneMatrix=PoseBoneMatrix.createDefault();
         // private tempPoseMat1:PoseBoneMatrix=PoseBoneMatrix.createDefault();
 
+        crossFromClip: animationClip;
+        crossFromClipFrameId: number
         private recordeLastFrameData() {
             if (this.lastFrame == null) this.lastFrame = {};
             for (let key in this._playClip.bones) {
@@ -394,6 +398,8 @@ namespace m4m.framework {
                 let index = this._playClip.indexDic[bonename];
                 this.lastFrame[bonename].copyFromData(this.curFrame, index * 7 + 1);
             }
+            this.crossFromClip = this.currentAniclip;
+            this.crossFromClipFrameId = this._playFrameid;
         }
 
         private playAniclip(aniclip: animationClip, onPlayEnd: () => void = null, speed: number = 1.0, beRevert: boolean = false) {
