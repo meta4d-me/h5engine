@@ -231,7 +231,7 @@ namespace m4m.framework {
             if (!this.bePlay) return;
             if (this.beCross) {
                 this.crossRestTimer -= delta * this.speed;
-                this.crossPercentage = this.crossRestTimer / this.crossTotalTime;
+                this.crossPercentage = 1.0 - this.crossRestTimer / this.crossTotalTime;
                 if (this.crossRestTimer <= 0) {
                     this.beCross = false;
                 }
@@ -343,13 +343,14 @@ namespace m4m.framework {
             {
                 if (crosstimer > 0 && this.curFrame) {
                     this.recordeLastFrameData();
+                    this.OnClipPlayEnd();
                     this.beCross = true;
                     this.crossTotalTime = crosstimer;
                     this.crossRestTimer = crosstimer;
                 } else {
+                    this.OnClipPlayEnd();
                     this.beCross = false;
                 }
-                this.OnClipPlayEnd();
             }
             this.beActivedEndFrame = false;
             this.playAniclip(clip, onPlayEnd, speed, beRevert);

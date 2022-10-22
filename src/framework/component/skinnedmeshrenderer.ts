@@ -374,7 +374,6 @@ namespace m4m.framework {
         static technicalType: "BONE_ARR" | "BONE_TEXTURE" = "BONE_ARR";
         /**使用骨骼数据数组还是骨骼贴图 ,初始化读取默认类型数值*/
         technicalType: "BONE_ARR" | "BONE_TEXTURE";
-        private _boneTex: boneMatricesTexture;
         update(delta: number) {
             // if (this._skeletonMatrixData == null)
             // {
@@ -397,8 +396,6 @@ namespace m4m.framework {
             }
 
         }
-        //beCross=0,boneCount,frameId,frameCount
-        //beCross=1,boneCount,fromFrameId,fromFrameCount,toFrameId,toFrameCount
         private _skinTexMeta = new Float32Array(6);
         render(context: renderContext, assetmgr: assetMgr, camera: m4m.framework.camera) {
             DrawCallInfo.inc.currentState = DrawCallEnum.SKinrender;
@@ -418,13 +415,13 @@ namespace m4m.framework {
                                 if (el != null) {
                                     el.setTexture("_SkinTexCrossFrom", fromTex);
                                     el.setTexture("_SkinTex", toTex);
-                                    this._skinTexMeta[1] = this.bones.length;
-                                    this._skinTexMeta[2] = this.player.PlayFrameID;
-                                    this._skinTexMeta[3] = this.player.currentAniclip.frameCount;
-                                    this._skinTexMeta[4] = this.player.crossingPercentage;
-                                    this._skinTexMeta[5] = this.player.crossFromClipFrameId;
-                                    this._skinTexMeta[6] = this.player.crossFromClip.frameCount;
-                                    el.setFloatv("_SkinTexMeta", this._skinTexMeta);
+                                    this._skinTexMeta[0] = this.bones.length;
+                                    this._skinTexMeta[1] = this.player.PlayFrameID;
+                                    this._skinTexMeta[2] = this.player.currentAniclip.frameCount;
+                                    this._skinTexMeta[3] = this.player.crossingPercentage;
+                                    this._skinTexMeta[4] = this.player.crossFromClipFrameId;
+                                    this._skinTexMeta[5] = this.player.crossFromClip.frameCount;
+                                    el.setFloatv("_SkinTexMeta", this._skinTexMeta, true);
                                 }
                             })
                         }
@@ -435,11 +432,11 @@ namespace m4m.framework {
                             this.materials.forEach(el => {
                                 if (el != null) {
                                     el.setTexture("_SkinTex", tex);
-                                    this._skinTexMeta[1] = this.bones.length;
-                                    this._skinTexMeta[2] = this.player.PlayFrameID;
-                                    this._skinTexMeta[3] = this.player.currentAniclip.frameCount;
-                                    this._skinTexMeta[4] = 1;
-                                    el.setFloatv("_SkinTexMeta", this._skinTexMeta);
+                                    this._skinTexMeta[0] = this.bones.length;
+                                    this._skinTexMeta[1] = this.player.PlayFrameID;
+                                    this._skinTexMeta[2] = this.player.currentAniclip.frameCount;
+                                    this._skinTexMeta[3] = 1.0;
+                                    el.setFloatv("_SkinTexMeta", this._skinTexMeta, true);
                                 }
                             })
                         }
@@ -486,34 +483,5 @@ namespace m4m.framework {
 
         }
     }
-    export class boneMatricesTexture {
-        private static texID = 0;
-        private _tex: m4m.framework.texture;
-        get tex() { return this._tex }
-        updateTexture(context: renderContext, boneMatrix: Float32Array) {
-            let ctx: WebGL2RenderingContext = context.webgl;
-            if (!this.tex) {
-                this._tex = new m4m.framework.texture(`bone_matrices_${boneMatricesTexture.texID++}`);
-                this._tex.glTexture = new m4m.render.glTexture2D(ctx, render.TextureFormatEnum.FLOAT32, false, false) as m4m.render.glTexture2D;
-                this._tex.glTexture.width = boneMatrix.length / 4;
-                this._tex.glTexture.height = 1;
-                this._tex.use();
-            }
-            (this._tex.glTexture as m4m.render.glTexture2D).uploadByteArray(
-                false,
-                false,
-                boneMatrix.length / 4,
-                1,
-                boneMatrix,
-                false,
-                false,
-                false,
-                false,
-                false,
-                ctx.FLOAT
-            );
-        }
-    }
-
 }
 

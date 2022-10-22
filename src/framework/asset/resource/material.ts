@@ -447,8 +447,8 @@ namespace m4m.framework {
         /**
          * @private
          */
-        setFloatv(_id: string, _numbers: Float32Array) {
-            if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Floatv) {
+        setFloatv(_id: string, _numbers: Float32Array, force: boolean = false) {
+            if (force || this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Floatv) {
                 this.statedMapUniforms[_id] = _numbers;
                 this.uniformDirtyMap[_id] = true;
             } else {

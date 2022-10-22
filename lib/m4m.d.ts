@@ -7102,7 +7102,6 @@ declare namespace m4m.framework {
         static technicalType: "BONE_ARR" | "BONE_TEXTURE";
         /**使用骨骼数据数组还是骨骼贴图 ,初始化读取默认类型数值*/
         technicalType: "BONE_ARR" | "BONE_TEXTURE";
-        private _boneTex;
         update(delta: number): void;
         private _skinTexMeta;
         render(context: renderContext, assetmgr: assetMgr, camera: m4m.framework.camera): void;
@@ -7114,12 +7113,6 @@ declare namespace m4m.framework {
          * @private
          */
         clone(): void;
-    }
-    class boneMatricesTexture {
-        private static texID;
-        private _tex;
-        get tex(): texture;
-        updateTexture(context: renderContext, boneMatrix: Float32Array): void;
     }
 }
 declare namespace m4m.framework {
@@ -7457,7 +7450,7 @@ declare namespace m4m.framework {
         /**
          * @private
          */
-        setFloatv(_id: string, _numbers: Float32Array): void;
+        setFloatv(_id: string, _numbers: Float32Array, force?: boolean): void;
         /**
          * @private
          */
@@ -8558,6 +8551,7 @@ declare namespace m4m.framework {
         private bePlay;
         speed: number;
         private beCross;
+        get beCrossing(): boolean;
         private beRevert;
         private _playTimer;
         private _playFrameid;
@@ -8565,6 +8559,7 @@ declare namespace m4m.framework {
         private crossTotalTime;
         private crossRestTimer;
         private crossPercentage;
+        get crossingPercentage(): number;
         private curFrame;
         private lastFrame;
         private carelist;
@@ -8638,6 +8633,8 @@ declare namespace m4m.framework {
         private beActivedEndFrame;
         private endFrame;
         playToXFrame(animName: string, endframe: number, crosstimer?: number, onPlayEnd?: () => void, speed?: number): void;
+        crossFromClip: animationClip;
+        crossFromClipFrameId: number;
         private recordeLastFrameData;
         private playAniclip;
         /**
