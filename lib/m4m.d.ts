@@ -22839,5 +22839,40 @@ declare namespace m4m.render {
         dispose(webgl: WebGL2RenderingContext): void;
         caclByteLength(): number;
     }
+    /**
+     * 视频纹理
+     */
+    class videoTexture implements ITexture {
+        private _video;
+        private _needUpdateVideo;
+        texture: WebGLTexture;
+        width: number;
+        height: number;
+        premultiply: boolean;
+        flipY: boolean;
+        mipmap: boolean;
+        linear: boolean;
+        repeat: boolean;
+        mirroredU: boolean;
+        mirroredV: boolean;
+        constructor(video: HTMLVideoElement);
+        /** 视频对象 */
+        get video(): HTMLVideoElement;
+        /**
+         * 应用webgl纹理属性
+         */
+        applyProperty(): void;
+        isFrameBuffer(): boolean;
+        dispose(webgl: WebGL2RenderingContext): void;
+        caclByteLength(): number;
+        /** 开启 视频到纹理的更新循环 */
+        loopVideoToTexture(): void;
+        /** 更新 视频帧 到纹理 , */
+        private updateVideo;
+        /**
+         * 更新纹理
+         */
+        private refreshTexture;
+    }
 }
 //# sourceMappingURL=m4m.d.ts.map
