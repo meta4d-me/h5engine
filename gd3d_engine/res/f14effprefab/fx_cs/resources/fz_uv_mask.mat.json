@@ -1,1 +1,0 @@
-{"shader":"particle_mask_add_tint.shader.json","srcshader":"Gd3d/particle_mask_add_tint","queue":0,"mapUniform":{"_Main_Tex":{"type":0,"value":"grad01_14iv.imgdesc.json"},"_Main_Color":{"type":3,"value":"(1,1,1,1)"},"_Mask":{"type":0,"value":"fz_sj1.imgdesc.json"},"_mixColorRate":{"type":1,"value":1.5},"_mixAlphaRate":{"type":1,"value":1}}}

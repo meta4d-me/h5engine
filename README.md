@@ -1,34 +1,54 @@
-#engine
-2017 02 01
-重构，将数学库移出核心层
-将原来的数学库打散，将对象池 和 数据结构放在渲染层
-计算函数库则上移到框架层
+# M4M
+M4M 是一个基于HTML5 技术栈的，多平台3D 游戏引擎库。
 
-核心层只放置足够“核心”的内容，以后还会考虑直接把核心层和jsloader整合，作为启动必不可少的部分
-
-由上自下的分层
-1.应用层&工具层
-//非引擎内容，这个项目中不包含
-二、框架层  完成30%
-提供给应用层工具层使用的功能
-以模块为单位提供
-1.场景管理   有效组织透明、半透明的绘制，分层绘制，pick查询，碰撞查询
-   
-2.效果框架   解决多个view的配合，3d 2d混合，后处理效果的连接
-			 实现post effect 类型的效果的基础
-			 解决shader 面对不同效果的配合问题
-3.逻辑框架   User Code 组织方法，对象组件模型
-	         组件Factory，inspector模型，适合编辑器的方式组织
-4.预制模块	 不可描述，先把
-	
-
-三、渲染层
-弥补webgl未尽的工作
-webgl api设计太不友好，
-渲染层其实是重新整理webgl api，好让框架层在使用时概念清晰严格
-
-渲染层功能已全部完成，框架层使用发现bug或功能不足的时候，倒回来再增加例子调试
-四、核心层
-最底层的一些功能，加载
-
-
+### 特性
+- unity场景模型资源导出
+- 资源 unity场景模型导出
+- 资源 gltf 模型
+- 资源 基本纹理 ".png" ".jpg"
+- 资源 压缩纹理 "ASTC" "ETC" "PVR" 
+- 资源 hdr纹理 ".hdr" ".raw"
+- 资源 图集
+- 3D 骨骼动画
+- 3D 节点关键帧动画
+- 3D 特效系统
+- 3D 物理系统（oimo.js、cannon.js）
+- 3D 空间UI容器
+- 场景 环境 灯光、雾效
+- 场景 pick功能 
+- 场景 gameObject + component 管理模式
+- 场景 相机功能
+- 场景 导航寻路网格
+- 自定义游戏组件脚本 behavior
+- 自定义编辑shader
+- 渲染 静态模型
+- 渲染 动态蒙皮模型
+- 渲染 模型Lightmap
+- 渲染 全屏后处理
+- 渲染 PBR材质
+- 渲染 Instance绘制
+- 渲染 UI图片
+- 渲染 UI SDF模式字体绘制
+- 渲染 UI绘制矩形区域裁剪
+- 键盘鼠标input
+- 2D UI组件 "图片" "按钮" "文本框" "滑动框" "文本输入框"
+- 2D UI事件系统
+- 2D spine骨骼动画
+- 2D 物理系统（matter.js）
+- 音频系统
+- 完善的数学库
+- 二进制读写工具
+### 目录结构
+* enginesource
+* &emsp;|---src&emsp;//引擎源码
+* &emsp;|---lib&emsp;//引擎编译发布
+* &emsp;|---examples&emsp;//样例
+* &emsp;&emsp;|---engineExample&emsp;(git submodule)&emsp;//引擎样例
+* &emsp;&emsp;&emsp;|---code&emsp;//引擎样例源码
+* &emsp;&emsp;&emsp;|---exampleResource&emsp;(git submodule)&emsp;//样例资源
+* &emsp;&emsp;&emsp;|---lib&emsp;//样例lib
+* &emsp;&emsp;|---wasmBoy&emsp;(git submodule)&emsp;//gameboy pbr渲染 + GB模拟器
+* &emsp;|---docs&emsp;(git submodule)&emsp;//引擎文档
+* &emsp;&emsp;|---APIDoc&emsp;//引擎API文档
+* &emsp;&emsp;|---tools&emsp;//引擎文档工具
+* &emsp;&emsp;&emsp;|---typeDoc&emsp;//API文档生成工具typedoc

@@ -1,1 +1,0 @@
-node api/tscdoc.js --path ../../launcher/proj_sample/scene_test/gd3d --output ../../launcher/apidocdata/data/ --dependence api/test/classes/EgretTest/libs
