@@ -2995,6 +2995,7 @@ declare namespace m4m.framework {
          */
         get fontsize(): number;
         set fontsize(size: number);
+        private _linespace;
         /**
          * @public
          * @language zh_CN
@@ -3002,7 +3003,9 @@ declare namespace m4m.framework {
          * 行高
          * @version m4m 1.0
          */
-        linespace: number;
+        get linespace(): number;
+        set linespace(val: number);
+        private _horizontalType;
         /**
          * @public
          * @language zh_CN
@@ -3010,7 +3013,9 @@ declare namespace m4m.framework {
          * 水平排列方式
          * @version m4m 1.0
          */
-        horizontalType: HorizontalType;
+        get horizontalType(): number;
+        set horizontalType(val: number);
+        private _verticalType;
         /**
          * @public
          * @language zh_CN
@@ -3018,7 +3023,9 @@ declare namespace m4m.framework {
          * 垂直排列方式
          * @version m4m 1.0
          */
-        verticalType: VerticalType;
+        get verticalType(): number;
+        set verticalType(val: number);
+        private _horizontalOverflow;
         /**
          * @public
          * @language zh_CN
@@ -3026,7 +3033,9 @@ declare namespace m4m.framework {
          * 是否横向溢出
          * @version m4m 1.0
          */
-        horizontalOverflow: boolean;
+        get horizontalOverflow(): boolean;
+        set horizontalOverflow(val: boolean);
+        private _verticalOverflow;
         /**
          * @public
          * @language zh_CN
@@ -3034,7 +3043,8 @@ declare namespace m4m.framework {
          * 是否竖向溢出
          * @version m4m 1.0
          */
-        verticalOverflow: boolean;
+        get verticalOverflow(): boolean;
+        set verticalOverflow(val: boolean);
         private lastStr;
         /** 检查文字,是否需要 动态添加 */
         private chackText;
@@ -3060,6 +3070,7 @@ declare namespace m4m.framework {
         private datar;
         /** 字符图 顶点数据 */
         private imgDatar;
+        private _color;
         /**
          * @public
          * @language zh_CN
@@ -3067,7 +3078,9 @@ declare namespace m4m.framework {
          * 填充颜色
          * @version m4m 1.0
          */
-        color: math.color;
+        get color(): math.color;
+        set color(val: math.color);
+        private _color2;
         /**
          * @public
          * @language zh_CN
@@ -3075,11 +3088,14 @@ declare namespace m4m.framework {
          * 描边颜色
          * @version m4m 1.0
          */
-        color2: math.color;
+        get color2(): math.color;
+        set color2(val: math.color);
+        private _outlineWidth;
         /**
          * 描边宽度
          */
-        outlineWidth: number;
+        get outlineWidth(): number;
+        set outlineWidth(val: number);
         private _richText;
         /**
          * 富文本模式 , 通过特定标签使用。
@@ -3105,7 +3121,7 @@ declare namespace m4m.framework {
         /** 纯文本默认 块列表 */
         private _defTextBlocks;
         /**富文本 脏标记  */
-        private _richDrity;
+        private _drityRich;
         private _CustomShaderName;
         /**
          * @public
@@ -3145,7 +3161,7 @@ declare namespace m4m.framework {
          */
         private _imgUIMat;
         private get imgUIMat();
-        private dirtyData;
+        private _dirtyData;
         /**
          * @private
          */
@@ -13061,6 +13077,7 @@ declare namespace m4m.math {
     function scaleToRef(src: color, scale: number, out: color): void;
     function colorClone(src: color, out: color): void;
     function colorLerp(srca: color, srcb: color, t: number, out: color): void;
+    function colorEqual(c: color, c1: color, threshold?: number): boolean;
     /**
      * 颜色转成 CSS 格式
      * @param src
