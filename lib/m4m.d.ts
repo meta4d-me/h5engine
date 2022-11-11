@@ -13267,6 +13267,7 @@ declare namespace m4m.math {
     function vec4ScaleByNum(from: m4m.math.vector4, scale: number, out: m4m.math.vector4): void;
     function vec4SetAll(vector: vector4, value: number): void;
     function vec4Set(vector: vector4, x: number, y: number, z: number, w: number): void;
+    function vec4Equal(vector: vector4, vector2: vector4, threshold?: number): boolean;
 }
 declare namespace m4m.framework {
     class navVec3 {

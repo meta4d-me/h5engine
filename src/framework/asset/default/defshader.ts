@@ -324,15 +324,16 @@ namespace m4m.framework {
             precision mediump float;
 
             uniform sampler2D _MainTex;
+            uniform vec4 _MainColor;
             uniform lowp float _AlphaCut;
             in highp vec2 xlv_TEXCOORD0;
             out vec4 color;
             void main()
             {
-                lowp vec4 tmpvar_3 = texture(_MainTex, xlv_TEXCOORD0);
-                if(tmpvar_3.a < _AlphaCut)
+                lowp vec4 _color = texture(_MainTex, xlv_TEXCOORD0) * _MainColor;
+                if(_color.a < _AlphaCut)
                     discard;
-                color = tmpvar_3;
+                color = _color;
             }
         `;
 
@@ -652,6 +653,20 @@ namespace m4m.framework {
                 p.state_zwrite = false;
                 p.state_ztest_method = render.webglkit.LEQUAL;
                 p.setAlphaBlend(render.BlendModeEnum.Blend);
+                assetmgr.mapShader[sh.getName()] = sh;
+            }
+            {
+                var sh = new shader("shader/ulit");
+                sh.defaultAsset = true;
+                sh.passes["base"] = [];
+                var p = new render.glDrawPass();
+                sh.passes["base"].push(p);
+                p.setProgram(programdiffuse);
+                sh.fillUnDefUniform(p);
+                p.state_ztest = true;
+                p.state_zwrite = true;
+                p.state_showface = render.ShowFaceStateEnum.ALL;
+                sh.layer = RenderLayerEnum.Common;
                 assetmgr.mapShader[sh.getName()] = sh;
             }
         }

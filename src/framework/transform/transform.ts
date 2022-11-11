@@ -1,6 +1,5 @@
 /// <reference path="../../io/reflect.ts" />
-namespace m4m.framework
-{
+namespace m4m.framework {
     /**
      * @public
      * @language zh_CN
@@ -8,8 +7,7 @@ namespace m4m.framework
      * @version m4m 1.0
      */
     @m4m.reflect.SerializeType
-    export class transform
-    {
+    export class transform {
         private static readonly help_v3 = new m4m.math.vector3();
 
         static readonly ClassName: string = "transform";
@@ -34,31 +32,30 @@ namespace m4m.framework
         // /**子对象是否有组件  */
         // hasComponentChild: boolean = false; 
         /** 自己是否有渲染器组件 */
-        hasRendererComp: boolean = false; 
+        hasRendererComp: boolean = false;
         /** 子对象是否有渲染器组件 */
-        hasRendererCompChild: boolean = false; 
+        hasRendererCompChild: boolean = false;
         /**自己是否有需要update方法的组件 */
-        hasUpdateComp: boolean = false; 
+        hasUpdateComp: boolean = false;
         /**子对象是否有需要update方法的组件 */
-        hasUpdateCompChild: boolean = false; 
+        hasUpdateCompChild: boolean = false;
         /**自己是否有需要init方法的组件 */
-        hasInitComp: boolean = false; 
+        hasInitComp: boolean = false;
         /**子对象是否有需要init方法的组件 */
-        hasInitCompChild: boolean = false; 
+        hasInitCompChild: boolean = false;
         /**自己是否有需要OnPlay方法的组件 */
-        hasOnPlayComp: boolean = false; 
+        hasOnPlayComp: boolean = false;
         /**子对象是否有需要OnPlay方法的组件 */
-        hasOnPlayCompChild: boolean = false; 
+        hasOnPlayCompChild: boolean = false;
 
         /** 需要每帧调用组件update , 设置为false 该节点以及子节点都会跳过update 函数的调用（减少消耗）*/
-        needUpdate : boolean = true;
+        needUpdate: boolean = true;
         /** 需要每帧筛查FillRenderer , 设置为false 该节点以及子节点都会跳过FillRenderer 函数的调用（减少消耗）*/
-        needFillRenderer : boolean = true;
+        needFillRenderer: boolean = true;
         /** 需要gpuInstanceBatcher 模式渲染 (减少渲染消耗 , 仅适合静态物)*/
-        needGpuInstancBatcher : boolean = false;
+        needGpuInstancBatcher: boolean = false;
 
-        private checkLRTSChange(): boolean
-        {
+        private checkLRTSChange(): boolean {
             if (!this.fastEqual(this.helpLPos, this._localTranslate))
                 return true;
             if (!this.fastEqual(this.helpLRotate, this._localRotate))
@@ -68,8 +65,7 @@ namespace m4m.framework
             return false;
         }
 
-        private fastEqual(d_0, d_1): boolean
-        {
+        private fastEqual(d_0, d_1): boolean {
             if (d_0.x != d_1.x) return false;
             if (d_0.y != d_1.y) return false;
             if (d_0.z != d_1.z) return false;
@@ -92,8 +88,7 @@ namespace m4m.framework
          * @param value 场景实例
          * @version m4m 1.0
          */
-        public set scene(value: scene)
-        {
+        public set scene(value: scene) {
             this._scene = value;
         }
 
@@ -104,10 +99,8 @@ namespace m4m.framework
          * 获取所在场景
          * @version m4m 1.0
          */
-        public get scene(): scene
-        {
-            if (this._scene == null)
-            {
+        public get scene(): scene {
+            if (this._scene == null) {
                 if (this._parent == null)
                     return null;
                 this._scene = this._parent.scene;
@@ -146,16 +139,14 @@ namespace m4m.framework
         /**
          * [过时接口,完全弃用]
          */
-        updateWorldTran()
-        {
+        updateWorldTran() {
         }
 
         /**
          * [过时接口,完全弃用]
          * @param bool
          */
-        updateTran(bool: boolean)
-        {
+        updateTran(bool: boolean) {
 
         }
 
@@ -203,15 +194,12 @@ namespace m4m.framework
          * 自己的aabb
          * @version m4m 1.0
          */
-        get aabb()
-        {
+        get aabb() {
 
-            if (!this._aabb)
-            {
+            if (!this._aabb) {
                 this._aabb = this._buildAABB();
             }
-            if (this._dirtyAABB)
-            {
+            if (this._dirtyAABB) {
                 this._aabb.update(this.getWorldMatrix());
                 this._dirtyAABB = false;
             }
@@ -279,49 +267,40 @@ namespace m4m.framework
         * 构建aabb
         * @version m4m 1.0
         */
-        private _buildAABB(): aabb
-        {
+        private _buildAABB(): aabb {
             let minimum = new math.vector3();
             let maximum = new math.vector3();
             let _types = transform.aabbCareTypes;
             let len = _types.length;
             let matched = false;
-            for (var i = 0; i < len; i++)
-            {
+            for (var i = 0; i < len; i++) {
                 let t = _types[i];
-                switch (t)
-                {
+                switch (t) {
                     case meshFilter.ClassName:
                         var filter = this.gameObject.getComponent("meshFilter") as meshFilter;
 
-                        if (filter != null && filter.mesh != null)
-                        {
+                        if (filter != null && filter.mesh != null) {
                             let m = filter.mesh;
-                            if (m.maximun && m.minimun)
-                            {
+                            if (m.maximun && m.minimun) {
                                 //mesh上自带 min max
                                 minimum = m.minimun;
                                 maximum = m.maximun;
                                 matched = true;
-                            } else if (filter.mesh.data != null && filter.mesh.data.pos != null)
-                            {
+                            } else if (filter.mesh.data != null && filter.mesh.data.pos != null) {
                                 let id = m.getGUID();
                                 let min_max_v3 = transform.aabbStoreMap[id]; //优化 每次实例化都需构建
-                                if (min_max_v3)
-                                {
+                                if (min_max_v3) {
                                     //取缓存数据
                                     minimum = min_max_v3[0];
                                     maximum = min_max_v3[1];
-                                } else
-                                {
+                                } else {
                                     //根据 mesh 顶点数据生成
                                     var meshdata: m4m.render.meshData = m.data;
                                     math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
                                     math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
                                     let len = meshdata.pos.length;
                                     let pos = meshdata.pos;
-                                    for (var i = 0; i < len; i++)
-                                    {
+                                    for (var i = 0; i < len; i++) {
                                         math.vec3Max(pos[i], maximum, maximum);
                                         math.vec3Min(pos[i], minimum, minimum);
                                     }
@@ -337,24 +316,19 @@ namespace m4m.framework
                         break;
                     case skinnedMeshRenderer.ClassName:
                         var skinmesh = this.gameObject.getComponent("skinnedMeshRenderer") as m4m.framework.skinnedMeshRenderer;
-                        if (filter != null && filter.mesh != null)
-                        {
+                        if (filter != null && filter.mesh != null) {
                             let m = skinmesh.mesh;
-                            if (m.maximun && m.minimun)
-                            {
+                            if (m.maximun && m.minimun) {
                                 minimum = m.minimun;
                                 maximum = m.maximun;
                                 matched = true;
-                            } else if (skinmesh.mesh.data != null && skinmesh.mesh.data.pos != null)
-                            {
+                            } else if (skinmesh.mesh.data != null && skinmesh.mesh.data.pos != null) {
                                 let id = m.getGUID();
                                 let min_max_v3 = transform.aabbStoreMap[id]; //优化 每次实例化都需构建
-                                if (min_max_v3)
-                                {
+                                if (min_max_v3) {
                                     minimum = min_max_v3[0];
                                     maximum = min_max_v3[1];
-                                } else
-                                {
+                                } else {
                                     // NOTE: 如果当前物体有骨骼动画, 则不会使用这里的aabb进行剔除
                                     var skinmeshdata: m4m.render.meshData = skinmesh.mesh.data;
                                     math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
@@ -363,8 +337,7 @@ namespace m4m.framework
                                     var p0 = m4m.math.pool.new_vector3();
 
                                     let len = skinmeshdata.pos.length;
-                                    for (var i = 0; i < len; i++)
-                                    {
+                                    for (var i = 0; i < len; i++) {
                                         skinmesh.calActualVertexByIndex(i, p0);
                                         math.vec3Max(p0, maximum, maximum);
                                         math.vec3Min(p0, minimum, minimum);
@@ -379,21 +352,9 @@ namespace m4m.framework
                         break;
                     case canvasRenderer.ClassName:
                         var canvasR = this.gameObject.getComponent("canvasRenderer") as m4m.framework.canvasRenderer;
-                        if (canvasR && canvasR.canvas)
-                        {
-                            var cvs = canvasR.canvas;
-                            var cPos = transform.helpv2;
-                            m4m.math.vec2Set(cPos, 0, 0);
-                            var wPos_0 = transform.helpv3;
-                            canvasR.calCanvasPosToWorldPos(cPos, wPos_0);
-
-                            var wPos_1 = transform.helpv3_1;
-                            m4m.math.vec2Set(cPos, cvs.pixelWidth, cvs.pixelHeight);
-                            canvasR.calCanvasPosToWorldPos(cPos, wPos_1);
-
-                            m4m.math.vec3Min(wPos_0, wPos_1, minimum);
-                            m4m.math.vec3Max(wPos_0, wPos_1, maximum);
-
+                        if (canvasR && canvasR.canvas) {
+                            m4m.math.vec3Set(minimum, -1, -1, 0);
+                            m4m.math.vec3Set(maximum, 1, 1, 0);
                             matched = true;
                         }
 
@@ -403,8 +364,7 @@ namespace m4m.framework
                 if (matched) break;
             }
 
-            if (!matched)
-            {
+            if (!matched) {
                 minimum.x = minimum.y = minimum.z = -1;
                 maximum.x = maximum.y = maximum.z = 1;
             }
@@ -440,12 +400,10 @@ namespace m4m.framework
          * 物理代理对象
          * @version m4m 1.0
          */
-        get physicsImpostor()
-        {
+        get physicsImpostor() {
             return this._physicsImpostor;
         }
-        set physicsImpostor(physicsImp: PhysicsImpostor)
-        {
+        set physicsImpostor(physicsImp: PhysicsImpostor) {
             this._physicsImpostor = physicsImp;
         }
 
@@ -457,8 +415,7 @@ namespace m4m.framework
          * @version m4m 1.0
          */
         private _parent: transform;
-        get parent()
-        {
+        get parent() {
             return this._parent;
         }
 
@@ -498,8 +455,7 @@ namespace m4m.framework
          * @param node 子物体实例
          * @version m4m 1.0
          */
-        addChild(node: transform)
-        {
+        addChild(node: transform) {
             this.addChildAt(node, this.children.length);
         }
 
@@ -512,18 +468,15 @@ namespace m4m.framework
          * @param index 索引位置
          * @version m4m 1.0
          */
-        addChildAt(node: transform, index: number)
-        {
+        addChildAt(node: transform, index: number) {
             if (index < 0)
                 return;
-            if (!node)
-            {
+            if (!node) {
                 console.error(`node is null?? ${this.name}`);
                 console.error(new Error().stack);
                 return;
             }
-            if (node._parent != null)
-            {
+            if (node._parent != null) {
                 node._parent.removeChild(node);
             }
             if (this.children == null)
@@ -539,13 +492,13 @@ namespace m4m.framework
             if (node.hasRendererComp || node.hasRendererCompChild)
                 node.markHaveRendererComp(node.hasRendererComp);
 
-            if(node.hasUpdateComp || node.hasUpdateCompChild)
+            if (node.hasUpdateComp || node.hasUpdateCompChild)
                 node.markHaveUpdateComp(node.hasUpdateComp);
-            
-            if(node.hasInitComp || node.hasInitCompChild )
+
+            if (node.hasInitComp || node.hasInitCompChild)
                 node.markHaveInitComp(node.hasInitComp);
 
-            if(node.hasOnPlayComp || node.hasOnPlayCompChild)
+            if (node.hasOnPlayComp || node.hasOnPlayCompChild)
                 node.markHaveOnplayComp(node.hasOnPlayComp);
 
 
@@ -559,11 +512,9 @@ namespace m4m.framework
          * 移除所有子物体
          * @version m4m 1.0
          */
-        removeAllChild(needDispose: boolean = false)
-        {
+        removeAllChild(needDispose: boolean = false) {
             if (this.children == undefined) return;
-            while (this.children.length > 0)
-            {
+            while (this.children.length > 0) {
                 if (needDispose)
                     this.children[0].dispose();
                 else
@@ -579,22 +530,19 @@ namespace m4m.framework
          * @param node 子物体实例
          * @version m4m 1.0
          */
-        removeChild(node: transform)
-        {
-            if (node._parent != this || this.children == null || this.children.length < 1)
-            {
+        removeChild(node: transform) {
+            if (node._parent != this || this.children == null || this.children.length < 1) {
                 console.warn("not my child.");
                 return;
             }
             var i = this.children.indexOf(node);
-            if (i >= 0)
-            {
+            if (i >= 0) {
                 this.children.splice(i, 1);
                 sceneMgr.app.markNotify(node, NotifyType.RemoveChild);
                 node._parent = null;
             }
 
-            if(this.children.length < 1){
+            if (this.children.length < 1) {
                 // this.hasComponentChild = false;
                 this.hasInitCompChild = false;
                 this.hasOnPlayCompChild = false;
@@ -610,21 +558,16 @@ namespace m4m.framework
          * @param name
          * @version m4m 1.0
          */
-        find(name: string): transform
-        {
+        find(name: string): transform {
             if (this.name == name)
                 return this;
-            else
-            {
-                if (this.children != undefined)
-                {
-                    for (let i in this.children)
-                    {
+            else {
+                if (this.children != undefined) {
+                    for (let i in this.children) {
                         let res = this.children[i].find(name);
                         if (res != null)
                             return res;
-                        else
-                        {
+                        else {
                             continue;
                         }
                     }
@@ -641,8 +584,7 @@ namespace m4m.framework
          * @param tran 指定的transform
          * @version m4m 1.0
          */
-        checkImpactTran(tran: transform): boolean
-        {
+        checkImpactTran(tran: transform): boolean {
             if (this.gameObject.collider == null) return false;
             return this.gameObject.collider.intersectsTransform(tran);
         }
@@ -655,26 +597,20 @@ namespace m4m.framework
          * 返回场景中所有与当前tranform碰撞的transform
          * @version m4m 1.0
          */
-        checkImpact(): Array<transform>
-        {
+        checkImpact(): Array<transform> {
             var trans: Array<transform> = new Array<transform>();
             this.doImpact(this.scene.getRoot(), trans);
             return trans;
         }
-        private doImpact(tran: transform, impacted: Array<transform>)
-        {
+        private doImpact(tran: transform, impacted: Array<transform>) {
             if (tran == this) return;
-            if (tran.gameObject != null && tran.gameObject.collider != null)
-            {
-                if (this.checkImpactTran(tran))
-                {
+            if (tran.gameObject != null && tran.gameObject.collider != null) {
+                if (this.checkImpactTran(tran)) {
                     impacted.push(tran);
                 }
             }
-            if (tran.children != null)
-            {
-                for (var i = 0; i < tran.children.length; i++)
-                {
+            if (tran.children != null) {
+                for (var i = 0; i < tran.children.length; i++) {
                     this.doImpact(tran.children[i], impacted);
                 }
             }
@@ -683,27 +619,21 @@ namespace m4m.framework
         private dirtyLocal: boolean = false;
         private dirtyWorld: boolean = false;
 
-        private dirtify(local = false)
-        {
+        private dirtify(local = false) {
             this.dirtiedOfFrustumCulling = true;
-            if ((!local || (local && this.dirtyLocal)) && this.dirtyWorld)
-            {
+            if ((!local || (local && this.dirtyLocal)) && this.dirtyWorld) {
                 return;
             }
 
-            if (local)
-            {
+            if (local) {
                 this.dirtyLocal = true;
             }
 
-            if (!this.dirtyWorld)
-            {
+            if (!this.dirtyWorld) {
                 this.dirtyWorld = true;
                 let i = this.children.length;
-                while (i--)
-                {
-                    if (this.children[i].dirtyWorld)
-                    {
+                while (i--) {
+                    if (this.children[i].dirtyWorld) {
                         continue;
                     }
                     this.children[i].dirtify();
@@ -716,10 +646,8 @@ namespace m4m.framework
         }
 
         //同步自己的 W 、L 矩阵
-        private sync()
-        {
-            if (this.dirtyLocal)
-            {
+        private sync() {
+            if (this.dirtyLocal) {
                 math.matrixMakeTransformRTS(this._localTranslate, this._localScale, this._localRotate, this.localMatrix);
                 math.vec3Clone(this._localTranslate, this.helpLPos);
                 math.vec3Clone(this._localScale, this.helpLScale);
@@ -727,13 +655,10 @@ namespace m4m.framework
                 this.dirtyLocal = false;
             }
 
-            if (this.dirtyWorld)
-            {
-                if (!this._parent)
-                {
+            if (this.dirtyWorld) {
+                if (!this._parent) {
                     math.matrixClone(this.localMatrix, this.worldMatrix);
-                } else
-                {
+                } else {
                     math.matrixMultiply(this._parent.worldMatrix, this.localMatrix, this.worldMatrix);
                 }
 
@@ -748,8 +673,7 @@ namespace m4m.framework
          * [ 过时接口,现不需要标记变化]
          * @version m4m 1.0
          */
-        markDirty()
-        {
+        markDirty() {
             // this.dirty = true;
             // var p = this._parent;
             // while (p != null)
@@ -768,44 +692,37 @@ namespace m4m.framework
         //         p = p._parent;
         //     }
         // }
-        markHaveRendererComp(selfHas = true)
-        {
+        markHaveRendererComp(selfHas = true) {
             this.hasRendererComp = this.hasRendererComp || selfHas;
             var p = this._parent;
-            while (p != null)
-            {
+            while (p != null) {
                 p.hasRendererCompChild = true;
                 p = p._parent;
             }
         }
 
-        markHaveUpdateComp(selfHas = true)
-        {
+        markHaveUpdateComp(selfHas = true) {
             this.hasUpdateComp = this.hasUpdateComp || selfHas;
             var p = this._parent;
-            while (p != null)
-            {
+            while (p != null) {
                 p.hasUpdateCompChild = true;
                 p = p._parent;
             }
         }
 
-        markHaveInitComp(selfHas = true)
-        {
+        markHaveInitComp(selfHas = true) {
             this.hasInitComp = this.hasInitComp || selfHas;
             var p = this._parent;
-            while (p != null && !p.hasInitCompChild)
-            {
+            while (p != null && !p.hasInitCompChild) {
                 p.hasInitCompChild = true;
                 p = p._parent;
             }
         }
 
-        markHaveOnplayComp(selfHas = true){
+        markHaveOnplayComp(selfHas = true) {
             this.hasOnPlayComp = this.hasOnPlayComp || selfHas;
             var p = this._parent;
-            while (p != null && !p.hasOnPlayCompChild)
-            {
+            while (p != null && !p.hasOnPlayCompChild) {
                 p.hasOnPlayCompChild = true;
                 p = p._parent;
             }
@@ -834,7 +751,7 @@ namespace m4m.framework
         //     }
         // }
 
-   
+
 
         private _localRotate: math.quaternion = new math.quaternion();
         /**
@@ -845,15 +762,12 @@ namespace m4m.framework
          * @version m4m 1.0
          */
         @m4m.reflect.Field("quaternion")
-        get localRotate()
-        {
+        get localRotate() {
             return this._localRotate;
         }
-        set localRotate(rotate: math.quaternion)
-        {
+        set localRotate(rotate: math.quaternion) {
             math.quatClone(rotate, this._localRotate);
-            if (!this.dirtyLocal)
-            {
+            if (!this.dirtyLocal) {
                 this.dirtify(true);
             }
         }
@@ -867,15 +781,12 @@ namespace m4m.framework
          * @version m4m 1.0
          */
         @m4m.reflect.Field("vector3")
-        get localTranslate()
-        {
+        get localTranslate() {
             return this._localTranslate;
         }
-        set localTranslate(position: math.vector3)
-        {
+        set localTranslate(position: math.vector3) {
             math.vec3Clone(position, this._localTranslate);
-            if (!this.dirtyLocal)
-            {
+            if (!this.dirtyLocal) {
                 this.dirtify(true);
             }
         }
@@ -887,15 +798,12 @@ namespace m4m.framework
         * 本地位移
         * @version m4m 1.0
         */
-        get localPosition()
-        {
+        get localPosition() {
             return this._localTranslate;
         }
-        set localPosition(position: math.vector3)
-        {
+        set localPosition(position: math.vector3) {
             math.vec3Clone(position, this._localTranslate);
-            if (!this.dirtyLocal)
-            {
+            if (!this.dirtyLocal) {
                 this.dirtify(true);
             }
         }
@@ -909,15 +817,12 @@ namespace m4m.framework
          * @version m4m 1.0
          */
         @m4m.reflect.Field("vector3")
-        get localScale()
-        {
+        get localScale() {
             return this._localScale;
         }
-        set localScale(scale: math.vector3)
-        {
+        set localScale(scale: math.vector3) {
             math.vec3Clone(scale, this._localScale);
-            if (!this.dirtyLocal)
-            {
+            if (!this.dirtyLocal) {
                 this.dirtify(true);
             }
         }
@@ -931,16 +836,13 @@ namespace m4m.framework
          * 本地旋转的欧拉角
          * @version m4m 1.0
          */
-        get localEulerAngles(): math.vector3
-        {
+        get localEulerAngles(): math.vector3 {
             math.quatToEulerAngles(this._localRotate, this._localEulerAngles);
             return this._localEulerAngles;
         }
-        set localEulerAngles(angles: math.vector3)
-        {
+        set localEulerAngles(angles: math.vector3) {
             math.quatFromEulerAngles(angles.x, angles.y, angles.z, this._localRotate);
-            if (!this.dirtyLocal)
-            {
+            if (!this.dirtyLocal) {
                 this.dirtify(true);
             }
         }
@@ -957,13 +859,10 @@ namespace m4m.framework
          * 获取世界坐标系下的旋转
          * @version m4m 1.0
          */
-        getWorldRotate()
-        {
-            if (!this._parent || !this._parent._parent)
-            {
+        getWorldRotate() {
+            if (!this._parent || !this._parent._parent) {
                 math.quatClone(this._localRotate, this.worldRotate);
-            } else
-            {
+            } else {
                 math.matrixGetRotation(this.getWorldMatrix(), this.worldRotate);
             }
             return this.worldRotate;
@@ -976,13 +875,10 @@ namespace m4m.framework
          * 设置transform世界空间下的旋转
          *
          */
-        setWorldRotate(rotate: math.quaternion)
-        {
-            if (!this._parent || !this._parent._parent)
-            {
+        setWorldRotate(rotate: math.quaternion) {
+            if (!this._parent || !this._parent._parent) {
                 math.quatClone(rotate, this._localRotate);
-            } else
-            {
+            } else {
                 let tquat = transform.helpquat;
                 let tquat_1 = transform.helpquat_1;
                 math.quatClone(this._parent.getWorldRotate(), tquat);
@@ -990,8 +886,7 @@ namespace m4m.framework
                 math.quatMultiply(tquat_1, rotate, this._localRotate);
             }
 
-            if (!this.dirtyLocal)
-            {
+            if (!this.dirtyLocal) {
                 this.dirtify(true);
             }
         }
@@ -1004,17 +899,13 @@ namespace m4m.framework
          * 获取世界坐标系下的位移
          * @version m4m 1.0
          */
-        getWorldTranslate()
-        {
-            if (!this.firstCalc && this.gameObject.isStatic)
-            {
+        getWorldTranslate() {
+            if (!this.firstCalc && this.gameObject.isStatic) {
                 return this.worldTranslate;
             }
-            if (!this._parent || !this._parent._parent)
-            {
+            if (!this._parent || !this._parent._parent) {
                 math.vec3Clone(this._localTranslate, this.worldTranslate);
-            } else
-            {
+            } else {
                 math.matrixGetTranslation(this.getWorldMatrix(), this.worldTranslate);
             }
             if (this.firstCalc)
@@ -1028,13 +919,10 @@ namespace m4m.framework
          * 获取世界坐标系下的位移
          * @version m4m 1.0
          */
-        getWorldPosition()
-        {
-            if (!this._parent || !this._parent._parent)
-            {
+        getWorldPosition() {
+            if (!this._parent || !this._parent._parent) {
                 math.vec3Clone(this._localTranslate, this.worldTranslate);
-            } else
-            {
+            } else {
                 math.matrixGetTranslation(this.getWorldMatrix(), this.worldTranslate);
             }
             return this.worldTranslate;
@@ -1048,20 +936,16 @@ namespace m4m.framework
          * @param pos 世界空间下的坐标
          * @version m4m 1.0
          */
-        setWorldPosition(pos: math.vector3)
-        {
-            if (!this._parent || !this._parent._parent)
-            {
+        setWorldPosition(pos: math.vector3) {
+            if (!this._parent || !this._parent._parent) {
                 math.vec3Clone(pos, this._localTranslate);
-            } else
-            {
+            } else {
                 let tmtx = transform.helpmtx;
                 math.matrixInverse(this._parent.getWorldMatrix(), tmtx);
                 math.matrixTransformVector3(pos, tmtx, this._localTranslate);
             }
 
-            if (!this.dirtyLocal)
-            {
+            if (!this.dirtyLocal) {
                 this.dirtify(true);
             }
         }
@@ -1073,13 +957,10 @@ namespace m4m.framework
          * 获取世界坐标系下的缩放
          * @version m4m 1.0
          */
-        getWorldScale()
-        {
-            if (!this._parent || !this._parent._parent)
-            {
+        getWorldScale() {
+            if (!this._parent || !this._parent._parent) {
                 math.vec3Clone(this._localScale, this.worldScale);
-            } else
-            {
+            } else {
                 math.matrixGetScale(this.getWorldMatrix(), this.worldScale);
             }
             return this.worldScale;
@@ -1092,13 +973,10 @@ namespace m4m.framework
          * 设置世界坐标系下的缩放
          * @version m4m 1.0
          */
-        setWorldScale(scale: math.vector3)
-        {
-            if (!this._parent || !this._parent._parent)
-            {
+        setWorldScale(scale: math.vector3) {
+            if (!this._parent || !this._parent._parent) {
                 math.vec3Clone(scale, this._localScale);
-            } else
-            {
+            } else {
                 let tv3 = transform.helpv3;
                 math.vec3Clone(this._parent.getWorldScale(), tv3);
                 this._localScale.x = scale.x / tv3.x;
@@ -1106,8 +984,7 @@ namespace m4m.framework
                 this._localScale.z = scale.z / tv3.z;
             }
 
-            if (!this.dirtyLocal)
-            {
+            if (!this.dirtyLocal) {
                 this.dirtify(true);
             }
         }
@@ -1119,10 +996,8 @@ namespace m4m.framework
          * 获取本地矩阵
          * @version m4m 1.0
          */
-        getLocalMatrix(): math.matrix
-        {
-            if (this.dirtyLocal)
-            {
+        getLocalMatrix(): math.matrix {
+            if (this.dirtyLocal) {
                 math.matrixMakeTransformRTS(this._localTranslate, this._localScale, this._localRotate, this.localMatrix);
                 math.vec3Clone(this._localTranslate, this.helpLPos);
                 math.vec3Clone(this._localScale, this.helpLScale);
@@ -1138,29 +1013,25 @@ namespace m4m.framework
          * 获取世界矩阵
          * @version m4m 1.0
          */
-        getWorldMatrix(): math.matrix
-        {
+        getWorldMatrix(): math.matrix {
             // if(!this.dirtyLocal){
             //     if(this.checkLRTSChange()){
             //         this.dirtify(true);
             //     }
             // }
 
-            if (!this.dirtyLocal && !this.dirtyWorld)
-            {
+            if (!this.dirtyLocal && !this.dirtyWorld) {
                 this.checkToTop();
             }
 
-            if (!this.dirtyLocal && !this.dirtyWorld)
-            {
+            if (!this.dirtyLocal && !this.dirtyWorld) {
                 return this.worldMatrix;
             }
 
             this.dirtiedOfFrustumCulling = true;
 
             //找dirty标记的 顶 ， 再刷新
-            if (this._parent)
-            {
+            if (this._parent) {
                 this._parent.getWorldMatrix();
             }
 
@@ -1169,14 +1040,11 @@ namespace m4m.framework
             return this.worldMatrix;
         }
 
-        private checkToTop()
-        {
+        private checkToTop() {
             let top: transform;
             let temp: transform = this;
-            while (true)
-            {
-                if (temp.checkLRTSChange())
-                {
+            while (true) {
+                if (temp.checkLRTSChange()) {
                     temp.dirtyLocal = true;
                     //temp.dirtify(true);
                     top = temp;
@@ -1185,8 +1053,7 @@ namespace m4m.framework
                 if (!temp._parent) break;
                 temp = temp._parent;
             }
-            if (top)
-            {
+            if (top) {
                 top.dirtify(true);
             }
         }
@@ -1198,8 +1065,7 @@ namespace m4m.framework
          * 获取世界坐标系下当前z轴的朝向
          * @version m4m 1.0
          */
-        getForwardInWorld(out: math.vector3)
-        {
+        getForwardInWorld(out: math.vector3) {
             math.matrixTransformNormal(transform.helpFoward, this.getWorldMatrix(), out);
             math.vec3Normalize(out, out);
         }
@@ -1211,8 +1077,7 @@ namespace m4m.framework
          * 获取世界坐标系下当前x轴的朝向
          * @version m4m 1.0
          */
-        getRightInWorld(out: math.vector3)
-        {
+        getRightInWorld(out: math.vector3) {
             math.matrixTransformNormal(transform.helpRight, this.getWorldMatrix(), out);
             math.vec3Normalize(out, out);
         }
@@ -1224,8 +1089,7 @@ namespace m4m.framework
          * 获取世界坐标系下y轴的朝向
          * @version m4m 1.0
          */
-        getUpInWorld(out: math.vector3)
-        {
+        getUpInWorld(out: math.vector3) {
             math.matrixTransformNormal(transform.helpUp, this.getWorldMatrix(), out);
             math.vec3Normalize(out, out);
         }
@@ -1238,21 +1102,17 @@ namespace m4m.framework
          * @param mat 世界空间下矩阵
          * @version m4m 1.0
          */
-        setWorldMatrix(mat: math.matrix)
-        {
-            if (!this._parent)
-            {
+        setWorldMatrix(mat: math.matrix) {
+            if (!this._parent) {
                 math.matrixDecompose(mat, this._localScale, this._localRotate, this._localTranslate);
-            } else
-            {
+            } else {
                 let tmtx = transform.helpmtx;
                 math.matrixInverse(this._parent.getWorldMatrix(), tmtx);
                 math.matrixMultiply(tmtx, mat, this.localMatrix);
                 math.matrixDecompose(this.localMatrix, this._localScale, this._localRotate, this._localTranslate);
             }
 
-            if (!this.dirtyLocal)
-            {
+            if (!this.dirtyLocal) {
                 this.dirtify(true);
             }
         }
@@ -1265,8 +1125,7 @@ namespace m4m.framework
          * @param trans 给定的transform
          * @version m4m 1.0
          */
-        lookat(trans: transform)
-        {
+        lookat(trans: transform) {
             this.calcLookAt(trans.getWorldTranslate());
         }
         /**
@@ -1277,18 +1136,15 @@ namespace m4m.framework
          * @param point 给定的坐标
          * @version m4m 1.0
          */
-        lookatPoint(point: math.vector3)
-        {
+        lookatPoint(point: math.vector3) {
             this.calcLookAt(point);
         }
 
-        private calcLookAt(point: math.vector3)
-        {
+        private calcLookAt(point: math.vector3) {
             math.quatLookat(this.getWorldTranslate(), point, this.worldRotate);
             this.setWorldRotate(this.worldRotate);
         }
-        constructor()
-        {
+        constructor() {
             this.gameObject = new gameObject();
             this.gameObject.transform = this;
         }
@@ -1319,8 +1175,7 @@ namespace m4m.framework
          * 获取当前transform的克隆
          * @version m4m 1.0
          */
-        clone(): transform
-        {
+        clone(): transform {
             return io.cloneObj(this) as transform;
         }
 
@@ -1331,8 +1186,7 @@ namespace m4m.framework
          * 获取当前transform是否被释放掉了
          * @version m4m 1.0
          */
-        get beDispose(): boolean
-        {
+        get beDispose(): boolean {
             return this._beDispose;
         }
         private _beDispose: boolean = false;//是否被释放了
@@ -1345,14 +1199,12 @@ namespace m4m.framework
          * 释放当前transform
          * @version m4m 1.0
          */
-        dispose()
-        {
+        dispose() {
             if (this._parent) this._parent.removeChild(this);
             this._dispose();
         }
 
-        private _dispose()
-        {
+        private _dispose() {
             if (this._beDispose) return;
             // if (this.children)
             {
@@ -1365,8 +1217,7 @@ namespace m4m.framework
                     this.children[i]._dispose();
                 this.children = [];
             }
-            if (this._physicsImpostor)
-            {
+            if (this._physicsImpostor) {
                 this._physicsImpostor.dispose();
             }
             // this._gameObject.dispose();
@@ -1387,15 +1238,12 @@ namespace m4m.framework
      * 作为引擎实例的唯一id使用 自增
      * @version m4m 1.0
      */
-    export class insID
-    {
-        constructor()
-        {
+    export class insID {
+        constructor() {
             this.id = insID.next();
         }
         private static idAll: number = 1;
-        private static next(): number
-        {
+        private static next(): number {
             var next = insID.idAll;
             insID.idAll++;
             return next;
@@ -1408,8 +1256,7 @@ namespace m4m.framework
          * 获取唯一id
          * @version m4m 1.0
          */
-        getInsID(): number
-        {
+        getInsID(): number {
             return this.id;
         }
     }
