@@ -22816,7 +22816,7 @@ declare namespace m4m.render {
         private getGLFormat;
         private static mapTexture;
         static formGrayArray(webgl: WebGL2RenderingContext, array: number[] | Float32Array | Float64Array, width: number, height: number): glTexture2D;
-        static staticTexture(webgl: WebGL2RenderingContext, name: string): glTexture2D;
+        static staticTexture(webgl: WebGL2RenderingContext, name: "grid" | "gray" | "white" | "black" | "normal"): glTexture2D;
         static particleTexture(webgl: WebGL2RenderingContext, name?: string): glTexture2D;
     }
     class glTextureCube implements ITexture {

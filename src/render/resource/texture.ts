@@ -492,56 +492,23 @@
             return t;
         }
 
-        static staticTexture(webgl: WebGL2RenderingContext, name: string) {
-            var t = glTexture2D.mapTexture[name];
-            if (t != undefined)
-                return t;
-
-
-            var mipmap = false;
-            var linear = true;
+        static staticTexture(webgl: WebGL2RenderingContext, name: "grid" | "gray" | "white" | "black" | "normal") {
+            let t = glTexture2D.mapTexture[name];
+            if (t != undefined) return t;
+            const mipmap = false;
+            const linear = true;
             t = new glTexture2D(webgl, TextureFormatEnum.RGBA, mipmap, linear);
 
-            var data = new Uint8Array(4);
-            var width = 1;
-            var height = 1;
-            data[0] = 128;
-            data[1] = 0;
-            data[2] = 128;
-            data[3] = 255;
-            if (name == "gray") {
-                data[0] = 128;
-                data[1] = 128;
-                data[2] = 128;
-                data[3] = 255;
-            }
-            else if (name == "white") {
-                data[0] = 255;
-                data[1] = 255;
-                data[2] = 255;
-                data[3] = 255;
-            }
-            else if (name == "black") {
-                data[0] = 0;
-                data[1] = 0;
-                data[2] = 0;
-                data[3] = 255;
-            }
-            else if (name == "normal") {
-                data[0] = 128;
-                data[1] = 128;
-                data[2] = 255;
-                data[3] = 255;
-            }
-            else if (name == "grid") {
-                width = 256;
-                height = 256;
-                data = new Uint8Array(width * width * 4);
-                for (var y = 0; y < height; y++) {
-                    for (var x = 0; x < width; x++) {
-                        var seek = (y * width + x) * 4;
+            let size = 1;
+            let data: Uint8Array;
+            if (name == "grid") {
+                size = 256
+                data = new Uint8Array(size * size * 4);
+                for (let y = 0; y < size; y++) {
+                    for (let x = 0; x < size; x++) {
+                        let seek = (y * size + x) * 4;
 
-                        if (((x - width * 0.5) * (y - height * 0.5)) > 0) {
+                        if (((x - size * 0.5) * (y - size * 0.5)) > 0) {
                             data[seek] = 0;
                             data[seek + 1] = 0;
                             data[seek + 2] = 0;
@@ -555,10 +522,29 @@
                         }
                     }
                 }
+            } else {
+                let rg = 0, b = 0;
+                switch (name) {
+                    case "gray": rg = b = 128; break;
+                    case "white": rg = b = 255; break;
+                    case "black": rg = b = 0; break;
+                    case "normal": rg = 128, b = 255; break;
+                }
 
+                size = 16;
+                data = new Uint8Array(size * size * 4);
+                for (let y = 0; y < size; y++) {
+                    for (let x = 0; x < size; x++) {
+                        let seek = (y * size + x) * 4;
+                        data[seek] = rg;
+                        data[seek + 1] = rg;
+                        data[seek + 2] = b;
+                        data[seek + 3] = 255;
+                    }
+                }
             }
 
-            t.uploadByteArray(mipmap, linear, width, height, data);
+            t.uploadByteArray(mipmap, linear, size, size, data);
 
             glTexture2D.mapTexture[name] = t;
             return t;
