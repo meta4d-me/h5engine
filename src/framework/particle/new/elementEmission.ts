@@ -331,7 +331,7 @@ namespace m4m.framework
         {
             if(this.ebo==null)
             {
-                this.ebo=this.mesh.data.genIndexDataArray();
+                this.ebo=this.mesh.data.genIndexDataArray() as Uint16Array;
             }
             return new Uint16Array(this.ebo);
         }

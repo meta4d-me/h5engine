@@ -67,7 +67,7 @@ namespace m4m.framework
             this.vertexCount = this.emisson.perVertexCount;
 
             this.dataForVbo = new Float32Array(this.vertexCount * this.vertexSize);
-            this.dataForEbo = this.data.mesh.data.genIndexDataArray();
+            this.dataForEbo = this.data.mesh.data.genIndexDataArray() as Uint16Array;
             this.dataForVbo.set(this.data.mesh.data.genVertexDataArray(this.vf), 0);
             this.sourceVbo = this.data.getVboData(this.vf);
 
