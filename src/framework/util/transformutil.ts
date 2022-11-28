@@ -1,5 +1,4 @@
-namespace m4m.framework
-{
+namespace m4m.framework {
     /**
      * @public
      * @language zh_CN
@@ -7,8 +6,7 @@ namespace m4m.framework
      * 原生3d模型类型
      * @version m4m 1.0
      */
-    export enum PrimitiveType
-    {
+    export enum PrimitiveType {
         Sphere,
         Capsule,
         Cylinder,
@@ -25,8 +23,7 @@ namespace m4m.framework
      * 原生2d类型
      * @version m4m 1.0
      */
-    export enum Primitive2DType
-    {
+    export enum Primitive2DType {
         /** 原始图片渲染器 */
         RawImage2D,
         /** 多功能图片渲染器（sprite） */
@@ -36,15 +33,20 @@ namespace m4m.framework
         /** 按钮 */
         Button,
         /** 输入框 */
-        InputField
+        InputField,
+        /** 进度条 */
+        Progressbar,
+        /** Panel */
+        Panel,
+        /** ScrollView */
+        ScrollRect,
     }
 
     /**
      * 判断 函数对象代码实现内容是否是空的
      * @param fun 
      */
-    export function functionIsEmpty(fun: Function)
-    {
+    export function functionIsEmpty(fun: Function) {
         if (!fun) true;
         let funStr = fun.toString().replace(/\s/g, "");
         let idx = funStr.indexOf("{");
@@ -57,8 +59,7 @@ namespace m4m.framework
      * 获取实例对象的类名字符串
      * @param obj 对象实例
      */
-    export function getClassName(obj: Object)
-    {
+    export function getClassName(obj: Object) {
         if (!obj) return "";
         let constructor = Object.getPrototypeOf(obj).constructor;
         if (!constructor) return "";
@@ -72,8 +73,7 @@ namespace m4m.framework
      * Transform工具类
      * @version m4m 1.0
      */
-    export class TransformUtil
-    {
+    export class TransformUtil {
         /**
          * @public
          * @language zh_CN
@@ -83,10 +83,8 @@ namespace m4m.framework
          * @param app application的实例
          * @version m4m 1.0
          */
-        static CreatePrimitive(type: PrimitiveType, app: application = null): transform
-        {
-            if (!app)
-            {
+        static CreatePrimitive(type: PrimitiveType, app: application = null): transform {
+            if (!app) {
                 app = sceneMgr.app;
             }
             let objName = (PrimitiveType[type] as string);
@@ -112,10 +110,8 @@ namespace m4m.framework
          * @param app application的实例
          * @version m4m 1.0
          */
-        static Create2DPrimitive(type: Primitive2DType, app: application = null): transform2D
-        {
-            if (!app)
-            {
+        static Create2DPrimitive(type: Primitive2DType, app: application = null): transform2D {
+            if (!app) {
                 app = sceneMgr.app;
             }
             // let enumObj = EnumUtil.getEnumObjByType("m4m.framework.Primitive2DType");
@@ -125,8 +121,7 @@ namespace m4m.framework
             let t2d = this.make2DNode(objName);
             let i2dComp = t2d.addComponent(componentName);
 
-            switch (type)
-            {
+            switch (type) {
                 case Primitive2DType.RawImage2D:
                     TransformUtil.create2D_rawImage(i2dComp as rawImage2D, app);
                     break;
@@ -142,12 +137,17 @@ namespace m4m.framework
                 case Primitive2DType.InputField:
                     TransformUtil.create2D_InputField(i2dComp as inputField, app);
                     break;
+                case Primitive2DType.Progressbar:
+
+                    break;
+                case Primitive2DType.ScrollRect:
+
+                    break;
             }
             return t2d;
         }
 
-        private static make2DNode(name: string, parent: transform2D = null, lOpt: layoutOption = 0, w: number = 100, h: number = 100, px: number = 0, py: number = 0)
-        {
+        private static make2DNode(name: string, parent: transform2D = null, lOpt: layoutOption = 0, w: number = 100, h: number = 100, px: number = 0, py: number = 0) {
             let node: transform2D = new transform2D();
             node.name = name;
             node.width = w;
@@ -160,22 +160,25 @@ namespace m4m.framework
             return node;
         }
 
-        private static create2D_rawImage(img: rawImage2D, app: application)
-        {
+        private static create2D_rawImage(img: rawImage2D, app: application) {
             img.transform.width = 100;
             img.transform.height = 100;
             img.image = app.getAssetMgr().getDefaultTexture("white");
         }
 
-        private static create2D_image2D(img: image2D, app: application)
-        {
+        private static create2D_image2D(img: image2D, app: application) {
             img.transform.width = 100;
             img.transform.height = 100;
             img.sprite = app.getAssetMgr().getDefaultSprite("white_sprite");
         }
 
-        private static create2D_label(label: label, app: application)
-        {
+        private static create2D_panel(img: image2D, app: application) {
+            img.transform.width = 100;
+            img.transform.height = 100;
+            img.sprite = app.getAssetMgr().getDefaultSprite("white_sprite");
+        }
+
+        private static create2D_label(label: label, app: application) {
             label.transform.width = 150;
             label.transform.height = 50;
             label.text = "label";
@@ -203,8 +206,7 @@ namespace m4m.framework
             // }
         }
 
-        private static create2D_button(btn: button, app: application)
-        {
+        private static create2D_button(btn: button, app: application) {
             btn.transform.width = 150;
             btn.transform.height = 50;
             let img = btn.transform.addComponent("image2D") as m4m.framework.image2D;
@@ -244,8 +246,7 @@ namespace m4m.framework
             // }
         }
 
-        private static create2D_InputField(ipt: inputField, app: application)
-        {
+        private static create2D_InputField(ipt: inputField, app: application) {
             let assetMgr = app.getAssetMgr();
             let opt = layoutOption;
             let tOpt = opt.TOP | opt.RIGHT | opt.BOTTOM | opt.LEFT;

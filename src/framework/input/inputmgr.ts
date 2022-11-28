@@ -157,7 +157,7 @@ namespace m4m.framework {
             this._point.touch = true;
             this._point.multiTouch = true;
             let lastTouche: pointinfo;
-            const rect = this.app.webgl.canvas.getBoundingClientRect();
+            const rect = (this.app.webgl.canvas as any).getBoundingClientRect();
             for (var i = 0; i < ev.changedTouches.length; i++) {
                 var touch = ev.changedTouches[i];
                 var id = touch.identifier;
@@ -187,7 +187,7 @@ namespace m4m.framework {
             this._point.touch = true;
             this._point.multiTouch = true;
             let lastTouche: pointinfo;
-            const rect = this.app.webgl.canvas.getBoundingClientRect();
+            const rect = (this.app.webgl.canvas as any).getBoundingClientRect();
             for (var i = 0; i < ev.changedTouches.length; i++) {
                 var touch = ev.changedTouches[i];
                 var id = touch.identifier;

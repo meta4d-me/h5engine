@@ -20716,7 +20716,13 @@ declare namespace m4m.framework {
         /** 按钮 */
         Button = 3,
         /** 输入框 */
-        InputField = 4
+        InputField = 4,
+        /** 进度条 */
+        Progressbar = 5,
+        /** Panel */
+        Panel = 6,
+        /** ScrollView */
+        ScrollRect = 7
     }
     /**
      * 判断 函数对象代码实现内容是否是空的
@@ -20759,6 +20765,7 @@ declare namespace m4m.framework {
         private static make2DNode;
         private static create2D_rawImage;
         private static create2D_image2D;
+        private static create2D_panel;
         private static create2D_label;
         private static create2D_button;
         private static create2D_InputField;
