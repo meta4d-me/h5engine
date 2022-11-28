@@ -1,10 +1,11 @@
-﻿namespace m4m.render
-{
+﻿namespace m4m.render {
+
+    /** 三角形索引类型数组 */
+    export type TriIndexTypeArray = Uint16Array | Uint32Array;
     /**
      * @private
      */
-    export class meshData
-    {
+    export class meshData {
         originVF: number;
 
         pos: m4m.math.vector3[];//use pos.length 作为定点数量
@@ -18,11 +19,13 @@
         blendWeight: number4[];
         //三角形索引
         trisindex: number[];
+        /** 三角形索引使用 uint32 模式，默认 false */
+        triIndexUint32Mode = false;
 
-        tmpVArr: Float32Array;
-        tmpInxArr: Uint16Array;
-        static addQuadPos(data: meshData, quad: m4m.math.vector3[]): void
-        {
+        // private tmpVArr: Float32Array;
+        // private tmpInxArr: Uint16Array;
+
+        static addQuadPos(data: meshData, quad: m4m.math.vector3[]): void {
             var istart = data.pos.length;
             meshData.addQuadVec3(data.pos, quad);
             data.trisindex.push(istart + 0);
@@ -32,8 +35,7 @@
             data.trisindex.push(istart + 1);
             data.trisindex.push(istart + 3);
         }
-        static addQuadPos_Quad(data: meshData, quad: m4m.math.vector3[]): void
-        {
+        static addQuadPos_Quad(data: meshData, quad: m4m.math.vector3[]): void {
             var istart = data.pos.length;
             meshData.addQuadVec3(data.pos, quad);
             data.trisindex.push(istart + 0);
@@ -41,23 +43,19 @@
             data.trisindex.push(istart + 3);
             data.trisindex.push(istart + 2);
         }
-        static addQuadVec3ByValue(array: m4m.math.vector3[], value: m4m.math.vector3): void
-        {
-            for (var i = 0; i < 4; i++)
-            {
+        static addQuadVec3ByValue(array: m4m.math.vector3[], value: m4m.math.vector3): void {
+            for (var i = 0; i < 4; i++) {
                 var v = math.pool.clone_vector3(value);
                 array.push(v);
             }
         }
-        static addQuadVec3(array: m4m.math.vector3[], quad: m4m.math.vector3[]): void
-        {
+        static addQuadVec3(array: m4m.math.vector3[], quad: m4m.math.vector3[]): void {
             array.push(quad[0]);
             array.push(quad[1]);
             array.push(quad[2]);
             array.push(quad[3]);
         }
-        static addQuadVec2(array: m4m.math.vector2[], quad: m4m.math.vector2[]): void
-        {
+        static addQuadVec2(array: m4m.math.vector2[], quad: m4m.math.vector2[]): void {
             array.push(quad[0]);
             array.push(quad[1]);
             array.push(quad[2]);
@@ -65,8 +63,7 @@
         }
 
 
-        static genQuad(size: number): meshData
-        {
+        static genQuad(size: number): meshData {
             var half = size * 0.5;
             var data = new meshData();
             data.pos = [];
@@ -92,8 +89,7 @@
             return data;
         }
 
-        static genQuad_forparticle(size: number): meshData
-        {
+        static genQuad_forparticle(size: number): meshData {
             var half = size * 0.5;
             var data = new meshData();
             data.pos = [];
@@ -118,8 +114,7 @@
             meshData.addQuadVec3ByValue(data.tangent, new math.vector3(1, 0, 0));
             return data;
         }
-        static genPlaneCCW(size: number): meshData
-        {
+        static genPlaneCCW(size: number): meshData {
             var half = size * 0.5;
             var data = new meshData();
             data.pos = [];
@@ -144,23 +139,20 @@
             meshData.addQuadVec3ByValue(data.tangent, new math.vector3(1, 0, 0));
             return data;
         }
-        static genCylinderCCW(height: number, radius: number, segment = 20): meshData
-        {
+        static genCylinderCCW(height: number, radius: number, segment = 20): meshData {
             var data = new meshData();
             data.pos = [];
             data.trisindex = [];
             data.normal = [];
             data.uv = [];
             var normal = new math.vector3(0, 1, 0);
-            for (var s = 0; s < 4; s++)
-            {
+            for (var s = 0; s < 4; s++) {
                 var y = (s < 2 ? 0.5 : -0.5) * height;
                 if (s == 0)
                     normal = new math.vector3(0, 1, 0);
                 else if (s == 3)
                     normal = new math.vector3(0, -1, 0);
-                for (var i = 0; i < segment; i++)
-                {
+                for (var i = 0; i < segment; i++) {
                     var r = i / segment * Math.PI * 2;
                     var x = Math.sin(r);
                     var z = Math.cos(r);
@@ -169,12 +161,10 @@
                     data.pos.push(new math.vector3(x * radius, y, z * radius));
                     var vn = math.pool.clone_vector3(normal);
                     data.normal.push(vn);
-                    if (s == 0 || s == 3)
-                    {
+                    if (s == 0 || s == 3) {
                         data.uv.push(new math.vector2(x / 2 + 0.5, z / 2 + 0.5));
                     }
-                    else
-                    {
+                    else {
                         data.uv.push(new math.vector2(i / segment, y < 0 ? 0 : 1));
                     }
                 }
@@ -189,8 +179,7 @@
             data.normal.push(new math.vector3(0, -1, 0));
             data.uv.push(new math.vector2(0.5, 0.5));
 
-            for (var i = 0; i < segment; i++)
-            {
+            for (var i = 0; i < segment; i++) {
                 //top
                 data.trisindex.push(itop);
                 data.trisindex.push(i == segment - 1 ? segment * 0 + 0 : segment * 0 + i + 1);
@@ -215,8 +204,7 @@
             }
             return data;
         }
-        static genPyramid(height: number, halfsize: number): meshData
-        {
+        static genPyramid(height: number, halfsize: number): meshData {
             var data = new meshData();
             data.pos = [];
             data.trisindex = [];
@@ -321,8 +309,7 @@
 
             return data;
         }
-        static genSphereCCW(radius: number = 1, widthSegments: number = 24, heightSegments: number = 12): meshData
-        {
+        static genSphereCCW(radius: number = 1, widthSegments: number = 24, heightSegments: number = 12): meshData {
             var data = new meshData();
             data.pos = [];
             data.trisindex = [];
@@ -342,12 +329,10 @@
             var normal = new math.vector3();
 
             // generate vertices, normals and uvs
-            for (iy = 0; iy <= heightSegments; iy++)
-            {
+            for (iy = 0; iy <= heightSegments; iy++) {
                 var verticesRow = [];
                 var v = iy / heightSegments;
-                for (ix = 0; ix <= widthSegments; ix++)
-                {
+                for (ix = 0; ix <= widthSegments; ix++) {
                     var u = ix / widthSegments;
 
                     // vertex
@@ -360,14 +345,12 @@
                     // normal
                     normal = math.pool.clone_vector3(vertex);
                     var num: number = Math.sqrt(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z);
-                    if (num > Number.MIN_VALUE)
-                    {
+                    if (num > Number.MIN_VALUE) {
                         normal.x = normal.x / num;
                         normal.y = normal.y / num;
                         normal.z = normal.z / num;
                     }
-                    else
-                    {
+                    else {
                         normal.x = 0;
                         normal.y = 0;
                         normal.z = 0;
@@ -383,10 +366,8 @@
             }
 
             // indices
-            for (iy = 0; iy < heightSegments; iy++)
-            {
-                for (ix = 0; ix < widthSegments; ix++)
-                {
+            for (iy = 0; iy < heightSegments; iy++) {
+                for (ix = 0; ix < widthSegments; ix++) {
                     var a = grid[iy][ix + 1];
                     var b = grid[iy][ix];
                     var c = grid[iy + 1][ix];
@@ -399,8 +380,7 @@
 
             return data;
         }
-        static genBoxCCW(size: number): meshData
-        {
+        static genBoxCCW(size: number): meshData {
             var half = size * 0.5;
             var data = new meshData();
             data.pos = [];
@@ -506,8 +486,7 @@
 
             return data;
         }
-        static genBoxByArray(array: m4m.math.vector3[], outData: meshData)
-        {
+        static genBoxByArray(array: m4m.math.vector3[], outData: meshData) {
             if (!outData) return;
             // var data = new meshData();
             outData.pos = [];
@@ -576,8 +555,7 @@
 
             // return data;
         }
-        static genBoxByArray_Quad(array: m4m.math.vector3[]): meshData
-        {
+        static genBoxByArray_Quad(array: m4m.math.vector3[]): meshData {
             var data = new meshData();
             data.pos = [];
             data.trisindex = [];
@@ -647,16 +625,14 @@
             return data;
         }
 
-        static genCircleLineCCW(radius: number, segment: number = 64, wide: number = 0.05): meshData
-        {
+        static genCircleLineCCW(radius: number, segment: number = 64, wide: number = 0.05): meshData {
             var data = new meshData();
             data.pos = [];
             data.trisindex = [];
             data.normal = [];
             data.uv = [];
 
-            for (var i = 0; i < segment; i++)
-            {
+            for (var i = 0; i < segment; i++) {
                 var r1 = Math.PI * 2 * i / segment;
                 var x1 = Math.sin(r1) * radius;
                 var z1 = Math.cos(r1) * radius;
@@ -676,8 +652,7 @@
             return data;
         }
 
-        caclByteLength(): number
-        {
+        caclByteLength(): number {
             let len = 0;
             if (this.pos != undefined) len += 12;
 
@@ -694,8 +669,7 @@
             len *= this.pos.length;
             return len;
         }
-        static calcByteSize(vf: VertexFormatMask): number
-        {
+        static calcByteSize(vf: VertexFormatMask): number {
             var total = 0;//nothing
             if (vf & VertexFormatMask.Position) total += 12;
             if (vf & VertexFormatMask.Normal) total += 12;
@@ -710,8 +684,7 @@
         }
 
         static timer = 0;
-        genVertexDataArray(vf: VertexFormatMask): Float32Array
-        {
+        genVertexDataArray(vf: VertexFormatMask): Float32Array {
             // let timeaa = performance.now();
             var _this = this;
             // if (_this.tmpVArr)
@@ -719,55 +692,45 @@
             var vertexCount = _this.pos.length;
             var total = meshData.calcByteSize(vf) / 4;
             var varray = new Float32Array(total * vertexCount);
-            _this.tmpVArr = varray;
-            for (var i = 0; i < vertexCount; i++)
-            {
+            // _this.tmpVArr = varray;
+            for (var i = 0; i < vertexCount; i++) {
                 var nseek = 0;
                 //pos
                 varray[i * total + nseek] = _this.pos[i].x; nseek++;
                 varray[i * total + nseek] = _this.pos[i].y; nseek++;
                 varray[i * total + nseek] = _this.pos[i].z; nseek++;
-                if (vf & VertexFormatMask.Normal)
-                {
-                    if (_this.normal == undefined || _this.normal.length == 0)
-                    {
+                if (vf & VertexFormatMask.Normal) {
+                    if (_this.normal == undefined || _this.normal.length == 0) {
                         varray[i * total + nseek] = 0; nseek++;
                         varray[i * total + nseek] = 0; nseek++;
                         varray[i * total + nseek] = 0; nseek++;
                     }
-                    else
-                    {
+                    else {
                         varray[i * total + nseek] = _this.normal[i].x; nseek++;
                         varray[i * total + nseek] = _this.normal[i].y; nseek++;
                         varray[i * total + nseek] = _this.normal[i].z; nseek++;
                     }
                 }
-                if (vf & VertexFormatMask.Tangent)
-                {
-                    if (_this.tangent == undefined || _this.tangent.length == 0)
-                    {
+                if (vf & VertexFormatMask.Tangent) {
+                    if (_this.tangent == undefined || _this.tangent.length == 0) {
                         varray[i * total + nseek] = 0; nseek++;
                         varray[i * total + nseek] = 0; nseek++;
                         varray[i * total + nseek] = 0; nseek++;
                     }
-                    else
-                    {
+                    else {
                         varray[i * total + nseek] = _this.tangent[i].x; nseek++;
                         varray[i * total + nseek] = _this.tangent[i].y; nseek++;
                         varray[i * total + nseek] = _this.tangent[i].z; nseek++;
                     }
                 }
-                if (vf & VertexFormatMask.Color)
-                {
-                    if (_this.color == undefined || _this.color.length == 0)
-                    {
+                if (vf & VertexFormatMask.Color) {
+                    if (_this.color == undefined || _this.color.length == 0) {
                         varray[i * total + nseek] = 1; nseek++;
                         varray[i * total + nseek] = 1; nseek++;
                         varray[i * total + nseek] = 1; nseek++;
                         varray[i * total + nseek] = 1; nseek++;
                     }
-                    else
-                    {
+                    else {
                         varray[i * total + nseek] = _this.color[i].r; nseek++;
                         varray[i * total + nseek] = _this.color[i].g; nseek++;
                         varray[i * total + nseek] = _this.color[i].b; nseek++;
@@ -775,78 +738,63 @@
                     }
                 }
 
-                if (vf & VertexFormatMask.UV0)
-                {
-                    if (_this.uv == undefined || _this.uv.length == 0)
-                    {
+                if (vf & VertexFormatMask.UV0) {
+                    if (_this.uv == undefined || _this.uv.length == 0) {
                         varray[i * total + nseek] = 0; nseek++;
                         varray[i * total + nseek] = 0; nseek++;
                     }
-                    else
-                    {
+                    else {
                         varray[i * total + nseek] = _this.uv[i].x; nseek++;
                         varray[i * total + nseek] = _this.uv[i].y; nseek++;
                     }
                 }
-                if (vf & VertexFormatMask.UV1)
-                {
-                    if (_this.uv2 == undefined || _this.uv2.length == 0)
-                    {
+                if (vf & VertexFormatMask.UV1) {
+                    if (_this.uv2 == undefined || _this.uv2.length == 0) {
                         varray[i * total + nseek] = 0; nseek++;
                         varray[i * total + nseek] = 0; nseek++;
                     }
-                    else
-                    {
+                    else {
                         varray[i * total + nseek] = _this.uv2[i].x; nseek++;
                         varray[i * total + nseek] = _this.uv2[i].y; nseek++;
                     }
                 }
 
-                if (vf & VertexFormatMask.BlendIndex4)
-                {
-                    if (_this.blendIndex == undefined || _this.blendIndex.length == 0)
-                    {
+                if (vf & VertexFormatMask.BlendIndex4) {
+                    if (_this.blendIndex == undefined || _this.blendIndex.length == 0) {
                         varray[i * total + nseek] = 0; nseek++;
                         varray[i * total + nseek] = 0; nseek++;
                         varray[i * total + nseek] = 0; nseek++;
                         varray[i * total + nseek] = 0; nseek++;
                     }
-                    else
-                    {
+                    else {
                         varray[i * total + nseek] = _this.blendIndex[i].v0; nseek++;
                         varray[i * total + nseek] = _this.blendIndex[i].v1; nseek++;
                         varray[i * total + nseek] = _this.blendIndex[i].v2; nseek++;
                         varray[i * total + nseek] = _this.blendIndex[i].v3; nseek++;
                     }
                 }
-                if (vf & VertexFormatMask.BlendWeight4)
-                {
-                    if (_this.blendWeight == undefined || _this.blendWeight.length == 0)
-                    {
+                if (vf & VertexFormatMask.BlendWeight4) {
+                    if (_this.blendWeight == undefined || _this.blendWeight.length == 0) {
                         varray[i * total + nseek] = 1; nseek++;
                         varray[i * total + nseek] = 0; nseek++;
                         varray[i * total + nseek] = 0; nseek++;
                         varray[i * total + nseek] = 0; nseek++;
                     }
-                    else
-                    {
+                    else {
                         varray[i * total + nseek] = _this.blendWeight[i].v0; nseek++;
                         varray[i * total + nseek] = _this.blendWeight[i].v1; nseek++;
                         varray[i * total + nseek] = _this.blendWeight[i].v2; nseek++;
                         varray[i * total + nseek] = _this.blendWeight[i].v3; nseek++;
                     }
                 }
-                if (vf & VertexFormatMask.ColorEX)
-                {
-                    if (_this.colorex == undefined || _this.colorex.length == 0)
-                    {
+                if (vf & VertexFormatMask.ColorEX) {
+                    if (_this.colorex == undefined || _this.colorex.length == 0) {
                         varray[i * total + nseek] = 1; nseek++;
                         varray[i * total + nseek] = 1; nseek++;
                         varray[i * total + nseek] = 1; nseek++;
                         varray[i * total + nseek] = 1; nseek++;
                     }
-                    else
-                    {
+                    else {
                         varray[i * total + nseek] = _this.colorex[i].r; nseek++;
                         varray[i * total + nseek] = _this.colorex[i].g; nseek++;
                         varray[i * total + nseek] = _this.colorex[i].b; nseek++;
@@ -859,17 +807,15 @@
             // console.error("解析Mesh总耗时：" + meshData.timer);
             return varray;
         }
-        genIndexDataArray(): Uint16Array
-        {
+        genIndexDataArray(): TriIndexTypeArray {
             // if (this.tmpInxArr)
             //     return this.tmpInxArr;
-            return this.tmpInxArr = new Uint16Array(this.trisindex);
+            // return this.tmpInxArr = new Uint16Array(this.trisindex);
+            return this.triIndexUint32Mode ? new Uint32Array(this.trisindex) : new Uint16Array(this.trisindex);
         }
-        genIndexDataArrayTri2Line(): Uint16Array
-        {
+        genIndexDataArrayTri2Line(): TriIndexTypeArray {
             var line: number[] = [];
-            for (var i = 0; i < ((this.trisindex.length / 3) | 0); i++)
-            {
+            for (var i = 0; i < ((this.trisindex.length / 3) | 0); i++) {
                 line.push(this.trisindex[i * 3 + 0]);
                 line.push(this.trisindex[i * 3 + 1]);
                 line.push(this.trisindex[i * 3 + 1]);
@@ -877,13 +823,12 @@
                 line.push(this.trisindex[i * 3 + 2]);
                 line.push(this.trisindex[i * 3 + 0]);
             }
-            return new Uint16Array(line);
+            // return new Uint16Array(line);
+            return this.triIndexUint32Mode ? new Uint32Array(line) : new Uint16Array(line);
         }
-        genIndexDataArrayQuad2Line(): Uint16Array
-        {
+        genIndexDataArrayQuad2Line(): TriIndexTypeArray {
             var line: number[] = [];
-            for (var i = 0; i < ((this.trisindex.length / 4) | 0); i++)
-            {
+            for (var i = 0; i < ((this.trisindex.length / 4) | 0); i++) {
                 line.push(this.trisindex[i * 4 + 0]);
                 line.push(this.trisindex[i * 4 + 1]);
                 line.push(this.trisindex[i * 4 + 1]);
@@ -891,29 +836,25 @@
                 line.push(this.trisindex[i * 4 + 2]);
                 line.push(this.trisindex[i * 4 + 3]);
             }
-            return new Uint16Array(line);
+            // return new Uint16Array(line);
+            return this.triIndexUint32Mode ? new Uint32Array(line) : new Uint16Array(line);
         }
 
-        static cloneByObj(target: meshData): meshData
-        {
+        static cloneByObj(target: meshData): meshData {
             let md = new meshData();
             target.originVF = md.originVF;
-            if (target.pos)
-            {
+            if (target.pos) {
                 md.pos = [];
-                target.pos.forEach((element, idx) =>
-                {
+                target.pos.forEach((element, idx) => {
                     md.pos[idx] = new math.vector3();
                     md.pos[idx].x = element.x;
                     md.pos[idx].y = element.y;
                     md.pos[idx].z = element.z;
                 });
             }
-            if (target.color)
-            {
+            if (target.color) {
                 md.color = [];
-                target.color.forEach((element, idx) =>
-                {
+                target.color.forEach((element, idx) => {
                     md.color[idx] = new math.color();
                     md.color[idx].r = element.r;
                     md.color[idx].g = element.g;
@@ -921,11 +862,9 @@
                     md.color[idx].a = element.a;
                 });
             }
-            if (target.colorex)
-            {
+            if (target.colorex) {
                 md.colorex = [];
-                target.colorex.forEach((element, idx) =>
-                {
+                target.colorex.forEach((element, idx) => {
                     md.colorex[idx] = new math.color();
                     md.colorex[idx].r = element.r;
                     md.colorex[idx].g = element.g;
@@ -933,53 +872,43 @@
                     md.colorex[idx].a = element.a;
                 });
             }
-            if (target.uv)
-            {
+            if (target.uv) {
                 md.uv = [];
-                target.uv.forEach((element, idx) =>
-                {
+                target.uv.forEach((element, idx) => {
                     md.uv[idx] = new math.vector2();
                     md.uv[idx].x = element.x;
                     md.uv[idx].y = element.y;
                 });
             }
-            if (target.uv2)
-            {
+            if (target.uv2) {
                 md.uv2 = [];
-                target.uv2.forEach((element, idx) =>
-                {
+                target.uv2.forEach((element, idx) => {
                     md.uv2[idx] = new math.vector2();
                     md.uv2[idx].x = element.x;
                     md.uv2[idx].y = element.y;
                 });
             }
-            if (target.normal)
-            {
+            if (target.normal) {
                 md.normal = [];
-                target.normal.forEach((element, idx) =>
-                {
+                target.normal.forEach((element, idx) => {
                     md.normal[idx] = new math.vector3();
                     md.normal[idx].x = element.x;
                     md.normal[idx].y = element.y;
                     md.normal[idx].z = element.z;
                 });
             }
-            if (target.tangent)
-            {
+            if (target.tangent) {
                 md.tangent = [];
-                target.tangent.forEach((element, idx) =>
-                {
+                target.tangent.forEach((element, idx) => {
                     md.tangent[idx] = new math.vector3();
                     md.tangent[idx].x = element.x;
                     md.tangent[idx].y = element.y;
                     md.tangent[idx].z = element.z;
                 });
             }
-            if (target.blendIndex)
-            {
+            if (target.blendIndex) {
                 md.blendIndex = [];
-                target.blendIndex.forEach((element, idx) =>
-                {
+                target.blendIndex.forEach((element, idx) => {
                     md.blendIndex[idx] = new render.number4();
                     md.blendIndex[idx].v0 = element.v0;
                     md.blendIndex[idx].v1 = element.v1;
@@ -987,11 +916,9 @@
                     md.blendIndex[idx].v3 = element.v3;
                 });
             }
-            if (target.blendWeight)
-            {
+            if (target.blendWeight) {
                 md.blendWeight = [];
-                target.blendWeight.forEach((element, idx) =>
-                {
+                target.blendWeight.forEach((element, idx) => {
                     md.blendWeight[idx] = new render.number4();
                     md.blendWeight[idx].v0 = element.v0;
                     md.blendWeight[idx].v1 = element.v1;
@@ -999,11 +926,9 @@
                     md.blendWeight[idx].v3 = element.v3;
                 });
             }
-            if (target.trisindex)
-            {
+            if (target.trisindex) {
                 md.trisindex = [];
-                target.trisindex.forEach(element =>
-                {
+                target.trisindex.forEach(element => {
                     md.trisindex.push(element);
                 });
             }
@@ -1016,10 +941,8 @@
          * 
          * @param recalculate 是否重新计算AABB
          */
-        getAABB(recalculate = false)
-        {
-            if (!this._aabb || recalculate)
-            {
+        getAABB(recalculate = false) {
+            if (!this._aabb || recalculate) {
                 let minimum = new math.vector3();
                 let maximum = new math.vector3();
 
@@ -1027,8 +950,7 @@
                 math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
                 let len = this.pos.length;
                 let pos = this.pos;
-                for (var i = 0; i < len; i++)
-                {
+                for (var i = 0; i < len; i++) {
                     math.vec3Max(pos[i], maximum, maximum);
                     math.vec3Min(pos[i], minimum, minimum);
                 }

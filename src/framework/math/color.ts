@@ -64,6 +64,7 @@
     }
 
     export function colorEqual(c: color, c1: color, threshold = 0.00001): boolean {
+        if (c == c1) return true;
         if (Math.abs(c.r - c1.r) > threshold) return false;
 
         if (Math.abs(c.g - c1.g) > threshold) return false;

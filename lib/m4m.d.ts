@@ -13267,6 +13267,7 @@ declare namespace m4m.math {
     function vec4ScaleByNum(from: m4m.math.vector4, scale: number, out: m4m.math.vector4): void;
     function vec4SetAll(vector: vector4, value: number): void;
     function vec4Set(vector: vector4, x: number, y: number, z: number, w: number): void;
+    function vec4Equal(vector: vector4, vector2: vector4, threshold?: number): boolean;
 }
 declare namespace m4m.framework {
     class navVec3 {
@@ -22530,8 +22531,8 @@ declare namespace m4m.render {
         caclByteLength(): number;
         uploadVertexSubData(webgl: WebGL2RenderingContext, varray: Float32Array, offset?: number): void;
         uploadVertexData(webgl: WebGL2RenderingContext, varray: Float32Array): void;
-        uploadIndexSubData(webgl: WebGL2RenderingContext, eboindex: number, data: Uint16Array, offset?: number): void;
-        uploadIndexData(webgl: WebGL2RenderingContext, eboindex: number, data: Uint16Array, dataType?: number): void;
+        uploadIndexSubData(webgl: WebGL2RenderingContext, eboindex: number, data: TriIndexTypeArray, offset?: number): void;
+        uploadIndexData(webgl: WebGL2RenderingContext, eboindex: number, data: TriIndexTypeArray, dataType?: number): void;
         /** 顶点数组绘制三角面 */
         drawArrayTris(webgl: WebGL2RenderingContext, start?: number, count?: number, instanceCount?: number): void;
         /** 顶点数组绘制线段 */
@@ -22549,6 +22550,8 @@ declare namespace m4m.render {
     }
 }
 declare namespace m4m.render {
+    /** 三角形索引类型数组 */
+    type TriIndexTypeArray = Uint16Array | Uint32Array;
     /**
      * @private
      */
@@ -22564,8 +22567,8 @@ declare namespace m4m.render {
         blendIndex: number4[];
         blendWeight: number4[];
         trisindex: number[];
-        tmpVArr: Float32Array;
-        tmpInxArr: Uint16Array;
+        /** 三角形索引使用 uint32 模式，默认 false */
+        triIndexUint32Mode: boolean;
         static addQuadPos(data: meshData, quad: m4m.math.vector3[]): void;
         static addQuadPos_Quad(data: meshData, quad: m4m.math.vector3[]): void;
         static addQuadVec3ByValue(array: m4m.math.vector3[], value: m4m.math.vector3): void;
@@ -22585,9 +22588,9 @@ declare namespace m4m.render {
         static calcByteSize(vf: VertexFormatMask): number;
         static timer: number;
         genVertexDataArray(vf: VertexFormatMask): Float32Array;
-        genIndexDataArray(): Uint16Array;
-        genIndexDataArrayTri2Line(): Uint16Array;
-        genIndexDataArrayQuad2Line(): Uint16Array;
+        genIndexDataArray(): TriIndexTypeArray;
+        genIndexDataArrayTri2Line(): TriIndexTypeArray;
+        genIndexDataArrayQuad2Line(): TriIndexTypeArray;
         static cloneByObj(target: meshData): meshData;
         /**
          * 获取AABB
@@ -22815,7 +22818,7 @@ declare namespace m4m.render {
         private getGLFormat;
         private static mapTexture;
         static formGrayArray(webgl: WebGL2RenderingContext, array: number[] | Float32Array | Float64Array, width: number, height: number): glTexture2D;
-        static staticTexture(webgl: WebGL2RenderingContext, name: string): glTexture2D;
+        static staticTexture(webgl: WebGL2RenderingContext, name: "grid" | "gray" | "white" | "black" | "normal"): glTexture2D;
         static particleTexture(webgl: WebGL2RenderingContext, name?: string): glTexture2D;
     }
     class glTextureCube implements ITexture {

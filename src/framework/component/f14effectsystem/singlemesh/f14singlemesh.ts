@@ -50,7 +50,7 @@ namespace m4m.framework
             this.vertexCount=this.posArr.length;
             
             this.dataforvbo=this.baseddata.mesh.data.genVertexDataArray(this.effect.VF);
-            this.dataforebo=this.baseddata.mesh.data.genIndexDataArray();
+            this.dataforebo=this.baseddata.mesh.data.genIndexDataArray() as Uint16Array;
         }
     
         public refreshStartEndFrame()

@@ -53,7 +53,7 @@ namespace m4m.framework {
                 this.posArr = this.currentData.mesh.data.pos;
                 this.colorArr = this.currentData.mesh.data.color;
                 this.uvArr = this.currentData.mesh.data.uv;
-                this.dataforebo = this.currentData.mesh.data.genIndexDataArray();
+                this.dataforebo = this.currentData.mesh.data.genIndexDataArray() as Uint16Array;
                 this.vertexLength = m4m.render.meshData.calcByteSize(this.effect.VF) / 4;
                 this.dataforvboLen = this.vertexCount * this.vertexLength;
             } else {
