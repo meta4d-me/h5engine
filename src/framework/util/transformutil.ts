@@ -138,10 +138,10 @@ namespace m4m.framework {
                     TransformUtil.create2D_InputField(i2dComp as inputField, app);
                     break;
                 case Primitive2DType.Progressbar:
-
+                    TransformUtil.create2D_progressbar(i2dComp as progressbar, app);
                     break;
                 case Primitive2DType.ScrollRect:
-
+                    TransformUtil.create2D_scrollRect(i2dComp as scrollRect, app);
                     break;
             }
             return t2d;
@@ -172,10 +172,44 @@ namespace m4m.framework {
             img.sprite = app.getAssetMgr().getDefaultSprite("white_sprite");
         }
 
-        private static create2D_panel(img: image2D, app: application) {
-            img.transform.width = 100;
-            img.transform.height = 100;
+        private static create2D_progressbar(progress: progressbar, app: application) {
+            progress.transform.width = 160;
+            progress.transform.height = 20;
+            let bgimg = progress.transform.addComponent("image2D") as m4m.framework.image2D;
+            bgimg.sprite = app.getAssetMgr().getDefaultSprite("white_sprite");
+            bgimg.color = new m4m.math.color(0.6, 0.6, 0.6, 1);
+            progress.barBg = bgimg;
+
+            let layout = m4m.framework.layoutOption;
+            let Opt = layout.TOP | layout.BOTTOM | layout.LEFT;
+            let cut = this.make2DNode("FillCut", progress.transform, Opt);
+            cut.isMask = true;
+            progress.cutPanel = cut;
+
+            let fill = this.make2DNode("Fill", cut, Opt);
+            let fillimg = fill.addComponent("image2D") as m4m.framework.image2D;
+            fillimg.sprite = app.getAssetMgr().getDefaultSprite("white_sprite");
+            progress.barOverImg = fillimg;
+            
+            progress.transform.markDirty();
+        }
+
+        private static create2D_scrollRect(scrollrect: scrollRect, app: application) {
+            scrollrect.transform.width = 200;
+            scrollrect.transform.height = 200;
+            let img = scrollrect.transform.addComponent("image2D") as m4m.framework.image2D;
             img.sprite = app.getAssetMgr().getDefaultSprite("white_sprite");
+            img.color = new m4m.math.color(0.3, 0.3, 0.3, 1);
+
+            let cont = this.make2DNode("Content", scrollrect.transform);
+            cont.width = scrollrect.transform.width + 100;
+            cont.height = scrollrect.transform.height + 100;
+
+            scrollrect.content=cont;
+            scrollrect.horizontal = true;
+            scrollrect.vertical = true;
+            scrollrect.transform.isMask=true;
+            scrollrect.transform.markDirty();
         }
 
         private static create2D_label(label: label, app: application) {

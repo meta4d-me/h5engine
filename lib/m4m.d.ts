@@ -20765,7 +20765,8 @@ declare namespace m4m.framework {
         private static make2DNode;
         private static create2D_rawImage;
         private static create2D_image2D;
-        private static create2D_panel;
+        private static create2D_progressbar;
+        private static create2D_scrollRect;
         private static create2D_label;
         private static create2D_button;
         private static create2D_InputField;
