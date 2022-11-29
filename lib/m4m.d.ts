@@ -7520,7 +7520,9 @@ declare namespace m4m.framework {
         private name;
         private id;
         defaultAsset: boolean;
-        constructor(assetName?: string);
+        szContent: string;
+        bObjRes: boolean;
+        constructor(assetName?: string, isObject?: boolean);
         /**
          * @public
          * @language zh_CN
@@ -7607,8 +7609,12 @@ declare namespace m4m.framework {
          * @param webgl webgl实例
          * @version m4m 1.0
          */
-        Parse(inData: ArrayBuffer | any, webgl: WebGL2RenderingContext): Promise<IAsset>;
+        Parse(inData: ArrayBuffer | string | any, webgl: WebGL2RenderingContext): Promise<IAsset>;
+        isEmptyStr(s: string): boolean;
+        static parseFace(row: string, data: Int32Array, n: number, vcnt: number): number;
+        parseObjMesh(inData: string, webgl: any, meshdata_: m4m.render.meshData): void;
         parseCMesh(inData: any, webgl: any): void;
+        parseCMesh1(inData: any, webgl: any): void;
         /**
          * @public
          * @language zh_CN
@@ -22564,6 +22570,8 @@ declare namespace m4m.render {
         static calcByteSize(vf: VertexFormatMask): number;
         static timer: number;
         genVertexDataArray(vf: VertexFormatMask): Float32Array;
+        saveContext: string;
+        genVertexDataArray1(vf: VertexFormatMask): Float32Array;
         genIndexDataArray(): Uint16Array;
         genIndexDataArrayTri2Line(): Uint16Array;
         genIndexDataArrayQuad2Line(): Uint16Array;

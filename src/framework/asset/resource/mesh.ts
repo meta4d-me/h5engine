@@ -14,11 +14,16 @@ namespace m4m.framework {
         private name: constText;
         private id: resID = new resID();
         defaultAsset: boolean = false;
-        constructor(assetName: string = null) {
+        public szContent:string = "";
+        public bObjRes:boolean = false;
+
+        constructor(assetName: string = null, isObject:boolean = false) {
             if (!assetName) {
                 assetName = "mesh_" + this.getGUID();
             }
             this.name = new constText(assetName);
+            if(isObject)
+                this.bObjRes = true;
         }
         /**
          * @public
@@ -346,11 +351,17 @@ namespace m4m.framework {
          * @param webgl webgl实例
          * @version m4m 1.0
          */
-        Parse(inData: ArrayBuffer | any, webgl: WebGL2RenderingContext) {
+        Parse(inData: ArrayBuffer| string | any, webgl: WebGL2RenderingContext) {
             return new Promise<IAsset>((reslove, reject) => {
                 // console.error(`[解析资源] mesh 00  ${this.name.getText()}`);
                 try {
-                    this.parseCMesh(inData, webgl);
+                    if(this.bObjRes)
+                    {
+                        var data:m4m.render.meshData = new m4m.render.meshData();
+                        this.parseObjMesh(inData, webgl, data);
+                    }
+                    else
+                        this.parseCMesh1(inData, webgl);
                 } catch (error) {
                     // console.error(`[解析资源] mesh 22  ${this.name.getText()} ${error.message}`);
                     reject(error.stack);
@@ -361,6 +372,154 @@ namespace m4m.framework {
             });
         }
 
+        isEmptyStr(s:string)
+        {
+            if (s == undefined || s == null || s == '')
+            {
+                return true;
+            }
+            return false;
+        }
+
+        static parseFace(row:string, data:Int32Array, n:number, vcnt:number):number
+        {
+            var j:number = 0;
+            while (row.charAt(0) != '\0')
+            {
+                if(row.charAt(0) == "")
+                    break;
+
+                // Skip initial white space
+                while (row.charAt(0) != '\0' && (row.charAt(0) == ' ' || row.charAt(0) == '\t'))
+                    row = row.substring(1);
+                var s:string = row;
+                // Find vertex delimiter and terminated the string there for conversion.
+                while (row.charAt(0) != '\0' && row.charAt(0) != ' ' && row.charAt(0) != '\t')
+                {
+                    if (row.charAt(0) == '/')
+                        row = "\0";
+                    var tmpArray = row.split(' ');
+                    if(tmpArray.length == 0)
+                    {
+                        break;
+                    }
+                    if(tmpArray.length == 1 && tmpArray[0] == "")
+                    {
+                        break;
+                    }
+
+
+                    var firstString = tmpArray[0];
+                    var firstLength = firstString.length;
+                    row = row.substring(firstLength);
+                }
+                if (s.charAt(0) == '\0')
+                    continue;
+                //var vi:number = Number(s);
+                //data[j++] = vi < 0 ? vi+vcnt : vi-1;
+                var array = s.split(' ');
+                if(array.length >= 1)
+                {
+                    var vi:number = Number(array[0]);
+                    data[j++] = vi < 0 ? vi+vcnt : vi-1;
+                }
+                if (j >= n)
+                    return j;
+            }
+            return j;
+        }
+
+        parseObjMesh(inData:string, webgl, meshdata_:m4m.render.meshData)
+        {
+            var data: m4m.render.meshData = meshdata_;
+            data.pos = [];
+            data.trisindex = [];
+            
+            console.log(data.pos);
+            
+            //var dataPosPush:any = data.pos.push();
+
+            var dataString = inData;
+            // for (var i = 0; i < array.length; i++) {
+            //     dataString += String.fromCharCode(array[i]);
+            // }
+            var lines = dataString.split('\n');
+            var face:Int32Array = new Int32Array(32);
+            /// scan every line
+            for(var i = 0; i < lines.length; i++)
+            {
+                console.log("line:" + i);
+                if(i == 669)
+                {
+                    console.log("get");
+                }
+
+                var content:string = lines[i].trim();
+                //if(this.isEmptyStr(content))
+                    //continue;
+                if (content == undefined || content == null || content == '')
+                    continue;
+
+                if(content.charAt(0) =='#')
+                {
+                    continue;
+                }
+                if (content.charAt(0) == 'v' && content.charAt(1) != 'n' && content.charAt(1) != 't')
+                {
+                    var subLine = content.substring(1);
+                    var xyz = subLine.split(' ');
+                    var _x = 0.0;
+                    var _y = 0.0;
+                    var _z = 0.0;
+                    if(xyz.length >= 3)
+                    {
+                        _x = Number(xyz[0]);
+                        _y = Number(xyz[1]);
+                        _z = Number(xyz[2]);
+                        
+                        data.pos.push({
+                            x: _x,
+                            y: _y,
+                            z: _z
+                        });
+                    }
+                }
+                if (content.charAt(0) == 'f')
+                {
+                    // Faces
+                    var newRow:string = content.substring(1);
+
+                    var nv:number = mesh.parseFace(newRow, face, 32, data.pos.length);
+                    for (var i:number = 2; i < nv; ++i)
+                    {
+                        const a:number = face[0];
+                        const b:number = face[i-1];
+                        const c:number = face[i];
+                        if (a < 0 || a >= data.pos.length || b < 0 || b >= data.pos.length || c < 0 || c >= data.pos.length)
+                            continue;
+                        //addTriangle(a, b, c, tcap);
+
+                        data.trisindex.push(a);
+                        data.trisindex.push(b);
+                        data.trisindex.push(c);
+                    }
+                }
+
+            }
+            this.data = data;
+            this.glMesh = new m4m.render.glMesh();
+            let fmt = m4m.render.VertexFormatMask.Position;
+            data.originVF = fmt;
+            var vertexs = this.data.genVertexDataArray(this.data.originVF);
+            var indices = this.data.genIndexDataArray();
+            this.glMesh.initBuffer(webgl, this.data.originVF, this.data.pos.length);
+            this.glMesh.uploadVertexData(webgl, vertexs);
+            this.glMesh.addIndex(webgl, indices.length);
+            this.glMesh.uploadIndexData(webgl, 0, indices);
+            this.glMesh.initVAO();
+
+        }
+
         parseCMesh(inData, webgl) {
             // console.log(`parseCMesh:${this.name.getText()}`);
             var data: m4m.render.meshData = new m4m.render.meshData();
@@ -369,6 +528,7 @@ namespace m4m.framework {
             let vertexCount = read.readUInt32();
             let fmt = m4m.render.VertexFormatMask;
             data.pos = [];
+
             for (let i = 0; i < vertexCount; ++i) {
                 data.pos.push({
                     x: read.readSingle(),
@@ -453,8 +613,13 @@ namespace m4m.framework {
                 _submeshinfo.size = read.readUInt32();
                 _submeshinfo.matIndex = i;//read.readUInt8();
                 this.submesh.push(_submeshinfo);
+                //console.log("_submeshinfo.size:" + _submeshinfo.size + " _submeshinfo.size/3:" + _submeshinfo.size/3.0 + " _submeshinfo.size/4:" + _submeshinfo.size/4.0);
+                var nSum:number = 0;
                 for (var j = 0; j < _submeshinfo.size; j++) {
-                    data.trisindex.push(read.readUInt32());
+                    let iii:number = read.readUInt32();
+                    //data.trisindex.push(read.readUInt32());
+                    data.trisindex.push(iii);
+                    nSum++;
                 }
 
             }
@@ -463,6 +628,150 @@ namespace m4m.framework {
             this.glMesh = new m4m.render.glMesh();
             var vertexs = this.data.genVertexDataArray(this.data.originVF);
             var indices = this.data.genIndexDataArray();
+            this.glMesh.initBuffer(webgl, this.data.originVF, this.data.pos.length);
+            this.glMesh.uploadVertexData(webgl, vertexs);
+            this.glMesh.addIndex(webgl, indices.length);
+            this.glMesh.uploadIndexData(webgl, 0, indices);
+            this.glMesh.initVAO();
+        }
+
+
+        parseCMesh1(inData, webgl) {
+            // console.log(`parseCMesh:${this.name.getText()}`);
+            let sz = this.getName();
+            console.log(sz);
+
+            var data: m4m.render.meshData = new m4m.render.meshData();
+            var read: m4m.io.binReader = new m4m.io.binReader(inData);
+            data.originVF = read.readUInt16();
+            let vertexCount = read.readUInt32();
+            let fmt = m4m.render.VertexFormatMask;
+            data.pos = [];
+
+            for (let i = 0; i < vertexCount; ++i) {
+                data.pos.push({
+                    x: read.readSingle(),
+                    y: read.readSingle(),
+                    z: read.readSingle()
+                });
+                if (data.originVF & fmt.Normal) {
+                    data.normal = data.normal || [];
+                    data.normal.push({
+                        x: read.readSingle(),
+                        y: read.readSingle(),
+                        z: read.readSingle()
+                    });
+                }
+                if (data.originVF & fmt.Tangent) {
+                    data.tangent = data.tangent || [];
+                    data.tangent.push({
+                        x: read.readSingle(),
+                        y: read.readSingle(),
+                        z: read.readSingle()
+                    });
+                }
+
+                if (data.originVF & fmt.Color) {
+                    data.color = data.color || [];
+                    data.color.push({
+                        r: read.readSingle(),
+                        g: read.readSingle(),
+                        b: read.readSingle(),
+                        a: read.readSingle()
+                    });
+                }
+                if (data.originVF & fmt.UV0) {
+                    data.uv = data.uv || [];
+                    data.uv.push({
+                        x: read.readSingle(),
+                        y: read.readSingle()
+                    });
+                }
+                if (data.originVF & fmt.UV1) {
+                    data.uv2 = data.uv2 || [];
+                    data.uv2.push({
+                        x: read.readSingle(),
+                        y: read.readSingle()
+                    });
+                }
+                if (data.originVF & fmt.BlendIndex4) {
+                    data.blendIndex = data.blendIndex || [];
+                    data.blendIndex.push({
+                        v0: read.readUInt32(),
+                        v1: read.readUInt32(),
+                        v2: read.readUInt32(),
+                        v3: read.readUInt32()
+                    });
+                }
+                if (data.originVF & fmt.BlendWeight4) {
+                    data.blendWeight = data.blendWeight || [];
+                    data.blendWeight.push({
+                        v0: read.readSingle(),
+                        v1: read.readSingle(),
+                        v2: read.readSingle(),
+                        v3: read.readSingle()
+                    });
+                }
+                if (data.originVF & fmt.ColorEX) {
+                    data.colorex = data.colorex || [];
+                    data.colorex.push({
+                        r: read.readSingle(),
+                        g: read.readSingle(),
+                        b: read.readSingle(),
+                        a: read.readSingle()
+                    })
+                }
+            }
+
+            for (let i = 0; i < vertexCount; ++i) {
+                this.szContent += "v " + data.pos[i].x + " " + data.pos[i].y + " " + data.pos[i].z + "\n";
+            }
+
+            var len = read.readUInt8();
+            data.trisindex = [];
+            this.submesh = [];
+            for (var i = 0; i < len; ++i) {
+                var _submeshinfo: subMeshInfo = new subMeshInfo();
+                _submeshinfo.start = read.readUInt16();
+                _submeshinfo.size = read.readUInt32();
+                _submeshinfo.matIndex = i;//read.readUInt8();
+                this.submesh.push(_submeshinfo);
+                //console.log("_submeshinfo.size:" + _submeshinfo.size + " _submeshinfo.size/3:" + _submeshinfo.size/3.0 + " _submeshinfo.size/4:" + _submeshinfo.size/4.0);
+                var nSum:number = 0;
+                for (var j = 0; j < _submeshinfo.size; j++) {
+                    let iii:number = read.readUInt32();
+                    //data.trisindex.push(read.readUInt32());
+                    data.trisindex.push(iii);
+                    // if(nSum%3 == 0)
+                    //     this.szContent += "f ";
+                    // this.szContent += iii + " ";
+                    // if(nSum%3 == 2)
+                    //     this.szContent += "\n";
+                    nSum++;
+                }
+
+            }
+
+            this.data = data;
+            this.glMesh = new m4m.render.glMesh();
+            var vertexs = this.data.genVertexDataArray1(this.data.originVF);
+            
+            
+            var indices = this.data.genIndexDataArray();
+            var indices1 = data.trisindex;
+            var count = 0
+            //console.log("length:" + indices1.length + " length/3:" + indices1.length/3.0 + " length/4:" + indices1.length/4.0);
+            for(var ii = 0; ii < indices1.length/3; ii++)
+            {
+                var index0 = indices1[count] + 1;
+                var index1 = indices1[count + 1] + 1;
+                var index2 = indices1[count + 2] + 1;
+                
+                //szContent += "f " + index0 + " " + index1 + " " + index2 + "\n";
+                this.szContent += "f " + index0 + " " + index1 + " " + index2 + "\n";
+                count += 3;
+            }
+            
 
             this.glMesh.initBuffer(webgl, this.data.originVF, this.data.pos.length);
             this.glMesh.uploadVertexData(webgl, vertexs);

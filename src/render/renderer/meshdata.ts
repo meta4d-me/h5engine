@@ -859,6 +859,176 @@
             // console.error("解析Mesh总耗时：" + meshData.timer);
             return varray;
         }
+
+        saveContext : string = ""
+        genVertexDataArray1(vf: VertexFormatMask): Float32Array
+        {
+            // let timeaa = performance.now();
+            var _this = this;
+            // if (_this.tmpVArr)
+            //     return _this.tmpVArr;
+            var vertexCount = _this.pos.length;
+            var total = meshData.calcByteSize(vf) / 4;
+            var varray = new Float32Array(total * vertexCount);
+            _this.tmpVArr = varray;
+            for (var i = 0; i < vertexCount; i++)
+            {
+                var nseek = 0;
+                //pos
+                varray[i * total + nseek] = _this.pos[i].x; nseek++;
+                varray[i * total + nseek] = _this.pos[i].y; nseek++;
+                varray[i * total + nseek] = _this.pos[i].z; nseek++;
+                this.saveContext += "v " + _this.pos[i].x + " " + _this.pos[i].y + " " + _this.pos[i].z + "\n";
+
+                if (vf & VertexFormatMask.Normal)
+                {
+                    if (_this.normal == undefined || _this.normal.length == 0)
+                    {
+                        varray[i * total + nseek] = 0; nseek++;
+                        varray[i * total + nseek] = 0; nseek++;
+                        varray[i * total + nseek] = 0; nseek++;
+                    }
+                    else
+                    {
+                        varray[i * total + nseek] = _this.normal[i].x; nseek++;
+                        varray[i * total + nseek] = _this.normal[i].y; nseek++;
+                        varray[i * total + nseek] = _this.normal[i].z; nseek++;
+                    }
+                }
+                if (vf & VertexFormatMask.Tangent)
+                {
+                    if (_this.tangent == undefined || _this.tangent.length == 0)
+                    {
+                        varray[i * total + nseek] = 0; nseek++;
+                        varray[i * total + nseek] = 0; nseek++;
+                        varray[i * total + nseek] = 0; nseek++;
+                    }
+                    else
+                    {
+                        varray[i * total + nseek] = _this.tangent[i].x; nseek++;
+                        varray[i * total + nseek] = _this.tangent[i].y; nseek++;
+                        varray[i * total + nseek] = _this.tangent[i].z; nseek++;
+                    }
+                }
+                if (vf & VertexFormatMask.Color)
+                {
+                    if (_this.color == undefined || _this.color.length == 0)
+                    {
+                        varray[i * total + nseek] = 1; nseek++;
+                        varray[i * total + nseek] = 1; nseek++;
+                        varray[i * total + nseek] = 1; nseek++;
+                        varray[i * total + nseek] = 1; nseek++;
+                    }
+                    else
+                    {
+                        varray[i * total + nseek] = _this.color[i].r; nseek++;
+                        varray[i * total + nseek] = _this.color[i].g; nseek++;
+                        varray[i * total + nseek] = _this.color[i].b; nseek++;
+                        varray[i * total + nseek] = _this.color[i].a; nseek++;
+                    }
+                }
+
+                if (vf & VertexFormatMask.UV0)
+                {
+                    if (_this.uv == undefined || _this.uv.length == 0)
+                    {
+                        varray[i * total + nseek] = 0; nseek++;
+                        varray[i * total + nseek] = 0; nseek++;
+                    }
+                    else
+                    {
+                        varray[i * total + nseek] = _this.uv[i].x; nseek++;
+                        varray[i * total + nseek] = _this.uv[i].y; nseek++;
+                    }
+                }
+                if (vf & VertexFormatMask.UV1)
+                {
+                    if (_this.uv2 == undefined || _this.uv2.length == 0)
+                    {
+                        varray[i * total + nseek] = 0; nseek++;
+                        varray[i * total + nseek] = 0; nseek++;
+                    }
+                    else
+                    {
+                        varray[i * total + nseek] = _this.uv2[i].x; nseek++;
+                        varray[i * total + nseek] = _this.uv2[i].y; nseek++;
+                    }
+                }
+
+                if (vf & VertexFormatMask.BlendIndex4)
+                {
+                    if (_this.blendIndex == undefined || _this.blendIndex.length == 0)
+                    {
+                        varray[i * total + nseek] = 0; nseek++;
+                        varray[i * total + nseek] = 0; nseek++;
+                        varray[i * total + nseek] = 0; nseek++;
+                        varray[i * total + nseek] = 0; nseek++;
+                    }
+                    else
+                    {
+                        varray[i * total + nseek] = _this.blendIndex[i].v0; nseek++;
+                        varray[i * total + nseek] = _this.blendIndex[i].v1; nseek++;
+                        varray[i * total + nseek] = _this.blendIndex[i].v2; nseek++;
+                        varray[i * total + nseek] = _this.blendIndex[i].v3; nseek++;
+                    }
+                }
+                if (vf & VertexFormatMask.BlendWeight4)
+                {
+                    if (_this.blendWeight == undefined || _this.blendWeight.length == 0)
+                    {
+                        varray[i * total + nseek] = 1; nseek++;
+                        varray[i * total + nseek] = 0; nseek++;
+                        varray[i * total + nseek] = 0; nseek++;
+                        varray[i * total + nseek] = 0; nseek++;
+                    }
+                    else
+                    {
+                        varray[i * total + nseek] = _this.blendWeight[i].v0; nseek++;
+                        varray[i * total + nseek] = _this.blendWeight[i].v1; nseek++;
+                        varray[i * total + nseek] = _this.blendWeight[i].v2; nseek++;
+                        varray[i * total + nseek] = _this.blendWeight[i].v3; nseek++;
+                    }
+                }
+                if (vf & VertexFormatMask.ColorEX)
+                {
+                    if (_this.colorex == undefined || _this.colorex.length == 0)
+                    {
+                        varray[i * total + nseek] = 1; nseek++;
+                        varray[i * total + nseek] = 1; nseek++;
+                        varray[i * total + nseek] = 1; nseek++;
+                        varray[i * total + nseek] = 1; nseek++;
+                    }
+                    else
+                    {
+                        varray[i * total + nseek] = _this.colorex[i].r; nseek++;
+                        varray[i * total + nseek] = _this.colorex[i].g; nseek++;
+                        varray[i * total + nseek] = _this.colorex[i].b; nseek++;
+                        varray[i * total + nseek] = _this.colorex[i].a; nseek++;
+                    }
+                }
+            }
+            // let tttttt = performance.now() - timeaa;
+            // meshData.timer += tttttt;
+            // console.error("解析Mesh总耗时：" + meshData.timer);
+
+            // this.saveContext += "v " + "-50.0" + " " + "0.0" + " " + "50.0" + "\n";
+            // this.saveContext += "v " + "50.0" + " " + "0.0" + " " + "-50.0" + "\n";
+            // this.saveContext += "v " + "-50.0" + " " + "0.0" + " " + "-50.0" + "\n";
+            
+            //this.saveContext += "v " + "-50.0" + " " + "0.0" + " " + "50.0" + "\n";
+            //this.saveContext += "v " + "50.0" + " " + "0.0" + " " + "50.0" + "\n";
+            //this.saveContext += "v " + "50.0" + " " + "0.0" + " " + "-50.0" + "\n";
+
+            //this.saveContext += "f 0 1 2\n";
+            //this.saveContext += "f 3 4 5\n";
+
+
+
+            return varray;
+        }
+
+
+
         genIndexDataArray(): Uint16Array
         {
             // if (this.tmpInxArr)
