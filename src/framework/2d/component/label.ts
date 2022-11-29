@@ -50,8 +50,8 @@ namespace m4m.framework {
             this._text = text;
             //设置缓存长度
             // this.initdater(this._text.length);
-            this.dirtyData = true;
-            this._richDrity = hasChange;
+            this._dirtyData = true;
+            this._drityRich = hasChange;
         }
 
         private initdater(textLen: number, datar: number[]) {
@@ -106,6 +106,7 @@ namespace m4m.framework {
 
         @m4m.reflect.Field("string")
         private _fontName = "defFont.font.json";
+
         private _fontsize: number = 14;
         /**
          * @public
@@ -119,9 +120,12 @@ namespace m4m.framework {
             return this._fontsize;
         }
         set fontsize(size: number) {
+            if (this._fontsize == size) return;
             this._fontsize = size;
+            this._dirtyData = this._drityRich = true;
         }
 
+        private _linespace = 1;
         /**
          * @public
          * @language zh_CN
@@ -130,8 +134,16 @@ namespace m4m.framework {
          * @version m4m 1.0
          */
         @m4m.reflect.Field("number")
-        linespace: number = 1;//fontsize的倍数
+        get linespace() {
+            return this._linespace;//fontsize的倍数
+        }
+        set linespace(val: number) {
+            if (this._linespace == val) return;
+            this._linespace = val;
+            this._dirtyData = this._drityRich = true;
+        }
 
+        private _horizontalType: HorizontalType = HorizontalType.Left;
         /**
          * @public
          * @language zh_CN
@@ -140,8 +152,16 @@ namespace m4m.framework {
          * @version m4m 1.0
          */
         @m4m.reflect.Field("number")
-        horizontalType: HorizontalType = HorizontalType.Left;
+        get horizontalType() {
+            return this._horizontalType;
+        }
+        set horizontalType(val: number) {
+            if (this._horizontalType == val) return;
+            this._horizontalType = val;
+            this._dirtyData = this._drityRich = true;
+        }
 
+        private _verticalType: VerticalType = VerticalType.Center;
         /**
          * @public
          * @language zh_CN
@@ -150,8 +170,16 @@ namespace m4m.framework {
          * @version m4m 1.0
          */
         @m4m.reflect.Field("number")
-        verticalType: VerticalType = VerticalType.Center;
+        get verticalType() {
+            return this._verticalType;
+        }
+        set verticalType(val: number) {
+            if (this._verticalType == val) return;
+            this._verticalType = val;
+            this._dirtyData = this._drityRich = true;
+        }
 
+        private _horizontalOverflow: boolean = false;
         /**
          * @public
          * @language zh_CN
@@ -160,8 +188,17 @@ namespace m4m.framework {
          * @version m4m 1.0
          */
         @m4m.reflect.Field("boolean")
-        horizontalOverflow: boolean = false;
+        get horizontalOverflow() {
+            return this._horizontalOverflow;
+        }
+        set horizontalOverflow(val: boolean) {
+            if (this._horizontalOverflow == val) return;
+            this._horizontalOverflow = val;
+            this._dirtyData = this._drityRich = true;
+        }
 
+
+        private _verticalOverflow: boolean = false;
         /**
          * @public
          * @language zh_CN
@@ -170,8 +207,14 @@ namespace m4m.framework {
          * @version m4m 1.0
          */
         @m4m.reflect.Field("boolean")
-        verticalOverflow: boolean = false;
-
+        get verticalOverflow() {
+            return this._verticalOverflow;
+        }
+        set verticalOverflow(val: boolean) {
+            if (this._verticalOverflow == val) return;
+            this._verticalOverflow = val;
+            this._dirtyData = this._drityRich = true;
+        }
 
         private lastStr: string = "";
         /** 检查文字,是否需要 动态添加 */
@@ -760,6 +803,7 @@ namespace m4m.framework {
         /** 字符图 顶点数据 */
         private imgDatar: number[] = [];
 
+        private _color: math.color = new math.color(1, 1, 1, 1);
         /**
          * @public
          * @language zh_CN
@@ -769,8 +813,18 @@ namespace m4m.framework {
          */
         @reflect.Field("color")
         @reflect.UIStyle("color")
-        color: math.color = new math.color(1, 1, 1, 1);
+        get color() {
+            return this._color;
+        }
+        set color(val: math.color) {
+            if (this._color != val) {
+                if (math.colorEqual(this._color, val)) return;  //数值相同
+                math.colorClone(val, this._color);
+            }
+            this._dirtyData = this._drityRich = true;
+        }
 
+        private _color2: math.color = new math.color(0, 0, 0.5, 0.5);
         /**
          * @public
          * @language zh_CN
@@ -780,13 +834,30 @@ namespace m4m.framework {
          */
         @reflect.Field("color")
         @reflect.UIStyle("color")
-        color2: math.color = new math.color(0, 0, 0.5, 0.5);
+        get color2() {
+            return this._color2;
+        }
+        set color2(val: math.color) {
+            if (this._color2 != val) {
+                if (math.colorEqual(this._color2, val)) return;  //数值相同
+                math.colorClone(val, this._color2);
+            }
+            this._dirtyData = this._drityRich = true;
+        }
 
+        private _outlineWidth = 0.75;
         /**
          * 描边宽度
          */
         @reflect.Field("number")
-        outlineWidth = 0.75;
+        get outlineWidth() {
+            return this._outlineWidth;
+        }
+        set outlineWidth(val: number) {
+            if (this._outlineWidth == val) return;
+            this._outlineWidth = val;
+            this._dirtyData = this._drityRich = true;
+        }
 
         private _richText: boolean = false;
         /**
@@ -814,7 +885,7 @@ namespace m4m.framework {
         public get imageTextAtlas() { return this._imageTextAtlas; }
         public set imageTextAtlas(val: atlas) {
             if (val == this._imageTextAtlas) return;
-            this._richDrity = true;
+            this._drityRich = true;
             this._imageTextAtlas = val;
             if (this._imageTextAtlas) {
                 this._imageTextAtlasName = this._imageTextAtlas.getName();
@@ -828,7 +899,7 @@ namespace m4m.framework {
         private _defTextBlocks: IBlock[] = [{ text: "", opts: null }];
 
         /**富文本 脏标记  */
-        private _richDrity: boolean = true;
+        private _drityRich: boolean = true;
 
         private _CustomShaderName = ``;//自定义UIshader
         /**
@@ -948,7 +1019,7 @@ namespace m4m.framework {
         }
 
 
-        private dirtyData: boolean = true;
+        private _dirtyData: boolean = true;
 
         /**
          * @private
@@ -959,15 +1030,15 @@ namespace m4m.framework {
 
             if (!this._font) return;
             if (this._richText) {
-                if (this._richDrity) {
+                if (this._drityRich) {
                     //富文本模式
                     this.parseRichText(this.text);
                     this.updateDataRich(this._font);
-                    this._richDrity = false;
+                    this._drityRich = false;
                 }
-            } else if (this.dirtyData) {
+            } else if (this._dirtyData) {
                 this.updateData(this._font);
-                this.dirtyData = false;
+                this._dirtyData = false;
             }
 
             let img;
@@ -1085,8 +1156,8 @@ namespace m4m.framework {
             d_b.y = l * m.rawData[1] + t * m.rawData[3] + m.rawData[5];
             //data_begin 有变化需要dirty
             if (!math.vec2Equal(_b, d_b, 0.00001)) {
-                this.dirtyData = true;
-                this._richDrity = true;
+                this._dirtyData = true;
+                this._drityRich = true;
             }
 
             m4m.math.vec2Clone(d_b, _b);

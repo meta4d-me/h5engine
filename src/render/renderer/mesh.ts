@@ -327,16 +327,23 @@
             webgl.bufferData(webgl.ARRAY_BUFFER, varray, this.mode);
         }
 
-        uploadIndexSubData(webgl: WebGL2RenderingContext, eboindex: number, data: Uint16Array, offset: number = 0) {
+        uploadIndexSubData(webgl: WebGL2RenderingContext, eboindex: number, data: TriIndexTypeArray, offset: number = 0) {
             if (!this.ebo) return;
             // webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, this.ebos[eboindex]);
             webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, this.ebo);
             webgl.bufferSubData(webgl.ELEMENT_ARRAY_BUFFER, offset, data);
         }
 
-        uploadIndexData(webgl: WebGL2RenderingContext, eboindex: number, data: Uint16Array, dataType = WebGL2RenderingContext.UNSIGNED_SHORT) {
+        uploadIndexData(webgl: WebGL2RenderingContext, eboindex: number, data: TriIndexTypeArray, dataType = WebGL2RenderingContext.UNSIGNED_SHORT) {
             if (!this.ebo) return;
-            this.eboDataType = dataType;
+            // this.eboDataType = dataType;
+            let _dType = WebGL2RenderingContext.UNSIGNED_SHORT;
+            //webgl2 支持 32模式了, 通过类型判断是否为uint32
+            if (data && data instanceof Uint32Array) {
+                _dType = WebGL2RenderingContext.UNSIGNED_INT;
+            }
+            this.eboDataType = _dType;
+            // this.eboDataType = dataType;
             // webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, this.ebos[eboindex]);
             webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, this.ebo);
             webgl.bufferData(webgl.ELEMENT_ARRAY_BUFFER, data, this.mode);

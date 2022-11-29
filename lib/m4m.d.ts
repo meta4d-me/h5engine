@@ -2995,6 +2995,7 @@ declare namespace m4m.framework {
          */
         get fontsize(): number;
         set fontsize(size: number);
+        private _linespace;
         /**
          * @public
          * @language zh_CN
@@ -3002,7 +3003,9 @@ declare namespace m4m.framework {
          * 行高
          * @version m4m 1.0
          */
-        linespace: number;
+        get linespace(): number;
+        set linespace(val: number);
+        private _horizontalType;
         /**
          * @public
          * @language zh_CN
@@ -3010,7 +3013,9 @@ declare namespace m4m.framework {
          * 水平排列方式
          * @version m4m 1.0
          */
-        horizontalType: HorizontalType;
+        get horizontalType(): number;
+        set horizontalType(val: number);
+        private _verticalType;
         /**
          * @public
          * @language zh_CN
@@ -3018,7 +3023,9 @@ declare namespace m4m.framework {
          * 垂直排列方式
          * @version m4m 1.0
          */
-        verticalType: VerticalType;
+        get verticalType(): number;
+        set verticalType(val: number);
+        private _horizontalOverflow;
         /**
          * @public
          * @language zh_CN
@@ -3026,7 +3033,9 @@ declare namespace m4m.framework {
          * 是否横向溢出
          * @version m4m 1.0
          */
-        horizontalOverflow: boolean;
+        get horizontalOverflow(): boolean;
+        set horizontalOverflow(val: boolean);
+        private _verticalOverflow;
         /**
          * @public
          * @language zh_CN
@@ -3034,7 +3043,8 @@ declare namespace m4m.framework {
          * 是否竖向溢出
          * @version m4m 1.0
          */
-        verticalOverflow: boolean;
+        get verticalOverflow(): boolean;
+        set verticalOverflow(val: boolean);
         private lastStr;
         /** 检查文字,是否需要 动态添加 */
         private chackText;
@@ -3060,6 +3070,7 @@ declare namespace m4m.framework {
         private datar;
         /** 字符图 顶点数据 */
         private imgDatar;
+        private _color;
         /**
          * @public
          * @language zh_CN
@@ -3067,7 +3078,9 @@ declare namespace m4m.framework {
          * 填充颜色
          * @version m4m 1.0
          */
-        color: math.color;
+        get color(): math.color;
+        set color(val: math.color);
+        private _color2;
         /**
          * @public
          * @language zh_CN
@@ -3075,11 +3088,14 @@ declare namespace m4m.framework {
          * 描边颜色
          * @version m4m 1.0
          */
-        color2: math.color;
+        get color2(): math.color;
+        set color2(val: math.color);
+        private _outlineWidth;
         /**
          * 描边宽度
          */
-        outlineWidth: number;
+        get outlineWidth(): number;
+        set outlineWidth(val: number);
         private _richText;
         /**
          * 富文本模式 , 通过特定标签使用。
@@ -3105,7 +3121,7 @@ declare namespace m4m.framework {
         /** 纯文本默认 块列表 */
         private _defTextBlocks;
         /**富文本 脏标记  */
-        private _richDrity;
+        private _drityRich;
         private _CustomShaderName;
         /**
          * @public
@@ -3145,7 +3161,7 @@ declare namespace m4m.framework {
          */
         private _imgUIMat;
         private get imgUIMat();
-        private dirtyData;
+        private _dirtyData;
         /**
          * @private
          */
@@ -8985,6 +9001,10 @@ declare namespace m4m.framework {
         private static helprect;
         private projectMatrixDirty;
         /**
+         * 后处理渲染颜色清理优先使用雾颜色
+         */
+        postClearUseFogColor: boolean;
+        /**
          * 相机剔除时，计算 z 轴上的平面 （far & near plane）
          */
         cullZPlane: boolean;
@@ -13063,6 +13083,7 @@ declare namespace m4m.math {
     function scaleToRef(src: color, scale: number, out: color): void;
     function colorClone(src: color, out: color): void;
     function colorLerp(srca: color, srcb: color, t: number, out: color): void;
+    function colorEqual(c: color, c1: color, threshold?: number): boolean;
     /**
      * 颜色转成 CSS 格式
      * @param src
@@ -13252,6 +13273,7 @@ declare namespace m4m.math {
     function vec4ScaleByNum(from: m4m.math.vector4, scale: number, out: m4m.math.vector4): void;
     function vec4SetAll(vector: vector4, value: number): void;
     function vec4Set(vector: vector4, x: number, y: number, z: number, w: number): void;
+    function vec4Equal(vector: vector4, vector2: vector4, threshold?: number): boolean;
 }
 declare namespace m4m.framework {
     class navVec3 {
@@ -20700,7 +20722,13 @@ declare namespace m4m.framework {
         /** 按钮 */
         Button = 3,
         /** 输入框 */
-        InputField = 4
+        InputField = 4,
+        /** 进度条 */
+        Progressbar = 5,
+        /** Panel */
+        Panel = 6,
+        /** ScrollView */
+        ScrollRect = 7
     }
     /**
      * 判断 函数对象代码实现内容是否是空的
@@ -20743,6 +20771,8 @@ declare namespace m4m.framework {
         private static make2DNode;
         private static create2D_rawImage;
         private static create2D_image2D;
+        private static create2D_progressbar;
+        private static create2D_scrollRect;
         private static create2D_label;
         private static create2D_button;
         private static create2D_InputField;
@@ -22515,8 +22545,8 @@ declare namespace m4m.render {
         caclByteLength(): number;
         uploadVertexSubData(webgl: WebGL2RenderingContext, varray: Float32Array, offset?: number): void;
         uploadVertexData(webgl: WebGL2RenderingContext, varray: Float32Array): void;
-        uploadIndexSubData(webgl: WebGL2RenderingContext, eboindex: number, data: Uint16Array, offset?: number): void;
-        uploadIndexData(webgl: WebGL2RenderingContext, eboindex: number, data: Uint16Array, dataType?: number): void;
+        uploadIndexSubData(webgl: WebGL2RenderingContext, eboindex: number, data: TriIndexTypeArray, offset?: number): void;
+        uploadIndexData(webgl: WebGL2RenderingContext, eboindex: number, data: TriIndexTypeArray, dataType?: number): void;
         /** 顶点数组绘制三角面 */
         drawArrayTris(webgl: WebGL2RenderingContext, start?: number, count?: number, instanceCount?: number): void;
         /** 顶点数组绘制线段 */
@@ -22534,6 +22564,8 @@ declare namespace m4m.render {
     }
 }
 declare namespace m4m.render {
+    /** 三角形索引类型数组 */
+    type TriIndexTypeArray = Uint16Array | Uint32Array;
     /**
      * @private
      */
@@ -22549,8 +22581,8 @@ declare namespace m4m.render {
         blendIndex: number4[];
         blendWeight: number4[];
         trisindex: number[];
-        tmpVArr: Float32Array;
-        tmpInxArr: Uint16Array;
+        /** 三角形索引使用 uint32 模式，默认 false */
+        triIndexUint32Mode: boolean;
         static addQuadPos(data: meshData, quad: m4m.math.vector3[]): void;
         static addQuadPos_Quad(data: meshData, quad: m4m.math.vector3[]): void;
         static addQuadVec3ByValue(array: m4m.math.vector3[], value: m4m.math.vector3): void;
@@ -22572,9 +22604,9 @@ declare namespace m4m.render {
         genVertexDataArray(vf: VertexFormatMask): Float32Array;
         saveContext: string;
         genVertexDataArray1(vf: VertexFormatMask): Float32Array;
-        genIndexDataArray(): Uint16Array;
-        genIndexDataArrayTri2Line(): Uint16Array;
-        genIndexDataArrayQuad2Line(): Uint16Array;
+        genIndexDataArray(): TriIndexTypeArray;
+        genIndexDataArrayTri2Line(): TriIndexTypeArray;
+        genIndexDataArrayQuad2Line(): TriIndexTypeArray;
         static cloneByObj(target: meshData): meshData;
         /**
          * 获取AABB
@@ -22802,7 +22834,7 @@ declare namespace m4m.render {
         private getGLFormat;
         private static mapTexture;
         static formGrayArray(webgl: WebGL2RenderingContext, array: number[] | Float32Array | Float64Array, width: number, height: number): glTexture2D;
-        static staticTexture(webgl: WebGL2RenderingContext, name: string): glTexture2D;
+        static staticTexture(webgl: WebGL2RenderingContext, name: "grid" | "gray" | "white" | "black" | "normal"): glTexture2D;
         static particleTexture(webgl: WebGL2RenderingContext, name?: string): glTexture2D;
     }
     class glTextureCube implements ITexture {
@@ -22842,6 +22874,41 @@ declare namespace m4m.render {
         height: number;
         dispose(webgl: WebGL2RenderingContext): void;
         caclByteLength(): number;
+    }
+    /**
+     * 视频纹理
+     */
+    class videoTexture implements ITexture {
+        private _video;
+        private _needUpdateVideo;
+        texture: WebGLTexture;
+        width: number;
+        height: number;
+        premultiply: boolean;
+        flipY: boolean;
+        mipmap: boolean;
+        linear: boolean;
+        repeat: boolean;
+        mirroredU: boolean;
+        mirroredV: boolean;
+        constructor(video: HTMLVideoElement);
+        /** 视频对象 */
+        get video(): HTMLVideoElement;
+        /**
+         * 应用webgl纹理属性
+         */
+        applyProperty(): void;
+        isFrameBuffer(): boolean;
+        dispose(webgl: WebGL2RenderingContext): void;
+        caclByteLength(): number;
+        /** 开启 视频到纹理的更新循环 */
+        loopVideoToTexture(): void;
+        /** 更新 视频帧 到纹理 , */
+        private updateVideo;
+        /**
+         * 更新纹理
+         */
+        private refreshTexture;
     }
 }
 //# sourceMappingURL=m4m.d.ts.map

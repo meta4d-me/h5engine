@@ -61,7 +61,7 @@ namespace m4m.framework
                 this.dataForVbo=this.meshlist[0].baseddata.mesh.data.genVertexDataArray(this.effect.VF);
                 
                 //this.dataForEbo=this.meshlist[0].dataforebo;
-                this.dataForEbo=this.meshlist[0].baseddata.mesh.data.genIndexDataArray();
+                this.dataForEbo=this.meshlist[0].baseddata.mesh.data.genIndexDataArray() as Uint16Array;
 
                 this.mesh.glMesh.initBuffer(this.effect.webgl,this.effect.VF,this.meshlist[0].baseddata.mesh.data.pos.length,render.MeshTypeEnum.Static);
                 this.mesh.glMesh.uploadVertexData(this.effect.webgl, this.dataForVbo);

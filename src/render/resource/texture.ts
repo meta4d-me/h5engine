@@ -492,56 +492,23 @@
             return t;
         }
 
-        static staticTexture(webgl: WebGL2RenderingContext, name: string) {
-            var t = glTexture2D.mapTexture[name];
-            if (t != undefined)
-                return t;
-
-
-            var mipmap = false;
-            var linear = true;
+        static staticTexture(webgl: WebGL2RenderingContext, name: "grid" | "gray" | "white" | "black" | "normal") {
+            let t = glTexture2D.mapTexture[name];
+            if (t != undefined) return t;
+            const mipmap = false;
+            const linear = true;
             t = new glTexture2D(webgl, TextureFormatEnum.RGBA, mipmap, linear);
 
-            var data = new Uint8Array(4);
-            var width = 1;
-            var height = 1;
-            data[0] = 128;
-            data[1] = 0;
-            data[2] = 128;
-            data[3] = 255;
-            if (name == "gray") {
-                data[0] = 128;
-                data[1] = 128;
-                data[2] = 128;
-                data[3] = 255;
-            }
-            else if (name == "white") {
-                data[0] = 255;
-                data[1] = 255;
-                data[2] = 255;
-                data[3] = 255;
-            }
-            else if (name == "black") {
-                data[0] = 0;
-                data[1] = 0;
-                data[2] = 0;
-                data[3] = 255;
-            }
-            else if (name == "normal") {
-                data[0] = 128;
-                data[1] = 128;
-                data[2] = 255;
-                data[3] = 255;
-            }
-            else if (name == "grid") {
-                width = 256;
-                height = 256;
-                data = new Uint8Array(width * width * 4);
-                for (var y = 0; y < height; y++) {
-                    for (var x = 0; x < width; x++) {
-                        var seek = (y * width + x) * 4;
+            let size = 1;
+            let data: Uint8Array;
+            if (name == "grid") {
+                size = 256
+                data = new Uint8Array(size * size * 4);
+                for (let y = 0; y < size; y++) {
+                    for (let x = 0; x < size; x++) {
+                        let seek = (y * size + x) * 4;
 
-                        if (((x - width * 0.5) * (y - height * 0.5)) > 0) {
+                        if (((x - size * 0.5) * (y - size * 0.5)) > 0) {
                             data[seek] = 0;
                             data[seek + 1] = 0;
                             data[seek + 2] = 0;
@@ -555,10 +522,29 @@
                         }
                     }
                 }
+            } else {
+                let rg = 0, b = 0;
+                switch (name) {
+                    case "gray": rg = b = 128; break;
+                    case "white": rg = b = 255; break;
+                    case "black": rg = b = 0; break;
+                    case "normal": rg = 128, b = 255; break;
+                }
 
+                size = 16;
+                data = new Uint8Array(size * size * 4);
+                for (let y = 0; y < size; y++) {
+                    for (let x = 0; x < size; x++) {
+                        let seek = (y * size + x) * 4;
+                        data[seek] = rg;
+                        data[seek + 1] = rg;
+                        data[seek + 2] = b;
+                        data[seek + 3] = 255;
+                    }
+                }
             }
 
-            t.uploadByteArray(mipmap, linear, width, height, data);
+            t.uploadByteArray(mipmap, linear, size, size, data);
 
             glTexture2D.mapTexture[name] = t;
             return t;
@@ -913,4 +899,186 @@
             return len;
         }
     }
+
+    /**
+     * 视频纹理
+     */
+    export class videoTexture implements ITexture {
+        private _video: HTMLVideoElement;
+        private _needUpdateVideo = false;
+        public texture: WebGLTexture;
+        public width: number = 1;
+        public height: number = 1;
+        public premultiply: boolean = false;
+        public flipY: boolean = true;
+        public mipmap: boolean = false;
+        public linear: boolean = true;
+        public repeat: boolean = true;
+        public mirroredU: boolean = false;
+        public mirroredV: boolean = false;
+        constructor(video: HTMLVideoElement) {
+            this._video = video;
+            const gl = m4m.framework.sceneMgr.app.webgl;
+            this.texture = gl.createTexture();
+            if (!video) {
+                console.error(`video is null`);
+                return;
+            }
+            this.width = video.width;
+            this.height = video.height;
+            this.applyProperty();
+            if (video.buffered.length) {    //video 有数据了可以上传纹理
+                this.refreshTexture();
+            }
+            if ('requestVideoFrameCallback' in video) {
+                video.requestVideoFrameCallback(() => {
+                    this.updateVideo();
+                });
+            }
+        }
+
+        /** 视频对象 */
+        public get video() { return this._video; }
+
+        /**
+         * 应用webgl纹理属性
+         */
+        applyProperty() {
+            if (!this._video) {
+                console.warn(`video is null`);
+            }
+            let mipmap = this.mipmap;
+            if (mipmapCancel) {
+                mipmap = false;
+            }
+            const linear = this.linear;
+            const repeat = this.repeat;
+            const mirroredU = this.mirroredU;
+            const mirroredV = this.mirroredV;
+
+            const gl = m4m.framework.sceneMgr.app.webgl;
+            gl.bindTexture(gl.TEXTURE_2D, this.texture);
+
+            if (mipmap) {
+                //生成mipmap
+                gl.generateMipmap(gl.TEXTURE_2D);
+
+                if (linear) {
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+                }
+                else {
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_NEAREST);
+
+                }
+            }
+            else {
+                if (linear) {
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+                }
+                else {
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+
+                }
+            }
+
+            if (repeat) {
+                if (mirroredU && mirroredV) {
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.MIRRORED_REPEAT);
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.MIRRORED_REPEAT);
+                }
+                else if (mirroredU) {
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.MIRRORED_REPEAT);
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+                }
+                else if (mirroredV) {
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.MIRRORED_REPEAT);
+                }
+                else {
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+                }
+            }
+            else {
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            }
+
+            gl.bindTexture(gl.TEXTURE_2D, null);
+        }
+
+        isFrameBuffer(): boolean {
+            return false;
+        }
+        dispose(webgl: WebGL2RenderingContext) {
+            this._video = null;
+            const gl = m4m.framework.sceneMgr.app.webgl;
+            if (this.texture) {
+                gl.deleteTexture(this.texture);
+                this.texture = null;
+            }
+
+        }
+        caclByteLength(): number {
+            return 0;
+        }
+
+        /** 开启 视频到纹理的更新循环 */
+        loopVideoToTexture() {
+            if (this._needUpdateVideo) return;
+            this.updateVideo();
+        }
+
+        /** 更新 视频帧 到纹理 , */
+        private updateVideo() {
+            this._needUpdateVideo = false;
+
+            if (!this._video) {
+                console.warn(`video is null`);
+                return;
+            }
+
+            //更新帧数据到 webgl 纹理
+            this.refreshTexture();
+
+            if ('requestVideoFrameCallback' in this._video) {
+                this._needUpdateVideo = true;
+                this._video.requestVideoFrameCallback(() => {
+                    this.updateVideo();
+                });
+            }
+
+        }
+
+        /**
+         * 更新纹理
+         */
+        private refreshTexture() {
+            if (!this._video) {
+                console.warn(`video is null`);
+            }
+            const gl = m4m.framework.sceneMgr.app.webgl;
+            gl.bindTexture(gl.TEXTURE_2D, this.texture);
+
+            gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this.premultiply ? 1 : 0);
+            gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, this.flipY ? 1 : 0);
+
+            let formatGLxF = gl.RGB;
+            let internalformatGL = gl.RGB;
+            gl.texImage2D(gl.TEXTURE_2D,
+                0,
+                internalformatGL,
+                formatGLxF,
+                //最后这个type，可以管格式
+                gl.UNSIGNED_BYTE
+                , this._video);
+
+            gl.bindTexture(gl.TEXTURE_2D, null);
+        }
+    }
+
 }
