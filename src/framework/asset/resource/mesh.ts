@@ -754,7 +754,7 @@ namespace m4m.framework {
 
             this.data = data;
             this.glMesh = new m4m.render.glMesh();
-            var vertexs = this.data.genVertexDataArray1(this.data.originVF);
+            var vertexs = this.data.genVertexDataArray(this.data.originVF);
             
             
             var indices = this.data.genIndexDataArray();
