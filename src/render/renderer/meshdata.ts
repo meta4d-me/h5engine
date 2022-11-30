@@ -48,6 +48,20 @@
         // private tmpVArr: Float32Array;
         // private tmpInxArr: Uint16Array;
 
+        /**
+         * 请使用 vertexBufferData ,为了兼容工具链暂时保留
+         * @deprecated 遗弃的接口 
+         */
+        private get tmpVArr() { return this.vertexBufferData; }
+        private set tmpVArr(val) { this.vertexBufferData = val; }
+
+        /**
+         * 请使用 triIndexBufferData ,为了兼容工具链暂时保留
+         * @deprecated 遗弃的接口 
+         */
+        private get tmpInxArr() { return this.triIndexBufferData; }
+        private set tmpInxArr(val) { this.triIndexBufferData = val; }
+
         static addQuadPos(data: meshData, quad: m4m.math.vector3[]): void {
             var istart = data.pos.length;
             meshData.addQuadVec3(data.pos, quad);
