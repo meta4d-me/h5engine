@@ -22612,6 +22612,18 @@ declare namespace m4m.render {
         vertexBufferData: Float32Array;
         /** 三角形索引数据buffer */
         triIndexBufferData: TriIndexTypeArray;
+        /**
+         * 请使用 vertexBufferData ,为了兼容工具链暂时保留
+         * @deprecated 遗弃的接口
+         */
+        private get tmpVArr();
+        private set tmpVArr(value);
+        /**
+         * 请使用 triIndexBufferData ,为了兼容工具链暂时保留
+         * @deprecated 遗弃的接口
+         */
+        private get tmpInxArr();
+        private set tmpInxArr(value);
         static addQuadPos(data: meshData, quad: m4m.math.vector3[]): void;
         static addQuadPos_Quad(data: meshData, quad: m4m.math.vector3[]): void;
         static addQuadVec3ByValue(array: m4m.math.vector3[], value: m4m.math.vector3): void;
