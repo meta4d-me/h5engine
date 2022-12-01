@@ -1,29 +1,66 @@
 ﻿namespace m4m.render {
 
+    type vertexData = {
+        pos: math.vector3, color: math.color, colorex: math.color,
+        uv: math.vector2, uv2: math.vector2, normal: math.vector3, tangent: math.vector3,
+        blendIndex: number4, blendWeight: number4
+    };
+
     /** 三角形索引类型数组 */
     export type TriIndexTypeArray = Uint16Array | Uint32Array;
     /**
      * @private
      */
     export class meshData {
+        /** 顶点数据格式 */
         originVF: number;
 
+        /** 顶点位置数组 */
         pos: m4m.math.vector3[];//use pos.length 作为定点数量
+        /** 顶点色数组 */
         color: m4m.math.color[];
+        /** 顶点色2数组 */
         colorex: m4m.math.color[];
+        /** 顶点UV1数组 */
         uv: m4m.math.vector2[];
+        /** 顶点UV2数组 */
         uv2: m4m.math.vector2[];//lightmap
+        /** 顶点法线数组 */
         normal: m4m.math.vector3[];//法线
+        /** 顶点切线数组 */
         tangent: m4m.math.vector3[];//切线
+        /** 顶点骨骼索引数组 */
         blendIndex: number4[];
+        /** 顶点骨骼权重数组 */
         blendWeight: number4[];
-        //三角形索引
+        /** 三角形索引数组 */
         trisindex: number[];
         /** 三角形索引使用 uint32 模式，默认 false */
         triIndexUint32Mode = false;
 
+        /** 数据是缓冲区模式 */
+        public get isBufferDataMode() { return this.vertexBufferData != null; }
+        /** 顶点数据buffer */
+        public vertexBufferData: Float32Array;
+        /** 三角形索引数据buffer */
+        public triIndexBufferData: TriIndexTypeArray;
+
         // private tmpVArr: Float32Array;
         // private tmpInxArr: Uint16Array;
+
+        /**
+         * 请使用 vertexBufferData ,为了兼容工具链暂时保留
+         * @deprecated 遗弃的接口 
+         */
+        private get tmpVArr() { return this.vertexBufferData; }
+        private set tmpVArr(val) { this.vertexBufferData = val; }
+
+        /**
+         * 请使用 triIndexBufferData ,为了兼容工具链暂时保留
+         * @deprecated 遗弃的接口 
+         */
+        private get tmpInxArr() { return this.triIndexBufferData; }
+        private set tmpInxArr(val) { this.triIndexBufferData = val; }
 
         static addQuadPos(data: meshData, quad: m4m.math.vector3[]): void {
             var istart = data.pos.length;
@@ -61,7 +98,6 @@
             array.push(quad[2]);
             array.push(quad[3]);
         }
-
 
         static genQuad(size: number): meshData {
             var half = size * 0.5;
@@ -683,10 +719,149 @@
             return total;
         }
 
-        static timer = 0;
+
+        /**
+         * 遍历顶点数据
+         * @param callbackfn 遍历每个顶点数据时调用的函数
+         */
+        foreachVertexData(callbackfn: (value: vertexData, index: number) => any) {
+            //
+            if (callbackfn == null) return;
+            const isBufferM = this.isBufferDataMode;
+            if (isBufferM && !this.vertexBufferData) return;
+            //
+            const vdata: vertexData = {} as any;
+            const vf = this.originVF;
+            if (!isBufferM) {
+                const len = this.pos.length;
+                for (let i = 0; i < len; i++) {
+                    //pos
+                    vdata.pos = this.pos[i];
+                    vdata.normal = vf & VertexFormatMask.Normal ? this.normal[i] : null;
+                    vdata.tangent = vf & VertexFormatMask.Tangent ? this.tangent[i] : null;
+                    vdata.uv = vf & VertexFormatMask.UV0 ? this.uv[i] : null;
+                    vdata.uv2 = vf & VertexFormatMask.UV1 ? this.uv2[i] : null;
+                    vdata.color = vf & VertexFormatMask.Color ? this.color[i] : null;
+                    vdata.colorex = vf & VertexFormatMask.ColorEX ? this.colorex[i] : null;
+                    vdata.blendIndex = vf & VertexFormatMask.BlendIndex4 ? this.blendIndex[i] : null;
+                    vdata.blendWeight = vf & VertexFormatMask.BlendWeight4 ? this.blendWeight[i] : null;
+                    //callback
+                    callbackfn(vdata, i);
+                }
+            } else {
+                const _pos = new math.vector3();
+                const _normal = new math.vector3();
+                const _tangent = new math.vector3();
+                const _uv = new math.vector2();
+                const _uv2 = new math.vector2();
+                const _color = new math.color();
+                const _colorex = new math.color();
+                const _blendIndex = new number4();
+                const _blendWeight = new number4();
+
+                const vBuffer = this.vertexBufferData;
+                const segmentSize = 3 +
+                    (vf & VertexFormatMask.Normal ? 3 : 0) +
+                    (vf & VertexFormatMask.Tangent ? 3 : 0) +
+                    (vf & VertexFormatMask.UV0 ? 2 : 0) +
+                    (vf & VertexFormatMask.UV1 ? 2 : 0) +
+                    (vf & VertexFormatMask.Color ? 4 : 0) +
+                    (vf & VertexFormatMask.ColorEX ? 4 : 0) +
+                    (vf & VertexFormatMask.BlendIndex4 ? 4 : 0) +
+                    (vf & VertexFormatMask.BlendWeight4 ? 4 : 0)
+                    ;
+
+
+                const len = Math.floor(vBuffer.length / segmentSize);
+                vdata.pos = _pos;
+                for (let i = 0; i < len; i++) {
+                    let idx = i * segmentSize;
+
+                    vdata.normal = (vf & VertexFormatMask.Normal) ? _normal : null;
+                    vdata.tangent = (vf & VertexFormatMask.Tangent) ? _tangent : null;
+                    vdata.color = (vf & VertexFormatMask.Color) ? _color : null;
+                    vdata.uv = (vf & VertexFormatMask.UV0) ? _uv : null;
+                    vdata.uv2 = (vf & VertexFormatMask.UV1) ? _uv2 : null;
+                    vdata.blendIndex = (vf & VertexFormatMask.BlendIndex4) ? _blendIndex : null;
+                    vdata.blendWeight = (vf & VertexFormatMask.BlendWeight4) ? _blendWeight : null;
+                    vdata.colorex = (vf & VertexFormatMask.ColorEX) ? _colorex : null;
+                    //
+                    math.vec3Set(vdata.pos, vBuffer[idx++], vBuffer[idx++], vBuffer[idx++]);
+                    if (vdata.normal) math.vec3Set(vdata.normal, vBuffer[idx++], vBuffer[idx++], vBuffer[idx++]);
+                    if (vdata.tangent) math.vec3Set(vdata.tangent, vBuffer[idx++], vBuffer[idx++], vBuffer[idx++]);
+                    if (vdata.color) math.colorSet(vdata.color, vBuffer[idx++], vBuffer[idx++], vBuffer[idx++], vBuffer[idx++]);
+                    if (vdata.uv) math.vec2Set(vdata.uv, vBuffer[idx++], vBuffer[idx++]);
+                    if (vdata.uv2) math.vec2Set(vdata.uv2, vBuffer[idx++], vBuffer[idx++]);
+                    if (vdata.blendIndex) number4.set(vdata.blendIndex, vBuffer[idx++], vBuffer[idx++], vBuffer[idx++], vBuffer[idx++]);
+                    if (vdata.blendWeight) number4.set(vdata.blendWeight, vBuffer[idx++], vBuffer[idx++], vBuffer[idx++], vBuffer[idx++]);
+                    if (vdata.colorex) math.colorSet(vdata.colorex, vBuffer[idx++], vBuffer[idx++], vBuffer[idx++], vBuffer[idx++]);
+                    //callBack
+                    callbackfn(vdata, i);
+                }
+            }
+        }
+
+        /**
+         * 遍历三角形索引数据
+         * @param callbackfn 遍历每个三角形索引时调用的函数
+         */
+        foreachTriIndexData(callbackfn: (value: number, index: number) => any) {
+            if (callbackfn == null) return;
+            const arr = this.isBufferDataMode ? this.triIndexBufferData : this.trisindex;
+            if (arr == null) return;
+            for (let i = 0, len = arr.length; i < len; i++) {
+                callbackfn(arr[i], i);
+            }
+        }
+
+        /**
+         * 获取 OBJ 格式模型 顶点数据字符串
+         * @param face 导出三角形面
+         * @param uv 导出顶点纹理坐标
+         * @param normal 导出顶点法线
+         * @returns OBJ 格式模型 顶点数据字符串
+         */
+        makeOBJFormatData(face = true, uv = false, normal = false): string {
+            let vStr = "";
+            let uvStr = "";
+            let nStr = "";
+            let faceStr = "";
+            this.foreachVertexData((val, i) => {
+                const pos = val.pos;
+                const _uv = val.uv;
+                const _n = val.normal;
+                vStr += `v ${pos.x} ${pos.y} ${pos.z}\n`;
+                if (uv && _uv) uvStr += `vt ${_uv.x} ${_uv.y}\n`;
+                if (normal && _n) nStr += `vn ${_n.x} ${_n.y} ${_n.z}\n`;
+            });
+
+            if (face) {
+                this.foreachTriIndexData((val, i) => {
+                    const triCount = i % 3;
+                    const _v = val + 1;
+                    if (triCount == 0) {
+                        faceStr += `f ${_v}`;
+                    } else if (triCount == 1) {
+                        faceStr += ` ${_v}`;
+                    } else if (triCount == 2) {
+                        faceStr += ` ${_v}\n`;
+                    }
+                });
+            }
+
+            return vStr + uvStr + nStr + faceStr;
+        }
+
+        // static timer = 0;
+        /**
+         * 生成顶点数据buffer
+         * @param vf 顶点数据格式
+         * @returns 点数据buffer
+         */
         genVertexDataArray(vf: VertexFormatMask): Float32Array {
-            // let timeaa = performance.now();
-            var _this = this;
+            const _this = this;
+            //buffer 数据模式 ，直接返回
+            if (_this.isBufferDataMode) return _this.vertexBufferData;
             // if (_this.tmpVArr)
             //     return _this.tmpVArr;
             var vertexCount = _this.pos.length;
@@ -807,10 +982,13 @@
             // console.error("解析Mesh总耗时：" + meshData.timer);
             return varray;
         }
+
+        /**
+         * 生成 三角形索引buffer数据
+         * @returns 三角形索引buffer数据
+         */
         genIndexDataArray(): TriIndexTypeArray {
-            // if (this.tmpInxArr)
-            //     return this.tmpInxArr;
-            // return this.tmpInxArr = new Uint16Array(this.trisindex);
+            if (this.isBufferDataMode) return this.triIndexBufferData;
             return this.triIndexUint32Mode ? new Uint32Array(this.trisindex) : new Uint16Array(this.trisindex);
         }
         genIndexDataArrayTri2Line(): TriIndexTypeArray {

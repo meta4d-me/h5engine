@@ -53,6 +53,12 @@
         v1: number;
         v2: number;
         v3: number;
+        public static set(data: number4, _v0: number, _v1: number, _v2: number, _v3: number) {
+            data.v0 = _v0;
+            data.v1 = _v1;
+            data.v2 = _v2;
+            data.v3 = _v3;
+        }
     }
     /**
      * @private

@@ -7536,7 +7536,9 @@ declare namespace m4m.framework {
         private name;
         private id;
         defaultAsset: boolean;
-        constructor(assetName?: string);
+        szContent: string;
+        bObjRes: boolean;
+        constructor(assetName?: string, isObject?: boolean);
         /**
          * @public
          * @language zh_CN
@@ -7623,8 +7625,12 @@ declare namespace m4m.framework {
          * @param webgl webgl实例
          * @version m4m 1.0
          */
-        Parse(inData: ArrayBuffer | any, webgl: WebGL2RenderingContext): Promise<IAsset>;
+        Parse(inData: ArrayBuffer | string | any, webgl: WebGL2RenderingContext): Promise<IAsset>;
+        isEmptyStr(s: string): boolean;
+        static parseFace(row: string, data: Int32Array, n: number, vcnt: number): number;
+        parseObjMesh(inData: string, webgl: any, meshdata_: m4m.render.meshData): void;
         parseCMesh(inData: any, webgl: any): void;
+        parseCMesh1(inData: any, webgl: any): void;
         /**
          * @public
          * @language zh_CN
@@ -22490,6 +22496,7 @@ declare namespace m4m.render {
         v1: number;
         v2: number;
         v3: number;
+        static set(data: number4, _v0: number, _v1: number, _v2: number, _v3: number): void;
     }
     /**
      * @private
@@ -22558,25 +22565,65 @@ declare namespace m4m.render {
     }
 }
 declare namespace m4m.render {
+    type vertexData = {
+        pos: math.vector3;
+        color: math.color;
+        colorex: math.color;
+        uv: math.vector2;
+        uv2: math.vector2;
+        normal: math.vector3;
+        tangent: math.vector3;
+        blendIndex: number4;
+        blendWeight: number4;
+    };
     /** 三角形索引类型数组 */
-    type TriIndexTypeArray = Uint16Array | Uint32Array;
+    export type TriIndexTypeArray = Uint16Array | Uint32Array;
     /**
      * @private
      */
-    class meshData {
+    export class meshData {
+        /** 顶点数据格式 */
         originVF: number;
+        /** 顶点位置数组 */
         pos: m4m.math.vector3[];
+        /** 顶点色数组 */
         color: m4m.math.color[];
+        /** 顶点色2数组 */
         colorex: m4m.math.color[];
+        /** 顶点UV1数组 */
         uv: m4m.math.vector2[];
+        /** 顶点UV2数组 */
         uv2: m4m.math.vector2[];
+        /** 顶点法线数组 */
         normal: m4m.math.vector3[];
+        /** 顶点切线数组 */
         tangent: m4m.math.vector3[];
+        /** 顶点骨骼索引数组 */
         blendIndex: number4[];
+        /** 顶点骨骼权重数组 */
         blendWeight: number4[];
+        /** 三角形索引数组 */
         trisindex: number[];
         /** 三角形索引使用 uint32 模式，默认 false */
         triIndexUint32Mode: boolean;
+        /** 数据是缓冲区模式 */
+        get isBufferDataMode(): boolean;
+        /** 顶点数据buffer */
+        vertexBufferData: Float32Array;
+        /** 三角形索引数据buffer */
+        triIndexBufferData: TriIndexTypeArray;
+        /**
+         * 请使用 vertexBufferData ,为了兼容工具链暂时保留
+         * @deprecated 遗弃的接口
+         */
+        private get tmpVArr();
+        private set tmpVArr(value);
+        /**
+         * 请使用 triIndexBufferData ,为了兼容工具链暂时保留
+         * @deprecated 遗弃的接口
+         */
+        private get tmpInxArr();
+        private set tmpInxArr(value);
         static addQuadPos(data: meshData, quad: m4m.math.vector3[]): void;
         static addQuadPos_Quad(data: meshData, quad: m4m.math.vector3[]): void;
         static addQuadVec3ByValue(array: m4m.math.vector3[], value: m4m.math.vector3): void;
@@ -22594,8 +22641,34 @@ declare namespace m4m.render {
         static genCircleLineCCW(radius: number, segment?: number, wide?: number): meshData;
         caclByteLength(): number;
         static calcByteSize(vf: VertexFormatMask): number;
-        static timer: number;
+        /**
+         * 遍历顶点数据
+         * @param callbackfn 遍历每个顶点数据时调用的函数
+         */
+        foreachVertexData(callbackfn: (value: vertexData, index: number) => any): void;
+        /**
+         * 遍历三角形索引数据
+         * @param callbackfn 遍历每个三角形索引时调用的函数
+         */
+        foreachTriIndexData(callbackfn: (value: number, index: number) => any): void;
+        /**
+         * 获取 OBJ 格式模型 顶点数据字符串
+         * @param face 导出三角形面
+         * @param uv 导出顶点纹理坐标
+         * @param normal 导出顶点法线
+         * @returns OBJ 格式模型 顶点数据字符串
+         */
+        makeOBJFormatData(face?: boolean, uv?: boolean, normal?: boolean): string;
+        /**
+         * 生成顶点数据buffer
+         * @param vf 顶点数据格式
+         * @returns 点数据buffer
+         */
         genVertexDataArray(vf: VertexFormatMask): Float32Array;
+        /**
+         * 生成 三角形索引buffer数据
+         * @returns 三角形索引buffer数据
+         */
         genIndexDataArray(): TriIndexTypeArray;
         genIndexDataArrayTri2Line(): TriIndexTypeArray;
         genIndexDataArrayQuad2Line(): TriIndexTypeArray;
@@ -22608,6 +22681,7 @@ declare namespace m4m.render {
         getAABB(recalculate?: boolean): framework.aabb;
         private _aabb;
     }
+    export {};
 }
 declare namespace m4m.render {
     class shaderUniform {
