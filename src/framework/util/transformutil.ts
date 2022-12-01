@@ -183,7 +183,7 @@ namespace m4m.framework {
             let layout = m4m.framework.layoutOption;
             let Opt = layout.TOP | layout.BOTTOM | layout.LEFT;
             let cut = this.make2DNode("FillCut", progress.transform, Opt);
-            cut.isMask = true;
+            // cut.isMask = true;
             progress.cutPanel = cut;
 
             let fill = this.make2DNode("Fill", cut, Opt);
@@ -191,7 +191,7 @@ namespace m4m.framework {
             fillimg.sprite = app.getAssetMgr().getDefaultSprite("white_sprite");
             progress.barOverImg = fillimg;
             
-            progress.transform.markDirty();
+            // progress.transform.markDirty();
         }
 
         private static create2D_scrollRect(scrollrect: scrollRect, app: application) {

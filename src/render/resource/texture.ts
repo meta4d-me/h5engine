@@ -931,7 +931,7 @@
                 this.refreshTexture();
             }
             if ('requestVideoFrameCallback' in video) {
-                video.requestVideoFrameCallback(() => {
+                (video as any).requestVideoFrameCallback(() => {
                     this.updateVideo();
                 });
             }
@@ -1047,7 +1047,7 @@
 
             if ('requestVideoFrameCallback' in this._video) {
                 this._needUpdateVideo = true;
-                this._video.requestVideoFrameCallback(() => {
+                (this._video as any).requestVideoFrameCallback(() => {
                     this.updateVideo();
                 });
             }

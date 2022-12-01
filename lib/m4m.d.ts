@@ -6055,11 +6055,11 @@ declare namespace m4m.framework {
             max?: any[];
             min?: any[];
         }, name?: string);
-        get data(): AccTypedArray | AccTypedArray[];
+        get data(): Int8Array | Uint8Array | Int16Array | Uint16Array | Uint32Array | Float32Array | AccTypedArray[];
         static newFloat32Array(acc: Accessor): Float32Array;
         static getSubChunks(acc: Accessor, data: AccTypedArray): AccTypedArray[];
         static getFloat32Blocks(acc: Accessor): AccTypedArray[];
-        static newTypedArray(acc: Accessor): Int8Array | Uint8Array | Int16Array | Uint16Array | Uint32Array | Float32Array;
+        static newTypedArray(acc: Accessor): AccTypedArray;
         static getData(acc: Accessor): Int8Array | Uint8Array | Int16Array | Uint16Array | Uint32Array | Float32Array | AccTypedArray[];
     }
     export {};
