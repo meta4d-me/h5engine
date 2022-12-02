@@ -407,8 +407,8 @@ namespace m4m.framework {
 
                 if (this.technicalType == "BONE_TEXTURE" && this.player.currentAniclip != null && this._mesh) {
                     if (this.player.beCrossing && this.player.crossFromClip) {
-                        let fromTex = this.player.crossFromClip.getFramesDataTex(context, this._mesh.getGUID(), this.bones);
-                        let toTex = this.player.currentAniclip.getFramesDataTex(context, this._mesh.getGUID(), this.bones);
+                        let fromTex = this.player.crossFromClip.getFramesDataTex(context.webgl, this._mesh.getGUID(), this.bones);
+                        let toTex = this.player.currentAniclip.getFramesDataTex(context.webgl, this._mesh.getGUID(), this.bones);
                         if (fromTex && toTex) {
                             skinStr = "skinTex"
                             this.materials.forEach(el => {
@@ -426,7 +426,7 @@ namespace m4m.framework {
                             })
                         }
                     } else {
-                        let tex = this.player.currentAniclip.getFramesDataTex(context, this._mesh.getGUID(), this.bones);
+                        let tex = this.player.currentAniclip.getFramesDataTex(context.webgl, this._mesh.getGUID(), this.bones);
                         if (tex) {
                             skinStr = "skinTex"
                             this.materials.forEach(el => {

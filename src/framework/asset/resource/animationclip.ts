@@ -274,7 +274,6 @@ namespace m4m.framework {
                 resolve(this);
             });
         }
-
         /**
          * @public
          * @language zh_CN
@@ -345,11 +344,11 @@ namespace m4m.framework {
          */
         subclips: subClip[];
         private _framesTex: { [meshID: number]: m4m.framework.texture } = {};
-        getFramesDataTex(ctx: renderContext, meshID: number, bones: transform[]) {
+        getFramesDataTex(webgl: WebGL2RenderingContext, meshID: number, bones: transform[]) {
             let tex = this._framesTex[meshID];
             if (tex) return tex;
             tex = new m4m.framework.texture();
-            tex.glTexture = new m4m.render.glTexture2D(ctx.webgl, render.TextureFormatEnum.FLOAT32, false, false) as m4m.render.glTexture2D;
+            tex.glTexture = new m4m.render.glTexture2D(webgl, render.TextureFormatEnum.FLOAT32, false, false) as m4m.render.glTexture2D;
             tex.glTexture.width = bones.length * 2;
             tex.glTexture.height = this.frameCount;
 
@@ -386,7 +385,7 @@ namespace m4m.framework {
                 false,
                 false,
                 false,
-                ctx.webgl.FLOAT
+                webgl.FLOAT
             );
             this._framesTex[meshID] = tex;
             return tex;

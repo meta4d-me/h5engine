@@ -5453,7 +5453,7 @@ declare namespace m4m.framework {
          */
         subclips: subClip[];
         private _framesTex;
-        getFramesDataTex(ctx: renderContext, meshID: number, bones: transform[]): texture;
+        getFramesDataTex(webgl: WebGL2RenderingContext, meshID: number, bones: transform[]): texture;
     }
     /**
      * @private
@@ -8668,6 +8668,7 @@ declare namespace m4m.framework {
         private boneCache;
         private recyclecache;
         fillPoseData(data: Float32Array, bones: transform[]): void;
+        prepareClipDataTex(clip: animationClip): void;
     }
 }
 declare namespace m4m.framework {

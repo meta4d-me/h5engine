@@ -603,5 +603,13 @@ namespace m4m.framework {
                     //----------------------
                 }
         }
+        //准备动画贴图
+        prepareClipDataTex(clip: animationClip) {
+            let comps = this.gameObject.getComponentsInChildren("skinnedMeshRenderer") as skinnedMeshRenderer[];
+            comps.forEach(el => {
+                clip.getFramesDataTex(sceneMgr.app.webgl, el.mesh.getGUID(), el.bones);
+            })
+        }
     }
+
 }
