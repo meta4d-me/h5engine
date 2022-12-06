@@ -494,7 +494,7 @@ namespace m4m.framework
             var i16 = _mesh.data.genIndexDataArray();
 
             _mesh.glMesh = new m4m.render.glMesh();
-            _mesh.glMesh.initBuffer(webgl, vf, _mesh.data.pos.length);
+            _mesh.glMesh.initBuffer(webgl, vf, _mesh.data.getVertexCount());
             _mesh.glMesh.uploadVertexData(webgl, v32);
 
             _mesh.glMesh.addIndex(webgl, i16.length);

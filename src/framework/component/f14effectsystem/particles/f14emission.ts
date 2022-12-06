@@ -49,7 +49,7 @@ namespace m4m.framework {
 
             this.initBycurrentdata();
             if (this.currentData.mesh.data) {
-                this.vertexCount = this.currentData.mesh.data.pos.length;
+                this.vertexCount = this.currentData.mesh.data.getVertexCount();
                 this.posArr = this.currentData.mesh.data.pos;
                 this.colorArr = this.currentData.mesh.data.color;
                 this.uvArr = this.currentData.mesh.data.uv;

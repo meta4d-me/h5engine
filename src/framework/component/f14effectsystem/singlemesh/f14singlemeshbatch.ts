@@ -63,7 +63,7 @@ namespace m4m.framework
                 //this.dataForEbo=this.meshlist[0].dataforebo;
                 this.dataForEbo=this.meshlist[0].baseddata.mesh.data.genIndexDataArray() as Uint16Array;
 
-                this.mesh.glMesh.initBuffer(this.effect.webgl,this.effect.VF,this.meshlist[0].baseddata.mesh.data.pos.length,render.MeshTypeEnum.Static);
+                this.mesh.glMesh.initBuffer(this.effect.webgl,this.effect.VF,this.meshlist[0].baseddata.mesh.data.getVertexCount(),render.MeshTypeEnum.Static);
                 this.mesh.glMesh.uploadVertexData(this.effect.webgl, this.dataForVbo);
                 this.mesh.glMesh.addIndex(this.effect.webgl, this.dataForEbo.length);
                 this.mesh.glMesh.uploadIndexData(this.effect.webgl, 0, this.dataForEbo);
@@ -84,8 +84,8 @@ namespace m4m.framework
             let toltalIndexCount:number=0;
             for(let i=0,len=this.meshlist.length;i<len;i++)
             {
-                totalVertexCount+=this.meshlist[i].baseddata.mesh.data.pos.length;
-                toltalIndexCount+=this.meshlist[i].baseddata.mesh.data.trisindex.length;
+                totalVertexCount+=this.meshlist[i].baseddata.mesh.data.getVertexCount();
+                toltalIndexCount+=this.meshlist[i].baseddata.mesh.data.getTriIndexCount();
             }
             this.dataForVbo=new Float32Array(totalVertexCount*this.vertexLength);
             this.dataForEbo=new Uint16Array(toltalIndexCount);
@@ -177,7 +177,7 @@ namespace m4m.framework
                 if(singlemesh.updateByEffect==false)
                 {
                     let newglmesh=new m4m.render.glMesh();
-                    newglmesh.initBuffer(this.effect.webgl,this.effect.VF,singlemesh.data.pos.length,render.MeshTypeEnum.Static);
+                    newglmesh.initBuffer(this.effect.webgl,this.effect.VF,singlemesh.data.getVertexCount(),render.MeshTypeEnum.Static);
                     newglmesh.uploadVertexData(this.effect.webgl, this.activemeshlist[0].dataforvbo);
                     // newglmesh.addIndex(this.effect.webgl, this.activemeshlist[0].dataforebo.length);
                     // newglmesh.uploadIndexData(this.effect.webgl, 0, this.activemeshlist[0].dataforebo);

@@ -105,8 +105,8 @@ namespace m4m.framework
             // {
             //     this.delayFlag = true;
             // }
-            this.perVertexCount = this.emissionData.mesh.data.pos.length;
-            this.perIndexxCount = this.emissionData.mesh.data.trisindex.length;
+            this.perVertexCount = this.emissionData.mesh.data.getVertexCount();
+            this.perIndexxCount = this.emissionData.mesh.data.getTriIndexCount();
             this.simulateInLocalSpace = this.emissionData.simulateInLocalSpace;
             switch (this.emissionData.emissionType)
             {

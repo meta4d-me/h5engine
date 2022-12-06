@@ -361,7 +361,7 @@ namespace m4m.framework
             {
                 curAttrsData.meshdataVbo = mesh.data.genVertexDataArray(this.vf);
             }
-            let vertexCount = mesh.data.pos.length;//顶点数量
+            let vertexCount = mesh.data.getVertexCount();//顶点数量
             let vertexArr = curAttrsData.meshdataVbo;
             let vertexSize = effectBatcher.vertexSize;
             for (let i = 0; i < vertexCount; i++)
@@ -664,7 +664,7 @@ namespace m4m.framework
                 }
             }
             let vertexStartIndex = 0;
-            let vertexCount = _initFrameData.attrsData.mesh.data.pos.length;//顶点数量
+            let vertexCount = _initFrameData.attrsData.mesh.data.getVertexCount();//顶点数量
             let indexCount = _initFrameData.attrsData.mesh.data.genIndexDataArray
             let subEffectBatcher: EffectBatcher = null;
             if (index >= 0)

@@ -14,15 +14,15 @@ namespace m4m.framework {
         private name: constText;
         private id: resID = new resID();
         defaultAsset: boolean = false;
-        public szContent:string = "";
-        public bObjRes:boolean = false;
+        public szContent: string = "";
+        public bObjRes: boolean = false;
 
-        constructor(assetName: string = null, isObject:boolean = false) {
+        constructor(assetName: string = null, isObject: boolean = false) {
             if (!assetName) {
                 assetName = "mesh_" + this.getGUID();
             }
             this.name = new constText(assetName);
-            if(isObject)
+            if (isObject)
                 this.bObjRes = true;
         }
         /**
@@ -351,13 +351,12 @@ namespace m4m.framework {
          * @param webgl webgl实例
          * @version m4m 1.0
          */
-        Parse(inData: ArrayBuffer| string | any, webgl: WebGL2RenderingContext) {
+        Parse(inData: ArrayBuffer | string | any, webgl: WebGL2RenderingContext) {
             return new Promise<IAsset>((reslove, reject) => {
                 // console.error(`[解析资源] mesh 00  ${this.name.getText()}`);
                 try {
-                    if(this.bObjRes)
-                    {
-                        var data:m4m.render.meshData = new m4m.render.meshData();
+                    if (this.bObjRes) {
+                        var data: m4m.render.meshData = new m4m.render.meshData();
                         this.parseObjMesh(inData, webgl, data);
                     }
                     else
@@ -372,39 +371,32 @@ namespace m4m.framework {
             });
         }
 
-        isEmptyStr(s:string)
-        {
-            if (s == undefined || s == null || s == '')
-            {
+        isEmptyStr(s: string) {
+            if (s == undefined || s == null || s == '') {
                 return true;
             }
             return false;
         }
 
-        static parseFace(row:string, data:Int32Array, n:number, vcnt:number):number
-        {
-            var j:number = 0;
-            while (row.charAt(0) != '\0')
-            {
-                if(row.charAt(0) == "")
+        static parseFace(row: string, data: Int32Array, n: number, vcnt: number): number {
+            var j: number = 0;
+            while (row.charAt(0) != '\0') {
+                if (row.charAt(0) == "")
                     break;
 
                 // Skip initial white space
                 while (row.charAt(0) != '\0' && (row.charAt(0) == ' ' || row.charAt(0) == '\t'))
                     row = row.substring(1);
-                var s:string = row;
+                var s: string = row;
                 // Find vertex delimiter and terminated the string there for conversion.
-                while (row.charAt(0) != '\0' && row.charAt(0) != ' ' && row.charAt(0) != '\t')
-                {
+                while (row.charAt(0) != '\0' && row.charAt(0) != ' ' && row.charAt(0) != '\t') {
                     if (row.charAt(0) == '/')
                         row = "\0";
                     var tmpArray = row.split(' ');
-                    if(tmpArray.length == 0)
-                    {
+                    if (tmpArray.length == 0) {
                         break;
                     }
-                    if(tmpArray.length == 1 && tmpArray[0] == "")
-                    {
+                    if (tmpArray.length == 1 && tmpArray[0] == "") {
                         break;
                     }
 
@@ -418,10 +410,9 @@ namespace m4m.framework {
                 //var vi:number = Number(s);
                 //data[j++] = vi < 0 ? vi+vcnt : vi-1;
                 var array = s.split(' ');
-                if(array.length >= 1)
-                {
-                    var vi:number = Number(array[0]);
-                    data[j++] = vi < 0 ? vi+vcnt : vi-1;
+                if (array.length >= 1) {
+                    var vi: number = Number(array[0]);
+                    data[j++] = vi < 0 ? vi + vcnt : vi - 1;
                 }
                 if (j >= n)
                     return j;
@@ -429,14 +420,13 @@ namespace m4m.framework {
             return j;
         }
 
-        parseObjMesh(inData:string, webgl, meshdata_:m4m.render.meshData)
-        {
+        parseObjMesh(inData: string, webgl, meshdata_: m4m.render.meshData) {
             var data: m4m.render.meshData = meshdata_;
             data.pos = [];
             data.trisindex = [];
-            
+
             console.log(data.pos);
-            
+
             //var dataPosPush:any = data.pos.push();
 
             var dataString = inData;
@@ -444,39 +434,34 @@ namespace m4m.framework {
             //     dataString += String.fromCharCode(array[i]);
             // }
             var lines = dataString.split('\n');
-            var face:Int32Array = new Int32Array(32);
+            var face: Int32Array = new Int32Array(32);
             /// scan every line
-            for(var i = 0; i < lines.length; i++)
-            {
+            for (var i = 0; i < lines.length; i++) {
                 console.log("line:" + i);
-                if(i == 669)
-                {
+                if (i == 669) {
                     console.log("get");
                 }
 
-                var content:string = lines[i].trim();
+                var content: string = lines[i].trim();
                 //if(this.isEmptyStr(content))
-                    //continue;
+                //continue;
                 if (content == undefined || content == null || content == '')
                     continue;
 
-                if(content.charAt(0) =='#')
-                {
+                if (content.charAt(0) == '#') {
                     continue;
                 }
-                if (content.charAt(0) == 'v' && content.charAt(1) != 'n' && content.charAt(1) != 't')
-                {
+                if (content.charAt(0) == 'v' && content.charAt(1) != 'n' && content.charAt(1) != 't') {
                     var subLine = content.substring(1);
                     var xyz = subLine.split(' ');
                     var _x = 0.0;
                     var _y = 0.0;
                     var _z = 0.0;
-                    if(xyz.length >= 3)
-                    {
+                    if (xyz.length >= 3) {
                         _x = Number(xyz[0]);
                         _y = Number(xyz[1]);
                         _z = Number(xyz[2]);
-                        
+
                         data.pos.push({
                             x: _x,
                             y: _y,
@@ -484,17 +469,15 @@ namespace m4m.framework {
                         });
                     }
                 }
-                if (content.charAt(0) == 'f')
-                {
+                if (content.charAt(0) == 'f') {
                     // Faces
-                    var newRow:string = content.substring(1);
+                    var newRow: string = content.substring(1);
 
-                    var nv:number = mesh.parseFace(newRow, face, 32, data.pos.length);
-                    for (var i:number = 2; i < nv; ++i)
-                    {
-                        const a:number = face[0];
-                        const b:number = face[i-1];
-                        const c:number = face[i];
+                    var nv: number = mesh.parseFace(newRow, face, 32, data.pos.length);
+                    for (var i: number = 2; i < nv; ++i) {
+                        const a: number = face[0];
+                        const b: number = face[i - 1];
+                        const c: number = face[i];
                         if (a < 0 || a >= data.pos.length || b < 0 || b >= data.pos.length || c < 0 || c >= data.pos.length)
                             continue;
                         //addTriangle(a, b, c, tcap);
@@ -614,9 +597,9 @@ namespace m4m.framework {
                 _submeshinfo.matIndex = i;//read.readUInt8();
                 this.submesh.push(_submeshinfo);
                 //console.log("_submeshinfo.size:" + _submeshinfo.size + " _submeshinfo.size/3:" + _submeshinfo.size/3.0 + " _submeshinfo.size/4:" + _submeshinfo.size/4.0);
-                var nSum:number = 0;
+                var nSum: number = 0;
                 for (var j = 0; j < _submeshinfo.size; j++) {
-                    let iii:number = read.readUInt32();
+                    let iii: number = read.readUInt32();
                     //data.trisindex.push(read.readUInt32());
                     data.trisindex.push(iii);
                     nSum++;
@@ -737,9 +720,9 @@ namespace m4m.framework {
                 _submeshinfo.matIndex = i;//read.readUInt8();
                 this.submesh.push(_submeshinfo);
                 //console.log("_submeshinfo.size:" + _submeshinfo.size + " _submeshinfo.size/3:" + _submeshinfo.size/3.0 + " _submeshinfo.size/4:" + _submeshinfo.size/4.0);
-                var nSum:number = 0;
+                var nSum: number = 0;
                 for (var j = 0; j < _submeshinfo.size; j++) {
-                    let iii:number = read.readUInt32();
+                    let iii: number = read.readUInt32();
                     //data.trisindex.push(read.readUInt32());
                     data.trisindex.push(iii);
                     // if(nSum%3 == 0)
@@ -755,23 +738,24 @@ namespace m4m.framework {
             this.data = data;
             this.glMesh = new m4m.render.glMesh();
             var vertexs = this.data.genVertexDataArray(this.data.originVF);
-            
-            
+
+
             var indices = this.data.genIndexDataArray();
             var indices1 = data.trisindex;
+            const triIndex = data.getTriIndexCount();
+            const loopCount = triIndex / 3;
             var count = 0
             //console.log("length:" + indices1.length + " length/3:" + indices1.length/3.0 + " length/4:" + indices1.length/4.0);
-            for(var ii = 0; ii < indices1.length/3; ii++)
-            {
+            for (var ii = 0; ii < loopCount; ii++) {
                 var index0 = indices1[count] + 1;
                 var index1 = indices1[count + 1] + 1;
                 var index2 = indices1[count + 2] + 1;
-                
+
                 //szContent += "f " + index0 + " " + index1 + " " + index2 + "\n";
                 this.szContent += "f " + index0 + " " + index1 + " " + index2 + "\n";
                 count += 3;
             }
-            
+
 
             this.glMesh.initBuffer(webgl, this.data.originVF, this.data.pos.length);
             this.glMesh.uploadVertexData(webgl, vertexs);
@@ -992,6 +976,7 @@ namespace m4m.framework {
             let ishided = false;
             if (!this.submesh) return ishided;
             let lastDistance = Number.MAX_VALUE;
+            let meshData = this.data;
             for (var i = 0; i < this.submesh.length; i++) {
                 var submesh = this.submesh[i];
                 if (submesh.line) {
@@ -1006,9 +991,18 @@ namespace m4m.framework {
                         var t1 = m4m.math.pool.new_vector3();
                         var t2 = m4m.math.pool.new_vector3();
                         for (var index = submesh.start; index < submesh.size; index += 3) {
-                            var p0 = this.data.pos[this.data.trisindex[index]];
-                            var p1 = this.data.pos[this.data.trisindex[index + 1]];
-                            var p2 = this.data.pos[this.data.trisindex[index + 2]];
+                            // var p0 = this.data.pos[this.data.trisindex[index]];
+                            // var p1 = this.data.pos[this.data.trisindex[index + 1]];
+                            // var p2 = this.data.pos[this.data.trisindex[index + 2]];
+                            let triIdx0 = meshData.getTriIndex(index);
+                            let triIdx1 = meshData.getTriIndex(index + 1);
+                            let triIdx2 = meshData.getTriIndex(index + 2);
+                            let p0 = t0;
+                            let p1 = t1;
+                            let p2 = t2;
+                            meshData.getPosition(triIdx0, p0);
+                            meshData.getPosition(triIdx1, p1);
+                            meshData.getPosition(triIdx2, p2);
 
                             m4m.math.matrixTransformVector3(p0, matrix, t0);
                             m4m.math.matrixTransformVector3(p1, matrix, t1);
@@ -1060,7 +1054,7 @@ namespace m4m.framework {
             var vertexs = _result.data.genVertexDataArray(vf);
             var indices = _result.data.genIndexDataArray();
 
-            _result.glMesh.initBuffer(sceneMgr.app.getAssetMgr().webgl, vf, this.data.pos.length);
+            _result.glMesh.initBuffer(sceneMgr.app.getAssetMgr().webgl, vf, this.data.getVertexCount());
             _result.glMesh.uploadVertexData(sceneMgr.app.getAssetMgr().webgl, vertexs);
             _result.glMesh.addIndex(sceneMgr.app.getAssetMgr().webgl, indices.length);
             _result.glMesh.uploadIndexData(sceneMgr.app.getAssetMgr().webgl, 0, indices);
@@ -1086,10 +1080,15 @@ namespace m4m.framework {
                 let meshdata = this.data;
                 m4m.math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, this._cacheMinP);
                 m4m.math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, this._cacheMaxP);
-                for (var i = 0; i < meshdata.pos.length; i++) {
-                    m4m.math.vec3Max(meshdata.pos[i], this._cacheMaxP, this._cacheMaxP);
-                    m4m.math.vec3Min(meshdata.pos[i], this._cacheMinP, this._cacheMinP);
-                }
+                // for (var i = 0; i < meshdata.pos.length; i++) {
+                //     m4m.math.vec3Max(meshdata.pos[i], this._cacheMaxP, this._cacheMaxP);
+                //     m4m.math.vec3Min(meshdata.pos[i], this._cacheMinP, this._cacheMinP);
+                // }
+                meshdata.foreachVertexData((v, i) => {
+                    const p = v.pos;
+                    m4m.math.vec3Max(p, this._cacheMaxP, this._cacheMaxP);
+                    m4m.math.vec3Min(p, this._cacheMinP, this._cacheMinP);
+                });
             }
             math.vec3Clone(this._cacheMinP, outMin);
             math.vec3Clone(this._cacheMaxP, outMax);

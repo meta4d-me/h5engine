@@ -6055,11 +6055,11 @@ declare namespace m4m.framework {
             max?: any[];
             min?: any[];
         }, name?: string);
-        get data(): Int8Array | Uint8Array | Int16Array | Uint16Array | Uint32Array | Float32Array | AccTypedArray[];
+        get data(): AccTypedArray | AccTypedArray[];
         static newFloat32Array(acc: Accessor): Float32Array;
         static getSubChunks(acc: Accessor, data: AccTypedArray): AccTypedArray[];
         static getFloat32Blocks(acc: Accessor): AccTypedArray[];
-        static newTypedArray(acc: Accessor): AccTypedArray;
+        static newTypedArray(acc: Accessor): Int8Array | Uint8Array | Int16Array | Uint16Array | Uint32Array | Float32Array;
         static getData(acc: Accessor): Int8Array | Uint8Array | Int16Array | Uint16Array | Uint32Array | Float32Array | AccTypedArray[];
     }
     export {};
@@ -19656,6 +19656,9 @@ declare namespace m4m.framework {
      * @version m4m 1.0
      */
     class ray {
+        private static readonly help_v3;
+        private static readonly help_v3_1;
+        private static readonly help_v3_2;
         origin: math.vector3;
         direction: math.vector3;
         /**
@@ -22608,8 +22611,11 @@ declare namespace m4m.render {
         triIndexUint32Mode: boolean;
         /** 数据是缓冲区模式 */
         get isBufferDataMode(): boolean;
+        private _vertexBufferData;
+        private _segmentSize;
         /** 顶点数据buffer */
-        vertexBufferData: Float32Array;
+        get vertexBufferData(): Float32Array;
+        set vertexBufferData(val: Float32Array);
         /** 三角形索引数据buffer */
         triIndexBufferData: TriIndexTypeArray;
         /**
@@ -22641,6 +22647,24 @@ declare namespace m4m.render {
         static genCircleLineCCW(radius: number, segment?: number, wide?: number): meshData;
         caclByteLength(): number;
         static calcByteSize(vf: VertexFormatMask): number;
+        /** 获取顶点段落长度 */
+        private getSegmentSize;
+        /** 获取顶点数量 */
+        getVertexCount(): number;
+        /** 获取三角形索引数量 */
+        getTriIndexCount(): number;
+        /**
+         * 获取顶点位置
+         * @param vertexIndex 顶点索引
+         * @param out 输出vector3
+         */
+        getPosition(vertexIndex: number, out: math.vector3): void;
+        /**
+         * 获取三角形索引
+         * @param Index 数组索引
+         * @returns 三角形顶点索引
+         */
+        getTriIndex(Index: number): number;
         /**
          * 遍历顶点数据
          * @param callbackfn 遍历每个顶点数据时调用的函数

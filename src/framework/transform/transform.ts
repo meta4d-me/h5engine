@@ -286,7 +286,7 @@ namespace m4m.framework {
                                 minimum = m.minimun;
                                 maximum = m.maximun;
                                 matched = true;
-                            } else if (filter.mesh.data != null && filter.mesh.data.pos != null) {
+                            } else if (filter.mesh.data != null && filter.mesh.data.getVertexCount() > 0) {
                                 let id = m.getGUID();
                                 let min_max_v3 = transform.aabbStoreMap[id]; //优化 每次实例化都需构建
                                 if (min_max_v3) {
@@ -298,12 +298,17 @@ namespace m4m.framework {
                                     var meshdata: m4m.render.meshData = m.data;
                                     math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
                                     math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
-                                    let len = meshdata.pos.length;
-                                    let pos = meshdata.pos;
-                                    for (var i = 0; i < len; i++) {
-                                        math.vec3Max(pos[i], maximum, maximum);
-                                        math.vec3Min(pos[i], minimum, minimum);
-                                    }
+                                    // let len = meshdata.getTriIndexCount();
+                                    // let pos = meshdata.pos;
+                                    // for (var i = 0; i < len; i++) {
+                                    //     math.vec3Max(pos[i], maximum, maximum);
+                                    //     math.vec3Min(pos[i], minimum, minimum);
+                                    // }
+                                    meshdata.foreachVertexData((v, i) => {
+                                        const p = v.pos;
+                                        math.vec3Max(p, maximum, maximum);
+                                        math.vec3Min(p, minimum, minimum);
+                                    });
 
                                     transform.aabbStoreMap[id] = [minimum, maximum];
                                 }
@@ -322,7 +327,7 @@ namespace m4m.framework {
                                 minimum = m.minimun;
                                 maximum = m.maximun;
                                 matched = true;
-                            } else if (skinmesh.mesh.data != null && skinmesh.mesh.data.pos != null) {
+                            } else if (skinmesh.mesh.data != null && skinmesh.mesh.data.getVertexCount() > 0) {
                                 let id = m.getGUID();
                                 let min_max_v3 = transform.aabbStoreMap[id]; //优化 每次实例化都需构建
                                 if (min_max_v3) {
@@ -336,7 +341,7 @@ namespace m4m.framework {
 
                                     var p0 = m4m.math.pool.new_vector3();
 
-                                    let len = skinmeshdata.pos.length;
+                                    let len = skinmeshdata.getVertexCount();
                                     for (var i = 0; i < len; i++) {
                                         skinmesh.calActualVertexByIndex(i, p0);
                                         math.vec3Max(p0, maximum, maximum);

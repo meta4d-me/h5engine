@@ -37,8 +37,8 @@ namespace m4m.framework
 
             let maxParticlesCount=this.getMaxParticleCount();
             //this.maxcoun=maxParticlesCount;
-            let particleVertexCount=datamesh.data.pos.length;
-            let particleIndexCount=datamesh.data.trisindex.length;
+            let particleVertexCount=datamesh.data.getVertexCount();
+            let particleIndexCount=datamesh.data.getTriIndexCount();
             let totalVertex=maxParticlesCount*particleVertexCount;
             let totalIndex=maxParticlesCount*particleIndexCount;
 

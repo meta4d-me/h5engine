@@ -1,9 +1,7 @@
 /// <reference path="../../io/reflect.ts" />
 
-namespace m4m.framework
-{
-    export interface ICollider
-    {
+namespace m4m.framework {
+    export interface ICollider {
         gameObject: gameObject;
         subTran: transform;
         getBound();
@@ -18,9 +16,8 @@ namespace m4m.framework
      */
     @reflect.nodeComponent
     @reflect.nodeBoxCollider
-    export class boxcollider implements INodeComponent, ICollider
-    {
-        static readonly ClassName:string="boxcollider";
+    export class boxcollider implements INodeComponent, ICollider {
+        static readonly ClassName: string = "boxcollider";
 
         /**
          * @public
@@ -38,13 +35,13 @@ namespace m4m.framework
          * @version m4m 1.0
          */
         subTran: transform;
-         /**
-         * @private
-         */
+        /**
+        * @private
+        */
         filter: meshFilter;
-         /**
-         * @private
-         */
+        /**
+        * @private
+        */
         obb: obb;
         /**
         * @public
@@ -54,7 +51,7 @@ namespace m4m.framework
         * @version m4m 1.0
         */
         @m4m.reflect.Field("vector3")
-        center: math.vector3 = new math.vector3(0,0,0);
+        center: math.vector3 = new math.vector3(0, 0, 0);
         /**
         * @public
         * @language zh_CN
@@ -63,12 +60,11 @@ namespace m4m.framework
         * @version m4m 1.0
         */
         @m4m.reflect.Field("vector3")
-        size: math.vector3 =  new math.vector3(1,1,1);
-         /**
-         * @private
-         */
-        getBound()
-        {
+        size: math.vector3 = new math.vector3(1, 1, 1);
+        /**
+        * @private
+        */
+        getBound() {
             return this.obb;
         }
 
@@ -80,8 +76,7 @@ namespace m4m.framework
         * 获取该碰撞盒物体的世界矩阵
         * @version m4m 1.0
         */
-        public get matrix(): m4m.math.matrix
-        {
+        public get matrix(): m4m.math.matrix {
             if (this.gameObject)
                 return this.gameObject.transform.getWorldMatrix();
 
@@ -90,29 +85,25 @@ namespace m4m.framework
         }
 
         private started = false;
-        start()
-        {
+        start() {
             this.filter = this.gameObject.getComponent("meshFilter") as meshFilter;
             this.build();
             this.started = true;
             this.ckBuildColliderMesh();
         }
 
-        onPlay()
-        {
+        onPlay() {
 
         }
 
-        update(delta: number)
-        {
-            if (this.obb)
-            {
+        update(delta: number) {
+            if (this.obb) {
                 this.obb.update(this.matrix);
             }
         }
-         /**
-         * @private
-         */
+        /**
+        * @private
+        */
         _colliderVisible: boolean = false;
         /**
         * @public
@@ -121,8 +112,7 @@ namespace m4m.framework
         * 碰撞盒的可见性
         * @version m4m 1.0
         */
-        get colliderVisible(): boolean
-        {
+        get colliderVisible(): boolean {
             return this._colliderVisible;
         }
         /**
@@ -132,12 +122,10 @@ namespace m4m.framework
         * 设置碰撞盒的可见性
         * @version m4m 1.0
         */
-        set colliderVisible(value: boolean)
-        {
+        set colliderVisible(value: boolean) {
             this._colliderVisible = value;
             this.ckBuildColliderMesh();
-            if (this.subTran)
-            {
+            if (this.subTran) {
                 this.subTran.gameObject.visible = this._colliderVisible;
             }
 
@@ -146,9 +134,9 @@ namespace m4m.framework
         /**
          * 检查创建碰撞区域 显示mesh
          */
-        private ckBuildColliderMesh(){
-            if(this._colliderVisible && this.started){
-                if(!this.subTran){
+        private ckBuildColliderMesh() {
+            if (this._colliderVisible && this.started) {
+                if (!this.subTran) {
                     this.buildMesh();
                 }
             }
@@ -160,8 +148,7 @@ namespace m4m.framework
         * 检测碰撞
         * @version m4m 1.0
         */
-        intersectsTransform(tran: transform): boolean
-        {
+        intersectsTransform(tran: transform): boolean {
             if (tran.gameObject.collider == null) return false;
             if (this.obb == null || tran.gameObject.collider.getBound() == null) return false;
             var _obb = tran.gameObject.collider.getBound();
@@ -175,19 +162,15 @@ namespace m4m.framework
         * 构建碰撞盒
         * @version m4m 1.0
         */
-        private build()
-        {
+        private build() {
             this.obb = new obb();
-            if (this.center && this.size)
-            {
+            if (this.center && this.size) {
                 this.obb.buildByCenterSize(this.center, this.size);
             }
-            else
-            {
+            else {
                 let minimum = poolv3();
                 let maximum = poolv3();
-                if (this.filter)
-                {
+                if (this.filter) {
                     // let meshdata: m4m.render.meshData = this.filter.getMeshOutput().data;
                     // m4m.math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
                     // m4m.math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
@@ -199,10 +182,9 @@ namespace m4m.framework
                     // }
                     // console.log("add obb filter " + minimum + "  " + maximum);
 
-                    this.filter.getMeshOutput().calcVectexMinMax(minimum,maximum);
+                    this.filter.getMeshOutput().calcVectexMinMax(minimum, maximum);
                 }
-                else
-                {
+                else {
                     minimum.x = minimum.y = minimum.z = -1;
                     maximum.x = maximum.y = maximum.z = 1;
                 }
@@ -220,8 +202,7 @@ namespace m4m.framework
         * 构建碰撞盒mesh 并显示
         * @version m4m 1.0
         */
-        private buildMesh()
-        {
+        private buildMesh() {
             this.subTran = new m4m.framework.transform();
             this.subTran.gameObject.hideFlags = HideFlags.DontSave | HideFlags.HideInHierarchy;
             this.subTran.name = "boxcollider";
@@ -244,8 +225,7 @@ namespace m4m.framework
         * 获取碰撞盒mesh
         * @version m4m 1.0
         */
-        private getColliderMesh(): mesh
-        {
+        private getColliderMesh(): mesh {
             var _mesh: mesh = new mesh();
             _mesh.data = m4m.render.meshData.genBoxByArray_Quad(this.obb.vectors);
             var vf = m4m.render.VertexFormatMask.Position | m4m.render.VertexFormatMask.Normal;
@@ -254,7 +234,7 @@ namespace m4m.framework
             var webgl = this.gameObject.getScene().webgl;
 
             _mesh.glMesh = new m4m.render.glMesh();
-            _mesh.glMesh.initBuffer(webgl, vf, _mesh.data.pos.length);
+            _mesh.glMesh.initBuffer(webgl, vf, _mesh.data.getVertexCount());
             _mesh.glMesh.uploadVertexData(webgl, v32);
 
             _mesh.glMesh.addIndex(webgl, i16.length);
@@ -274,25 +254,21 @@ namespace m4m.framework
             }
             return _mesh;
         }
-         /**
-         * @private
-         */
-        remove()
-        {
-            if (this.subTran)
-            {
+        /**
+        * @private
+        */
+        remove() {
+            if (this.subTran) {
                 this.subTran.dispose();
             }
-            if (this.obb)
-            {
+            if (this.obb) {
                 this.obb.dispose();
             }
         }
-         /**
-         * @private
-         */
-        clone()
-        {
+        /**
+        * @private
+        */
+        clone() {
 
         }
     }

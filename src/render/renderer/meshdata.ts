@@ -40,8 +40,17 @@
 
         /** 数据是缓冲区模式 */
         public get isBufferDataMode() { return this.vertexBufferData != null; }
+
+        private _vertexBufferData: Float32Array;
+        private _segmentSize: number = 0;
+
         /** 顶点数据buffer */
-        public vertexBufferData: Float32Array;
+        public get vertexBufferData() { return this._vertexBufferData; };
+        public set vertexBufferData(val) {
+            this._vertexBufferData = val;
+            this._segmentSize = this.getSegmentSize();
+        };
+
         /** 三角形索引数据buffer */
         public triIndexBufferData: TriIndexTypeArray;
 
@@ -719,12 +728,84 @@
             return total;
         }
 
+        /** 获取顶点段落长度 */
+        private getSegmentSize() {
+            const vf = this.originVF;
+            return 3 +
+                (vf & VertexFormatMask.Normal ? 3 : 0) +
+                (vf & VertexFormatMask.Tangent ? 3 : 0) +
+                (vf & VertexFormatMask.UV0 ? 2 : 0) +
+                (vf & VertexFormatMask.UV1 ? 2 : 0) +
+                (vf & VertexFormatMask.Color ? 4 : 0) +
+                (vf & VertexFormatMask.ColorEX ? 4 : 0) +
+                (vf & VertexFormatMask.BlendIndex4 ? 4 : 0) +
+                (vf & VertexFormatMask.BlendWeight4 ? 4 : 0)
+                ;
+        }
+
+        /** 获取顶点数量 */
+        public getVertexCount() {
+            if (!this.isBufferDataMode) {
+                return this.pos.length;
+            } else {
+                if (!this.vertexBufferData) return 0;
+                const segmentSize = this._segmentSize;
+                return Math.floor(this.vertexBufferData.length / segmentSize);
+            }
+        }
+
+        /** 获取三角形索引数量 */
+        public getTriIndexCount() {
+            if (!this.isBufferDataMode) {
+                if (!this.trisindex) return 0;
+                return this.trisindex.length;
+            } else {
+                if (!this.triIndexBufferData) return 0;
+                return this.triIndexBufferData.length;
+            }
+        }
+
+        /**
+         * 获取顶点位置
+         * @param vertexIndex 顶点索引
+         * @param out 输出vector3
+         */
+        public getPosition(vertexIndex: number, out: math.vector3) {
+            if (vertexIndex < 0 || !out) return;
+            if (!this.isBufferDataMode) {
+                const pos = this.pos[vertexIndex];
+                out.x = pos.x;
+                out.y = pos.y;
+                out.z = pos.z;
+            } else {
+                const startIdx = vertexIndex * this._segmentSize;
+                out.x = this._vertexBufferData[startIdx];
+                out.y = this._vertexBufferData[startIdx + 1];
+                out.z = this._vertexBufferData[startIdx + 2];
+            }
+        }
+
+        /**
+         * 获取三角形索引
+         * @param Index 数组索引
+         * @returns 三角形顶点索引
+         */
+        public getTriIndex(Index: number) {
+            if (!this.isBufferDataMode) {
+                if (!this.trisindex) return 0;
+                return this.trisindex[Index];
+            } else {
+                if (!this.triIndexBufferData) return 0;
+                return this.triIndexBufferData[Index];
+            }
+
+        }
 
         /**
          * 遍历顶点数据
          * @param callbackfn 遍历每个顶点数据时调用的函数
          */
-        foreachVertexData(callbackfn: (value: vertexData, index: number) => any) {
+        public foreachVertexData(callbackfn: (value: vertexData, index: number) => any) {
             //
             if (callbackfn == null) return;
             const isBufferM = this.isBufferDataMode;
@@ -737,14 +818,14 @@
                 for (let i = 0; i < len; i++) {
                     //pos
                     vdata.pos = this.pos[i];
-                    vdata.normal = vf & VertexFormatMask.Normal ? this.normal[i] : null;
-                    vdata.tangent = vf & VertexFormatMask.Tangent ? this.tangent[i] : null;
-                    vdata.uv = vf & VertexFormatMask.UV0 ? this.uv[i] : null;
-                    vdata.uv2 = vf & VertexFormatMask.UV1 ? this.uv2[i] : null;
-                    vdata.color = vf & VertexFormatMask.Color ? this.color[i] : null;
-                    vdata.colorex = vf & VertexFormatMask.ColorEX ? this.colorex[i] : null;
-                    vdata.blendIndex = vf & VertexFormatMask.BlendIndex4 ? this.blendIndex[i] : null;
-                    vdata.blendWeight = vf & VertexFormatMask.BlendWeight4 ? this.blendWeight[i] : null;
+                    vdata.normal = vf & VertexFormatMask.Normal && this.normal ? this.normal[i] : null;
+                    vdata.tangent = vf & VertexFormatMask.Tangent && this.tangent ? this.tangent[i] : null;
+                    vdata.uv = vf & VertexFormatMask.UV0 && this.uv ? this.uv[i] : null;
+                    vdata.uv2 = vf & VertexFormatMask.UV1 && this.uv2 ? this.uv2[i] : null;
+                    vdata.color = vf & VertexFormatMask.Color && this.color ? this.color[i] : null;
+                    vdata.colorex = vf & VertexFormatMask.ColorEX && this.colorex ? this.colorex[i] : null;
+                    vdata.blendIndex = vf & VertexFormatMask.BlendIndex4 && this.blendIndex ? this.blendIndex[i] : null;
+                    vdata.blendWeight = vf & VertexFormatMask.BlendWeight4 && this.blendWeight ? this.blendWeight[i] : null;
                     //callback
                     callbackfn(vdata, i);
                 }
@@ -760,17 +841,7 @@
                 const _blendWeight = new number4();
 
                 const vBuffer = this.vertexBufferData;
-                const segmentSize = 3 +
-                    (vf & VertexFormatMask.Normal ? 3 : 0) +
-                    (vf & VertexFormatMask.Tangent ? 3 : 0) +
-                    (vf & VertexFormatMask.UV0 ? 2 : 0) +
-                    (vf & VertexFormatMask.UV1 ? 2 : 0) +
-                    (vf & VertexFormatMask.Color ? 4 : 0) +
-                    (vf & VertexFormatMask.ColorEX ? 4 : 0) +
-                    (vf & VertexFormatMask.BlendIndex4 ? 4 : 0) +
-                    (vf & VertexFormatMask.BlendWeight4 ? 4 : 0)
-                    ;
-
+                const segmentSize = this._segmentSize;
 
                 const len = Math.floor(vBuffer.length / segmentSize);
                 vdata.pos = _pos;
@@ -805,7 +876,7 @@
          * 遍历三角形索引数据
          * @param callbackfn 遍历每个三角形索引时调用的函数
          */
-        foreachTriIndexData(callbackfn: (value: number, index: number) => any) {
+        public foreachTriIndexData(callbackfn: (value: number, index: number) => any) {
             if (callbackfn == null) return;
             const arr = this.isBufferDataMode ? this.triIndexBufferData : this.trisindex;
             if (arr == null) return;

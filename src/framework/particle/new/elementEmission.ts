@@ -115,8 +115,8 @@ namespace m4m.framework
                 this.initByEmissonData(data);
             }
 
-            this.perVertexCount = this.mesh.data.pos.length;
-            this.perIndexxCount = this.mesh.data.trisindex.length;
+            this.perVertexCount = this.mesh.data.getVertexCount();
+            this.perIndexxCount = this.mesh.data.getTriIndexCount();
 
             if(this.emissionType==ParticleEmissionType.continue)
             {
