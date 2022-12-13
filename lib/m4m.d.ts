@@ -451,7 +451,6 @@ declare namespace m4m.framework {
         update(delta: number): any;
         gameObject: gameObject;
         remove(): any;
-        clone(): any;
     }
     /**
      * @public
@@ -22733,7 +22732,8 @@ declare namespace m4m.render {
         Float4v = 4,
         Float4x4 = 5,
         Float4x4v = 6,
-        CubeTexture = 7
+        CubeTexture = 7,
+        Int = 8
     }
     /**
      * @private

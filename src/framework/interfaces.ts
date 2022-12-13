@@ -17,7 +17,7 @@ namespace m4m.framework {
         update(delta: number);
         gameObject: gameObject;
         remove();
-        clone();
+        // clone();         //没有实际使用过 的接口
         // jsonToAttribute(json: any, assetmgr: assetMgr);
     }
 

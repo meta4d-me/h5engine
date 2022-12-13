@@ -342,6 +342,9 @@ namespace m4m.framework
                         case render.UniformTypeEnum.Float:
                             this.defaultMapUniform[item.name]={type:render.UniformTypeEnum.Float,value:0};
                             break;
+                        case render.UniformTypeEnum.Int:
+                            this.defaultMapUniform[item.name]={type:render.UniformTypeEnum.Int,value:0};
+                            break;
                         case render.UniformTypeEnum.Floatv:
                             this.defaultMapUniform[item.name]={type:render.UniformTypeEnum.Float4x4v,value:null};
                             break;

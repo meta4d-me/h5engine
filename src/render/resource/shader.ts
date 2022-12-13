@@ -14,7 +14,8 @@ namespace m4m.render {
         Float4v = 4,
         Float4x4 = 5,
         Float4x4v = 6,
-        CubeTexture = 7
+        CubeTexture = 7,
+        Int = 8,
     }
     /**
      * @private
@@ -183,6 +184,9 @@ namespace m4m.render {
                 }
                 else if (type === webgl.FLOAT) {
                     _uniform.type = UniformTypeEnum.Float;
+                }
+                else if (type === webgl.INT) {
+                    _uniform.type = UniformTypeEnum.Int;
                 }
                 else if (type === webgl.FLOAT_VEC4 && isArray) {
                     _uniform.type = UniformTypeEnum.Float4v;
