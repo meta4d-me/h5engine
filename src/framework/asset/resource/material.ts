@@ -450,6 +450,23 @@ namespace m4m.framework {
                 arr[0] = _number ?? 0;
             }
         }
+
+        setInt(_id: string, _number: number) {
+            if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Int) {
+                if (this.statedMapUniforms[_id] != _number) {
+                    this.uniformDirtyMap[_id] = true;
+                }
+                this.statedMapUniforms[_id] = _number;
+            } else {
+                console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
+            }
+
+            // if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id)) {
+            if (this._enableGpuInstancing) {
+                let arr = this.getInstanceAttribValue(_id);
+                arr[0] = _number ?? 0;
+            }
+        }
         /**
          * @private
          */

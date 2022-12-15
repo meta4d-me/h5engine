@@ -7453,6 +7453,7 @@ declare namespace m4m.framework {
          * @private
          */
         setFloat(_id: string, _number: number): void;
+        setInt(_id: string, _number: number): void;
         /**
          * @private
          */
