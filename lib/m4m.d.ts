@@ -5988,6 +5988,7 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         set realName(name: string);
+        static dumpmem(): void;
         hexToRgb: (hex: any) => any;
         buffers: bin[];
         load(mgr: assetMgr, ctx: WebGL2RenderingContext, folder: string, brdf: texture, env: texture, irrSH: texture, exposure?: any, specFactor?: number, irrFactor?: number, uvChecker?: texture): Promise<transform>;

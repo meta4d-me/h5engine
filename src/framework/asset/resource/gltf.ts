@@ -120,6 +120,15 @@ namespace m4m.framework {
             this._realName = name;
         }
 
+
+        static dumpmem(): void {
+            var meminfo = window.performance["memory"];
+            var memsize = meminfo.usedJSHeapSize / 1024 / 1024 | 0;
+            if (memsize > 2048)
+                throw "use too mush memory";
+            console.log("====gltf mem= " + memsize + " MB");
+        }
+
         hexToRgb = hex =>
             hex?.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i
                 , (m, r, g, b) => '#' + r + r + g + g + b + b)
@@ -132,6 +141,10 @@ namespace m4m.framework {
                 console.error(`load fail , data is Null.`);
                 return;
             }
+
+            console.log("====gltf begin log==");
+            gltf.dumpmem();
+
             const load = (uri) => new Promise((res) => {
                 mgr.load(folder + uri, AssetTypeEnum.Auto, () => {
                     res(mgr.getAssetByName(uri.split('/').pop()));
@@ -168,6 +181,10 @@ namespace m4m.framework {
                     });
                 });
             }
+            console.log("====gltf begin buffers==");
+            gltf.dumpmem();
+
+
             const samplers = this.data.samplers ?? [];
             //buffers
             let currBufLen = 0;
@@ -184,6 +201,10 @@ namespace m4m.framework {
                 }
             }) ?? []);
 
+
+            console.log("====gltf begin accessor==");
+            gltf.dumpmem();
+
             //bufferView
             const views = this.data.bufferViews?.map(({ buffer = 0, byteOffset = 0, byteLength = 0, byteStride = 0 }) => {
                 // return {byteStride ,dv: new DataView(this.buffers[buffer].data, byteOffset, byteLength)};
@@ -196,6 +217,8 @@ namespace m4m.framework {
                     bufferView: views[acc.bufferView],
                 }
             });
+            console.log("====gltf begin loadimage==");
+            gltf.dumpmem();
             //images
             const images: HTMLImageElement[] = await Promise.all(this.data?.images?.map(({ uri, mimeType, bufferView }) => {
                 if (uri) { return loadImg(uri); }
@@ -204,7 +227,8 @@ namespace m4m.framework {
                     return getImgByBin(view, mimeType);
                 }
             }) ?? []);
-
+            console.log("====gltf begin loadtexture==");
+            gltf.dumpmem();
             const textures: texture[] = await Promise.all(this.data.textures?.map(({ sampler, source }) => {
                 const img = images[source];
                 const tex = new m4m.framework.texture(img.src);
@@ -235,7 +259,8 @@ namespace m4m.framework {
                 tex.use();
                 return tex;
             }) ?? []);
-
+            console.log("====gltf begin load lightmap==");
+            gltf.dumpmem();
             //lightMap 处理
             let sceneExtensions = this.data.scenes[defaltScene].extensions;
             let gd_linfo_scene: { mode: string, maps: string[] };
@@ -261,7 +286,8 @@ namespace m4m.framework {
                     }
                 }));
             }
-
+            console.log("====gltf begin load material==");
+            gltf.dumpmem();
             const extrasCfg = this.data.extras?.clayViewerConfig?.materials as any[];
             const materials: material[] = this.data.materials?.map(m => {
                 const mat = new material(m.name);
@@ -392,137 +418,167 @@ namespace m4m.framework {
                 return mat;
             });
 
+            console.log("====gltf begin load mesh==");
+            gltf.dumpmem();
 
+            //问题1
+            //ebo count 远远小于vbo 且大量vbo长度相同，这说明有大量mesh公用一个vbo的情况
+            //如何识别
             const meshes = this.data.meshes?.map(({ name, primitives }) => {
-                return primitives.map(({ attributes, indices, material, extensions }) => {
-                    const mf = new mesh(folder + name);
-                    const mdata = mf.data = new m4m.render.meshData();
-                    const vert: m4m.math.vector3[] = mdata.pos = [];
-                    const uv1: m4m.math.vector2[] = mdata.uv = [];
-                    const uv2: m4m.math.vector2[] = mdata.uv2 = [];
-                    const normal: m4m.math.vector3[] = mdata.normal = [];
-                    const tangent: m4m.math.vector3[] = mdata.tangent = [];
-                    // const colors = mdata.color = [];
-                    const attr: { [k: string]: Accessor } = {};
-                    for (let k in attributes) {
-                        attr[k] = new Accessor(accessors[attributes[k]], k);
+                //二了呀，一个mesh的primitives基本上就是 同一个vbo
+                console.log("====gltf begin load one mesh " + name);
+                gltf.dumpmem();
+                const mf = new mesh(folder + name);
+                const mdata = mf.data = new m4m.render.meshData();
+                const vert: m4m.math.vector3[] = mdata.pos = [];
+                const uv1: m4m.math.vector2[] = mdata.uv = [];
+                const uv2: m4m.math.vector2[] = mdata.uv2 = [];
+                const normal: m4m.math.vector3[] = mdata.normal = [];
+                const tangent: m4m.math.vector3[] = mdata.tangent = [];
+                const colors = mdata.color = [];
+                const attr: { [k: string]: Accessor } = {};
+                for (let k in primitives[0].attributes) {
+                    attr[k] = new Accessor(accessors[primitives[0].attributes[k]], k);
+                }
+
+                const vcount = attr.POSITION.count;
+                const bs =
+                    + (attr.POSITION?.size ?? 0)
+                    + (attr.NORMAL?.size ?? 0)
+                    + (attr.COLOR?.size ?? 0)
+                    + (attr.TANGENT?.size ? 3 : 0) // 引擎里的Tangent是vec3，而不是vec4
+                    + (attr.TEXCOORD_0?.size ?? 0)
+                    + (attr.TEXCOORD_1?.size ?? 0);
+                const vbo = new Float32Array(vcount * bs);
+
+                console.log("vcount=" + vcount);
+
+                mf.glMesh = new m4m.render.glMesh();
+                let vf
+                if (attr.POSITION?.size)
+                    vf |= m4m.render.VertexFormatMask.Position;
+                if (attr.NORMAL?.size)
+                    vf |= m4m.render.VertexFormatMask.Normal;
+                // | m4m.render.VertexFormatMask.Color
+                if (attr.TANGENT?.size)
+                    vf |= m4m.render.VertexFormatMask.Tangent;
+                if (attr.TEXCOORD_0?.size)
+                    vf |= m4m.render.VertexFormatMask.UV0;
+                if (attr.TEXCOORD_1?.size)
+                    vf |= m4m.render.VertexFormatMask.UV1;
+                // | m4m.render.VertexFormatMask.BlendIndex4
+                // | m4m.render.VertexFormatMask.BlendWeight4;
+                mf.glMesh.initBuffer(ctx, vf, vcount, m4m.render.MeshTypeEnum.Static);
+
+
+
+                for (let i = 0; i < vcount; i++) {
+                    if (attr.TEXCOORD_0?.size != null) {
+                        let uvFliped0 = attr.TEXCOORD_0.data[i];
+                        uv1[i] = new m4m.math.vector2(uvFliped0[0], uvFliped0[1] * -1 + 1);
                     }
 
-                    const vcount = attr.POSITION.count;
-                    const bs =
-                        + (attr.POSITION?.size ?? 0)
-                        + (attr.NORMAL?.size ?? 0)
-                        // + (attr.COLOR?.size ?? 0)
-                        + (attr.TANGENT?.size ? 3 : 0) // 引擎里的Tangent是vec3，而不是vec4
-                        + (attr.TEXCOORD_0?.size ?? 0)
-                        + (attr.TEXCOORD_1?.size ?? 0);
-                    const vbo = new Float32Array(vcount * bs);
+                    if (attr.TEXCOORD_1?.size != null) {
+                        let uvFliped1 = attr.TEXCOORD_1.data[i];
+                        uv2[i] = new m4m.math.vector2(uvFliped1[0], uvFliped1[1] * -1 + 1);
+                    }
 
-                    mf.glMesh = new m4m.render.glMesh();
-                    let vf
-                    if (attr.POSITION?.size)
-                        vf |= m4m.render.VertexFormatMask.Position;
-                    if (attr.NORMAL?.size)
-                        vf |= m4m.render.VertexFormatMask.Normal;
-                    // | m4m.render.VertexFormatMask.Color
-                    if (attr.TANGENT?.size)
-                        vf |= m4m.render.VertexFormatMask.Tangent;
-                    if (attr.TEXCOORD_0?.size)
-                        vf |= m4m.render.VertexFormatMask.UV0;
-                    if (attr.TEXCOORD_1?.size)
-                        vf |= m4m.render.VertexFormatMask.UV1;
-                    // | m4m.render.VertexFormatMask.BlendIndex4
-                    // | m4m.render.VertexFormatMask.BlendWeight4;
-                    mf.glMesh.initBuffer(ctx, vf, vcount, m4m.render.MeshTypeEnum.Dynamic);
+                    if (attr.POSITION?.size != null) {
+                        let _posArr = attr.POSITION.data[i];
+                        vert[i] = new m4m.math.vector3(_posArr[0], _posArr[1], _posArr[2]);
+                    }
 
+                    if (attr.NORMAL?.size != null) {
+                        let _normalArr = attr.NORMAL.data[i];
+                        normal[i] = new m4m.math.vector3(_normalArr[0], _normalArr[1], _normalArr[2]);
+                    }
+
+                    if (attr.TANGENT?.size != null) {
+                        let _tangentArr = attr.TANGENT.data[i];
+                        let t = new m4m.math.vector3(_tangentArr[0], _tangentArr[1], _tangentArr[2]);
+                        //处理 w 分量 , w 存入 xyz 中, w 只因为为1 或 -1 ,表示为切向方向性。
+                        //将w 平移2 , 映射为 -1 -> 1 , 1 -> 3 ，这样保障 normalize 后 xyz 一致                                                                                                                                                                                                                                      
+                        let w = _tangentArr[3] + 2;
+                        //将w 乘入 xyz , x = x * w , y = y * w , y = y * w 
+                        m4m.math.vec3ScaleByNum(t, w, t);
+                        tangent[i] = t;
+                    }
+
+                    const cur = vbo.subarray(i * bs); // offset
+                    let bit = 0;
+                    if (attr.POSITION?.size != null) {
+                        const position = cur.subarray(bit, bit += 3);
+                        position.set(attr.POSITION.data[i] as AccTypedArray);
+                    }
+
+                    // const color = cur.subarray(3, 7);
+                    if (attr.NORMAL?.size != null) {
+                        const n = cur.subarray(bit, bit += 3);
+                        n.set(attr.NORMAL.data[i] as AccTypedArray);
+                    }
+
+                    if (attr.TANGENT?.size != null) {
+                        const tan = cur.subarray(bit, bit += 3);
+                        const t = tangent[i];
+                        tan[0] = t.x;
+                        tan[1] = t.y;
+                        tan[2] = t.z;
+                    }
+
+                    if (attr.TEXCOORD_0?.size != null) {
+                        const _uv = cur.subarray(bit, bit += 2);
+                        let u = uv1[i];
+                        _uv[0] = u.x;
+                        _uv[1] = u.y;
+                    }
+
+                    if (attr.TEXCOORD_1?.size != null) {
+                        const _uv2 = cur.subarray(bit, bit += 2);
+                        let u = uv2[i];
+                        _uv2[0] = u.x;
+                        _uv2[1] = u.y;
+                    }
+
+                    // const tangent = cur.subarray(7, 9);
+
+                    // colors[i] = new m4m.math.vector4();
+                }
+                mf.glMesh.uploadVertexData(ctx, vbo);
+
+
+          
+
+
+                mdata.trisindex =[];
+                mf.submesh = [];
+                let info =new meshinfo();
+                info.mesh=mf;
+                info.lightMapTexST=[];
+                info.outmats=[];
+
+                primitives.map(({ attributes, indices, material, extensions }) => {
                     const eboAcc = new Accessor(accessors[indices], "indices");
                     const ebo = eboAcc.data as Uint16Array;
-                    mdata.trisindex = Array.from(ebo);
 
-                    for (let i = 0; i < vcount; i++) {
-                        if (attr.TEXCOORD_0?.size != null) {
-                            let uvFliped0 = attr.TEXCOORD_0.data[i];
-                            uv1[i] = new m4m.math.vector2(uvFliped0[0], uvFliped0[1] * -1 + 1);
-                        }
+                    console.log("ebo count=" + ebo.length);
 
-                        if (attr.TEXCOORD_1?.size != null) {
-                            let uvFliped1 = attr.TEXCOORD_1.data[i];
-                            uv2[i] = new m4m.math.vector2(uvFliped1[0], uvFliped1[1] * -1 + 1);
-                        }
-
-                        if (attr.POSITION?.size != null) {
-                            let _posArr = attr.POSITION.data[i];
-                            vert[i] = new m4m.math.vector3(_posArr[0], _posArr[1], _posArr[2]);
-                        }
-
-                        if (attr.NORMAL?.size != null) {
-                            let _normalArr = attr.NORMAL.data[i];
-                            normal[i] = new m4m.math.vector3(_normalArr[0], _normalArr[1], _normalArr[2]);
-                        }
-
-                        if (attr.TANGENT?.size != null) {
-                            let _tangentArr = attr.TANGENT.data[i];
-                            let t = new m4m.math.vector3(_tangentArr[0], _tangentArr[1], _tangentArr[2]);
-                            //处理 w 分量 , w 存入 xyz 中, w 只因为为1 或 -1 ,表示为切向方向性。
-                            //将w 平移2 , 映射为 -1 -> 1 , 1 -> 3 ，这样保障 normalize 后 xyz 一致
-                            let w = _tangentArr[3] + 2;
-                            //将w 乘入 xyz , x = x * w , y = y * w , y = y * w 
-                            m4m.math.vec3ScaleByNum(t, w, t);
-                            tangent[i] = t;
-                        }
-
-                        const cur = vbo.subarray(i * bs); // offset
-                        let bit = 0;
-                        if (attr.POSITION?.size != null) {
-                            const position = cur.subarray(bit, bit += 3);
-                            position.set(attr.POSITION.data[i] as AccTypedArray);
-                        }
-
-                        // const color = cur.subarray(3, 7);
-                        if (attr.NORMAL?.size != null) {
-                            const n = cur.subarray(bit, bit += 3);
-                            n.set(attr.NORMAL.data[i] as AccTypedArray);
-                        }
-
-                        if (attr.TANGENT?.size != null) {
-                            const tan = cur.subarray(bit, bit += 3);
-                            const t = tangent[i];
-                            tan[0] = t.x;
-                            tan[1] = t.y;
-                            tan[2] = t.z;
-                        }
-
-                        if (attr.TEXCOORD_0?.size != null) {
-                            const _uv = cur.subarray(bit, bit += 2);
-                            let u = uv1[i];
-                            _uv[0] = u.x;
-                            _uv[1] = u.y;
-                        }
-
-                        if (attr.TEXCOORD_1?.size != null) {
-                            const _uv2 = cur.subarray(bit, bit += 2);
-                            let u = uv2[i];
-                            _uv2[0] = u.x;
-                            _uv2[1] = u.y;
-                        }
-
-                        // const tangent = cur.subarray(7, 9);
-
-                        // colors[i] = new m4m.math.vector4();
+                    let indexbegin =  mdata.trisindex.length;
+                    for(var i=0;i<ebo.length;i++)
+                    {
+                        mdata.trisindex.push(ebo[i]);
                     }
-                    mf.glMesh.uploadVertexData(ctx, vbo);
-                    mf.glMesh.addIndex(ctx, ebo.length);
-                    mf.glMesh.uploadIndexData(ctx, 0, ebo, eboAcc.componentType);
-                    mf.submesh = [];
+                    //mdata.trisindex = Array.from(ebo);
+                    // mf.glMesh.addIndex(ctx, ebo.length);
+                    // mf.glMesh.uploadIndexData(ctx, 0, ebo, eboAcc.componentType);
+                    //mf.submesh = [];
                     const sm = new m4m.framework.subMeshInfo();
                     sm.matIndex = 0;
                     sm.useVertexIndex = 0;
-                    sm.start = 0;
+                    sm.start = indexbegin;
                     sm.size = ebo.length;
                     sm.line = false;
                     mf.submesh.push(sm);
-                    mf.glMesh.uploadIndexSubData(ctx, 0, ebo);
-                    mf.glMesh.initVAO();
+                    // mf.glMesh.uploadIndexSubData(ctx, 0, ebo);
 
                     //light Map
                     let lightMapTexST = null;
@@ -543,8 +599,18 @@ namespace m4m.framework {
                             outMat = outMat;
                         }
                     }
-                    return { m: mf, mat: outMat, lTexST: lightMapTexST };
+                    info.outmats.push(outMat);
+                    info.lightMapTexST.push(lightMapTexST);
                 });
+                mf.glMesh.addIndex(ctx,mdata.trisindex.length);
+                mf.glMesh.uploadIndexData(ctx,0,mdata.genIndexDataArray());
+                mf.glMesh.initVAO();
+
+                console.log("====gltf end load mesh " + name);
+                gltf.dumpmem();
+            
+
+                return info;
             });
 
             const nodes = this.data.nodes?.map(({ name, mesh, matrix, rotation, scale, translation, skin, camera, children }) => {
@@ -567,25 +633,45 @@ namespace m4m.framework {
                 }
                 n.markDirty();
                 if (mesh != null) {
-                    const child = meshes[mesh].map(({ m, mat, lTexST }) => {
-                        const texST: number[] = lTexST;
-                        const submesh = new m4m.framework.transform();
-
-                        const mf = submesh.gameObject.addComponent("meshFilter") as meshFilter;
-                        mf.mesh = m;
-                        const renderer = submesh.gameObject.addComponent("meshRenderer") as meshRenderer;
-                        renderer.materials = [mat];
-                        if (texST) {
-                            renderer.lightmapIndex = -2;    //标记该节点使用非全局lightmap
-                            math.vec4Set(renderer.lightmapScaleOffset, texST[0], texST[1], texST[2], texST[3]);
+                    let realmesh = meshes[mesh] as meshinfo;
+                    let submesh = new m4m.framework.transform();
+                    let mfit = submesh.gameObject.addComponent("meshFilter") as meshFilter;
+                    mfit.mesh =realmesh.mesh;
+                    const renderer = submesh.gameObject.addComponent("meshRenderer") as meshRenderer;
+                    renderer.materials = realmesh.outmats;
+                    for(var i=0;i<realmesh.outmats.length;i++)
+                    {
+                        if (realmesh.lightMapTexST[i]!=null)
+                        {
+                             renderer.lightmapIndex = -2;    //标记该节点使用非全局lightmap
+                            math.vec4Set(renderer.lightmapScaleOffset, realmesh.lightMapTexST[i].x, realmesh.lightMapTexST[i].y, realmesh.lightMapTexST[i].z, realmesh.lightMapTexST[i].w);
                         }
-                        // renderer.materials.push(mat);
-                        // renderer.materials.push(new framework.material());
-                        // renderer.materials[0].setShader(mgr.getShader("shader/def"));
-                        // renderer.materials[0].setShader(mgr.getShader("simple.shader.json"));
-                        return submesh;
-                    });
-                    child.forEach(c => n.addChild(c));
+                    }
+                    //{
+                        //         renderer.lightmapIndex = -2;    //标记该节点使用非全局lightmap
+                        //         math.vec4Set(renderer.lightmapScaleOffset, texST[0], texST[1], texST[2], texST[3]);
+                        //     }
+                    n.addChild(submesh);
+                    // const child = meshes[mesh].map(({ m, mat, lTexST }) => {
+                    //     const texST: number[] = lTexST;
+                    //     const submesh = new m4m.framework.transform();
+
+                    //     const mf = submesh.gameObject.addComponent("meshFilter") as meshFilter;
+                    //     mf.mesh = m;
+                    //     const renderer = submesh.gameObject.addComponent("meshRenderer") as meshRenderer;
+                    //     renderer.materials = [mat];
+                    //     if (texST) {
+                    //         renderer.lightmapIndex = -2;    //标记该节点使用非全局lightmap
+                    //         math.vec4Set(renderer.lightmapScaleOffset, texST[0], texST[1], texST[2], texST[3]);
+                    //     }
+                    //     // renderer.materials.push(mat);
+                    //     // renderer.materials.push(new framework.material());
+                    //     // renderer.materials[0].setShader(mgr.getShader("shader/def"));
+                    //     // renderer.materials[0].setShader(mgr.getShader("simple.shader.json"));
+                    //     return submesh;
+                    // });
+                    // child.forEach(c => n.addChild(c));
+                    
                 }
                 return { n, children };
             });
@@ -720,5 +806,11 @@ namespace m4m.framework {
             }
             return this.newTypedArray(acc);
         }
+    }
+    class meshinfo
+    {
+        mesh:mesh;
+        outmats:material[] ;
+        lightMapTexST:math.vector4[];
     }
 }
