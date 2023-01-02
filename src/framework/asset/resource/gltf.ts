@@ -429,7 +429,7 @@ namespace m4m.framework {
                 console.log("====gltf begin load one mesh " + name);
                 gltf.dumpmem();
                 const mf = new mesh(folder + name);
-                const mdata = mf.data = new m4m.render.meshData();
+                let mdata = mf.data = new m4m.render.meshData();
                 const vert: m4m.math.vector3[] = mdata.pos = [];
                 const uv1: m4m.math.vector2[] = mdata.uv = [];
                 const uv2: m4m.math.vector2[] = mdata.uv2 = [];
@@ -604,6 +604,7 @@ namespace m4m.framework {
                 });
                 mf.glMesh.addIndex(ctx,mdata.trisindex.length);
                 mf.glMesh.uploadIndexData(ctx,0,mdata.genIndexDataArray());
+               
                 mf.glMesh.initVAO();
 
                 console.log("====gltf end load mesh " + name);
