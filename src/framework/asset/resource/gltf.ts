@@ -593,7 +593,7 @@ namespace m4m.framework {
                     //mf.submesh = [];
                     const sm = new m4m.framework.subMeshInfo();
                     sm.matIndex = 0;
-                    sm.useVertexIndex = mf.submesh.length;
+                    sm.useVertexIndex = 0;
                     sm.start = indexbegin;
                     sm.size = ebo.length;
                     sm.line = false;
