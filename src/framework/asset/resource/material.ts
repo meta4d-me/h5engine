@@ -709,6 +709,10 @@ namespace m4m.framework {
             for (let i = 0, l = drawPasses.length; i < l; i++) {
                 //渲染状态 和 gl程序启用
                 let pass = drawPasses[i];
+
+                //临时加的，要不然面反的好难受
+                pass.state_showface=  m4m.render.ShowFaceStateEnum.ALL;
+
                 pass.use(context.webgl);
 
                 //顶点状态绑定

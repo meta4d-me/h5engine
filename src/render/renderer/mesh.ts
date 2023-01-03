@@ -92,6 +92,7 @@
         private vbo: WebGLBuffer;
         private vertexCount: number;
         private eboDataType = WebGL2RenderingContext.UNSIGNED_SHORT;
+        private eboElementSize = 2;
         private webgl: WebGL2RenderingContext;
         vertexByteSize: number;
         ebo: WebGLBuffer;
@@ -344,11 +345,14 @@
             if (!this.ebo) return;
             // this.eboDataType = dataType;
             let _dType = WebGL2RenderingContext.UNSIGNED_SHORT;
+            this.eboElementSize =2;
             //webgl2 支持 32模式了, 通过类型判断是否为uint32
             if (data && data instanceof Uint32Array) {
                 _dType = WebGL2RenderingContext.UNSIGNED_INT;
+                this.eboElementSize =4;
             }
             this.eboDataType = _dType;
+          
             // this.eboDataType = dataType;
             // webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, this.ebos[eboindex]);
             webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, this.ebo);
@@ -386,10 +390,11 @@
             if (count < 0) count = ((this.indexCount / 3) | 0) * 3;
             drawInfo.ins.triCount += count / 3;
             drawInfo.ins.renderCount++;
+            //下面的*2 是 写死 16bit的地址
             if (instanceCount > 1 && webgl.drawElementsInstanced != null) {
-                webgl.drawElementsInstanced(webgl.TRIANGLES, count, this.eboDataType, start * 2, instanceCount);
+                webgl.drawElementsInstanced(webgl.TRIANGLES, count, this.eboDataType, start * this.eboElementSize, instanceCount);
             } else {
-                webgl.drawElements(webgl.TRIANGLES, count, this.eboDataType, start * 2);
+                webgl.drawElements(webgl.TRIANGLES, count, this.eboDataType, start * this.eboElementSize);
             }
         }
         /** EBO 绘制线段 */
@@ -398,9 +403,9 @@
             if (count < 0) count = ((this.indexCount / 2) | 0) * 2;
             drawInfo.ins.renderCount++;
             if (instanceCount > 1 && webgl.drawElementsInstanced != null) {
-                webgl.drawElementsInstanced(webgl.LINES, count, this.eboDataType, start * 2, instanceCount);
+                webgl.drawElementsInstanced(webgl.LINES, count, this.eboDataType, start * this.eboElementSize, instanceCount);
             } else {
-                webgl.drawElements(webgl.LINES, count, this.eboDataType, start * 2);
+                webgl.drawElements(webgl.LINES, count, this.eboDataType, start * this.eboElementSize);
             }
         }
 

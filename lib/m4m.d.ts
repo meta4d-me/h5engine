@@ -22530,6 +22530,7 @@ declare namespace m4m.render {
         private vbo;
         private vertexCount;
         private eboDataType;
+        private eboElementSize;
         private webgl;
         vertexByteSize: number;
         ebo: WebGLBuffer;
