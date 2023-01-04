@@ -711,7 +711,7 @@ namespace m4m.framework {
                 let pass = drawPasses[i];
 
                 //临时加的，要不然面反的好难受
-                pass.state_showface=  m4m.render.ShowFaceStateEnum.ALL;
+                //pass.state_showface=  m4m.render.ShowFaceStateEnum.ALL;
 
                 pass.use(context.webgl);
 

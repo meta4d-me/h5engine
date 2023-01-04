@@ -715,7 +715,8 @@ namespace m4m.framework {
             this.submesh = [];
             for (var i = 0; i < len; ++i) {
                 var _submeshinfo: subMeshInfo = new subMeshInfo();
-                _submeshinfo.start = read.readUInt16();
+                read.readUInt16();
+                _submeshinfo.start = data.trisindex.length;
                 _submeshinfo.size = read.readUInt32();
                 _submeshinfo.matIndex = i;//read.readUInt8();
                 this.submesh.push(_submeshinfo);

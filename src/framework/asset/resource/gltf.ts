@@ -584,8 +584,13 @@ namespace m4m.framework {
                     console.log("ebo count=" + ebo.length);
 
                     let indexbegin = mdata.trisindex.length;
-                    for (var i = 0; i < ebo.length; i++) {
-                        mdata.trisindex.push(ebo[i]);
+                    for (var i = 0; i < ebo.length/3; i++) {
+                        var i0 =ebo[i*3+0];
+                        var i1 =ebo[i*3+1];
+                        var i2 =ebo[i*3+2];
+                        mdata.trisindex.push(i0);
+                        mdata.trisindex.push(i2);
+                        mdata.trisindex.push(i1);
                     }
                     //mdata.trisindex = Array.from(ebo);
                     // mf.glMesh.addIndex(ctx, ebo.length);
