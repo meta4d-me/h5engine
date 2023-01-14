@@ -124,9 +124,11 @@ namespace m4m.framework {
         static dumpmem(): void {
             var meminfo = window.performance["memory"];
             var memsize = meminfo.usedJSHeapSize / 1024 / 1024 | 0;
-            if (memsize > 2048)
-                throw "use too mush memory";
+          
             console.log("====gltf mem= " + memsize + " MB");
+
+            //if (memsize > 2048)
+            //throw "use too mush memory";
         }
 
         hexToRgb = hex =>
@@ -437,85 +439,124 @@ namespace m4m.framework {
                 const normal: m4m.math.vector3[] = mdata.normal = [];
                 const tangent: m4m.math.vector3[] = mdata.tangent = [];
                 const colors = mdata.color = [];
-                const attr: { [k: string]: Accessor } = {};
+
+              
+                const attr: { [k: string]: GltfAttr } = {};
                 for (let k in primitives[0].attributes) {
-                    attr[k] = new Accessor(accessors[primitives[0].attributes[k]], k);
+                    let attrview = accessors[primitives[0].attributes[k]];
+                    attr[k] = attrview;
                 }
 
                 const vcount = attr.POSITION.count;
                 const bs =
-                    + (attr.POSITION?.size ?? 0)
-                    + (attr.NORMAL?.size ?? 0)
-                    + (attr.COLOR?.size ?? 0)
-                    + (attr.TANGENT?.size ? 3 : 0) // 引擎里的Tangent是vec3，而不是vec4
-                    + (attr.TEXCOORD_0?.size ?? 0)
-                    + (attr.TEXCOORD_1?.size ?? 0);
+                    + (attr.POSITION?3: 0)
+                    + (attr.NORMAL?3: 0)
+                    + (attr.COLOR?4: 0)
+                    + (attr.TANGENT?3: 0) // 引擎里的Tangent是vec3，而不是vec4
+                    + (attr.TEXCOORD_0?2: 0)
+                    + (attr.TEXCOORD_1?12: 0);
                 const vbo = new Float32Array(vcount * bs);
 
                 console.log("vcount=" + vcount);
 
                 mf.glMesh = new m4m.render.glMesh();
                 let vf
-                if (attr.POSITION?.size)
+                if (attr.POSITION)
                     vf |= m4m.render.VertexFormatMask.Position;
-                if (attr.NORMAL?.size)
+                if (attr.NORMAL)
                     vf |= m4m.render.VertexFormatMask.Normal;
-                // | m4m.render.VertexFormatMask.Color
-                if (attr.TANGENT?.size)
+                if(attr.COLOR)
+                    vf |= m4m.render.VertexFormatMask.Color
+                if (attr.TANGENT)
                     vf |= m4m.render.VertexFormatMask.Tangent;
-                if (attr.TEXCOORD_0?.size)
+                if (attr.TEXCOORD_0)
                     vf |= m4m.render.VertexFormatMask.UV0;
-                if (attr.TEXCOORD_1?.size)
+                if (attr.TEXCOORD_1)
                     vf |= m4m.render.VertexFormatMask.UV1;
                 // | m4m.render.VertexFormatMask.BlendIndex4
                 // | m4m.render.VertexFormatMask.BlendWeight4;
+                console.log("before initBuffer");
+                gltf.dumpmem();
+
                 mf.glMesh.initBuffer(ctx, vf, vcount, m4m.render.MeshTypeEnum.Static);
 
-                let uv0data: Float32Array[] = null;
-                let uv1data: Float32Array[] = null;
-                let posdata: Float32Array[] = null;
-                let nordata: Float32Array[] = null;
-                let tandata: Float32Array[] = null;
-                if (attr.TEXCOORD_0?.size != null)
-                    uv0data = attr.TEXCOORD_0.data as Float32Array[];
-                if (attr.TEXCOORD_1?.size != null)
-                    uv1data = attr.TEXCOORD_1.data as Float32Array[];
-                if (attr.TEXCOORD_1?.size != null)
-                    uv1data = attr.TEXCOORD_1.data as Float32Array[];
-                if (attr.POSITION?.size != null)
-                    posdata = attr.POSITION.data as Float32Array[];
-                if (attr.NORMAL?.size != null)
-                    nordata = attr.NORMAL.data as Float32Array[];
-                if (attr.TANGENT?.size != null)
-                    tandata = attr.TANGENT.data as Float32Array[];
+                let uv0data: Float32Array = null;
+                let uv1data: Float32Array = null;
+                let posdata: Float32Array = null;
+                let nordata: Float32Array = null;
+                let tandata: Float32Array = null;
+                if (attr.TEXCOORD_0 != null)
+                {
+                    uv0data = new Float32Array(attr.TEXCOORD_0.bufferView.rawBuffer,attr.TEXCOORD_0.bufferView.byteOffset);
+ 
+                    console.log("attr uv0");
+                    gltf.dumpmem();
+                }
+                if (attr.TEXCOORD_1 != null)
+                {
+                    uv1data = new Float32Array(attr.TEXCOORD_1.bufferView.rawBuffer,attr.TEXCOORD_1.bufferView.byteOffset);
 
+                    console.log("attr uv1");
+                    gltf.dumpmem();
+                }
+
+                if (attr.POSITION != null)
+                {
+                    posdata = new Float32Array(attr.POSITION.bufferView.rawBuffer,attr.POSITION.bufferView.byteOffset);
+
+                    console.log("attr pos");
+                    gltf.dumpmem();
+                }
+                if (attr.NORMAL != null)
+                {
+                    nordata = new Float32Array(attr.NORMAL.bufferView.rawBuffer,attr.NORMAL.bufferView.byteOffset);
+
+                    console.log("attr nor");
+                    gltf.dumpmem();
+                }
+                if (attr.TANGENT != null)
+                {   
+                    tandata =new Float32Array(attr.TANGENT.bufferView.rawBuffer,attr.TANGENT.bufferView.byteOffset);
+
+                    
+                    console.log("attr tan");
+                    gltf.dumpmem();
+                }
+                console.log("after initBuffer");
+                gltf.dumpmem();
                 for (let i = 0; i < vcount; i++) {
                     if (uv0data != null) {
-                        let uvFliped0 = uv0data[i];
-                        uv1[i] = new m4m.math.vector2(uvFliped0[0], uvFliped0[1] * -1 + 1);
+                        let uvFliped0 = uv0data[i*2+0];
+                        let uvFliped1 = uv0data[i*2+1];
+                        uv1[i] = new m4m.math.vector2(uvFliped0, uvFliped1 * -1 + 1);
                     }
 
                     if (uv1data != null) {
-                        let uvFliped1 = uv1data[i];
-                        uv2[i] = new m4m.math.vector2(uvFliped1[0], uvFliped1[1] * -1 + 1);
+                        let uvFliped0 = uv1data[i*2+0];
+                        let uvFliped1 = uv1data[i*2+1];
+                        uv2[i] = new m4m.math.vector2(uvFliped0, uvFliped1 * -1 + 1);
                     }
 
                     if (posdata != null) {
-                        let _posArr = posdata[i];
-                        vert[i] = new m4m.math.vector3(_posArr[0], _posArr[1], _posArr[2]);
+                        let _pos0 = posdata[i*3+0];
+                        let _pos1 = posdata[i*3+1];
+                        let _pos2 = posdata[i*3+2];
+                        vert[i] = new m4m.math.vector3(_pos0, _pos1, _pos2);
                     }
 
                     if (nordata != null) {
-                        let _normalArr = nordata[i];
-                        normal[i] = new m4m.math.vector3(_normalArr[0], _normalArr[1], _normalArr[2]);
+                        let _pos0 = nordata[i*3+0];
+                        let _pos1 = nordata[i*3+1];
+                        let _pos2 = nordata[i*3+2];
+                        normal[i] = new m4m.math.vector3(_pos0, _pos1, _pos2);
                     }
 
                     if (tandata != null) {
-                        let _tangentArr = tandata[i];
-                        let t = new m4m.math.vector3(_tangentArr[0], _tangentArr[1], _tangentArr[2]);
+
+                        let t = new m4m.math.vector3(tandata[i*4+0], tandata[i*4+1], tandata[i*4+2]);
                         //处理 w 分量 , w 存入 xyz 中, w 只因为为1 或 -1 ,表示为切向方向性。
                         //将w 平移2 , 映射为 -1 -> 1 , 1 -> 3 ，这样保障 normalize 后 xyz 一致                                                                                                                                                                                                                                      
-                        let w = _tangentArr[3] + 2;
+                        let w = tandata[i*4+3] + 2;
                         //将w 乘入 xyz , x = x * w , y = y * w , y = y * w 
                         m4m.math.vec3ScaleByNum(t, w, t);
                         tangent[i] = t;
@@ -523,7 +564,7 @@ namespace m4m.framework {
 
                     const cur = vbo.subarray(i * bs); // offset
                     let bit = 0;
-                    if (attr.POSITION?.size != null) {
+                    if (attr.POSITION != null) {
                         const position = cur.subarray(bit, bit += 3);
                         position[0]=vert[i].x;
                         position[1]=vert[i].y;
@@ -531,14 +572,14 @@ namespace m4m.framework {
                     }
 
                     // const color = cur.subarray(3, 7);
-                    if (attr.NORMAL?.size != null) {
+                    if (attr.NORMAL != null) {
                         const n = cur.subarray(bit, bit += 3);
                         n[0]=normal[i].x;
                         n[1]=normal[i].y;
                         n[2]=normal[i].z;
                     }
 
-                    if (attr.TANGENT?.size != null) {
+                    if (attr.TANGENT != null) {
                         const tan = cur.subarray(bit, bit += 3);
                         const t = tangent[i];
                         tan[0] = t.x;
@@ -546,14 +587,14 @@ namespace m4m.framework {
                         tan[2] = t.z;
                     }
 
-                    if (attr.TEXCOORD_0?.size != null) {
+                    if (attr.TEXCOORD_0 != null) {
                         const _uv = cur.subarray(bit, bit += 2);
                         let u = uv1[i];
                         _uv[0] = u.x;
                         _uv[1] = u.y;
                     }
 
-                    if (attr.TEXCOORD_1?.size != null) {
+                    if (attr.TEXCOORD_1 != null) {
                         const _uv2 = cur.subarray(bit, bit += 2);
                         let u = uv2[i];
                         _uv2[0] = u.x;
@@ -566,7 +607,8 @@ namespace m4m.framework {
                 }
                 mf.glMesh.uploadVertexData(ctx, vbo);
 
-
+                console.log("after uploadVertexData");
+                gltf.dumpmem();
 
 
 
@@ -578,10 +620,16 @@ namespace m4m.framework {
                 info.outmats = [];
 
                 primitives.map(({ attributes, indices, material, extensions }) => {
-                    const eboAcc = new Accessor(accessors[indices], "indices");
-                    const ebo = eboAcc.data as Uint16Array;
-
-                    console.log("ebo count=" + ebo.length);
+                    let eboacc= accessors[indices] as GltfAttr;
+                    //let eboAcc = new Accessor(accessors[indices], "indices");
+                    //let ebo = eboAcc.data as Uint32Array;
+                     let ebo:any;
+                     if(eboacc.componentType==5125)
+                         ebo = new Uint32Array(eboacc.bufferView.rawBuffer,eboacc.bufferView.byteOffset,eboacc.count);
+                     if(eboacc.componentType==5123)
+                         ebo =new Uint16Array(eboacc.bufferView.rawBuffer,eboacc.bufferView.byteOffset,eboacc.count);
+                    
+                         console.log("ebo count=" + ebo.length);
 
                     let indexbegin = mdata.trisindex.length;
                     for (var i = 0; i < ebo.length/3; i++) {
@@ -835,5 +883,21 @@ namespace m4m.framework {
         mesh: mesh;
         outmats: material[];
         lightMapTexST: math.vector4[];
+    }
+
+
+    class GltfAttr
+    {
+        bufferView:{
+            rawBuffer:ArrayBuffer;
+            byteOffset:number;
+            byteLength:number;
+            byteStride:number;
+        };
+        componentType:number;//5126 ==float //5125 =uint32 5123 ==uint16
+        count:number;
+        name:string;
+        type:string;
+        normalized:boolean;
     }
 }
