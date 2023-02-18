@@ -715,7 +715,11 @@ namespace m4m.framework {
             this.submesh = [];
             for (var i = 0; i < len; ++i) {
                 var _submeshinfo: subMeshInfo = new subMeshInfo();
+		//原来这个格式定的不支持32bit index了，
                 _submeshinfo.start = read.readUInt16();
+		//如果你也碰到这个毛病，有个临时的处理方法
+		//read.readUInt16();
+                //_submeshinfo.start = data.trisindex.length;
                 _submeshinfo.size = read.readUInt32();
                 _submeshinfo.matIndex = i;//read.readUInt8();
                 this.submesh.push(_submeshinfo);

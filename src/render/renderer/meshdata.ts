@@ -36,7 +36,7 @@
         /** 三角形索引数组 */
         trisindex: number[];
         /** 三角形索引使用 uint32 模式，默认 false */
-        triIndexUint32Mode = false;
+        triIndexUint32Mode = true;
 
         /** 数据是缓冲区模式 */
         public get isBufferDataMode() { return this.vertexBufferData != null; }
