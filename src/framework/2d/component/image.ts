@@ -1,7 +1,6 @@
 /// <reference path="../../../io/reflect.ts" />
 
-namespace m4m.framework
-{
+namespace m4m.framework {
     /**
      * @public
      * @language zh_CN
@@ -11,20 +10,18 @@ namespace m4m.framework
      */
     @reflect.node2DComponent
     @reflect.nodeRender
-    export class image2D implements IRectRenderer
-    {
-        static readonly ClassName:string="image2D";
+    export class image2D implements IRectRenderer {
+        static readonly ClassName: string = "image2D";
 
         /**
          * @private
          */
-        constructor()
-        {
+        constructor() {
             m4m.io.enumMgr.enumMap["ImageType"] = ImageType;
             m4m.io.enumMgr.enumMap["FillMethod"] = FillMethod;
         }
 
-        private _unitLen = 13; 
+        private _unitLen = 13;
         //2d使用固定的顶点格式
         //pos[0,1,2]color[3,4,5,6]uv[7,8]color2[9,10,11,12] length=13
         private datar: number[] = [
@@ -60,7 +57,7 @@ namespace m4m.framework
          * 设置rander Shader名字
          * @version m4m 1.0
          */
-        setShaderByName(shaderName:string){
+        setShaderByName(shaderName: string) {
             this._CustomShaderName = shaderName;
         }
 
@@ -71,14 +68,14 @@ namespace m4m.framework
          * 获取rander 的材质
          * @version m4m 1.0
          */
-        getMaterial(){
-            if(!this._uimat){
+        getMaterial() {
+            if (!this._uimat) {
                 return this.uimat;
             }
             return this._uimat;
         }
 
-        private _darwRect : m4m.math.rect;
+        private _darwRect: m4m.math.rect;
 
         /**
          * @public
@@ -87,8 +84,8 @@ namespace m4m.framework
          * 获取渲染绘制矩形边界
          * @version m4m 1.0
          */
-        getDrawBounds(){
-            if(!this._darwRect){
+        getDrawBounds() {
+            if (!this._darwRect) {
                 this._darwRect = new math.rect();
                 this.calcDrawRect();
             }
@@ -100,33 +97,34 @@ namespace m4m.framework
          * ui默认材质
          */
         private _uimat: material;
-        private get uimat(){
+        private get uimat() {
             let assetmgr = this.transform.canvas.assetmgr;
-            if(!assetmgr) return this._uimat;
+            if (!assetmgr) return this._uimat;
 
             this.searchTexture();
-            if (this._sprite  && this._sprite.texture){
+            if (this._sprite && this._sprite.texture) {
                 let pMask = this.transform.parentIsMask;
                 let mat = this._uimat;
                 let rectTag = "";
                 let uiTag = "_ui";
-                if(pMask){
+                if (pMask) {
                     // let prect = this.transform.maskRect;
                     // rectTag = `mask(${prect.x}_${prect.y}_${prect.w}_${prect.h})`; //when parentIsMask,can't multiplexing material , can be multiplexing when parent equal
-                    
+
                     let rId = this.transform.maskRectId;
                     rectTag = `mask(${rId})`;
                 }
-                let matName =this._sprite.texture.getName() + uiTag + rectTag;
-                if(!mat || mat.getName() != matName){
-                    if(mat) mat.unuse(); 
+                let useShaderName = this._CustomShaderName ? this._CustomShaderName : pMask ? image2D.defMaskUIShader : image2D.defUIShader;
+                let matName = useShaderName + this._sprite.texture.getName() + uiTag + rectTag;
+                if (!mat || mat.getName() != matName) {
+                    if (mat) mat.unuse();
                     mat = assetmgr.getAssetByName(matName) as m4m.framework.material;
-                    if(mat) mat.use();
+                    if (mat) mat.use();
                 }
-                if(!mat){
+                if (!mat) {
                     mat = new material(matName);
                     let sh = assetmgr.getShader(this._CustomShaderName);
-                    sh = sh? sh : assetmgr.getShader(pMask? image2D.defMaskUIShader : image2D.defUIShader);
+                    sh = sh ? sh : assetmgr.getShader(pMask ? image2D.defMaskUIShader : image2D.defUIShader);
                     mat.setShader(sh);
                     mat.use();
                     this.needRefreshImg = true;
@@ -146,12 +144,10 @@ namespace m4m.framework
          */
         @reflect.Field("number")
         @reflect.UIStyle("enum")
-        get imageType()
-        {
+        get imageType() {
             return this._imageType;
         }
-        set imageType(type: ImageType)
-        {
+        set imageType(type: ImageType) {
             this._imageType = type;
             this.prepareData();
             if (this.transform != null)
@@ -168,12 +164,10 @@ namespace m4m.framework
          */
         @reflect.Field("number")
         @reflect.UIStyle("enum")
-        get fillMethod()
-        {
+        get fillMethod() {
             return this._fillMethod;
         }
-        set fillMethod(method: FillMethod)
-        {
+        set fillMethod(method: FillMethod) {
             this._fillMethod = method;
             this.prepareData();
             if (this.transform != null)
@@ -189,19 +183,17 @@ namespace m4m.framework
          * @version m4m 1.0
          */
         @m4m.reflect.Field("number")
-        get fillAmmount()
-        {
+        get fillAmmount() {
             return this._fillAmmount;
         }
-        set fillAmmount(ammount: number)
-        {
+        set fillAmmount(ammount: number) {
             this._fillAmmount = ammount;
             if (this.transform != null)
                 this.transform.markDirty();
-            }
+        }
 
         transform: transform2D;
-            
+
         // /**
         //  * @public
         //  * @language zh_CN
@@ -238,7 +230,7 @@ namespace m4m.framework
         //         this.updateTran();
         //     }
         // }
-        
+
         /**
          * @public
          * @language zh_CN
@@ -246,20 +238,18 @@ namespace m4m.framework
          * 精灵
          * @version m4m 1.0
          */
-        public set sprite(sprite: sprite)
-        {
-            if(sprite == this._sprite) return;
-            
-            if(this._sprite)
-            {
+        public set sprite(sprite: sprite) {
+            if (sprite == this._sprite) return;
+
+            if (this._sprite) {
                 this._sprite.unuse();
             }
-            if(!this._sprite || !sprite || this._sprite.texture != sprite.texture ){
+            if (!this._sprite || !sprite || this._sprite.texture != sprite.texture) {
                 this.needRefreshImg = true;
             }
-            
+
             this._sprite = sprite;
-            if(sprite){
+            if (sprite) {
                 // this._imageBorder.l = sprite.border.l;
                 // this._imageBorder.t = sprite.border.t;
                 // this._imageBorder.r = sprite.border.r;
@@ -267,24 +257,23 @@ namespace m4m.framework
                 this._sprite.use();
                 this._spriteName = this._sprite.getName();
                 this.prepareData();
-                if (this.transform != null){
+                if (this.transform != null) {
                     this.transform.markDirty();
                     this.updateTran();
                 }
-            }else{
+            } else {
                 this._spriteName = "";
             }
 
         }
-        public get sprite()
-        {
+        public get sprite() {
             return this._sprite;
         }
 
         @m4m.reflect.Field("string")
-        private _spriteName:string = "";
-        
-        
+        private _spriteName: string = "";
+
+
         @reflect.Field("border")
         private _imageBorder = new math.border();
         /**
@@ -294,94 +283,89 @@ namespace m4m.framework
          * 9宫格边距
          * @version m4m 1.0
          */
-        get imageBorder(){
+        get imageBorder() {
             return this._imageBorder;
         }
 
         /**
          * @private
          */
-        render(canvas: canvas)
-        {
+        render(canvas: canvas) {
             let mat = this.uimat;
-            if(!mat) return;
+            if (!mat) return;
 
-            let img ;
-            if (this._sprite  && this._sprite.texture )
-            {
+            let img;
+            if (this._sprite && this._sprite.texture) {
                 img = this._sprite.texture;
             }
 
 
-            if(img){
+            if (img) {
                 let needRMask = false;
-                if(this.needRefreshImg){
+                if (this.needRefreshImg) {
                     mat.setTexture("_MainTex", img);
                     this.needRefreshImg = false;
                     needRMask = true;
                 }
-                
-                if(this.transform.parentIsMask){
-                    if(!this._cacheMaskV4 ) this._cacheMaskV4 = new math.vector4();
+
+                if (this.transform.parentIsMask) {
+                    if (!this._cacheMaskV4) this._cacheMaskV4 = new math.vector4();
                     let rect = this.transform.maskRect;
-                    if(this._cacheMaskV4.x != rect.x || this._cacheMaskV4.y != rect.y || this._cacheMaskV4.w != rect.w || this._cacheMaskV4.z != rect.h || needRMask){
-                        this._cacheMaskV4.x = rect.x; this._cacheMaskV4.y = rect.y;this._cacheMaskV4.z = rect.w;this._cacheMaskV4.w = rect.h;
-                        mat.setVector4("_maskRect",this._cacheMaskV4);
+                    if (this._cacheMaskV4.x != rect.x || this._cacheMaskV4.y != rect.y || this._cacheMaskV4.w != rect.w || this._cacheMaskV4.z != rect.h || needRMask) {
+                        this._cacheMaskV4.x = rect.x; this._cacheMaskV4.y = rect.y; this._cacheMaskV4.z = rect.w; this._cacheMaskV4.w = rect.h;
+                        mat.setVector4("_maskRect", this._cacheMaskV4);
                     }
                 }
-                
+
                 canvas.pushRawData(mat, this.datar);
             }
 
         }
 
         //资源管理器中寻找 指定的贴图资源
-        private searchTexture(){
-            if(this._sprite) return;
+        private searchTexture() {
+            if (this._sprite) return;
             let assetmgr = this.transform.canvas.assetmgr;
             let temp = assetMgr.mapNamed[this._spriteName];
-            let tspr:sprite;
-            if(temp != null){
+            let tspr: sprite;
+            if (temp != null) {
                 tspr = assetmgr.getAssetByName(this._spriteName) as m4m.framework.sprite;
-            }else{
-                if(assetmgr.mapDefaultSprite[this._spriteName]) //找默认资源
+            } else {
+                if (assetmgr.mapDefaultSprite[this._spriteName]) //找默认资源
                     tspr = assetmgr.getDefaultSprite(this._spriteName);
             }
-            if(tspr){
+            if (tspr) {
                 this.sprite = tspr;
                 this.needRefreshImg = true;
                 return;  //捕获到目标sprite后强制 下一帧渲染 （防止 transform树同步延迟 导致 右上角ghostShadow 问题）
             }
         }
 
-        private _cacheMaskV4:math.vector4;
-        
-        /**
-         * @private
-         */
-        start()
-        {
-
-        }
-
-        onPlay(){
-
-        }
+        private _cacheMaskV4: math.vector4;
 
         /**
          * @private
          */
-        update(delta: number)
-        {
+        start() {
+
+        }
+
+        onPlay() {
+
         }
 
         /**
          * @private
          */
-        remove()
-        {
-            if(this._sprite) this._sprite.unuse();
-            if(this._uimat) this._uimat.unuse();
+        update(delta: number) {
+        }
+
+        /**
+         * @private
+         */
+        remove() {
+            if (this._sprite) this._sprite.unuse();
+            if (this._uimat) this._uimat.unuse();
             this.datar.length = 0;
             this.transform = null;
             this._imageBorder = null;
@@ -391,15 +375,13 @@ namespace m4m.framework
          * @private
          * 根据显示方式来准备数据
          */
-        private prepareData()
-        {
+        private prepareData() {
             if (this._sprite == null) return;
             let urange = this._sprite.urange;
             let vrange = this._sprite.vrange;
             let ulen = urange.y - urange.x;
             let vlen = vrange.y - vrange.x;
-            switch (this._imageType)
-            {
+            switch (this._imageType) {
                 case ImageType.Simple:
                     this.datar = [
                         0, 0, 0, 1, 1, 1, 1, urange.x, vrange.x, 1, 1, 1, 1,
@@ -490,8 +472,7 @@ namespace m4m.framework
                 case ImageType.Filled:
                     let halfu = urange.x + 0.5 * ulen;
                     let halfv = vrange.x + 0.5 * vlen;
-                    switch (this._fillMethod)
-                    {
+                    switch (this._fillMethod) {
                         case FillMethod.Horizontal:
                         case FillMethod.Vertical:
                         case FillMethod.Radial_90:
@@ -563,8 +544,7 @@ namespace m4m.framework
         /**
          * @private
          */
-        updateTran()
-        {
+        updateTran() {
             var m = this.transform.getWorldMatrix();
 
             var l = -this.transform.pivot.x * this.transform.width;
@@ -583,8 +563,7 @@ namespace m4m.framework
 
 
             if (this._sprite == null) return;
-            switch (this._imageType)
-            {
+            switch (this._imageType) {
                 case ImageType.Simple:
                     this.updateSimpleData(x0, y0, x1, y1, x2, y2, x3, y3);
                     break;
@@ -600,8 +579,7 @@ namespace m4m.framework
             }
             //主color
             let vertexCount = this.datar.length / this._unitLen;
-            for (var i = 0; i < vertexCount; i++)
-            {
+            for (var i = 0; i < vertexCount; i++) {
                 this.datar[i * this._unitLen + 3] = this.color.r;
                 this.datar[i * this._unitLen + 4] = this.color.g;
                 this.datar[i * this._unitLen + 5] = this.color.b;
@@ -609,32 +587,32 @@ namespace m4m.framework
             }
 
             //drawRect 
-            this.min_x = Math.min(x0,x1,x2,x3,this.min_x);
-            this.min_y = Math.min(y0,y1,y2,y3,this.min_y);
-            this.max_x = Math.max(x0,x1,x2,x3,this.max_x);
-            this.max_y = Math.max(y0,y1,y2,y3,this.max_y);
+            this.min_x = Math.min(x0, x1, x2, x3, this.min_x);
+            this.min_y = Math.min(y0, y1, y2, y3, this.min_y);
+            this.max_x = Math.max(x0, x1, x2, x3, this.max_x);
+            this.max_y = Math.max(y0, y1, y2, y3, this.max_y);
             this.calcDrawRect();
         }
 
-        private min_x : number = Number.MAX_VALUE;
-        private max_x : number = Number.MAX_VALUE * -1;
-        private min_y : number = Number.MAX_VALUE;
-        private max_y : number = Number.MAX_VALUE * -1;
+        private min_x: number = Number.MAX_VALUE;
+        private max_x: number = Number.MAX_VALUE * -1;
+        private min_y: number = Number.MAX_VALUE;
+        private max_y: number = Number.MAX_VALUE * -1;
         /** 计算drawRect */
-        private calcDrawRect(){
-            if(!this._darwRect)    return;
+        private calcDrawRect() {
+            if (!this._darwRect) return;
             //drawBounds (y 轴反向)
             let canvas = this.transform.canvas;
-            if(!canvas)return;
+            if (!canvas) return;
             let minPos = poolv2();
             minPos.x = this.min_x;
             minPos.y = this.max_y;
-            canvas.clipPosToCanvasPos(minPos,minPos);
+            canvas.clipPosToCanvasPos(minPos, minPos);
 
             let maxPos = poolv2();
             maxPos.x = this.max_x;
             maxPos.y = this.min_y;
-            canvas.clipPosToCanvasPos(maxPos,maxPos);
+            canvas.clipPosToCanvasPos(maxPos, maxPos);
 
             this._darwRect.x = minPos.x;
             this._darwRect.y = minPos.y;
@@ -648,17 +626,15 @@ namespace m4m.framework
             poolv2_del(maxPos);
         }
 
-        
+
 
         /**
          * @private
          * 更新quad的顶点数据
          */
-        private updateQuadData(x0: number, y0: number, x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, quadIndex = 0, mirror: boolean = false)
-        {
+        private updateQuadData(x0: number, y0: number, x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, quadIndex = 0, mirror: boolean = false) {
             let _index: number = quadIndex * 6;
-            if (!mirror)
-            {
+            if (!mirror) {
                 this.datar[(_index + 0) * this._unitLen] = x0;
                 this.datar[(_index + 0) * this._unitLen + 1] = y0;
                 this.datar[(_index + 1) * this._unitLen] = x1;
@@ -672,8 +648,7 @@ namespace m4m.framework
                 this.datar[(_index + 5) * this._unitLen] = x3;
                 this.datar[(_index + 5) * this._unitLen + 1] = y3;
             }
-            else
-            {
+            else {
                 this.datar[(_index + 0) * this._unitLen] = x0;
                 this.datar[(_index + 0) * this._unitLen + 1] = y0;
                 this.datar[(_index + 1) * this._unitLen] = x1;
@@ -693,8 +668,7 @@ namespace m4m.framework
          * @private
          * 更新常规数据
          */
-        private updateSimpleData(x0: number, y0: number, x1: number, y1: number, x2: number, y2: number, x3: number, y3: number)
-        {
+        private updateSimpleData(x0: number, y0: number, x1: number, y1: number, x2: number, y2: number, x3: number, y3: number) {
             this.updateQuadData(x0, y0, x1, y1, x2, y2, x3, y3);
         }
 
@@ -702,8 +676,7 @@ namespace m4m.framework
          * @private
          * 更新9宫数据
          */
-        private updateSlicedData(x0: number, y0: number, x1: number, y1: number, x2: number, y2: number, x3: number, y3: number)
-        {
+        private updateSlicedData(x0: number, y0: number, x1: number, y1: number, x2: number, y2: number, x3: number, y3: number) {
             let border = this._imageBorder;
             let rect = this._sprite.rect;
 
@@ -871,8 +844,7 @@ namespace m4m.framework
 
             let partVertexs: math.vector2[];
             let partUVs: math.vector2[];
-            for (let i = 0; i < 9; i++)
-            {
+            for (let i = 0; i < 9; i++) {
                 let r: number = Math.floor(i / 3);
                 let c: number = i % 3;
 
@@ -908,21 +880,18 @@ namespace m4m.framework
          * @private
          * 更新填充数据
          */
-        private updateFilledData(x0: number, y0: number, x1: number, y1: number, x2: number, y2: number, x3: number, y3: number)
-        {
+        private updateFilledData(x0: number, y0: number, x1: number, y1: number, x2: number, y2: number, x3: number, y3: number) {
             let urange = this._sprite.urange;
             let vrange = this._sprite.vrange;
             let ulen = urange.y - urange.x;
             let vlen = vrange.y - vrange.x;
             let halfu = urange.x + 0.5 * ulen;
             let halfv = vrange.x + 0.5 * vlen;
-            switch (this._fillMethod)
-            {
+            switch (this._fillMethod) {
                 case FillMethod.Horizontal:
                 case FillMethod.Vertical:
                 case FillMethod.Radial_90:
-                    if (this._fillMethod == FillMethod.Horizontal)
-                    {
+                    if (this._fillMethod == FillMethod.Horizontal) {
                         x1 = x1 - (1 - this.fillAmmount) * (x1 - x0);
                         y1 = y1 - (1 - this.fillAmmount) * (y1 - y0);
                         x3 = x3 - (1 - this.fillAmmount) * (x3 - x2);
@@ -932,8 +901,7 @@ namespace m4m.framework
                         this.datar[4 * this._unitLen + 7] = urange.x + this.fillAmmount * ulen;
                         this.datar[5 * this._unitLen + 7] = urange.x + this.fillAmmount * ulen;
                     }
-                    else if (this._fillMethod == FillMethod.Vertical)
-                    {
+                    else if (this._fillMethod == FillMethod.Vertical) {
                         x0 = x0 - (1 - this.fillAmmount) * (x0 - x2);
                         y0 = y0 - (1 - this.fillAmmount) * (y0 - y2);
                         x1 = x1 - (1 - this.fillAmmount) * (x1 - x3);
@@ -944,10 +912,8 @@ namespace m4m.framework
                         this.datar[4 * this._unitLen + 8] = (vrange.y - this.fillAmmount * vlen);
 
                     }
-                    else if (this._fillMethod == FillMethod.Radial_90)
-                    {
-                        if (this.fillAmmount >= 0.5)
-                        {
+                    else if (this._fillMethod == FillMethod.Radial_90) {
+                        if (this.fillAmmount >= 0.5) {
                             let _fillRate = 2 * (1 - this.fillAmmount);
                             x0 = x0 - _fillRate * (x0 - x1);
                             y0 = y0 - _fillRate * (y0 - y1);
@@ -956,8 +922,7 @@ namespace m4m.framework
                             this.datar[1 * this._unitLen + 8] = vrange.x;
                             this.datar[4 * this._unitLen + 8] = vrange.x;
                         }
-                        else
-                        {
+                        else {
                             let _fillRate = 2 * (0.5 - this.fillAmmount);
                             x1 = x1 - _fillRate * (x1 - x3);
                             y1 = y1 - _fillRate * (y1 - y3);
@@ -976,35 +941,32 @@ namespace m4m.framework
                     let ty = (y0 + y1) / 2;
                     let bx = (x2 + x3) / 2;
                     let by = (y2 + y3) / 2;
-                    if (this.fillAmmount >= 0.75)
-                    {
+                    if (this.fillAmmount >= 0.75) {
                         let _fillRate = 4 * (1 - this.fillAmmount);
                         x2 = x2 - _fillRate * (x2 - x0);
                         y2 = y2 - _fillRate * (y2 - y0);
 
-                        this.datar[5  * this._unitLen + 8] = vrange.y - _fillRate * vlen;
-                        this.datar[0  * this._unitLen + 7] = urange.x;
-                        this.datar[3  * this._unitLen + 7] = urange.x;
-                        this.datar[6  * this._unitLen + 7] = halfu;
-                        this.datar[7  * this._unitLen + 8] = vrange.x;
+                        this.datar[5 * this._unitLen + 8] = vrange.y - _fillRate * vlen;
+                        this.datar[0 * this._unitLen + 7] = urange.x;
+                        this.datar[3 * this._unitLen + 7] = urange.x;
+                        this.datar[6 * this._unitLen + 7] = halfu;
+                        this.datar[7 * this._unitLen + 8] = vrange.x;
                         this.datar[10 * this._unitLen + 8] = vrange.x;
                     }
-                    else if (this.fillAmmount >= 0.5)
-                    {
+                    else if (this.fillAmmount >= 0.5) {
                         let _fillRate = 4 * (0.75 - this.fillAmmount);
                         x0 = x0 - _fillRate * (x0 - tx);
                         y0 = y0 - _fillRate * (y0 - ty);
                         x2 = x0;
                         y2 = y0;
 
-                        this.datar[0  * this._unitLen + 7] = urange.x + 0.5 * ulen * _fillRate;
-                        this.datar[3  * this._unitLen + 7] = urange.x + 0.5 * ulen * _fillRate;
-                        this.datar[6  * this._unitLen + 7] = halfu;
-                        this.datar[7  * this._unitLen + 8] = vrange.x;
+                        this.datar[0 * this._unitLen + 7] = urange.x + 0.5 * ulen * _fillRate;
+                        this.datar[3 * this._unitLen + 7] = urange.x + 0.5 * ulen * _fillRate;
+                        this.datar[6 * this._unitLen + 7] = halfu;
+                        this.datar[7 * this._unitLen + 8] = vrange.x;
                         this.datar[10 * this._unitLen + 8] = vrange.x;
                     }
-                    else if (this.fillAmmount >= 0.25)
-                    {
+                    else if (this.fillAmmount >= 0.25) {
                         let _fillRate = 4 * (0.5 - this.fillAmmount);
                         tx = tx - _fillRate * (tx - x1);
                         ty = ty - _fillRate * (ty - y1);
@@ -1013,12 +975,11 @@ namespace m4m.framework
                         x2 = x0;
                         y2 = y0;
 
-                        this.datar[6  * this._unitLen + 7] = halfu + 0.5 * ulen * _fillRate;
-                        this.datar[7  * this._unitLen + 8] = vrange.x;
+                        this.datar[6 * this._unitLen + 7] = halfu + 0.5 * ulen * _fillRate;
+                        this.datar[7 * this._unitLen + 8] = vrange.x;
                         this.datar[10 * this._unitLen + 8] = vrange.x;
                     }
-                    else
-                    {
+                    else {
                         let _fillRate = 4 * (0.25 - this.fillAmmount);
                         x1 = x1 - _fillRate * (x1 - x3);
                         y1 = y1 - _fillRate * (y1 - y3);
@@ -1029,7 +990,7 @@ namespace m4m.framework
                         x2 = x0;
                         y2 = y0;
 
-                        this.datar[7  * this._unitLen + 8] = vrange.x + _fillRate * vlen;
+                        this.datar[7 * this._unitLen + 8] = vrange.x + _fillRate * vlen;
                         this.datar[10 * this._unitLen + 8] = vrange.x + _fillRate * vlen;
                     }
                     this.updateQuadData(x0, y0, tx, ty, x2, y2, bx, by, 0, true);
@@ -1049,8 +1010,7 @@ namespace m4m.framework
 
                     let b_x1 = b_x;
                     let b_y1 = b_y;
-                    if (this.fillAmmount >= 0.875)
-                    {
+                    if (this.fillAmmount >= 0.875) {
                         let _fillRate = 8 * (1 - this.fillAmmount);
                         b_x = b_x - _fillRate * (b_x - x2);
                         b_y = b_y - _fillRate * (b_y - y2);
@@ -1058,18 +1018,17 @@ namespace m4m.framework
                         this.datar[17 * this._unitLen + 7] = halfu - 0.5 * _fillRate * ulen;
                         this.datar[14 * this._unitLen + 8] = vrange.y;
                         this.datar[15 * this._unitLen + 8] = vrange.y;
-                        this.datar[5  * this._unitLen + 8] = halfv;
-                        this.datar[0  * this._unitLen + 7] = urange.x;
-                        this.datar[3  * this._unitLen + 7] = urange.x;
-                        this.datar[6  * this._unitLen + 7] = halfu;
-                        this.datar[7  * this._unitLen + 8] = vrange.x;
+                        this.datar[5 * this._unitLen + 8] = halfv;
+                        this.datar[0 * this._unitLen + 7] = urange.x;
+                        this.datar[3 * this._unitLen + 7] = urange.x;
+                        this.datar[6 * this._unitLen + 7] = halfu;
+                        this.datar[7 * this._unitLen + 8] = vrange.x;
                         this.datar[10 * this._unitLen + 8] = vrange.x;
                         this.datar[19 * this._unitLen + 8] = halfv;
                         this.datar[20 * this._unitLen + 7] = urange.y;
                         this.datar[22 * this._unitLen + 7] = urange.y;
                     }
-                    else if (this.fillAmmount >= 0.75)
-                    {
+                    else if (this.fillAmmount >= 0.75) {
                         let _fillRate = 8 * (0.875 - this.fillAmmount);
                         x2 = x2 - _fillRate * (x2 - l_x);
                         y2 = y2 - _fillRate * (y2 - l_y);
@@ -1078,18 +1037,17 @@ namespace m4m.framework
 
                         this.datar[14 * this._unitLen + 8] = vrange.y - 0.5 * _fillRate * vlen;
                         this.datar[15 * this._unitLen + 8] = vrange.y - 0.5 * _fillRate * vlen;
-                        this.datar[5  * this._unitLen + 8] = halfv;
-                        this.datar[0  * this._unitLen + 7] = urange.x;
-                        this.datar[3  * this._unitLen + 7] = urange.x;
-                        this.datar[6  * this._unitLen + 7] = halfu;
-                        this.datar[7  * this._unitLen + 8] = vrange.x;
+                        this.datar[5 * this._unitLen + 8] = halfv;
+                        this.datar[0 * this._unitLen + 7] = urange.x;
+                        this.datar[3 * this._unitLen + 7] = urange.x;
+                        this.datar[6 * this._unitLen + 7] = halfu;
+                        this.datar[7 * this._unitLen + 8] = vrange.x;
                         this.datar[10 * this._unitLen + 8] = vrange.x;
                         this.datar[19 * this._unitLen + 8] = halfv;
                         this.datar[20 * this._unitLen + 7] = urange.y;
                         this.datar[22 * this._unitLen + 7] = urange.y;
                     }
-                    else if (this.fillAmmount >= 0.625)
-                    {
+                    else if (this.fillAmmount >= 0.625) {
                         let _fillRate = 8 * (0.75 - this.fillAmmount);
                         l_x = l_x - _fillRate * (l_x - x0);
                         l_y = l_y - _fillRate * (l_y - y0);
@@ -1098,18 +1056,17 @@ namespace m4m.framework
                         b_x = x2;
                         b_y = y2;
 
-                        this.datar[5  * this._unitLen + 8] = halfv - 0.5 * _fillRate * vlen;
-                        this.datar[0  * this._unitLen + 7] = urange.x;
-                        this.datar[3  * this._unitLen + 7] = urange.x;
-                        this.datar[6  * this._unitLen + 7] = halfu;
-                        this.datar[7  * this._unitLen + 8] = vrange.x;
+                        this.datar[5 * this._unitLen + 8] = halfv - 0.5 * _fillRate * vlen;
+                        this.datar[0 * this._unitLen + 7] = urange.x;
+                        this.datar[3 * this._unitLen + 7] = urange.x;
+                        this.datar[6 * this._unitLen + 7] = halfu;
+                        this.datar[7 * this._unitLen + 8] = vrange.x;
                         this.datar[10 * this._unitLen + 8] = vrange.x;
                         this.datar[19 * this._unitLen + 8] = halfv;
                         this.datar[20 * this._unitLen + 7] = urange.y;
                         this.datar[22 * this._unitLen + 7] = urange.y;
                     }
-                    else if (this.fillAmmount >= 0.5)
-                    {
+                    else if (this.fillAmmount >= 0.5) {
                         let _fillRate = 8 * (0.625 - this.fillAmmount);
                         x0 = x0 - _fillRate * (x0 - t_x);
                         y0 = y0 - _fillRate * (y0 - t_y);
@@ -1120,17 +1077,16 @@ namespace m4m.framework
                         b_x = x2;
                         b_y = y2;
 
-                        this.datar[0  * this._unitLen + 7] = urange.x + 0.5 * _fillRate * ulen;
-                        this.datar[3  * this._unitLen + 7] = urange.x + 0.5 * _fillRate * ulen;
-                        this.datar[6  * this._unitLen + 7] = halfu;
-                        this.datar[7  * this._unitLen + 8] = vrange.x;
+                        this.datar[0 * this._unitLen + 7] = urange.x + 0.5 * _fillRate * ulen;
+                        this.datar[3 * this._unitLen + 7] = urange.x + 0.5 * _fillRate * ulen;
+                        this.datar[6 * this._unitLen + 7] = halfu;
+                        this.datar[7 * this._unitLen + 8] = vrange.x;
                         this.datar[10 * this._unitLen + 8] = vrange.x;
                         this.datar[19 * this._unitLen + 8] = halfv;
                         this.datar[20 * this._unitLen + 7] = urange.y;
                         this.datar[22 * this._unitLen + 7] = urange.y;
                     }
-                    else if (this.fillAmmount >= 0.375)
-                    {
+                    else if (this.fillAmmount >= 0.375) {
                         let _fillRate = 8 * (0.5 - this.fillAmmount);
                         t_x = t_x - _fillRate * (t_x - x1);
                         t_y = t_y - _fillRate * (t_y - y1);
@@ -1143,15 +1099,14 @@ namespace m4m.framework
                         b_x = x2;
                         b_y = y2;
 
-                        this.datar[6  * this._unitLen + 7] = halfu + 0.5 * _fillRate * ulen;
-                        this.datar[7  * this._unitLen + 8] = vrange.x;
+                        this.datar[6 * this._unitLen + 7] = halfu + 0.5 * _fillRate * ulen;
+                        this.datar[7 * this._unitLen + 8] = vrange.x;
                         this.datar[10 * this._unitLen + 8] = vrange.x;
                         this.datar[19 * this._unitLen + 8] = halfv;
                         this.datar[20 * this._unitLen + 7] = urange.y;
                         this.datar[22 * this._unitLen + 7] = urange.y;
                     }
-                    else if (this.fillAmmount >= 0.25)
-                    {
+                    else if (this.fillAmmount >= 0.25) {
                         let _fillRate = 8 * (0.375 - this.fillAmmount);
                         x1 = x1 - _fillRate * (x1 - r_x);
                         y1 = y1 - _fillRate * (y1 - r_y);
@@ -1166,14 +1121,13 @@ namespace m4m.framework
                         b_x = x2;
                         b_y = y2;
 
-                        this.datar[7  * this._unitLen + 8] = vrange.x + 0.5 * _fillRate * vlen;
+                        this.datar[7 * this._unitLen + 8] = vrange.x + 0.5 * _fillRate * vlen;
                         this.datar[10 * this._unitLen + 8] = vrange.x + 0.5 * _fillRate * vlen;
                         this.datar[19 * this._unitLen + 8] = halfv;
                         this.datar[20 * this._unitLen + 7] = urange.y;
                         this.datar[22 * this._unitLen + 7] = urange.y;
                     }
-                    else if (this.fillAmmount >= 0.125)
-                    {
+                    else if (this.fillAmmount >= 0.125) {
                         let _fillRate = 8 * (0.25 - this.fillAmmount);
                         r_x = r_x - _fillRate * (r_x - x3);
                         r_y = r_y - _fillRate * (r_y - y3);
@@ -1194,8 +1148,7 @@ namespace m4m.framework
                         this.datar[20 * this._unitLen + 7] = urange.y;
                         this.datar[22 * this._unitLen + 7] = urange.y;
                     }
-                    else
-                    {
+                    else {
                         let _fillRate = 8 * (0.125 - this.fillAmmount);
                         x3 = x3 - _fillRate * (x3 - b_x);
                         y3 = y3 - _fillRate * (y3 - b_y);
@@ -1232,8 +1185,7 @@ namespace m4m.framework
          * @private
          * 更新瓦片数据。这里只是没有border的瓦片。如果有border就要复杂很多
          */
-        private updateTiledData(x0: number, y0: number, x1: number, y1: number, x2: number, y2: number, x3: number, y3: number)
-        {
+        private updateTiledData(x0: number, y0: number, x1: number, y1: number, x2: number, y2: number, x3: number, y3: number) {
             let rect = this._sprite.rect;
             let border = this._imageBorder;
 
@@ -1250,10 +1202,8 @@ namespace m4m.framework
             let inv_vl = 1 / _vl;
             let dindex = 0;
             //创建完整的
-            for (var i = 0; i < _vl - 1; i++)
-            {
-                for (var j = 0; j < _ul - 1; j++)
-                {
+            for (var i = 0; i < _vl - 1; i++) {
+                for (var j = 0; j < _ul - 1; j++) {
                     let tdata = [
                         0, 0, 0, 1, 1, 1, 1, urange.x, vrange.x, 1, 1, 1, 1,
                         0, 0, 0, 1, 1, 1, 1, urange.y, vrange.x, 1, 1, 1, 1,
@@ -1279,8 +1229,7 @@ namespace m4m.framework
             //最后一行
             var intvl = Math.ceil(_vl) - 1;
             var tvl = _vl - Math.ceil(_vl) + 1;
-            for (var j = 0; j < _ul - 1; j++)
-            {
+            for (var j = 0; j < _ul - 1; j++) {
                 let tdata = [
                     0, 0, 0, 1, 1, 1, 1, urange.x, vrange.x, 1, 1, 1, 1,
                     0, 0, 0, 1, 1, 1, 1, urange.y, vrange.x, 1, 1, 1, 1,
@@ -1305,8 +1254,7 @@ namespace m4m.framework
             //最后一列
             var intul = Math.ceil(_ul) - 1;
             var tul = _ul - Math.ceil(_ul) + 1;
-            for (var i = 0; i < _vl - 1; i++)
-            {
+            for (var i = 0; i < _vl - 1; i++) {
                 let tdata = [
                     0, 0, 0, 1, 1, 1, 1, urange.x, vrange.x, 1, 1, 1, 1,
                     0, 0, 0, 1, 1, 1, 1, urange.x + tul * ulen, vrange.x, 1, 1, 1, 1,
@@ -1361,8 +1309,7 @@ namespace m4m.framework
      * 贴图的显示方式
      * @version m4m 1.0
      */
-    export enum ImageType
-    {
+    export enum ImageType {
         Simple,//普通贴图
         Sliced,//九宫
         Tiled,//平铺,根据显示的尺寸和图片的尺寸来计算mesh的uv，平铺上去。这里暂不考虑九宫的平铺（需要动态创建顶点）。
@@ -1376,8 +1323,7 @@ namespace m4m.framework
      * 更新瓦片数据。这里只是没有border的瓦片。如果有border就要复杂很多
      * @version m4m 1.0
      */
-    export enum FillMethod
-    {
+    export enum FillMethod {
         Horizontal,//横向填充
         Vertical,//纵向填充
         Radial_90,//角度填充

@@ -957,7 +957,8 @@ namespace m4m.framework {
                 let rId = transform.maskRectId;
                 rectTag = `mask(${rId})`;
             }
-            let matName = _tex.getName() + uiTag + rectTag;
+            let useShaderName = cShaderName ? cShaderName : pMask ? defMaskSh : defSh;
+            let matName = useShaderName + _tex.getName() + uiTag + rectTag;
             if (!mat || mat.getName() != matName) {
                 if (mat) mat.unuse();
                 mat = assetmgr.getAssetByName(matName) as m4m.framework.material;

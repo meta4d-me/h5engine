@@ -5988,9 +5988,14 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         set realName(name: string);
+        static dumpmem(): void;
         hexToRgb: (hex: any) => any;
         buffers: bin[];
         load(mgr: assetMgr, ctx: WebGL2RenderingContext, folder: string, brdf: texture, env: texture, irrSH: texture, exposure?: any, specFactor?: number, irrFactor?: number, uvChecker?: texture): Promise<transform>;
+        static loadgltfebo_mix(ctx: WebGL2RenderingContext, mf: mesh, primitives: any[], accessors: any[], materials: material[], hasLightMap: boolean, lightMapTexs: texture[], info: meshinfo): void;
+        static loadgltfebo_one(ctx: WebGL2RenderingContext, mf: mesh, primitive: any, accessors: any[], materials: material[], hasLightMap: boolean, lightMapTexs: texture[], info: meshinfo): void;
+        static loadgltfebo(eboacc: GltfAttr, mf: mesh, outMat: material, hasLightMap: boolean, lightMapTexs: texture[], info: meshinfo, extensions: any): void;
+        static loadgltfvbo(ctx: WebGL2RenderingContext, mf: mesh, primitive: any, accessors: any[]): void;
         /**
          * 获取实时灯光列表详细
          */
@@ -6060,6 +6065,24 @@ declare namespace m4m.framework {
         static getFloat32Blocks(acc: Accessor): AccTypedArray[];
         static newTypedArray(acc: Accessor): Int8Array | Uint8Array | Int16Array | Uint16Array | Uint32Array | Float32Array;
         static getData(acc: Accessor): Int8Array | Uint8Array | Int16Array | Uint16Array | Uint32Array | Float32Array | AccTypedArray[];
+    }
+    class meshinfo {
+        mesh: mesh;
+        outmats: material[];
+        lightMapTexST: math.vector4[];
+    }
+    class GltfAttr {
+        bufferView: {
+            rawBuffer: ArrayBuffer;
+            byteOffset: number;
+            byteLength: number;
+            byteStride: number;
+        };
+        componentType: number;
+        count: number;
+        name: string;
+        type: string;
+        normalized: boolean;
     }
     export {};
 }
@@ -22529,6 +22552,7 @@ declare namespace m4m.render {
         private vbo;
         private vertexCount;
         private eboDataType;
+        private eboElementSize;
         private webgl;
         vertexByteSize: number;
         ebo: WebGLBuffer;
