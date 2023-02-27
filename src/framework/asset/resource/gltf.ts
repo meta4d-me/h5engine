@@ -527,7 +527,7 @@ namespace m4m.framework {
                         for (var i = 0; i < realmesh.outmats.length; i++) {
                             if (realmesh.lightMapTexST[i] != null) {
                                 renderer.lightmapIndex = -2;    //标记该节点使用非全局lightmap
-                                math.vec4Set(renderer.lightmapScaleOffset, realmesh.lightMapTexST[i].x, realmesh.lightMapTexST[i].y, realmesh.lightMapTexST[i].z, realmesh.lightMapTexST[i].w);
+                                math.vec4Set(renderer.lightmapScaleOffset, realmesh.lightMapTexST[i][0], realmesh.lightMapTexST[i][1], realmesh.lightMapTexST[i][2], realmesh.lightMapTexST[i][3]);
                             }
                         }
                         n.addChild(submesh);
@@ -956,7 +956,7 @@ namespace m4m.framework {
     class meshinfo {
         mesh: mesh;
         outmats: material[];
-        lightMapTexST: math.vector4[];
+        lightMapTexST: number[][];
     }
 
 

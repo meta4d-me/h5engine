@@ -6069,7 +6069,7 @@ declare namespace m4m.framework {
     class meshinfo {
         mesh: mesh;
         outmats: material[];
-        lightMapTexST: math.vector4[];
+        lightMapTexST: number[][];
     }
     class GltfAttr {
         bufferView: {
