@@ -469,25 +469,24 @@ namespace m4m.framework {
                     console.log("====gltf begin load one mesh " + name);
                     gltf.dumpmem();
 
-                    let infos:meshinfo[] =[];
-                    for(var i=0;i<primitives.length;i++)
-                    {
+                    let infos: meshinfo[] = [];
+                    for (var i = 0; i < primitives.length; i++) {
                         let mf = new mesh(folder + name);
                         gltf.loadgltfvbo(ctx, mf, primitives[i], accessors);
                         let info = new meshinfo();
                         info.mesh = mf;
                         info.lightMapTexST = [];
                         info.outmats = [];
-    
+
 
                         gltf.loadgltfebo_one(ctx, mf, primitives[i], accessors, materials, hasLightMap, lightMapTexs, info);
-    
+
                         infos.push(info);
-                  
+
                     }
                     console.log("====gltf end load mesh " + name);
                     gltf.dumpmem();
-                  
+
 
                     return infos;
                 }
@@ -516,9 +515,8 @@ namespace m4m.framework {
                 n.markDirty();
                 if (mesh != null) {
                     let realmeshs = meshes[mesh] as meshinfo[];
-                    for(var imesh=0;imesh<realmeshs.length;imesh++)
-                    {
-                        let realmesh= realmeshs[imesh];
+                    for (var imesh = 0; imesh < realmeshs.length; imesh++) {
+                        let realmesh = realmeshs[imesh];
                         let submesh = new m4m.framework.transform();
                         let mfit = submesh.gameObject.addComponent("meshFilter") as meshFilter;
                         mfit.mesh = realmesh.mesh;
@@ -590,10 +588,10 @@ namespace m4m.framework {
             mdata.trisindex = [];
             mf.submesh = [];
 
-            let { attributes, indices, material, extensions } =primitive;    
+            let { attributes, indices, material, extensions } = primitive;
             //primitives.map(({ attributes, indices, material, extensions }) => {
-                let eboacc = accessors[indices] as GltfAttr;
-                gltf.loadgltfebo(eboacc, mf, materials[material], hasLightMap, lightMapTexs, info, extensions)
+            let eboacc = accessors[indices] as GltfAttr;
+            gltf.loadgltfebo(eboacc, mf, materials[material], hasLightMap, lightMapTexs, info, extensions)
             //});
             mf.glMesh.addIndex(ctx, mdata.trisindex.length);
             mf.glMesh.uploadIndexData(ctx, 0, mdata.genIndexDataArray());
@@ -605,12 +603,13 @@ namespace m4m.framework {
             //let eboAcc = new Accessor(accessors[indices], "indices");
             //let ebo = eboAcc.data as Uint32Array;
             let ebo: any;
+            const byteOffset = (eboacc.bufferView.byteOffset ?? 0) + (eboacc.byteOffset ?? 0);
             if (eboacc.componentType == 5125)
-                ebo = new Uint32Array(eboacc.bufferView.rawBuffer, eboacc.bufferView.byteOffset, eboacc.count);
-            if (eboacc.componentType == 5123 )
-                ebo = new Uint16Array(eboacc.bufferView.rawBuffer, eboacc.bufferView.byteOffset, eboacc.count);
+                ebo = new Uint32Array(eboacc.bufferView.rawBuffer, byteOffset, eboacc.count);
+            if (eboacc.componentType == 5123)
+                ebo = new Uint16Array(eboacc.bufferView.rawBuffer, byteOffset, eboacc.count);
             if (eboacc.componentType == 5121)
-                ebo = new Uint8Array(eboacc.bufferView.rawBuffer, eboacc.bufferView.byteOffset, eboacc.count);
+                ebo = new Uint8Array(eboacc.bufferView.rawBuffer, byteOffset, eboacc.count);
             console.log("ebo count=" + ebo.length);
 
             let indexbegin = mf.data.trisindex.length;
@@ -716,32 +715,32 @@ namespace m4m.framework {
             let nordata: Float32Array = null;
             let tandata: Float32Array = null;
             if (attr.TEXCOORD_0 != null) {
-                uv0data = new Float32Array(attr.TEXCOORD_0.bufferView.rawBuffer, attr.TEXCOORD_0.bufferView.byteOffset);
+                uv0data = new Float32Array(attr.TEXCOORD_0.bufferView.rawBuffer, (attr.TEXCOORD_0.bufferView.byteOffset ?? 0) + (attr.TEXCOORD_0.byteOffset ?? 0));
 
                 console.log("attr uv0");
                 gltf.dumpmem();
             }
             if (attr.TEXCOORD_1 != null) {
-                uv1data = new Float32Array(attr.TEXCOORD_1.bufferView.rawBuffer, attr.TEXCOORD_1.bufferView.byteOffset);
+                uv1data = new Float32Array(attr.TEXCOORD_1.bufferView.rawBuffer, (attr.TEXCOORD_1.bufferView.byteOffset ?? 0) + (attr.TEXCOORD_1.byteOffset ?? 0));
 
                 console.log("attr uv1");
                 gltf.dumpmem();
             }
 
             if (attr.POSITION != null) {
-                posdata = new Float32Array(attr.POSITION.bufferView.rawBuffer, attr.POSITION.bufferView.byteOffset);
+                posdata = new Float32Array(attr.POSITION.bufferView.rawBuffer, (attr.POSITION.bufferView.byteOffset ?? 0) + (attr.POSITION.byteOffset ?? 0));
 
                 console.log("attr pos");
                 gltf.dumpmem();
             }
             if (attr.NORMAL != null) {
-                nordata = new Float32Array(attr.NORMAL.bufferView.rawBuffer, attr.NORMAL.bufferView.byteOffset);
+                nordata = new Float32Array(attr.NORMAL.bufferView.rawBuffer, (attr.NORMAL.bufferView.byteOffset ?? 0) + (attr.NORMAL.byteOffset ?? 0));
 
                 console.log("attr nor");
                 gltf.dumpmem();
             }
             if (attr.TANGENT != null) {
-                tandata = new Float32Array(attr.TANGENT.bufferView.rawBuffer, attr.TANGENT.bufferView.byteOffset);
+                tandata = new Float32Array(attr.TANGENT.bufferView.rawBuffer, (attr.TANGENT.bufferView.byteOffset ?? 0) + (attr.TANGENT.byteOffset ?? 0));
 
 
                 console.log("attr tan");
@@ -967,6 +966,7 @@ namespace m4m.framework {
             byteLength: number;
             byteStride: number;
         };
+        byteOffset?: number;
         componentType: number;//5126 ==float //5125 =uint32 5123 ==uint16
         count: number;
         name: string;

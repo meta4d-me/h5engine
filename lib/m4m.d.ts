@@ -6078,6 +6078,7 @@ declare namespace m4m.framework {
             byteLength: number;
             byteStride: number;
         };
+        byteOffset?: number;
         componentType: number;
         count: number;
         name: string;
