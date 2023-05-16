@@ -1664,6 +1664,7 @@ declare namespace m4m.framework {
      * @version m4m 1.0
      */
     enum layoutOption {
+        NOTHING = 0,
         LEFT = 1,
         TOP = 2,
         RIGHT = 4,
@@ -22575,7 +22576,7 @@ declare namespace m4m.render {
         uploadVertexSubData(webgl: WebGL2RenderingContext, varray: Float32Array, offset?: number): void;
         uploadVertexData(webgl: WebGL2RenderingContext, varray: Float32Array): void;
         uploadIndexSubData(webgl: WebGL2RenderingContext, eboindex: number, data: TriIndexTypeArray, offset?: number): void;
-        uploadIndexData(webgl: WebGL2RenderingContext, eboindex: number, data: TriIndexTypeArray, dataType?: number): void;
+        uploadIndexData(webgl: WebGL2RenderingContext, eboindex: number, data: TriIndexTypeArray, dataType?: 5123): void;
         /** 顶点数组绘制三角面 */
         drawArrayTris(webgl: WebGL2RenderingContext, start?: number, count?: number, instanceCount?: number): void;
         /** 顶点数组绘制线段 */
@@ -22955,7 +22956,7 @@ declare namespace m4m.render {
     }
     class glTextureCube implements ITexture {
         constructor(webgl: WebGL2RenderingContext, format?: TextureFormatEnum, mipmap?: boolean, linear?: boolean);
-        uploadImages(Texture_NEGATIVE_X: framework.texture, Texture_NEGATIVE_Y: framework.texture, Texture_NEGATIVE_Z: framework.texture, Texture_POSITIVE_X: framework.texture, Texture_POSITIVE_Y: framework.texture, Texture_POSITIVE_Z: framework.texture, min?: number, max?: number, mipmap?: number): void;
+        uploadImages(Texture_NEGATIVE_X: framework.texture, Texture_NEGATIVE_Y: framework.texture, Texture_NEGATIVE_Z: framework.texture, Texture_POSITIVE_X: framework.texture, Texture_POSITIVE_Y: framework.texture, Texture_POSITIVE_Z: framework.texture, min?: 9728, max?: 9728, mipmap?: number): void;
         private upload;
         webgl: WebGL2RenderingContext;
         loaded: boolean;

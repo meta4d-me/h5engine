@@ -444,7 +444,7 @@
         }
 
         private getGLFormat(): { internalformatGL: number, formatGL: number } {
-            let formatGL = this.webgl.RGBA;
+            let formatGL:number = this.webgl.RGBA;
             let internalformatGL = formatGL;
             switch (this.format) {
                 case TextureFormatEnum.RGB:
@@ -639,7 +639,7 @@
             // gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,1);
 
             this.webgl.bindTexture(this.webgl.TEXTURE_CUBE_MAP, this.texture);
-            var formatGL = this.webgl.RGBA;
+            var formatGL:number = this.webgl.RGBA;
             if (this.format == TextureFormatEnum.RGB)
                 formatGL = this.webgl.RGB;
             else if (this.format == TextureFormatEnum.Gray)

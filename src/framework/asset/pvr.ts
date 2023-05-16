@@ -111,7 +111,7 @@ namespace m4m.framework {
                 case ChannelTypes.UnsignedShortNorm:
                     break;
             }
-            var target = this.gl.TEXTURE_2D;
+            var target:number = this.gl.TEXTURE_2D;
             if (this.numFaces > 1)
                 target = this.gl.TEXTURE_CUBE_MAP;
 

@@ -147,7 +147,7 @@ namespace m4m.framework {
             return t2d;
         }
 
-        private static make2DNode(name: string, parent: transform2D = null, lOpt: layoutOption = 0, w: number = 100, h: number = 100, px: number = 0, py: number = 0) {
+        private static make2DNode(name: string, parent: transform2D = null, lOpt: layoutOption = layoutOption.NOTHING, w: number = 100, h: number = 100, px: number = 0, py: number = 0) {
             let node: transform2D = new transform2D();
             node.name = name;
             node.width = w;

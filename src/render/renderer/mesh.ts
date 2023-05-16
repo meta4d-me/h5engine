@@ -91,7 +91,7 @@
         private mode: number;
         private vbo: WebGLBuffer;
         private vertexCount: number;
-        private eboDataType = WebGL2RenderingContext.UNSIGNED_SHORT;
+        private eboDataType:number = WebGL2RenderingContext.UNSIGNED_SHORT;
         private eboElementSize = 2;
         private webgl: WebGL2RenderingContext;
         vertexByteSize: number;
@@ -344,7 +344,7 @@
         uploadIndexData(webgl: WebGL2RenderingContext, eboindex: number, data: TriIndexTypeArray, dataType = WebGL2RenderingContext.UNSIGNED_SHORT) {
             if (!this.ebo) return;
             // this.eboDataType = dataType;
-            let _dType = WebGL2RenderingContext.UNSIGNED_SHORT;
+            let _dType:number = WebGL2RenderingContext.UNSIGNED_SHORT;
             this.eboElementSize =2;
             //webgl2 支持 32模式了, 通过类型判断是否为uint32
             if (data && data instanceof Uint32Array) {

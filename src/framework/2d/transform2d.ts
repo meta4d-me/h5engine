@@ -12,6 +12,7 @@ namespace m4m.framework
      */
     export enum layoutOption
     {
+        NOTHING = 0,
         LEFT = 1,
         TOP = 2,
         RIGHT = 4,
