@@ -241,7 +241,11 @@ namespace m4m.framework {
                     if (uTEnum.Texture == unifom.type || uTEnum.CubeTexture == unifom.type) {
                         render.shaderUniform.texindex++;
                     }
-                    continue;
+                    //材质里做什么缓存？VAO？
+                    //如果用了VAO，这也有个bug
+                    //即使材质相同，shader 有#define，还是会不同，这个缓存机制有坑
+                    //比如同一个材质，同时被Skin 和 非skin的模型用了，这个缓存就会变成天坑
+                    //continue;
                 }
                 udMap[unifom.name] = false;  //标记为 没有 变化
 
