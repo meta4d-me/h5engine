@@ -564,9 +564,9 @@ namespace m4m.framework {
     export enum lineType {
         /** 单行模式 */
         SingleLine,
-        /** 多行模式 */
+        /** 多行模式 (输入回车键提交)*/
         MultiLine,
-        /** 多行模式 (输入回车键换行处理)*/
+        /** 多行模式 (输入回车键换行处理 , ctrl + 回车 为提交处理)*/
         MultiLine_NewLine,
     }
 

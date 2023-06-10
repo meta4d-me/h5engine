@@ -2906,9 +2906,9 @@ declare namespace m4m.framework {
     enum lineType {
         /** 单行模式 */
         SingleLine = 0,
-        /** 多行模式 */
+        /** 多行模式 (输入回车键提交)*/
         MultiLine = 1,
-        /** 多行模式 (输入回车键换行处理)*/
+        /** 多行模式 (输入回车键换行处理 , ctrl + 回车 为提交处理)*/
         MultiLine_NewLine = 2
     }
     /**
@@ -22576,7 +22576,7 @@ declare namespace m4m.render {
         uploadVertexSubData(webgl: WebGL2RenderingContext, varray: Float32Array, offset?: number): void;
         uploadVertexData(webgl: WebGL2RenderingContext, varray: Float32Array): void;
         uploadIndexSubData(webgl: WebGL2RenderingContext, eboindex: number, data: TriIndexTypeArray, offset?: number): void;
-        uploadIndexData(webgl: WebGL2RenderingContext, eboindex: number, data: TriIndexTypeArray, dataType?: 5123): void;
+        uploadIndexData(webgl: WebGL2RenderingContext, eboindex: number, data: TriIndexTypeArray, dataType?: number): void;
         /** 顶点数组绘制三角面 */
         drawArrayTris(webgl: WebGL2RenderingContext, start?: number, count?: number, instanceCount?: number): void;
         /** 顶点数组绘制线段 */
@@ -22956,7 +22956,7 @@ declare namespace m4m.render {
     }
     class glTextureCube implements ITexture {
         constructor(webgl: WebGL2RenderingContext, format?: TextureFormatEnum, mipmap?: boolean, linear?: boolean);
-        uploadImages(Texture_NEGATIVE_X: framework.texture, Texture_NEGATIVE_Y: framework.texture, Texture_NEGATIVE_Z: framework.texture, Texture_POSITIVE_X: framework.texture, Texture_POSITIVE_Y: framework.texture, Texture_POSITIVE_Z: framework.texture, min?: 9728, max?: 9728, mipmap?: number): void;
+        uploadImages(Texture_NEGATIVE_X: framework.texture, Texture_NEGATIVE_Y: framework.texture, Texture_NEGATIVE_Z: framework.texture, Texture_POSITIVE_X: framework.texture, Texture_POSITIVE_Y: framework.texture, Texture_POSITIVE_Z: framework.texture, min?: number, max?: number, mipmap?: number): void;
         private upload;
         webgl: WebGL2RenderingContext;
         loaded: boolean;

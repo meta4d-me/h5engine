@@ -606,7 +606,7 @@
             Texture_POSITIVE_X: framework.texture,
             Texture_POSITIVE_Y: framework.texture,
             Texture_POSITIVE_Z: framework.texture,
-            min = WebGL2RenderingContext.NEAREST, max = WebGL2RenderingContext.NEAREST, mipmap: number = null
+            min : number = WebGL2RenderingContext.NEAREST, max : number = WebGL2RenderingContext.NEAREST, mipmap: number = null
         ) {
             let wrc = this.webgl;
 
