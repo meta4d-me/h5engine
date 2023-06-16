@@ -190,7 +190,7 @@ namespace m4m.framework {
             let fillimg = fill.addComponent("image2D") as m4m.framework.image2D;
             fillimg.sprite = app.getAssetMgr().getDefaultSprite("white_sprite");
             progress.barOverImg = fillimg;
-            
+
             // progress.transform.markDirty();
         }
 
@@ -205,10 +205,10 @@ namespace m4m.framework {
             cont.width = scrollrect.transform.width + 100;
             cont.height = scrollrect.transform.height + 100;
 
-            scrollrect.content=cont;
+            scrollrect.content = cont;
             scrollrect.horizontal = true;
             scrollrect.vertical = true;
-            scrollrect.transform.isMask=true;
+            scrollrect.transform.isMask = true;
             scrollrect.transform.markDirty();
         }
 
@@ -294,6 +294,7 @@ namespace m4m.framework {
             let bg_t = this.make2DNode("frameImage", node, tOpt);
             let bg_img = bg_t.addComponent("image2D") as image2D;
             bg_img.sprite = assetMgr.getDefaultSprite("white_sprite");
+            bg_img.color = new math.color(0.8, 0.8, 0.8, 1);
 
             let fSize = 24;
             //添加 Text lable

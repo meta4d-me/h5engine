@@ -236,8 +236,12 @@ namespace m4m.framework {
         private createInputEle() {
             this.inputElement = <HTMLInputElement>document.createElement("Input");
             let inpEle = this.inputElement;
+            if(this.ContentType == contentType.PassWord){
+                inpEle.type = "password";
+            }else{
+                inpEle.type = "text";
+            }
             this.setStyleEle(inpEle);
-            inpEle.type = "text";
             inpEle.style["-moz-appearance"] = 'textfield';
         }
 
@@ -470,6 +474,10 @@ namespace m4m.framework {
             this.inputElement.value = this._text;
             if (this._textLable) {
                 this._textLable.text = this._text;
+                //密码模式
+                if(this._contentType == contentType.PassWord){
+                    this._textLable.text = this._text.replace(/[\S|\s]/g, "*");
+                }
             }
         }
 
