@@ -5928,7 +5928,7 @@ declare namespace m4m.framework {
         _webgl: WebGL2RenderingContext;
         static _canvas: HTMLCanvasElement;
         static _c2d: CanvasRenderingContext2D;
-        constructor(webgl: WebGL2RenderingContext, fontname: string, fontsize: number);
+        constructor(webgl: WebGL2RenderingContext, fontname?: string, fontsize?: number);
         IsSDF(): boolean;
         private name;
         private id;

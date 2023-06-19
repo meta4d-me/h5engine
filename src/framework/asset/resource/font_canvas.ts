@@ -4,7 +4,7 @@ namespace m4m.framework {
         _webgl: WebGL2RenderingContext;
         static _canvas: HTMLCanvasElement;
         static _c2d: CanvasRenderingContext2D;
-        constructor(webgl: WebGL2RenderingContext, fontname: string, fontsize: number) {
+        constructor(webgl: WebGL2RenderingContext, fontname: string="serif", fontsize: number=16) {
             this.name = new constText("canvasfont_" + fontname + "_" + fontsize);
             this._webgl = webgl;
             let cachefontsize = 256;
@@ -110,7 +110,7 @@ namespace m4m.framework {
                     // _2d.fillRect(0, 0, this.pointSize, this.pointSize);
 
                     _2d.fillStyle = "rgba(255,255,255,255)";
-                    _2d.font = ((this.pointSize) | 0) + "px serif";
+                    _2d.font = ((this.pointSize) | 0) + "px "+this.fontname;
                     _2d.textBaseline = "bottom";
                     _2d.fillText(c, 0, this.pointSize, this.pointSize);
                     let mr = _2d.measureText(c);
