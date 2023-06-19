@@ -5,11 +5,23 @@ namespace m4m.framework {
         static _canvas: HTMLCanvasElement;
         static _c2d: CanvasRenderingContext2D;
         constructor(webgl: WebGL2RenderingContext, fontname: string, fontsize: number) {
-            this.name = new constText(fontname);
+            this.name = new constText("canvasfont_" + fontname + "_" + fontsize);
             this._webgl = webgl;
             let cachefontsize = 256;
             this._texture = new m4m.render.WriteableTexture2D(webgl, render.TextureFormatEnum.RGBA, cachefontsize, cachefontsize, false, false, false, false, false);
-            this._restex = new texture(fontname + "_tex");
+
+
+            //填个黑底 
+            // let tdata = new Uint8Array(cachefontsize * cachefontsize * 4);
+            // for (var i = 0; i < tdata.length / 4; i++) {
+            //     tdata[i * 4 + 0] = 255;
+            //     tdata[i * 4 + 1] = 0;
+            //     tdata[i * 4 + 2] = 255;
+            //     tdata[i * 4 + 3] = 127;
+            // }
+            // this._texture.updateRect(tdata, 0, 0, cachefontsize, cachefontsize);
+
+            this._restex = new texture(this.name.getText());
             this._restex.glTexture = this._texture;
 
             this.defaultAsset = false;
@@ -84,6 +96,7 @@ namespace m4m.framework {
         _posy: number = 0;
         EnsureString(text: string): void {
             let _2d = font_canvas._c2d;
+            let updatecount = 0;
             for (var i = 0; i < text.length; i++) {
                 let c = text.charAt(i);
                 let cinfo = this.cmap[c];
@@ -92,41 +105,46 @@ namespace m4m.framework {
 
                     _2d.clearRect(0, 0, this.pointSize, this.pointSize);
 
-                    //加一个调试用背景
-                    _2d.fillStyle = "rgba(0,0,0,255)";
-                    _2d.fillRect(0, 0, this.pointSize, this.pointSize);
+                    // //加一个调试用背景
+                    // _2d.fillStyle = "rgba(0,0,0,255)";
+                    // _2d.fillRect(0, 0, this.pointSize, this.pointSize);
 
                     _2d.fillStyle = "rgba(255,255,255,255)";
                     _2d.font = ((this.pointSize) | 0) + "px serif";
-                    _2d.textBaseline="bottom";
+                    _2d.textBaseline = "bottom";
                     _2d.fillText(c, 0, this.pointSize, this.pointSize);
                     let mr = _2d.measureText(c);
-
-                    let data = _2d.getImageData(0, 0, this.pointSize, this.pointSize);
-
-                    this._texture.updateRect(data.data, this._posx, this._posy, this.pointSize, this.pointSize);
-                    cinfo.x = this._posx / this._texture.width;
-                    cinfo.y = this._posy / this._texture.height;
-                    cinfo.w = this.pointSize / this._texture.width;
-                    cinfo.h = this.pointSize / this._texture.height;
-                    cinfo.xAddvance = mr.width;
-                    cinfo.xOffset = 0;
-                    cinfo.yOffset = 0;
-                    cinfo.xSize = this.pointSize;
-                    cinfo.ySize = this.pointSize;
-
-
-                    this.cmap[c] = cinfo;
-                    this._posx += this.pointSize;
-                    if (this._posx > this._texture.width) {
+                    if (this._posx + mr.width > this._texture.width) {
                         this._posx = 0;
                         this._posy += this.pointSize;
                         if ((this._posy + this.pointSize) > this._texture.height)
                             throw new Error("no cache area in font tex.");
                     }
+                    let data = _2d.getImageData(0, 0,  mr.width, this.pointSize);
+
+                    this._texture.updateRect(data.data, this._posx, this._texture.height - this.pointSize - this._posy,  mr.width, this.pointSize);
+
+                    cinfo.x = this._posx / this._texture.width;
+                    cinfo.y = (this._posy / this._texture.height) * 1.0;
+                    cinfo.w = mr.width / this._texture.width;
+                    cinfo.h = this.pointSize / this._texture.height;
+                    cinfo.xAddvance = mr.width;
+                    cinfo.xOffset = 0;
+                    cinfo.yOffset = 0;
+                    cinfo.xSize = mr.width;
+                    cinfo.ySize = this.pointSize;
+
+
+                    this.cmap[c] = cinfo;
+                    updatecount++;
+                    //偏移像素
+                    this._posx += mr.width;
+
                 }
 
             }
+            if (updatecount > 0)
+                console.log("update font:" + updatecount);
 
         }
     }
