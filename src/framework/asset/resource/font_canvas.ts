@@ -7,7 +7,8 @@ namespace m4m.framework {
         constructor(webgl: WebGL2RenderingContext, fontname: string, fontsize: number) {
             this.name = new constText(fontname);
             this._webgl = webgl;
-            this._texture = new m4m.render.WriteableTexture2D(webgl, render.TextureFormatEnum.RGBA, 2048, 2048, false, false, false, false, false);
+            let cachefontsize = 256;
+            this._texture = new m4m.render.WriteableTexture2D(webgl, render.TextureFormatEnum.RGBA, cachefontsize, cachefontsize, false, false, false, false, false);
             this._restex = new texture(fontname + "_tex");
             this._restex.glTexture = this._texture;
 
@@ -16,13 +17,13 @@ namespace m4m.framework {
             this.fontname = fontname;
             this.pointSize = fontsize;
             this.padding = 0;
-            this.baseline =0;
+            this.baseline = 0;
             if (font_canvas._canvas == null) {
                 font_canvas._canvas = document.createElement("canvas");
                 font_canvas._canvas.width = 64;
                 font_canvas._canvas.height = 64;
 
-                font_canvas._c2d = font_canvas._canvas.getContext("2d", {colorSpace:"display-p3", willReadFrequently: true });
+                font_canvas._c2d = font_canvas._canvas.getContext("2d", { willReadFrequently: true });
 
             }
 
@@ -79,28 +80,51 @@ namespace m4m.framework {
         /** 字符容器图的高度 */
         atlasHeight: number;
 
+        _posx: number = 0;
+        _posy: number = 0;
         EnsureString(text: string): void {
+            let _2d = font_canvas._c2d;
             for (var i = 0; i < text.length; i++) {
                 let c = text.charAt(i);
                 let cinfo = this.cmap[c];
-                 if (cinfo == undefined) {
-                     cinfo = new charinfo();
-                     font_canvas._c2d.clearRect(0, 0, this.pointSize + this.padding * 2, this.pointSize + this.padding * 2);
-                     font_canvas._c2d.fillText(c, 0, 0, this.pointSize);
-                     let data = font_canvas._c2d.getImageData(0, 0, this.pointSize, this.pointSize);
+                if (cinfo == undefined) {
+                    cinfo = new charinfo();
 
-                     this._texture.updateRect(data.data, 0, 0, this.pointSize, this.pointSize);
-                     cinfo.x =0;
-                     cinfo.y=0;
-                     cinfo.w= this.pointSize;
-                     cinfo.h =this.pointSize;
-                     cinfo.xAddvance=this.pointSize;
-                     cinfo.xOffset=0;
-                     cinfo.yOffset=0;
-                     cinfo.xSize =this.pointSize;
-                     cinfo.ySize =this.pointSize;
-                     this.cmap[c]=cinfo;
-                 }
+                    _2d.clearRect(0, 0, this.pointSize, this.pointSize);
+
+                    //加一个调试用背景
+                    _2d.fillStyle = "rgba(0,0,0,255)";
+                    _2d.fillRect(0, 0, this.pointSize, this.pointSize);
+
+                    _2d.fillStyle = "rgba(255,255,255,255)";
+                    _2d.font = ((this.pointSize) | 0) + "px serif";
+                    _2d.textBaseline="bottom";
+                    _2d.fillText(c, 0, this.pointSize, this.pointSize);
+                    let mr = _2d.measureText(c);
+
+                    let data = _2d.getImageData(0, 0, this.pointSize, this.pointSize);
+
+                    this._texture.updateRect(data.data, this._posx, this._posy, this.pointSize, this.pointSize);
+                    cinfo.x = this._posx / this._texture.width;
+                    cinfo.y = this._posy / this._texture.height;
+                    cinfo.w = this.pointSize / this._texture.width;
+                    cinfo.h = this.pointSize / this._texture.height;
+                    cinfo.xAddvance = mr.width;
+                    cinfo.xOffset = 0;
+                    cinfo.yOffset = 0;
+                    cinfo.xSize = this.pointSize;
+                    cinfo.ySize = this.pointSize;
+
+
+                    this.cmap[c] = cinfo;
+                    this._posx += this.pointSize;
+                    if (this._posx > this._texture.width) {
+                        this._posx = 0;
+                        this._posy += this.pointSize;
+                        if ((this._posy + this.pointSize) > this._texture.height)
+                            throw new Error("no cache area in font tex.");
+                    }
+                }
 
             }
 

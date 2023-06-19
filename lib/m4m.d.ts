@@ -5959,6 +5959,8 @@ declare namespace m4m.framework {
         atlasWidth: number;
         /** 字符容器图的高度 */
         atlasHeight: number;
+        _posx: number;
+        _posy: number;
         EnsureString(text: string): void;
     }
 }

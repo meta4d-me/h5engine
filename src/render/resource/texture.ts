@@ -444,7 +444,7 @@
         }
 
         private getGLFormat(): { internalformatGL: number, formatGL: number } {
-            let formatGL:number = this.webgl.RGBA;
+            let formatGL: number = this.webgl.RGBA;
             let internalformatGL = formatGL;
             switch (this.format) {
                 case TextureFormatEnum.RGB:
@@ -606,7 +606,7 @@
             Texture_POSITIVE_X: framework.texture,
             Texture_POSITIVE_Y: framework.texture,
             Texture_POSITIVE_Z: framework.texture,
-            min : number = WebGL2RenderingContext.NEAREST, max : number = WebGL2RenderingContext.NEAREST, mipmap: number = null
+            min: number = WebGL2RenderingContext.NEAREST, max: number = WebGL2RenderingContext.NEAREST, mipmap: number = null
         ) {
             let wrc = this.webgl;
 
@@ -639,7 +639,7 @@
             // gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,1);
 
             this.webgl.bindTexture(this.webgl.TEXTURE_CUBE_MAP, this.texture);
-            var formatGL:number = this.webgl.RGBA;
+            var formatGL: number = this.webgl.RGBA;
             if (this.format == TextureFormatEnum.RGB)
                 formatGL = this.webgl.RGB;
             else if (this.format == TextureFormatEnum.Gray)
@@ -781,7 +781,8 @@
     export class WriteableTexture2D implements ITexture {
         constructor(webgl: WebGL2RenderingContext, format: TextureFormatEnum = TextureFormatEnum.RGBA, width: number, height: number, linear: boolean, premultiply: boolean = true, repeat: boolean = false, mirroredU: boolean = false, mirroredV: boolean = false) {
             this.webgl = webgl;
-
+            this.width = width;
+            this.height = height;
             this.texture = webgl.createTexture();
 
             this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, premultiply ? 1 : 0);
@@ -852,7 +853,7 @@
         repeat: boolean = false;
         mirroredU: boolean = false;
         mirroredV: boolean = false
-        updateRect(data: Uint8Array |Uint8ClampedArray, x: number, y: number, width: number, height: number) {
+        updateRect(data: Uint8Array | Uint8ClampedArray, x: number, y: number, width: number, height: number) {
             this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
 
             this.webgl.texSubImage2D(this.webgl.TEXTURE_2D, 0,
