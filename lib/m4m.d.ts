@@ -2980,8 +2980,8 @@ declare namespace m4m.framework {
          * 字体
          * @version m4m 1.0
          */
-        get font(): font;
-        set font(font: font);
+        get font(): IFont;
+        set font(font: IFont);
         private needRefreshFont;
         private needRefreshAtlas;
         private _fontName;
@@ -3051,7 +3051,7 @@ declare namespace m4m.framework {
         /**
          * @private
          */
-        updateData(_font: m4m.framework.font): void;
+        updateData(_font: m4m.framework.IFont): void;
         /** 更新数据 富文本 模式 */
         private updateDataRich;
         /**
@@ -5749,6 +5749,28 @@ declare namespace m4m.framework {
     }
 }
 declare namespace m4m.framework {
+    interface IFont extends IAsset {
+        cmap: {
+            [id: string]: charinfo;
+        };
+        /** 字体名 */
+        fontname: string;
+        /** 像素尺寸 */
+        pointSize: number;
+        /** 填充间隔 */
+        padding: number;
+        /**行高 */
+        lineHeight: number;
+        /** 基线 */
+        baseline: number;
+        /** 字符容器图的宽度 */
+        atlasWidth: number;
+        /** 字符容器图的高度 */
+        atlasHeight: number;
+        EnsureString(text: string): void;
+        GetTexture(): texture;
+        IsSDF(): boolean;
+    }
     /**
      * @public
      * @language zh_CN
@@ -5756,8 +5778,9 @@ declare namespace m4m.framework {
      * 字体资源
      * @version m4m 1.0
      */
-    class font implements IAsset {
+    class font implements IFont {
         static readonly ClassName: string;
+        IsSDF(): boolean;
         private name;
         private id;
         /**
@@ -5854,6 +5877,8 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         Parse(jsonStr: string, assetmgr: assetMgr, bundleName?: string): this;
+        EnsureString(text: string): void;
+        GetTexture(): texture;
     }
     /**
      * @private
@@ -5896,6 +5921,45 @@ declare namespace m4m.framework {
          */
         xAddvance: number;
         static caclByteLength(): number;
+    }
+}
+declare namespace m4m.framework {
+    class font_canvas implements IFont {
+        _webgl: WebGL2RenderingContext;
+        static _canvas: HTMLCanvasElement;
+        static _c2d: CanvasRenderingContext2D;
+        constructor(webgl: WebGL2RenderingContext, fontname: string, fontsize: number);
+        IsSDF(): boolean;
+        private name;
+        private id;
+        defaultAsset: boolean;
+        getName(): string;
+        getGUID(): number;
+        use(): void;
+        unuse(disposeNow?: boolean): void;
+        private _texture;
+        private _restex;
+        dispose(): void;
+        GetTexture(): texture;
+        caclByteLength(): number;
+        cmap: {
+            [id: string]: charinfo;
+        };
+        /** 字体名 */
+        fontname: string;
+        /** 像素尺寸 */
+        pointSize: number;
+        /** 填充间隔 */
+        padding: number;
+        /**行高 */
+        lineHeight: number;
+        /** 基线 */
+        baseline: number;
+        /** 字符容器图的宽度 */
+        atlasWidth: number;
+        /** 字符容器图的高度 */
+        atlasHeight: number;
+        EnsureString(text: string): void;
     }
 }
 declare namespace m4m.framework {
@@ -22576,7 +22640,7 @@ declare namespace m4m.render {
         uploadVertexSubData(webgl: WebGL2RenderingContext, varray: Float32Array, offset?: number): void;
         uploadVertexData(webgl: WebGL2RenderingContext, varray: Float32Array): void;
         uploadIndexSubData(webgl: WebGL2RenderingContext, eboindex: number, data: TriIndexTypeArray, offset?: number): void;
-        uploadIndexData(webgl: WebGL2RenderingContext, eboindex: number, data: TriIndexTypeArray, dataType?: number): void;
+        uploadIndexData(webgl: WebGL2RenderingContext, eboindex: number, data: TriIndexTypeArray, dataType?: 5123): void;
         /** 顶点数组绘制三角面 */
         drawArrayTris(webgl: WebGL2RenderingContext, start?: number, count?: number, instanceCount?: number): void;
         /** 顶点数组绘制线段 */
@@ -22980,7 +23044,7 @@ declare namespace m4m.render {
         repeat: boolean;
         mirroredU: boolean;
         mirroredV: boolean;
-        updateRect(data: Uint8Array, x: number, y: number, width: number, height: number): void;
+        updateRect(data: Uint8Array | Uint8ClampedArray, x: number, y: number, width: number, height: number): void;
         updateRectImg(data: ImageData | HTMLVideoElement | HTMLImageElement | HTMLCanvasElement, x: number, y: number): void;
         isFrameBuffer(): boolean;
         webgl: WebGL2RenderingContext;

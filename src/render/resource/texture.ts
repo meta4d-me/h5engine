@@ -852,7 +852,7 @@
         repeat: boolean = false;
         mirroredU: boolean = false;
         mirroredV: boolean = false
-        updateRect(data: Uint8Array, x: number, y: number, width: number, height: number) {
+        updateRect(data: Uint8Array |Uint8ClampedArray, x: number, y: number, width: number, height: number) {
             this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
 
             this.webgl.texSubImage2D(this.webgl.TEXTURE_2D, 0,
