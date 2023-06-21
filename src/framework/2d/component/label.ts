@@ -233,6 +233,7 @@ namespace m4m.framework {
             this.lastStr = str;
         }
 
+        //pixelFit: number = 1.0;
         /**
          * @private
          */
@@ -443,7 +444,7 @@ namespace m4m.framework {
         private setDataByBlock(_font: IFont, blocks: IBlock[]) {
             //字符的 label尺寸 与 像素尺寸 的比值。
             let fontSize = this._fontsize;
-            let rate = fontSize / _font.pointSize;
+            let rate = fontSize / _font.pointSize //* this.pixelFit;
             let rBaseLine = _font.baseline * rate;
             let imgSize = fontSize * 0.8;
             let imgHalfGap = (fontSize - imgSize) / 2;

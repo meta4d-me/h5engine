@@ -7,8 +7,8 @@ namespace m4m.framework {
         constructor(webgl: WebGL2RenderingContext, fontname: string = "serif", fontsize: number = 16) {
             this.name = new constText("canvasfont_" + fontname + "_" + fontsize);
             this._webgl = webgl;
-            let cachefontsize = 256;
-            this._texture = new m4m.render.WriteableTexture2D(webgl, render.TextureFormatEnum.RGBA, cachefontsize, cachefontsize, false, false, false, false, false);
+            let cachefontsize = 2048;
+            this._texture = new m4m.render.WriteableTexture2D(webgl, render.TextureFormatEnum.RGBA, cachefontsize, cachefontsize, true, false, false, false, false);
 
 
             //填个黑底 
