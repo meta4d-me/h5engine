@@ -4,7 +4,7 @@ namespace m4m.framework {
         _webgl: WebGL2RenderingContext;
         static _canvas: HTMLCanvasElement;
         static _c2d: CanvasRenderingContext2D;
-        constructor(webgl: WebGL2RenderingContext, fontname: string="serif", fontsize: number=16) {
+        constructor(webgl: WebGL2RenderingContext, fontname: string = "serif", fontsize: number = 16) {
             this.name = new constText("canvasfont_" + fontname + "_" + fontsize);
             this._webgl = webgl;
             let cachefontsize = 256;
@@ -110,19 +110,40 @@ namespace m4m.framework {
                     // _2d.fillRect(0, 0, this.pointSize, this.pointSize);
 
                     _2d.fillStyle = "rgba(255,255,255,255)";
-                    _2d.font = ((this.pointSize) | 0) + "px "+this.fontname;
-                    _2d.textBaseline = "bottom";
-                    _2d.fillText(c, 0, this.pointSize, this.pointSize);
+                    _2d.font = ((this.pointSize) | 0) + "px " + this.fontname;
+                    _2d.textBaseline = "top";
+                    _2d.fillText(c, 0, 0, this.pointSize);
                     let mr = _2d.measureText(c);
-                    if (this._posx + mr.width > this._texture.width) {
+
+                    let pixelwidth = this.pointSize;//or mr.width
+
+                    if (this._posx + pixelwidth > this._texture.width) {
                         this._posx = 0;
                         this._posy += this.pointSize;
                         if ((this._posy + this.pointSize) > this._texture.height)
                             throw new Error("no cache area in font tex.");
                     }
-                    let data = _2d.getImageData(0, 0,  mr.width, this.pointSize);
 
-                    this._texture.updateRect(data.data, this._posx, this._texture.height - this.pointSize - this._posy,  mr.width, this.pointSize);
+                    let data = _2d.getImageData(0, 0, pixelwidth, this.pointSize);
+
+                    if (this.pointSize < 12) {
+                        var newdata = data.data;
+                    }
+                    else {
+                        var newdata = new Uint8ClampedArray(pixelwidth * this.pointSize * 4);
+                        for (var y = 0; y < this.pointSize; y++) {
+                            for (var x = 0; x < pixelwidth; x++) {
+                                let index = (y * pixelwidth + x) * 4;
+                                let index2 = ((this.pointSize - y - 1) * pixelwidth + x) * 4;
+                                newdata[index2 + 0] = data.data[index + 0];
+                                newdata[index2 + 1] = data.data[index + 1];
+                                newdata[index2 + 2] = data.data[index + 2];
+                                newdata[index2 + 3] = data.data[index + 3];
+                            }
+                        }
+                    }
+
+                    this._texture.updateRect(newdata, this._posx, this._texture.height - this.pointSize - this._posy, pixelwidth, this.pointSize);
 
                     cinfo.x = this._posx / this._texture.width;
                     cinfo.y = (this._posy / this._texture.height) * 1.0;
@@ -138,7 +159,7 @@ namespace m4m.framework {
                     this.cmap[c] = cinfo;
                     updatecount++;
                     //偏移像素
-                    this._posx += mr.width;
+                    this._posx += pixelwidth;
 
                 }
 

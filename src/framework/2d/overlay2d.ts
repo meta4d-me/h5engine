@@ -263,7 +263,7 @@ namespace m4m.framework {
 
             this.canvas.rootSizeAdjust();
 
-            if(!this._hasListenerEvent){
+            if (!this._hasListenerEvent) {
                 this.onPointEvent();
             }
 
@@ -485,6 +485,13 @@ namespace m4m.framework {
 
             outScreenPos.x = real_x + rect.x * this.app.width;
             outScreenPos.y = real_y + rect.y * this.app.height;
+        }
+        getScaleHeight(): number {
+            if (this.scaleMode == m4m.framework.UIScaleMode.CONSTANT_PIXEL_SIZE)
+                return 1.0
+            else {
+                return this.camera.currViewPixelRect.h/this.canvas.pixelHeight  ;
+            }
         }
     }
 

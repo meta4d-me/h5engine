@@ -1653,6 +1653,7 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         calClipPosToScreenPos(clipPos: m4m.math.vector2, outScreenPos: m4m.math.vector2): void;
+        getScaleHeight(): number;
     }
 }
 declare namespace m4m.framework {

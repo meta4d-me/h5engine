@@ -343,9 +343,11 @@ namespace m4m.framework
             let ModelPos = math.pool.new_vector3();
             ModelPos.x = (from.x / this.canvas.pixelWidth) * 2 - 1;
             ModelPos.y = (from.y / this.canvas.pixelHeight) * -2 + 1;
+            ModelPos.z =this.gameObject.transform.localTranslate.z;
+
             let m_mtx = this.gameObject.transform.getWorldMatrix();
             math.matrixTransformVector3(ModelPos,m_mtx,out);
-            out.z = this.gameObject.transform.getWorldTranslate().z;
+            //out.z = this.gameObject.transform.getWorldTranslate().z;
             m4m.math.pool.delete_vector3(ModelPos);
         }
 
