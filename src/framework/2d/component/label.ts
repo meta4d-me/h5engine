@@ -75,7 +75,7 @@ namespace m4m.framework {
             }
         }
 
-        private _font: font;
+        private _font: IFont;
         /**
          * @public
          * @language zh_CN
@@ -86,7 +86,7 @@ namespace m4m.framework {
         get font() {
             return this._font;
         }
-        set font(font: font) {
+        set font(font: IFont) {
             if (font == this._font) return;
 
             this.needRefreshFont = true;
@@ -233,10 +233,11 @@ namespace m4m.framework {
             this.lastStr = str;
         }
 
+        //pixelFit: number = 1.0;
         /**
          * @private
          */
-        updateData(_font: m4m.framework.font) {
+        updateData(_font: m4m.framework.IFont) {
             if (label.onTryExpandTexts) { this.chackText(this._text); } //检查 依赖文本(辅助 自动填充字体)
             //set data
             let b = this._defTextBlocks[0];
@@ -427,7 +428,7 @@ namespace m4m.framework {
         // }
 
         /** 更新数据 富文本 模式 */
-        private updateDataRich(_font: m4m.framework.font) {
+        private updateDataRich(_font: m4m.framework.IFont) {
             //检查 依赖文本(辅助 自动填充字体)
             if (label.onTryExpandTexts) { this.chackText(this._text); }
 
@@ -440,10 +441,10 @@ namespace m4m.framework {
          * @param _font 
          * @param blocks 
          */
-        private setDataByBlock(_font: font, blocks: IBlock[]) {
+        private setDataByBlock(_font: IFont, blocks: IBlock[]) {
             //字符的 label尺寸 与 像素尺寸 的比值。
             let fontSize = this._fontsize;
-            let rate = fontSize / _font.pointSize;
+            let rate = fontSize / _font.pointSize //* this.pixelFit;
             let rBaseLine = _font.baseline * rate;
             let imgSize = fontSize * 0.8;
             let imgHalfGap = (fontSize - imgSize) / 2;
@@ -901,7 +902,7 @@ namespace m4m.framework {
         /**富文本 脏标记  */
         private _drityRich: boolean = true;
 
-        private _CustomShaderName = ``;//自定义UIshader
+        private _CustomShaderName = null;//自定义UIshader
         /**
          * @public
          * @language zh_CN
@@ -988,14 +989,22 @@ namespace m4m.framework {
 
             this.searchTexture();
 
-            if (!this.font || !this.font.texture) return this._uimat;
+            if (!this.font || !this.font.GetTexture()) return this._uimat;
             //获取材质
-            this._uimat = this.getMatByShader(this._uimat, this.font.texture,
-                this._CustomShaderName, label.defMaskUIShader, label.defUIShader, () => {
-                    //材质资源对象 刷新了
-                    this.needRefreshFont = true;
-                });
-
+            if (this.font.IsSDF()) {
+                this._uimat = this.getMatByShader(this._uimat, this.font.GetTexture(),
+                    this._CustomShaderName, label.defMaskUIShader, label.defUIShader, () => {
+                        //材质资源对象 刷新了
+                        this.needRefreshFont = true;
+                    });
+            }
+            else {
+                this._uimat = this.getMatByShader(this._uimat, this.font.GetTexture(),
+                    this._CustomShaderName, label.defImgMaskUIShader, label.defImgUIShader, () => {
+                        //材质资源对象 刷新了
+                        this.needRefreshAtlas = true;
+                    });
+            }
             return this._uimat;
         }
 
@@ -1010,6 +1019,7 @@ namespace m4m.framework {
             this.searchTextureAtlas();
 
             if (!this._imageTextAtlas || !this._imageTextAtlas.texture) return this._imgUIMat;
+
             this._imgUIMat = this.getMatByShader(this._imgUIMat, this._imageTextAtlas.texture,
                 "", label.defImgMaskUIShader, label.defImgUIShader, () => {
                     //材质资源对象 刷新了
@@ -1030,6 +1040,7 @@ namespace m4m.framework {
             if (!mat) return;
 
             if (!this._font) return;
+            this._font.EnsureString(this.text);
             if (this._richText) {
                 if (this._drityRich) {
                     //富文本模式
@@ -1044,7 +1055,7 @@ namespace m4m.framework {
 
             let img;
             if (this._font) {
-                img = this._font.texture;
+                img = this._font.GetTexture();
             }
 
             if (img) {
@@ -1058,7 +1069,7 @@ namespace m4m.framework {
                 if (this.transform.parentIsMask) {
                     //mask uniform 上传
                     this.setMaskData(mat, forceRMask);
-                } else {
+                } else if (this.font.IsSDF()) {
                     mat.setFloat("_outlineWidth", this.outlineWidth);
                 }
 

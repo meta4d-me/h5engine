@@ -1,5 +1,25 @@
-﻿namespace m4m.framework
-{
+﻿namespace m4m.framework {
+    export interface IFont extends IAsset {
+        cmap: { [id: string]: charinfo };
+        /** 字体名 */
+        fontname: string;
+        /** 像素尺寸 */
+        pointSize: number;
+        /** 填充间隔 */
+        padding: number;
+        /**行高 */
+        lineHeight: number;
+        /** 基线 */
+        baseline: number;
+        /** 字符容器图的宽度 */
+        atlasWidth: number;
+        /** 字符容器图的高度 */
+        atlasHeight: number;
+
+        EnsureString(text: string): void;
+        GetTexture():texture;
+        IsSDF():boolean;
+    }
     /**
      * @public
      * @language zh_CN
@@ -8,10 +28,12 @@
      * @version m4m 1.0
      */
     @m4m.reflect.SerializeType
-    export class font implements IAsset
-    {
+    export class font implements IFont {
         static readonly ClassName: string = "font";
-
+        IsSDF():boolean
+        {
+            return true;
+        }
         private name: constText;
         private id: resID = new resID();
         /**
@@ -22,10 +44,8 @@
          * @version m4m 1.0
          */
         defaultAsset: boolean;//是否为系统默认资源
-        constructor(assetName: string = null)
-        {
-            if (!assetName)
-            {
+        constructor(assetName: string = null) {
+            if (!assetName) {
                 assetName = "font_" + this.getGUID();
             }
             this.name = new constText(assetName);
@@ -37,8 +57,7 @@
          * 获取资源名称
          * @version m4m 1.0
          */
-        getName(): string
-        {
+        getName(): string {
             return this.name.getText();
         }
         /**
@@ -48,8 +67,7 @@
          * 获取资源唯一id
          * @version m4m 1.0
          */
-        getGUID(): number
-        {
+        getGUID(): number {
             return this.id.getID();
         }
         /**
@@ -59,8 +77,7 @@
          * 引用计数加一
          * @version m4m 1.0
          */
-        use()
-        {
+        use() {
             sceneMgr.app.getAssetMgr().use(this);
         }
         /**
@@ -70,8 +87,7 @@
          * 引用计数减一
          * @version m4m 1.0
          */
-        unuse(disposeNow: boolean = false)
-        {
+        unuse(disposeNow: boolean = false) {
             sceneMgr.app.getAssetMgr().unuse(this, disposeNow);
         }
         /**
@@ -81,10 +97,8 @@
          * 释放资源
          * @version m4m 1.0
          */
-        dispose()
-        {
-            if (this.texture)
-            {
+        dispose() {
+            if (this.texture) {
                 this.texture.unuse();
             }
             delete this.cmap;
@@ -97,25 +111,20 @@
          * 计算资源字节大小
          * @version m4m 1.0
          */
-        caclByteLength(): number
-        {
+        caclByteLength(): number {
             let total = 0;
-            for (let k in this.cmap)
-            {
+            for (let k in this.cmap) {
                 total += math.caclStringByteLength(k);
                 total += charinfo.caclByteLength();
             }
             return total;
         }
         private _texture: texture;
-        public get texture()
-        {
+        public get texture() {
             return this._texture;
         }
-        public set texture(value: texture)
-        {
-            if (this._texture != null)
-            {
+        public set texture(value: texture) {
+            if (this._texture != null) {
                 this._texture.unuse();
             }
             this._texture = value;
@@ -156,8 +165,7 @@
          * @param assetmgr 资源管理实例
          * @version m4m 1.0
          */
-        Parse(jsonStr: string, assetmgr: assetMgr,  bundleName: string = null)
-        {
+        Parse(jsonStr: string, assetmgr: assetMgr, bundleName: string = null) {
             // let d1 = new Date().valueOf();
             let json = JSON.parse(jsonStr);
 
@@ -176,8 +184,7 @@
             //parse char map
             this.cmap = {};
             let map = json["map"];
-            for (var c in map)
-            {
+            for (var c in map) {
                 let finfo = new charinfo();//ness
                 this.cmap[c] = finfo;
                 finfo.x = (map[c][0] - 0.5) / this.atlasWidth;
@@ -194,13 +201,19 @@
             json = null;
             return this;
         }
-
+        EnsureString(text: string): void
+        {
+            
+        }
+        GetTexture():texture
+        {
+            return this._texture;
+        }
     }
     /**
      * @private
      */
-    export class charinfo
-    {
+    export class charinfo {
         /**
          * uv
          */
@@ -237,8 +250,7 @@
          * 字符宽度
          */
         xAddvance: number;//字符宽度
-        static caclByteLength(): number
-        {
+        static caclByteLength(): number {
             return 36;
         }
     }
