@@ -161,6 +161,13 @@ namespace m4m.framework {
             this._contentType = contentType;
         }
 
+        private _overflowMode: number = inputOverflowMode.AUTO;
+        get OverflowMode() { return this._overflowMode; }
+        set OverflowMode(overflowMode: inputOverflowMode) {
+            this._overflowMode = overflowMode;
+            this.setTextAreaOverflow();
+        }
+
         private _textLable: label;
         /**
          * @public
@@ -236,9 +243,9 @@ namespace m4m.framework {
         private createInputEle() {
             this.inputElement = <HTMLInputElement>document.createElement("Input");
             let inpEle = this.inputElement;
-            if(this.ContentType == contentType.PassWord){
+            if (this.ContentType == contentType.PassWord) {
                 inpEle.type = "password";
-            }else{
+            } else {
                 inpEle.type = "text";
             }
             this.setStyleEle(inpEle);
@@ -250,8 +257,20 @@ namespace m4m.framework {
             let inpEle = this.inputElement;
             this.setStyleEle(inpEle);
             inpEle.style.resize = "none";
-            inpEle.style.overflowY = 'scroll';   //Y 轴滚动条
+            // inpEle.style.overflowY = 'scroll';   //Y 轴滚动条
             // inpEle.style.scrollbarGutter = "stable";
+            this.setTextAreaOverflow();
+        }
+
+        private setTextAreaOverflow() {
+            if (!this.inputElement || this._lineType == lineType.SingleLine) return;
+            let _ofyStr = "";
+            switch (this._overflowMode) {
+                case inputOverflowMode.AUTO: _ofyStr = "auto"; break;
+                case inputOverflowMode.SCROLL: _ofyStr = "scroll"; break;
+                case inputOverflowMode.HIDDEN: _ofyStr = "hidden"; break;
+            }
+            this.inputElement.style.overflowY = _ofyStr;
         }
 
         /** 初始化 html 元素 */
@@ -475,7 +494,7 @@ namespace m4m.framework {
             if (this._textLable) {
                 this._textLable.text = this._text;
                 //密码模式
-                if(this._contentType == contentType.PassWord){
+                if (this._contentType == contentType.PassWord) {
                     this._textLable.text = this._text.replace(/[\S|\s]/g, "*");
                 }
             }
@@ -602,5 +621,17 @@ namespace m4m.framework {
         PassWord = 64,
         /** 自定义 */
         Custom = 128,
+    }
+
+    /**
+     * 输入框 滑动进度条模式
+     */
+    export enum inputOverflowMode {
+        /** 按需要启用滑动进度条 */
+        AUTO,
+        /** 隐藏滑动进度条 */
+        HIDDEN,
+        /** 一直显示滑动进度条 */
+        SCROLL
     }
 }

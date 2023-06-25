@@ -2826,6 +2826,9 @@ declare namespace m4m.framework {
         */
         get ContentType(): contentType;
         set ContentType(contentType: contentType);
+        private _overflowMode;
+        get OverflowMode(): inputOverflowMode;
+        set OverflowMode(overflowMode: inputOverflowMode);
         private _textLable;
         /**
          * @public
@@ -2854,6 +2857,7 @@ declare namespace m4m.framework {
         private setStyleEle;
         private createInputEle;
         private createTextAreaEle;
+        private setTextAreaOverflow;
         /** 初始化 html 元素 */
         private initEle;
         private updateEleStyle;
@@ -2935,6 +2939,17 @@ declare namespace m4m.framework {
         PassWord = 64,
         /** 自定义 */
         Custom = 128
+    }
+    /**
+     * 输入框 滑动进度条模式
+     */
+    enum inputOverflowMode {
+        /** 按需要启用滑动进度条 */
+        AUTO = 0,
+        /** 隐藏滑动进度条 */
+        HIDDEN = 1,
+        /** 一直显示滑动进度条 */
+        SCROLL = 2
     }
 }
 declare namespace m4m.framework {
