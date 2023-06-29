@@ -34,6 +34,7 @@ namespace m4m.framework {
                 floatnewfontsize = intnewfontsize = 64;
             return intnewfontsize;
         }
+        //辅助将顶点对齐到屏幕坐标，能改善清晰度
         pixelFit(label: label, vec2: m4m.math.vector2, screenAddX: number, screenAddY: number): void {
             let ws = label.transform.getWorldScale();
             let oh = this.overlay.getScaleHeight();
@@ -46,6 +47,7 @@ namespace m4m.framework {
             vec2.x = screenx / sx;
             vec2.y = screeny / sy;
         }
+        //辅助计算字符宽度，到屏幕坐标
         pixelWidth(label: label, screenwidth: number): number {
             let ws = label.transform.getWorldScale();
             //let oh = this.overlay.getScaleHeight();
