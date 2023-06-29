@@ -3052,8 +3052,8 @@ declare namespace m4m.framework {
          * 水平排列方式
          * @version m4m 1.0
          */
-        get horizontalType(): number;
-        set horizontalType(val: number);
+        get horizontalType(): HorizontalType;
+        set horizontalType(val: HorizontalType);
         private _verticalType;
         /**
          * @public
@@ -3062,8 +3062,8 @@ declare namespace m4m.framework {
          * 垂直排列方式
          * @version m4m 1.0
          */
-        get verticalType(): number;
-        set verticalType(val: number);
+        get verticalType(): VerticalType;
+        set verticalType(val: VerticalType);
         private _horizontalOverflow;
         /**
          * @public
@@ -3361,6 +3361,10 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         color: math.color;
+        private _proportionalScalingMode;
+        /** 图 等比缩放居中显示模式 （默认false）*/
+        get proportionalScalingMode(): boolean;
+        set proportionalScalingMode(val: boolean);
         private static readonly defUIShader;
         private static readonly defMaskUIShader;
         private _CustomShaderName;

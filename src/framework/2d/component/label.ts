@@ -236,10 +236,10 @@ namespace m4m.framework {
          * @version m4m 1.0
          */
         @m4m.reflect.Field("number")
-        get horizontalType() {
+        get horizontalType() : HorizontalType{
             return this._horizontalType;
         }
-        set horizontalType(val: number) {
+        set horizontalType(val: HorizontalType) {
             if (this._horizontalType == val) return;
             this._horizontalType = val;
             this._dirtyData = this._drityRich = true;
@@ -254,10 +254,10 @@ namespace m4m.framework {
          * @version m4m 1.0
          */
         @m4m.reflect.Field("number")
-        get verticalType() {
+        get verticalType() : VerticalType{
             return this._verticalType;
         }
-        set verticalType(val: number) {
+        set verticalType(val: VerticalType) {
             if (this._verticalType == val) return;
             this._verticalType = val;
             this._dirtyData = this._drityRich = true;

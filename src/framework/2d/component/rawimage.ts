@@ -47,6 +47,7 @@ namespace m4m.framework {
             this._image = _image;
             if (_image) {
                 this._image.use();
+                this.updateTran();
             }
         }
 
@@ -60,6 +61,18 @@ namespace m4m.framework {
         @reflect.Field("color")
         @reflect.UIStyle("vector4")
         color: math.color = new math.color(1.0, 1.0, 1.0, 1.0);
+
+        private _proportionalScalingMode: boolean = false;
+
+        /** 图 等比缩放居中显示模式 （默认false）*/
+        public get proportionalScalingMode() { return this._proportionalScalingMode; }
+        public set proportionalScalingMode(val: boolean) {
+            if (val == this._proportionalScalingMode) return;
+            this._proportionalScalingMode = val;
+            if (this._image) {
+                this.updateTran();
+            }
+        }
 
 
         private static readonly defUIShader = `shader/defui`;  //非mask 使用shader
@@ -215,21 +228,45 @@ namespace m4m.framework {
          * @private
          */
         updateTran() {
-            var m = this.transform.getWorldMatrix();
+            let _w = this.transform.width;
+            let _h = this.transform.height;
+            let _l_offset = 0;
+            let _t_offset = 0;
+            let needCalcEqualRatio = this._image && this._proportionalScalingMode;
 
-            var l = -this.transform.pivot.x * this.transform.width;
-            var r = this.transform.width + l;
-            var t = -this.transform.pivot.y * this.transform.height;
-            var b = this.transform.height + t;
+            let m = this.transform.getWorldMatrix();
 
-            var x0 = l * m.rawData[0] + t * m.rawData[2] + m.rawData[4];
-            var y0 = l * m.rawData[1] + t * m.rawData[3] + m.rawData[5];
-            var x1 = r * m.rawData[0] + t * m.rawData[2] + m.rawData[4];
-            var y1 = r * m.rawData[1] + t * m.rawData[3] + m.rawData[5];
-            var x2 = l * m.rawData[0] + b * m.rawData[2] + m.rawData[4];
-            var y2 = l * m.rawData[1] + b * m.rawData[3] + m.rawData[5];
-            var x3 = r * m.rawData[0] + b * m.rawData[2] + m.rawData[4];
-            var y3 = r * m.rawData[1] + b * m.rawData[3] + m.rawData[5];
+            if (needCalcEqualRatio) {
+                let _imgW = this._image.glTexture.width;
+                let _imgH = this._image.glTexture.height;
+                let _defW = _w - _imgW;
+                let _defH = _h - _imgH;
+                let _asp = _imgH / _imgW;
+                let _wBigThanH = _defW > _defH;
+                if (_wBigThanH) {
+                    let _tW = _h / _asp;
+                    _l_offset = (_w - _tW) / 2;
+                    _w = _tW;
+                } else {
+                    let _tH = _w * _asp;
+                    _t_offset = (_h - _tH) / 2;
+                    _h = _tH;
+                }
+            }
+
+            let l = -this.transform.pivot.x * _w + _l_offset;
+            let r = _w + l;
+            let t = -this.transform.pivot.y * _h + _t_offset;
+            let b = _h + t;
+
+            let x0 = l * m.rawData[0] + t * m.rawData[2] + m.rawData[4];
+            let y0 = l * m.rawData[1] + t * m.rawData[3] + m.rawData[5];
+            let x1 = r * m.rawData[0] + t * m.rawData[2] + m.rawData[4];
+            let y1 = r * m.rawData[1] + t * m.rawData[3] + m.rawData[5];
+            let x2 = l * m.rawData[0] + b * m.rawData[2] + m.rawData[4];
+            let y2 = l * m.rawData[1] + b * m.rawData[3] + m.rawData[5];
+            let x3 = r * m.rawData[0] + b * m.rawData[2] + m.rawData[4];
+            let y3 = r * m.rawData[1] + b * m.rawData[3] + m.rawData[5];
 
             this.datar[0 * 13] = x0;
             this.datar[0 * 13 + 1] = y0;
@@ -244,7 +281,7 @@ namespace m4m.framework {
             this.datar[5 * 13] = x3;
             this.datar[5 * 13 + 1] = y3;
             //主color
-            for (var i = 0; i < 6; i++) {
+            for (let i = 0; i < 6; i++) {
                 this.datar[i * 13 + 3] = this.color.r;
                 this.datar[i * 13 + 4] = this.color.g;
                 this.datar[i * 13 + 5] = this.color.b;
