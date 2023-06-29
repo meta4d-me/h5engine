@@ -249,7 +249,7 @@ namespace m4m.framework {
                 console.error("Failed to get webgl at the application.start()");
                 throw Error("Failed to get webgl at the application.start()");
             }
-            
+
             // 扩展
             new GLExtension(this.webgl);
 
@@ -440,8 +440,7 @@ namespace m4m.framework {
                 this.ccHeight = canvas.clientHeight != null ? canvas.clientHeight : this.ccHeight;
             }
 
-            //if (this.ccWidth != this._canvasClientWidth || this.ccHeight != this._canvasClientHeight) 
-            {
+            if (this.ccWidth != this._canvasClientWidth || this.ccHeight != this._canvasClientHeight) {
                 this._canvasClientWidth = this.ccWidth;
                 this._canvasClientHeight = this.ccHeight;
                 this.setScreenAsp();

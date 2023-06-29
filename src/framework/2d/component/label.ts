@@ -6,6 +6,7 @@ namespace m4m.framework {
         get pixelPerfact(): boolean
         calcScreenHeight(label: label): number
         pixelFit(label: label, vec2: m4m.math.vector2, screenAddX: number, screenAddY: number): void;
+        pixelWidth(label: label, screenwidth: number): number;
     }
     export class FontSelector_autoSize implements IFontSelector {
         constructor(overlay: overlay2D, name: string) {
@@ -44,6 +45,13 @@ namespace m4m.framework {
             let screeny = ((vec2.y * sy) | 0) + (screenAddY | 0);
             vec2.x = screenx / sx;
             vec2.y = screeny / sy;
+        }
+        pixelWidth(label: label, screenwidth: number): number {
+            let ws = label.transform.getWorldScale();
+            //let oh = this.overlay.getScaleHeight();
+            let ow = this.overlay.getScaleWidth();
+            let sx = Math.abs(ws.x) * ow;
+            return screenwidth / sx;
         }
         public overlay: overlay2D;
         public fontname: string;
@@ -319,188 +327,6 @@ namespace m4m.framework {
             this.setDataByBlock(_font, this._defTextBlocks);
         }
 
-        // _updateData(_font: m4m.framework.font)
-        // {
-        //     if (label.onTryExpandTexts) { this.chackText(this._text); } //检查 依赖文本(辅助 自动填充字体)
-
-        //     // this.dirtyData = false;
-
-        //     //字符的 label尺寸 与 像素尺寸 的比值。
-        //     let rate = this._fontsize / _font.pointSize;
-        //     //矩阵信息
-        //     let m = this.transform.getWorldMatrix();
-        //     let m11 = m.rawData[0];
-        //     let m12 = m.rawData[2];
-        //     let m21 = m.rawData[1];
-        //     let m22 = m.rawData[3];
-
-        //     //顶点开始位置
-        //     let bx = this.data_begin.x;
-        //     let by = this.data_begin.y;
-
-        //     //计算出排列数据
-        //     let txadd = 0;                                  //字符x偏移量
-        //     let tyadd = 0;                                  //字符y偏移量
-        //     let lineEndIndexs: number[] = [];              //每行结束位置的索引列表
-        //     let lineWidths: number[] = [];                 //每行字符宽度之和列表
-        //     let contrast_w = this.horizontalOverflow ? Number.MAX_VALUE : this.transform.width;     //最大宽度限制
-        //     let contrast_h = this.verticalOverflow ? Number.MAX_VALUE : this.transform.height;      //最大高度限制
-        //     let lineHeight = this._fontsize * this.linespace;                                       //一行的高度
-        //     let renderTextCount = 0;
-        //     tyadd += lineHeight;
-        //     let i = 0;
-        //     for (let len = this._text.length; i < len; i++)
-        //     {
-        //         let c = this._text.charAt(i);
-        //         let isNewline = c == `\n`; //换行符
-        //         let cinfo = _font.cmap[c];
-        //         if (!isNewline && cinfo == undefined) { continue; }
-        //         let cWidth = cinfo ? cinfo.xAddvance * rate : 0;                 //字符的宽度
-
-        //         //需要换行了
-        //         if (isNewline || txadd + cWidth > contrast_w)
-        //         {
-        //             if (tyadd + lineHeight > contrast_h) { break; }             //高度超限制了
-
-        //             lineEndIndexs.push(i);
-        //             lineWidths.push(this.transform.width - txadd);
-        //             txadd = 0;                                                  //文本x偏移置0
-        //             tyadd += lineHeight;                                        //文本y偏移增加
-        //         }
-
-        //         if (cinfo)
-        //         {
-        //             txadd += cWidth;                                     //文本x偏移增加
-        //             renderTextCount++;
-        //         }
-        //     }
-        //     //最后的字符存入
-        //     lineEndIndexs.push(i);
-        //     lineWidths.push(this.transform.width - txadd);
-
-        //     //文本渲染所占高度 和 transfrom节点高度的相差值
-        //     let diffY = this.transform.height - tyadd;
-
-        //     //相对transfrom X坐标的偏移
-        //     let xadd = 0;
-        //     //相对transfrom Y坐标的偏移
-        //     let yadd = 0;
-        //     if (this.verticalType == VerticalType.Center)               //垂直居中布局
-        //     {
-        //         yadd += diffY / 2;
-        //     }
-        //     else if (this.verticalType == VerticalType.Boom)            //垂直靠下布局
-        //     {
-        //         yadd += diffY;
-        //     }
-
-        //     //清理缓存
-        //     this.initdater(renderTextCount, this.datar);
-        //     i = 0;
-        //     let rI = 0;
-        //     for (let lineI = 0; lineI < lineEndIndexs.length; lineI++)
-        //     {
-        //         //一行
-        //         xadd = 0;
-        //         if (this.horizontalType == HorizontalType.Center)       //水平居中布局
-        //         {
-        //             xadd += lineWidths[lineI] / 2;
-        //         }
-        //         else if (this.horizontalType == HorizontalType.Right)   //水平靠右布局
-        //         {
-        //             xadd += lineWidths[lineI];
-        //         }
-
-        //         //遍历一行字符
-        //         for (; i < lineEndIndexs[lineI]; i++)
-        //         {
-        //             let c = this._text.charAt(i);
-        //             let cinfo = _font.cmap[c];
-        //             if (cinfo == undefined) { continue; }
-
-        //             var cx = xadd + cinfo.xOffset * rate;
-        //             var cy = yadd - cinfo.yOffset * rate + _font.baseline * rate;
-
-        //             var ch = rate * cinfo.ySize;
-        //             var cw = rate * cinfo.xSize;
-        //             xadd += cinfo.xAddvance * rate;
-        //             var x1 = cx + cw;
-        //             var y1 = cy;
-        //             var x2 = cx;
-        //             var y2 = cy + ch;
-        //             var x3 = cx + cw;
-        //             var y3 = cy + ch;
-
-        //             //pos
-        //             let _x0 = this.datar[rI * 6 * 13 + 0] = bx + cx * m11 + cy * m12;//x
-        //             let _y0 = this.datar[rI * 6 * 13 + 1] = by + cx * m21 + cy * m22;//y
-        //             let _x1 = this.datar[rI * 6 * 13 + 13 * 1 + 0] = bx + x1 * m11 + y1 * m12;//x
-        //             let _y1 = this.datar[rI * 6 * 13 + 13 * 1 + 1] = by + x1 * m21 + y1 * m22;//y
-        //             let _x2 = this.datar[rI * 6 * 13 + 13 * 2 + 0] = bx + x2 * m11 + y2 * m12;//x
-        //             let _y2 = this.datar[rI * 6 * 13 + 13 * 2 + 1] = by + x2 * m21 + y2 * m22;//y
-        //             this.datar[rI * 6 * 13 + 13 * 3 + 0] = bx + x2 * m11 + y2 * m12;//x
-        //             this.datar[rI * 6 * 13 + 13 * 3 + 1] = by + x2 * m21 + y2 * m22;//y
-        //             this.datar[rI * 6 * 13 + 13 * 4 + 0] = bx + x1 * m11 + y1 * m12;//x
-        //             this.datar[rI * 6 * 13 + 13 * 4 + 1] = by + x1 * m21 + y1 * m22;//y
-        //             let _x3 = this.datar[rI * 6 * 13 + 13 * 5 + 0] = bx + x3 * m11 + y3 * m12;//x
-        //             let _y3 = this.datar[rI * 6 * 13 + 13 * 5 + 1] = by + x3 * m21 + y3 * m22;//y
-
-
-        //             //uv
-        //             var u0 = cinfo.x;
-        //             var v0 = cinfo.y;
-        //             var u1 = cinfo.x + cinfo.w;
-        //             var v1 = cinfo.y;
-        //             var u2 = cinfo.x;
-        //             var v2 = cinfo.y + cinfo.h;
-        //             var u3 = cinfo.x + cinfo.w;
-        //             var v3 = cinfo.y + cinfo.h;
-
-        //             this.datar[rI * 6 * 13 + 7] = u0;
-        //             this.datar[rI * 6 * 13 + 8] = v0;
-        //             this.datar[rI * 6 * 13 + 13 * 1 + 7] = u1;
-        //             this.datar[rI * 6 * 13 + 13 * 1 + 8] = v1;
-        //             this.datar[rI * 6 * 13 + 13 * 2 + 7] = u2;
-        //             this.datar[rI * 6 * 13 + 13 * 2 + 8] = v2;
-        //             this.datar[rI * 6 * 13 + 13 * 3 + 7] = u2;
-        //             this.datar[rI * 6 * 13 + 13 * 3 + 8] = v2;
-        //             this.datar[rI * 6 * 13 + 13 * 4 + 7] = u1;
-        //             this.datar[rI * 6 * 13 + 13 * 4 + 8] = v1;
-        //             this.datar[rI * 6 * 13 + 13 * 5 + 7] = u3;
-        //             this.datar[rI * 6 * 13 + 13 * 5 + 8] = v3;
-
-        //             //主color
-        //             for (var j = 0; j < 6; j++)
-        //             {
-        //                 this.datar[rI * 6 * 13 + 13 * j + 3] = this.color.r;
-        //                 this.datar[rI * 6 * 13 + 13 * j + 4] = this.color.g;
-        //                 this.datar[rI * 6 * 13 + 13 * j + 5] = this.color.b;
-        //                 this.datar[rI * 6 * 13 + 13 * j + 6] = this.color.a;
-
-        //                 this.datar[rI * 6 * 13 + 13 * j + 9] = this.color2.r;
-        //                 this.datar[rI * 6 * 13 + 13 * j + 10] = this.color2.g;
-        //                 this.datar[rI * 6 * 13 + 13 * j + 11] = this.color2.b;
-        //                 this.datar[rI * 6 * 13 + 13 * j + 12] = this.color2.a;
-        //             }
-
-        //             //drawRect 
-        //             this.min_x = Math.min(_x0, _x1, _x2, _x3, this.min_x);
-        //             this.min_y = Math.min(_y0, _y1, _y2, _y3, this.min_y);
-        //             this.max_x = Math.max(_x0, _x1, _x2, _x3, this.max_x);
-        //             this.max_y = Math.max(_y0, _y1, _y2, _y3, this.max_y);
-
-        //             //有效渲染字符 索引递增
-        //             rI++;
-        //         }
-        //         yadd += lineHeight;
-        //     }
-
-        //     //debug log
-        //     // console.log(`lable text: 实际填充数 ：${rI} , 容器尺寸 ：${renderTextCount} \r text:${this._text}`);
-
-        //     this.calcDrawRect();
-        // }
-
         /** 更新数据 富文本 模式 */
         private updateDataRich(_font: m4m.framework.IFont) {
             //检查 依赖文本(辅助 自动填充字体)
@@ -578,6 +404,9 @@ namespace m4m.framework {
                         if (!isNewline && !cinfo) { continue; }
                         if (cinfo) {
                             cWidth = cinfo.xAddvance * rate;                            //字符的宽度
+                            if (this.fontSelector != null) {
+                                cWidth = this.fontSelector.pixelWidth(this, cWidth);
+                            }
                             hasC = true;
                         }
                     } else {
@@ -804,7 +633,7 @@ namespace m4m.framework {
 
 
                         this.fontSelector.pixelFit(this, fixpos, xaddonce, 0);
-                        xaddonce = fixpos2.x - x0 + 1;
+                        xaddonce = fixpos2.x - x0;
 
                     }
                     xadd += xaddonce;

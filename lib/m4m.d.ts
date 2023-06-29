@@ -2960,12 +2960,14 @@ declare namespace m4m.framework {
         get pixelPerfact(): boolean;
         calcScreenHeight(label: label): number;
         pixelFit(label: label, vec2: m4m.math.vector2, screenAddX: number, screenAddY: number): void;
+        pixelWidth(label: label, screenwidth: number): number;
     }
     class FontSelector_autoSize implements IFontSelector {
         constructor(overlay: overlay2D, name: string);
         get pixelPerfact(): boolean;
         calcScreenHeight(label: label): number;
         pixelFit(label: label, vec2: m4m.math.vector2, screenAddX: number, screenAddY: number): void;
+        pixelWidth(label: label, screenwidth: number): number;
         overlay: overlay2D;
         fontname: string;
         static fonts: {
