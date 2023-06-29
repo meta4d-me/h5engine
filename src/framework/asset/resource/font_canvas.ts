@@ -29,7 +29,7 @@ namespace m4m.framework {
             this.fontname = fontname;
             this.pointSize = fontsize;
             this.padding = 0;
-            this.baseline = 0;
+            this.baseline = 0;//fontsize*3/4;
             if (font_canvas._canvas == null) {
                 font_canvas._canvas = document.createElement("canvas");
                 font_canvas._canvas.width = 64;
@@ -102,7 +102,7 @@ namespace m4m.framework {
                 let cinfo = this.cmap[c];
                 if (cinfo == undefined) {
                     cinfo = new charinfo();
-
+                    _2d.canvas.style.background = "#000000";
                     _2d.clearRect(0, 0, this.pointSize, this.pointSize);
 
                     // //加一个调试用背景
@@ -115,7 +115,7 @@ namespace m4m.framework {
                     _2d.fillText(c, 0, 0, this.pointSize);
                     let mr = _2d.measureText(c);
 
-                    let pixelwidth = this.pointSize;//or mr.width
+                    let pixelwidth = this.pointSize;// mr.width;
 
                     if (this._posx + pixelwidth > this._texture.width) {
                         this._posx = 0;
@@ -124,24 +124,26 @@ namespace m4m.framework {
                             throw new Error("no cache area in font tex.");
                     }
 
-                    let data = _2d.getImageData(0, 0, pixelwidth, this.pointSize);
+                    let data = _2d.getImageData(0, 0, 64, 64);
 
-                    if (this.pointSize < 12) {
-                        var newdata = data.data;
-                    }
-                    else {
-                        var newdata = new Uint8ClampedArray(pixelwidth * this.pointSize * 4);
-                        for (var y = 0; y < this.pointSize; y++) {
-                            for (var x = 0; x < pixelwidth; x++) {
-                                let index = (y * pixelwidth + x) * 4;
-                                let index2 = ((this.pointSize - y - 1) * pixelwidth + x) * 4;
-                                newdata[index2 + 0] = data.data[index + 0];
-                                newdata[index2 + 1] = data.data[index + 1];
-                                newdata[index2 + 2] = data.data[index + 2];
-                                newdata[index2 + 3] = data.data[index + 3];
-                            }
+
+                    var newdata = new Uint8ClampedArray(pixelwidth * this.pointSize * 4);
+                    for (var y = 0; y < this.pointSize; y++) {
+                        for (var x = 0; x < pixelwidth; x++) {
+                            let index = (y * 64 + x) * 4;
+                            let lum = data.data[index + 3];
+                            // if (lum < 128)
+                            //     lum = 0;
+                            // else
+                            //     lum = 255;
+                            let index2 = ((this.pointSize - y - 1) * pixelwidth + x) * 4;
+                            newdata[index2 + 0] = 255;
+                            newdata[index2 + 1] = 255;
+                            newdata[index2 + 2] = 255;
+                            newdata[index2 + 3] = lum;
                         }
                     }
+
 
                     this._texture.updateRect(newdata, this._posx, this._texture.height - this.pointSize - this._posy, pixelwidth, this.pointSize);
 
@@ -151,7 +153,7 @@ namespace m4m.framework {
                     cinfo.h = this.pointSize / this._texture.height;
                     cinfo.xAddvance = mr.width;
                     cinfo.xOffset = 0;
-                    cinfo.yOffset = 0;
+                    cinfo.yOffset = 0;//this.pointSize*3/4;
                     cinfo.xSize = mr.width;
                     cinfo.ySize = this.pointSize;
 

@@ -1654,6 +1654,7 @@ declare namespace m4m.framework {
          */
         calClipPosToScreenPos(clipPos: m4m.math.vector2, outScreenPos: m4m.math.vector2): void;
         getScaleHeight(): number;
+        getScaleWidth(): number;
     }
 }
 declare namespace m4m.framework {
@@ -2954,6 +2955,24 @@ declare namespace m4m.framework {
     }
 }
 declare namespace m4m.framework {
+    interface IFontSelector {
+        Update(label: label): void;
+        get pixelPerfact(): boolean;
+        calcScreenHeight(label: label): number;
+        pixelFit(label: label, vec2: m4m.math.vector2, screenAddX: number, screenAddY: number): void;
+    }
+    class FontSelector_autoSize implements IFontSelector {
+        constructor(overlay: overlay2D, name: string);
+        get pixelPerfact(): boolean;
+        calcScreenHeight(label: label): number;
+        pixelFit(label: label, vec2: m4m.math.vector2, screenAddX: number, screenAddY: number): void;
+        overlay: overlay2D;
+        fontname: string;
+        static fonts: {
+            [id: string]: IFont;
+        };
+        Update(label: label): void;
+    }
     /**
      * @public
      * @language zh_CN
@@ -2962,14 +2981,13 @@ declare namespace m4m.framework {
      * @version m4m 1.0
      */
     class label implements IRectRenderer {
+        constructor();
         private static readonly defUIShader;
         private static readonly defMaskUIShader;
         private static readonly defImgUIShader;
         private static readonly defImgMaskUIShader;
         private static readonly helpOptObj;
         private static readonly helpColor;
-        /** 尝试 动态扩展 字体信息 函数接口 */
-        static onTryExpandTexts: (str: string) => void;
         static readonly ClassName: string;
         /**字段 用于快速判断实例是否是label */
         readonly isLabel = true;
@@ -2988,6 +3006,9 @@ declare namespace m4m.framework {
         get text(): string;
         set text(text: string);
         private initdater;
+        srcfontsize: number;
+        fontSelector: IFontSelector;
+        static commonfontSelector: IFontSelector;
         private _font;
         /**
          * @public
@@ -3063,7 +3084,6 @@ declare namespace m4m.framework {
         set verticalOverflow(val: boolean);
         private lastStr;
         /** 检查文字,是否需要 动态添加 */
-        private chackText;
         /**
          * @private
          */
@@ -22658,7 +22678,7 @@ declare namespace m4m.render {
         uploadVertexSubData(webgl: WebGL2RenderingContext, varray: Float32Array, offset?: number): void;
         uploadVertexData(webgl: WebGL2RenderingContext, varray: Float32Array): void;
         uploadIndexSubData(webgl: WebGL2RenderingContext, eboindex: number, data: TriIndexTypeArray, offset?: number): void;
-        uploadIndexData(webgl: WebGL2RenderingContext, eboindex: number, data: TriIndexTypeArray, dataType?: number): void;
+        uploadIndexData(webgl: WebGL2RenderingContext, eboindex: number, data: TriIndexTypeArray, dataType?: 5123): void;
         /** 顶点数组绘制三角面 */
         drawArrayTris(webgl: WebGL2RenderingContext, start?: number, count?: number, instanceCount?: number): void;
         /** 顶点数组绘制线段 */

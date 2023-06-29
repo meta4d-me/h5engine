@@ -490,7 +490,14 @@ namespace m4m.framework {
             if (this.scaleMode == m4m.framework.UIScaleMode.CONSTANT_PIXEL_SIZE)
                 return 1.0
             else {
-                return this.camera.currViewPixelRect.h/this.canvas.pixelHeight  ;
+                return this.app.webgl.canvas.height  / this.canvas.pixelHeight;
+            }
+        }
+        getScaleWidth(): number {
+            if (this.scaleMode == m4m.framework.UIScaleMode.CONSTANT_PIXEL_SIZE)
+                return 1.0
+            else {
+                return this.app.webgl.canvas.width / this.canvas.pixelWidth;
             }
         }
     }
