@@ -371,6 +371,9 @@ namespace m4m.framework {
             let contrast_w = this.horizontalOverflow ? Number.MAX_VALUE : this.transform.width;     //最大宽度限制
             let contrast_h = this.verticalOverflow ? Number.MAX_VALUE : this.transform.height;      //最大高度限制
             let lineHeight = fontSize * this.linespace;                                       //一行的高度
+            if (this.fontSelector != null) {
+                lineHeight = this.fontSelector.pixelWidth(this, lineHeight);
+            }
             tyadd += lineHeight;
             let rI = 0;
             let imgCharCount = 0;
