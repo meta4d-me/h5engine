@@ -784,7 +784,7 @@
             this.width = width;
             this.height = height;
             this.texture = webgl.createTexture();
-
+            this.premultiply=premultiply;
             this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, premultiply ? 1 : 0);
             this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 0);
 
@@ -855,6 +855,8 @@
         mirroredV: boolean = false
         updateRect(data: Uint8Array | Uint8ClampedArray, x: number, y: number, width: number, height: number) {
             this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
+            this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this.premultiply ? 1 : 0);
+            this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 0);
 
             this.webgl.texSubImage2D(this.webgl.TEXTURE_2D, 0,
                 x, y, width, height,
