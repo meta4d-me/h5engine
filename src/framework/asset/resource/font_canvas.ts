@@ -119,7 +119,7 @@ namespace m4m.framework {
 
                     if (this._posx + pixelwidth > this._texture.width) {
                         this._posx = 0;
-                        this._posy += this.pointSize;
+                        this._posy += this.pointSize+1;
                         if ((this._posy + this.pointSize) > this._texture.height)
                             throw new Error("no cache area in font tex.");
                     }
@@ -161,7 +161,7 @@ namespace m4m.framework {
                     this.cmap[c] = cinfo;
                     updatecount++;
                     //偏移像素
-                    this._posx += pixelwidth;
+                    this._posx += pixelwidth +1;
 
                 }
 
