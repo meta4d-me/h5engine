@@ -228,6 +228,7 @@ namespace m4m.framework {
          * @private
          */
         updateTran() {
+            if(!this.transform) return;
             let _w = this.transform.width;
             let _h = this.transform.height;
             let _l_offset = 0;

@@ -22684,7 +22684,7 @@ declare namespace m4m.render {
         uploadVertexSubData(webgl: WebGL2RenderingContext, varray: Float32Array, offset?: number): void;
         uploadVertexData(webgl: WebGL2RenderingContext, varray: Float32Array): void;
         uploadIndexSubData(webgl: WebGL2RenderingContext, eboindex: number, data: TriIndexTypeArray, offset?: number): void;
-        uploadIndexData(webgl: WebGL2RenderingContext, eboindex: number, data: TriIndexTypeArray, dataType?: 5123): void;
+        uploadIndexData(webgl: WebGL2RenderingContext, eboindex: number, data: TriIndexTypeArray, dataType?: number): void;
         /** 顶点数组绘制三角面 */
         drawArrayTris(webgl: WebGL2RenderingContext, start?: number, count?: number, instanceCount?: number): void;
         /** 顶点数组绘制线段 */
