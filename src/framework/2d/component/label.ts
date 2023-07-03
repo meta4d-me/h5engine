@@ -28,10 +28,12 @@ namespace m4m.framework {
 
             let floatnewfontsize = (ws * oh * oldsize);
             let intnewfontsize = floatnewfontsize | 0;
+
             if (intnewfontsize < 8)
                 floatnewfontsize = intnewfontsize = 8;
             if (intnewfontsize > 64)
                 floatnewfontsize = intnewfontsize = 64;
+
             return intnewfontsize;
         }
         //辅助将顶点对齐到屏幕坐标，能改善清晰度
@@ -69,7 +71,12 @@ namespace m4m.framework {
             let font: IFont = FontSelector_autoSize.fonts[fontname];
             if (font == undefined) {
                 let fontsize = intnewfontsize;
-                if (intnewfontsize < 24) fontsize = intnewfontsize * 2;
+                //小字体双倍分辨率
+                if (intnewfontsize < 24) 
+                    fontsize = intnewfontsize * 2;
+                //大字体不要单数
+                else if (intnewfontsize % 2 == 1)
+                    fontsize = intnewfontsize - 1;
                 //else if (intnewfontsize < 32) fontsize = intnewfontsize * 1.5;
                 font = new m4m.framework.font_canvas(m4m.framework.sceneMgr.app.webgl, this.fontname, fontsize);
                 FontSelector_autoSize.fonts[fontname] = font;
@@ -236,7 +243,7 @@ namespace m4m.framework {
          * @version m4m 1.0
          */
         @m4m.reflect.Field("number")
-        get horizontalType() : HorizontalType{
+        get horizontalType(): HorizontalType {
             return this._horizontalType;
         }
         set horizontalType(val: HorizontalType) {
@@ -254,7 +261,7 @@ namespace m4m.framework {
          * @version m4m 1.0
          */
         @m4m.reflect.Field("number")
-        get verticalType() : VerticalType{
+        get verticalType(): VerticalType {
             return this._verticalType;
         }
         set verticalType(val: VerticalType) {

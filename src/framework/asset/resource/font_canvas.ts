@@ -33,7 +33,7 @@ namespace m4m.framework {
             if (font_canvas._canvas == null) {
                 font_canvas._canvas = document.createElement("canvas");
                 font_canvas._canvas.width = 64;
-                font_canvas._canvas.height = 64;
+                font_canvas._canvas.height = 65;
 
                 font_canvas._c2d = font_canvas._canvas.getContext("2d", { willReadFrequently: true });
 
@@ -103,7 +103,7 @@ namespace m4m.framework {
                 if (cinfo == undefined) {
                     cinfo = new charinfo();
                     _2d.canvas.style.background = "#000000";
-                    _2d.clearRect(0, 0, this.pointSize, this.pointSize);
+                    _2d.clearRect(0, 0, 64, 65);
 
                     // //加一个调试用背景
                     // _2d.fillStyle = "rgba(0,0,0,255)";
@@ -112,23 +112,25 @@ namespace m4m.framework {
                     _2d.fillStyle = "rgba(255,255,255,255)";
                     _2d.font = ((this.pointSize) | 0) + "px " + this.fontname;
                     _2d.textBaseline = "top";
-                    _2d.fillText(c, 0, 0, this.pointSize);
+
+                    //字体头顶有时候像被切掉了一点点，绘制文字时直接从上面加一个像素，这样又会产生从下面被切掉的感觉。。。
+                    _2d.fillText(c, 0, 1, this.pointSize);
                     let mr = _2d.measureText(c);
 
                     let pixelwidth = this.pointSize;// mr.width;
 
                     if (this._posx + pixelwidth > this._texture.width) {
                         this._posx = 0;
-                        this._posy += this.pointSize+1;
-                        if ((this._posy + this.pointSize) > this._texture.height)
+                        this._posy += (this.pointSize + 2);
+                        if ((this._posy + this.pointSize + 1) > this._texture.height)
                             throw new Error("no cache area in font tex.");
                     }
 
-                    let data = _2d.getImageData(0, 0, 64, 64);
+                    let data = _2d.getImageData(0, 0, 64, 65);
 
 
-                    var newdata = new Uint8ClampedArray(pixelwidth * this.pointSize * 4);
-                    for (var y = 0; y < this.pointSize; y++) {
+                    var newdata = new Uint8ClampedArray(pixelwidth * (this.pointSize + 1) * 4);
+                    for (var y = 0; y < this.pointSize + 1; y++) {
                         for (var x = 0; x < pixelwidth; x++) {
                             let index = (y * 64 + x) * 4;
                             let lum = data.data[index + 3];
@@ -136,7 +138,7 @@ namespace m4m.framework {
                             //     lum = 0;
                             // else
                             //     lum = 255;
-                            let index2 = ((this.pointSize - y - 1) * pixelwidth + x) * 4;
+                            let index2 = (((this.pointSize + 1) - y - 1) * pixelwidth + x) * 4;
                             newdata[index2 + 0] = 255;
                             newdata[index2 + 1] = 255;
                             newdata[index2 + 2] = 255;
@@ -145,23 +147,23 @@ namespace m4m.framework {
                     }
 
 
-                    this._texture.updateRect(newdata, this._posx, this._texture.height - this.pointSize - this._posy, pixelwidth, this.pointSize);
+                    this._texture.updateRect(newdata, this._posx, this._texture.height - (this.pointSize + 1) - this._posy, pixelwidth, this.pointSize + 1);
 
                     cinfo.x = this._posx / this._texture.width;
                     cinfo.y = (this._posy / this._texture.height) * 1.0;
                     cinfo.w = mr.width / this._texture.width;
-                    cinfo.h = this.pointSize / this._texture.height;
+                    cinfo.h = (this.pointSize + 1) / this._texture.height;
                     cinfo.xAddvance = mr.width;
                     cinfo.xOffset = 0;
                     cinfo.yOffset = 0;//this.pointSize*3/4;
                     cinfo.xSize = mr.width;
-                    cinfo.ySize = this.pointSize;
+                    cinfo.ySize = (this.pointSize + 1);
 
 
                     this.cmap[c] = cinfo;
                     updatecount++;
                     //偏移像素
-                    this._posx += pixelwidth +1;
+                    this._posx += pixelwidth + 1;
 
                 }
 
