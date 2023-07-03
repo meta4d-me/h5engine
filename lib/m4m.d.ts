@@ -22752,6 +22752,7 @@ declare namespace m4m.render {
         set vertexBufferData(val: Float32Array);
         /** 三角形索引数据buffer */
         triIndexBufferData: TriIndexTypeArray;
+        AutoGenNormal(): void;
         /**
          * 请使用 vertexBufferData ,为了兼容工具链暂时保留
          * @deprecated 遗弃的接口

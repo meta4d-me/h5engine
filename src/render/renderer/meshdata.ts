@@ -54,6 +54,68 @@
         /** 三角形索引数据buffer */
         public triIndexBufferData: TriIndexTypeArray;
 
+        public AutoGenNormal(): void {
+            if (this.normal != undefined)
+                throw new Error("first set normal to undefined.");
+
+
+            //计算面法线
+            let faceNormal: math.vector3[] = [];
+            let p2face: { [id: number]: number[] } = {};
+            for (var i = 0; i < this.trisindex.length / 3; i++) {
+                let f0 = this.trisindex[i * 3 + 0];
+                let f1 = this.trisindex[i * 3 + 1];
+                let f2 = this.trisindex[i * 3 + 2];
+
+                //收集顶点经过的面
+                if (p2face[f0] == undefined)
+                    p2face[f0] = [i];
+                else
+                    p2face[f0].push(i);
+                if (p2face[f1] == undefined)
+                    p2face[f1] = [i];
+                else
+                    p2face[f1].push(i);
+                if (p2face[f2] == undefined)
+                    p2face[f2] = [i];
+                else
+                    p2face[f2].push(i);
+
+
+                let p0 = this.pos[f0];
+                let p1 = this.pos[f1];
+                let p2 = this.pos[f2];
+
+                let v1 = new math.vector3();
+                let v2 = new math.vector3();
+                math.vec3Subtract(p1, p0, v1);
+                math.vec3Subtract(p2, p0, v2);
+                math.vec3Normalize(v1, v1);
+                math.vec3Normalize(v2, v2);
+
+                let facevec = new math.vector3();
+                math.vec3Cross(v2, v1, facevec);
+                faceNormal.push(facevec);
+            }
+
+
+            this.normal = [];
+            for (var i = 0; i < this.pos.length; i++) {
+                if (p2face[i] == undefined) continue;
+                var ncount = p2face[i].length;
+                let _normal = new math.vector3(0, 0, 0);
+                for (var j = 0; j < ncount; j++) {
+                    let facenor = faceNormal[p2face[i][j]];
+                    math.vec3Add(_normal, facenor, _normal);
+                }
+                _normal.x /= ncount;
+                _normal.y /= ncount;
+                _normal.z /= ncount;
+                math.vec3Normalize(_normal, _normal);
+
+                this.normal.push(_normal);
+            }
+        }
         // private tmpVArr: Float32Array;
         // private tmpInxArr: Uint16Array;
 
