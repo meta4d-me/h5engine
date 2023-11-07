@@ -1,13 +1,39 @@
 ﻿/// <reference path="../../../io/reflect.ts" />
 
 namespace m4m.framework {
+    /**
+     * 字体选择器接口
+     */
     export interface IFontSelector {
+        /**
+         * 更新
+         * @param label label对象
+         */
         Update(label: label): void
         get pixelPerfact(): boolean
+        /**
+         * 计算屏幕高度
+         * @param label  label对象
+         */
         calcScreenHeight(label: label): number
+        /**
+         * 辅助将顶点对齐到屏幕坐标，能改善清晰度
+         * @param label label对象
+         * @param vec2 坐标
+         * @param screenAddX 屏幕空间坐标增量 X
+         * @param screenAddY 屏幕空间坐标增量 Y
+         */
         pixelFit(label: label, vec2: m4m.math.vector2, screenAddX: number, screenAddY: number): void;
+        /**
+         * 像素宽度
+         * @param label  label对象
+         * @param screenwidth 屏幕空间宽度
+         */
         pixelWidth(label: label, screenwidth: number): number;
     }
+    /**
+     * 自动大小的 字体选择器 
+     */
     export class FontSelector_autoSize implements IFontSelector {
         constructor(overlay: overlay2D, name: string) {
 
@@ -114,7 +140,9 @@ namespace m4m.framework {
         /**字段 用于快速判断实例是否是label */
         readonly isLabel = true;
 
-        /** 当需渲染字符被 加入排列时 的回调*/
+        /**
+         * 当需渲染字符被 加入排列时 的回调
+         */
         public onAddRendererText: (x: number, y: number) => void;
 
         /** 有图片字符需要渲染 */
@@ -142,6 +170,11 @@ namespace m4m.framework {
             this._drityRich = hasChange;
         }
 
+        /**
+         * 初始化 绘制网格数据
+         * @param textLen 文本长度
+         * @param datar 网格数据数组容器
+         */
         private initdater(textLen: number, datar: number[]) {
             let size = 6 * 13;
             let cachelen = size * textLen;
@@ -326,7 +359,8 @@ namespace m4m.framework {
 
         //pixelFit: number = 1.0;
         /**
-         * @private
+         * 更新数据
+         * @param _font 引擎字体对象
          */
         updateData(_font: m4m.framework.IFont) {
             // if (label.onTryExpandTexts) { this.chackText(this._text); } //检查 依赖文本(辅助 自动填充字体)
@@ -336,7 +370,10 @@ namespace m4m.framework {
             this.setDataByBlock(_font, this._defTextBlocks);
         }
 
-        /** 更新数据 富文本 模式 */
+        /**
+         * 更新数据 富文本 模式
+         * @param _font 引擎字体对象
+         */
         private updateDataRich(_font: m4m.framework.IFont) {
             //检查 依赖文本(辅助 自动填充字体)
             // if (label.onTryExpandTexts) { this.chackText(this._text); }
@@ -347,8 +384,8 @@ namespace m4m.framework {
 
         /**
          * 通过 block 设置数据
-         * @param _font 
-         * @param blocks 
+         * @param _font 引擎字体对象
+         * @param blocks 文本数据块队列
          */
         private setDataByBlock(_font: IFont, blocks: IBlock[]) {
             //字符的 label尺寸 与 像素尺寸 的比值。
@@ -707,7 +744,11 @@ namespace m4m.framework {
             this.calcDrawRect();
         }
 
-        /**获取 图片字符 选项 */
+        /**
+         * 获取 图片字符 选项
+         * @param opts 选项队列
+         * @returns Image选项
+         */
         private getImgOpt(opts: IRichTextOpt[]) {
             if (opts == null) return;
             for (let i = 0, len = opts.length; i < len; i++) {
@@ -852,11 +893,8 @@ namespace m4m.framework {
 
         private _CustomShaderName = null;//自定义UIshader
         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
          * 设置rander Shader名字
-         * @version m4m 1.0
+         * @param shaderName shader 资源名
          */
         setShaderByName(shaderName: string) {
             this._CustomShaderName = shaderName;
@@ -868,6 +906,7 @@ namespace m4m.framework {
          * @classdesc
          * 获取rander 的材质
          * @version m4m 1.0
+         * @returns 材质
          */
         getMaterial() {
             if (!this._uimat) {
@@ -884,6 +923,7 @@ namespace m4m.framework {
          * @classdesc
          * 获取渲染绘制矩形边界
          * @version m4m 1.0
+         * @returns rect 对象
          */
         getDrawBounds() {
             if (!this._darwRect) {
@@ -893,7 +933,16 @@ namespace m4m.framework {
             return this._darwRect;
         }
 
-        /** 获取材质 通过 shaderName*/
+        /**
+         * 获取材质 通过 shaderName
+         * @param oldMat 
+         * @param _tex 
+         * @param cShaderName 
+         * @param defMaskSh 
+         * @param defSh 
+         * @param newMatCB 
+         * @returns 材质对象
+         */
         private getMatByShader(oldMat: material, _tex: texture, cShaderName: string, defMaskSh: string, defSh: string, newMatCB?: Function) {
             let transform = this.transform;
             let assetmgr = sceneMgr.app.getAssetMgr();
@@ -980,9 +1029,6 @@ namespace m4m.framework {
 
         private _dirtyData: boolean = true;
 
-        /**
-         * @private
-         */
         render(canvas: canvas) {
             let mat = this.uimat;
             if (!mat) return;
@@ -1052,6 +1098,11 @@ namespace m4m.framework {
             }
         }
 
+        /**
+         * 设置矩形裁剪遮罩数据
+         * @param mat 材质对象
+         * @param needRMask 是否需要裁剪遮罩？
+         */
         private setMaskData(mat: material, needRMask: boolean) {
             //mask uniform 上传
             if (this._cacheMaskV4 == null) this._cacheMaskV4 = new math.vector4();
@@ -1062,7 +1113,9 @@ namespace m4m.framework {
             }
         }
 
-        //资源管理器中寻找 指定的贴图资源
+        /**
+         * 资源管理器中寻找 指定的贴图资源
+         */
         private searchTexture() {
             //font  不存在，但有名字，在资源管理器中搜索
             if (this._font == null || this.font.IsSDF() == false) {
@@ -1119,6 +1172,9 @@ namespace m4m.framework {
 
         }
 
+        /**
+         * 资源管理器中寻找 指定的图集资源
+         */
         private searchTextureAtlas() {
             //字符图集
             if (!this._imageTextAtlas && this._imageTextAtlasName) {
@@ -1134,9 +1190,6 @@ namespace m4m.framework {
 
         private _cacheMaskV4: math.vector4;
 
-        /**
-         * @private
-         */
         updateTran() {
             var m = this.transform.getWorldMatrix();
 
@@ -1159,7 +1212,10 @@ namespace m4m.framework {
         private max_x: number = Number.MAX_VALUE * -1;
         private min_y: number = Number.MAX_VALUE;
         private max_y: number = Number.MAX_VALUE * -1;
-        /** 计算drawRect */
+        /**
+         * 计算 渲染绘制覆盖到的矩形范围 Rect
+         * @returns 
+         */
         private calcDrawRect() {
             if (!this._darwRect) return;
             //drawBounds (y 轴反向)
@@ -1190,7 +1246,7 @@ namespace m4m.framework {
 
         /**
          * 解析 富文本
-         * @param text 
+         * @param text 原始文本字符串
          */
         private parseRichText(text: string) {
             //Color <color=#ffffffff></color>   文字颜色
@@ -1291,9 +1347,7 @@ namespace m4m.framework {
             }
         }
 
-        /**
-         * @private
-         */
+       
         start() {
 
         }
@@ -1302,9 +1356,7 @@ namespace m4m.framework {
 
         }
 
-        /**
-         * @private
-         */
+
         update(delta: number) {
             if (this.fontSelector != null) {
                 this.fontSelector.Update(this);
@@ -1320,9 +1372,6 @@ namespace m4m.framework {
          */
         transform: transform2D;
 
-        /**
-         * @private
-         */
         remove() {
             if (this._font) this._font.unuse();
             if (this._imageTextAtlas) this._imageTextAtlas.unuse();
@@ -1384,7 +1433,10 @@ namespace m4m.framework {
     interface IRichTextOpt {
         /** 值 */
         value: any;
-        /** 获取类型 */
+        /**
+         * 获取选项类型
+         * @returns 选项
+         */
         getType(): RichOptType;
     }
 

@@ -97,6 +97,7 @@ namespace m4m.framework {
          * @classdesc
          * 获取rander 的材质
          * @version m4m 1.0
+         * @returns 材质对象
          */
         getMaterial() {
             if (!this._uimat) {
@@ -113,6 +114,7 @@ namespace m4m.framework {
          * @classdesc
          * 获取渲染绘制矩形边界
          * @version m4m 1.0
+         * @returns 矩形区域 Rect对象
          */
         getDrawBounds() {
             if (!this._darwRect) {
@@ -189,9 +191,6 @@ namespace m4m.framework {
         //     return this._uimat;
         // }
 
-        /**
-         * @private
-         */
         render(canvas: canvas) {
             let mat = this.uimat;
             if (!mat) return;
@@ -224,9 +223,6 @@ namespace m4m.framework {
 
         private _cacheMaskV4: math.vector4;
 
-        /**
-         * @private
-         */
         updateTran() {
             if(!this.transform) return;
             let _w = this.transform.width;
@@ -302,7 +298,10 @@ namespace m4m.framework {
         private max_x: number = Number.MAX_VALUE * -1;
         private min_y: number = Number.MAX_VALUE;
         private max_y: number = Number.MAX_VALUE * -1;
-        /** 计算drawRect */
+        /**
+         * 计算 渲染绘制覆盖到的矩形范围 Rect
+         * @returns 
+         */
         private calcDrawRect() {
             if (!this._darwRect) return;
             //drawBounds (y 轴反向)
@@ -330,9 +329,6 @@ namespace m4m.framework {
             poolv2_del(maxPos);
         }
 
-        /**
-         * @private
-         */
         start() {
 
         }
@@ -341,9 +337,6 @@ namespace m4m.framework {
 
         }
 
-        /**
-         * @private
-         */
         update(delta: number) {
 
         }
@@ -357,9 +350,6 @@ namespace m4m.framework {
          */
         transform: transform2D;
 
-        /**
-         * @private
-         */
         remove() {
             if (this._image) this._image.unuse();
             if (this._uimat) this._uimat.unuse();

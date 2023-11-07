@@ -223,6 +223,7 @@ namespace m4m {
             regType(constructorObj, { "nodecomp_inspector": "1" });
         }
         /**
+         * 装饰器 可渲染节点对象
          * @private
          */
         export function nodeRender(constructorObj: any) {
@@ -283,6 +284,7 @@ namespace m4m {
             regType(constructorObj, { "canvasRenderer": "1" });
         }
         /**
+         * 装饰器 2D组件标记
          * @private
          */
         export function node2DComponent(constructorObj: any) {
@@ -345,7 +347,7 @@ namespace m4m {
          * @public
          * @language zh_CN
          * @classdesc
-         * Field 
+         * 装饰器 Field （字段）标记 
          * @version m4m 1.0
          * @param valueType 值类型
          * @param defaultValue 默认值
@@ -422,7 +424,7 @@ namespace m4m {
          * @public
          * @language zh_CN
          * @classdesc
-         * 属性面板显示方式修饰
+         * 装饰器 属性面板显示方式修饰
          * @version m4m 1.0
          */
         export function UIStyle(style: string, min?: number, max?: number, defvalue?: any) {

@@ -240,6 +240,9 @@ namespace m4m.framework {
             Ele.style.display = "none"
         }
 
+        /**
+         * 创建 Html的InputElement 对象
+         */
         private createInputEle() {
             this.inputElement = <HTMLInputElement>document.createElement("Input");
             let inpEle = this.inputElement;
@@ -252,6 +255,10 @@ namespace m4m.framework {
             inpEle.style["-moz-appearance"] = 'textfield';
         }
 
+        /**
+         * 创建 Html的TextareaElement 对象
+         * 多行文本输入会使用到
+         */
         private createTextAreaEle() {
             this.inputElement = <HTMLTextAreaElement>document.createElement("textarea");
             let inpEle = this.inputElement;
@@ -262,6 +269,9 @@ namespace m4m.framework {
             this.setTextAreaOverflow();
         }
 
+        /**
+         * 设置 TextareaElement 对象 的Overflow模式
+         */
         private setTextAreaOverflow() {
             if (!this.inputElement || this._lineType == lineType.SingleLine) return;
             let _ofyStr = "";
@@ -348,6 +358,10 @@ namespace m4m.framework {
             this.inputElmLayout();
         }
 
+        /**
+         * 更新 html 元素的Style（样式）
+         * @returns 
+         */
         private updateEleStyle() {
             let inpEle = this.inputElement;
             if (!inpEle) return;
@@ -372,6 +386,10 @@ namespace m4m.framework {
             inpEle.placeholder = placeholderStr;
         }
 
+        /**
+         * 销毁 html 元素
+         * @returns 
+         */
         private removeEle() {
             let inpEle = this.inputElement;
             if (!inpEle) return;
@@ -389,13 +407,13 @@ namespace m4m.framework {
             this.inputElement = null;
         }
 
-        /**
-         * @private
-         */
         start() {
             this.initEle();
         }
 
+        /**
+         * 检查是否是 移动设备
+         */
         private ckIsMobile() {
             if (inputField._isMobile == null) {
                 if (navigator && navigator.userAgent) {
@@ -412,7 +430,6 @@ namespace m4m.framework {
         }
 
         /**
-        * @private
         * inputElement 位置、宽高刷新
         */
         private inputElmLayout() {
@@ -438,7 +455,6 @@ namespace m4m.framework {
         }
 
         /**
-         * @private
          * 输入文本刷新
          */
         private textRefresh() {
@@ -500,17 +516,11 @@ namespace m4m.framework {
             }
         }
 
-        /**
-         * @private
-         */
         update(delta: number) {
             this.layoutRefresh();
             this.textRefresh();
         }
 
-        /**
-         * @private
-         */
         remove() {
             if (this._textLable) this._textLable.onAddRendererText = null;
             this._placeholderLabel = null;
@@ -524,9 +534,6 @@ namespace m4m.framework {
             this.onmouseout = null;
         }
 
-        /**
-         * @private
-         */
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean) {
             // if(this._isIos) return;
             if (oncap == false) {

@@ -67,6 +67,7 @@ namespace m4m.framework {
          * @classdesc
          * 获取rander 的材质
          * @version m4m 1.0
+         * @returns 引擎材质对象
          */
         getMaterial() {
             if (!this._uimat) {
@@ -78,11 +79,8 @@ namespace m4m.framework {
         private _darwRect: m4m.math.rect;
 
         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
          * 获取渲染绘制矩形边界
-         * @version m4m 1.0
+         * @returns rect (矩形边界)数据对象
          */
         getDrawBounds() {
             if (!this._darwRect) {
@@ -287,9 +285,6 @@ namespace m4m.framework {
             return this._imageBorder;
         }
 
-        /**
-         * @private
-         */
         render(canvas: canvas) {
             let mat = this.uimat;
             if (!mat) return;
@@ -322,7 +317,9 @@ namespace m4m.framework {
 
         }
 
-        //资源管理器中寻找 指定的贴图资源
+        /**
+         * 资源管理器中寻找 指定的贴图资源
+         */
         private searchTexture() {
             if (this._sprite) return;
             let assetmgr = this.transform.canvas.assetmgr;
@@ -343,9 +340,6 @@ namespace m4m.framework {
 
         private _cacheMaskV4: math.vector4;
 
-        /**
-         * @private
-         */
         start() {
 
         }
@@ -354,15 +348,9 @@ namespace m4m.framework {
 
         }
 
-        /**
-         * @private
-         */
         update(delta: number) {
         }
 
-        /**
-         * @private
-         */
         remove() {
             if (this._sprite) this._sprite.unuse();
             if (this._uimat) this._uimat.unuse();
@@ -372,7 +360,6 @@ namespace m4m.framework {
         }
 
         /**
-         * @private
          * 根据显示方式来准备数据
          */
         private prepareData() {
@@ -541,9 +528,6 @@ namespace m4m.framework {
 
         }
 
-        /**
-         * @private
-         */
         updateTran() {
             var m = this.transform.getWorldMatrix();
 
@@ -598,7 +582,9 @@ namespace m4m.framework {
         private max_x: number = Number.MAX_VALUE * -1;
         private min_y: number = Number.MAX_VALUE;
         private max_y: number = Number.MAX_VALUE * -1;
-        /** 计算drawRect */
+        /**
+         * 计算实际渲染绘制覆盖到的区域 Rect
+         */
         private calcDrawRect() {
             if (!this._darwRect) return;
             //drawBounds (y 轴反向)
@@ -626,10 +612,7 @@ namespace m4m.framework {
             poolv2_del(maxPos);
         }
 
-
-
         /**
-         * @private
          * 更新quad的顶点数据
          */
         private updateQuadData(x0: number, y0: number, x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, quadIndex = 0, mirror: boolean = false) {
@@ -665,7 +648,6 @@ namespace m4m.framework {
         }
 
         /**
-         * @private
          * 更新常规数据
          */
         private updateSimpleData(x0: number, y0: number, x1: number, y1: number, x2: number, y2: number, x3: number, y3: number) {
@@ -673,7 +655,6 @@ namespace m4m.framework {
         }
 
         /**
-         * @private
          * 更新9宫数据
          */
         private updateSlicedData(x0: number, y0: number, x1: number, y1: number, x2: number, y2: number, x3: number, y3: number) {
@@ -877,7 +858,6 @@ namespace m4m.framework {
         }
 
         /**
-         * @private
          * 更新填充数据
          */
         private updateFilledData(x0: number, y0: number, x1: number, y1: number, x2: number, y2: number, x3: number, y3: number) {
@@ -1182,7 +1162,6 @@ namespace m4m.framework {
         }
 
         /**
-         * @private
          * 更新瓦片数据。这里只是没有border的瓦片。如果有border就要复杂很多
          */
         private updateTiledData(x0: number, y0: number, x1: number, y1: number, x2: number, y2: number, x3: number, y3: number) {

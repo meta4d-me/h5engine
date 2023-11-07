@@ -30,6 +30,12 @@ namespace m4m.framework
      */
     export interface I2DPointListener
     {
+        /**
+         * Point(点)事件触发
+         * @param canvas 引擎 canvas 对象
+         * @param ev Point(点)事件
+         * @param oncap 是捕获阶段？
+         */
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean);
     }
 

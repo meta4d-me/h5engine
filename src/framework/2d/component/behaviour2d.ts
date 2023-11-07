@@ -37,6 +37,7 @@ namespace m4m.framework
         update(delta: number) {
 
         }
+        /** 销毁时调用 */
         remove() {
             
         }

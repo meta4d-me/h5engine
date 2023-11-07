@@ -12,10 +12,18 @@ namespace m4m.framework {
      * @version m4m 1.0
      */
     export interface INodeComponent {
+        /** 初始化时调用  在start 之后*/
         onPlay();
+        /** 初始化时调用 */
         start();
+         /**
+         * 每帧调用一次
+         * @param delta 上一帧的消耗时间(单位s)
+         */
         update(delta: number);
+        /** 节点对象 */
         gameObject: gameObject;
+        /** 销毁时调用 */
         remove();
         // clone();         //没有实际使用过 的接口
         // jsonToAttribute(json: any, assetmgr: assetMgr);
@@ -29,10 +37,18 @@ namespace m4m.framework {
      * @version m4m 1.0
      */
     export interface I2DComponent {
+        /** 初始化时调用  在start 之后*/
         onPlay();
+        /** 初始化时调用 */
         start();
+        /**
+         * 每帧调用一次
+         * @param delta 上一帧的消耗时间(单位s)
+         */
         update(delta: number);
+        /** 节点变换对象 */
         transform: transform2D;
+        /** 销毁时调用 */
         remove();
     }
 
@@ -57,12 +73,22 @@ namespace m4m.framework {
      * @version m4m 1.0
      */
     export interface IRectRenderer extends I2DComponent {
+        /**
+         * 执行渲染
+         * @param canvas 引擎 canvas 对象
+         */
         render(canvas: canvas);
-        //刷新顶点信息
+        /**
+         * 刷新顶点信息
+         */
         updateTran();
-        //获取渲染材质
+        /**
+         * 获取渲染材质
+         */
         getMaterial(): material;
-        //获取渲染边界(合并渲染深度排序会使用到)
+        /**
+         * 获取渲染边界(合并渲染深度排序会使用到)
+         */
         getDrawBounds(): m4m.math.rect;
     }
 

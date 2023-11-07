@@ -191,27 +191,20 @@ namespace m4m.framework
             this._fadeDuration = duration;
         }
 
-        /**
-         * @private
-         */
         start()
         {
         }
+
         onPlay(){
 
         }
 
-        /**
-         * @private
-         */
         update(delta: number)
         {
             // math.colorLerp();
         }
         transform: transform2D;
-        /**
-         * @private
-         */
+
         remove()
         {
             this._targetImage = null;
@@ -225,9 +218,7 @@ namespace m4m.framework
         private downPointV2 = new m4m.math.vector2();
         private isMovedLimit = false; //point 移动范围是否超出限制值
         private readonly movedLimit = 0.02; //point 移动范围限制值
-        /**
-         * @private
-         */
+
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean)
         {
             //oncap==true 是捕获阶段，一般的行为，只在pop阶段处理
@@ -344,6 +335,7 @@ namespace m4m.framework
         private _dragOut = false;
 
         /**
+         * 展示 Normal（正常）状态
          * @private
          */
         private showNormal()
@@ -363,6 +355,7 @@ namespace m4m.framework
 
         
         /**
+         * 展示 Press（按压）状态
          * @private
          */
         private showPress()
@@ -385,6 +378,11 @@ namespace m4m.framework
             }
         }
 
+        /**
+         * 尝试获取 sprite 资源
+         * @param spriteName sprite 资源名
+         * @returns sprite 资源
+         */
         private tryGetSprite(spriteName:string){
             let temp = assetMgr.mapNamed[spriteName];
             if(temp != null){
@@ -394,6 +392,8 @@ namespace m4m.framework
         }
 
         /**
+         * 改变按钮颜色
+         * @param targetColor 目标颜色
          * @private
          */
         private changeColor(targetColor: math.color): void
@@ -406,6 +406,8 @@ namespace m4m.framework
         }
 
         /**
+         * 改变按钮图案
+         * @param sprite sprite 资源
          * @private
          */
         private changeSprite(sprite: sprite)
