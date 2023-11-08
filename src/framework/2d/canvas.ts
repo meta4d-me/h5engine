@@ -20,6 +20,7 @@ namespace m4m.framework {
         private dataForEbo: Uint16Array;
 
         /**
+         * 初始化 2D batcher 的mesh buffer
          * @private
          */
         initBuffer(webgl: WebGL2RenderingContext, vf: render.VertexFormatMask, drawMode: render.DrawModeEnum) {
@@ -35,6 +36,7 @@ namespace m4m.framework {
         }
 
         /**
+         * batcher 且换到开始状态
          * @private
          */
         begin(webgl: WebGL2RenderingContext, pass: render.glDrawPass) {
@@ -50,6 +52,7 @@ namespace m4m.framework {
         //buffer 最大限制
         private static limitCount = 2048 * 64;
         /**
+         * batcher 填入增加部分mesh数据
          * @private
          */
         push(webgl: WebGL2RenderingContext, vbodata: number[], ebodata: number[]) {
@@ -96,6 +99,7 @@ namespace m4m.framework {
         }
 
         /**
+         * batcher 且换到结束状态，停止填入mesh
          * @private
          */
         end(webgl: WebGL2RenderingContext) {
@@ -431,7 +435,9 @@ namespace m4m.framework {
             this.lastMultiTouch = multiTouch;
         }
 
-        //捕获阶段流
+        /**
+         * 捕获阶段流
+         */
         private capturePointFlow() {
             //event 捕捉阶段，自上而下
             var list = this._pointEventCareList;
@@ -458,7 +464,9 @@ namespace m4m.framework {
             }
         }
 
-        //冒泡阶段流
+        /**
+         * 冒泡阶段流
+         */
         private popPointFlow() {
             var list = this._pointEventCareList;
             var buoy = this._peCareListBuoy;
@@ -485,6 +493,12 @@ namespace m4m.framework {
 
         private _insIdFrameMap: { [insID: number]: number } = {};
 
+        /**
+         * 场景节点树更新
+         * @param node 
+         * @param delta 
+         * @returns 
+         */
         private objupdate(node: transform2D, delta) {
             if (!node || !node.visible) return;
             let app = this.scene.app;
@@ -714,6 +728,10 @@ namespace m4m.framework {
             return !isInside;
         }
 
+        /**
+         * 渲染强制 Top模式的文本
+         * @returns 
+         */
         private renderTopLabels() {
             let len = canvas.helpLabelArr.length
             if (len < 1) return;

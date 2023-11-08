@@ -64,17 +64,11 @@ namespace m4m.framework
          */
         subTran: transform;
 
-        /**
-         * @private
-         */
         getBound()
         {
             return null;
         }
 
-        /**
-         * @private
-         */
         intersectsTransform(tran: transform): boolean
         {
             return false;
@@ -101,9 +95,6 @@ namespace m4m.framework
         //绑定这个canvas 从哪个camera 响应事件
         cameraTouch: camera;
 
-        /**
-         * @private
-         */
         start()
         {
             this.canvas.scene = this.gameObject.getScene();
@@ -178,9 +169,7 @@ namespace m4m.framework
         }
 
         private m_lastAsp = -1;
-        /**
-         * @private
-         */
+  
         update(delta: number)
         {
             let asp = this.canvas.pixelWidth / this.canvas.pixelHeight;
@@ -351,9 +340,6 @@ namespace m4m.framework
             m4m.math.pool.delete_vector3(ModelPos);
         }
 
-        /**
-         * @private
-         */
         render(context: renderContext, assetmgr: assetMgr, camera: m4m.framework.camera)
         {
            // if (!(camera.CullingMask & this.renderLayer)) return;
@@ -361,14 +347,12 @@ namespace m4m.framework
             this.canvas.render(context, assetmgr);
         }
 
-        /**
-         * @private
-         */
         remove()
         {
 
         }
         /**
+         * [无效弃用接口]
          * @private
          */
         clone()

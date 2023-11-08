@@ -42,13 +42,23 @@ namespace m4m.framework {
         dw_imgCount: number;
 
         dw_fileCount: number;
-
+        /**
+         * onReady
+         */
         onReady: () => void;
+        /**
+         * 加载完毕回调
+         */
         onDownloadFinish: () => void;
         ready: boolean;
         isunload: boolean = false;
-
+        /**
+         * 解析成功执行函数
+         */
         parseResolve: (o?) => void;
+        /**
+         * 解析失败执行函数
+         */
         parseReject: (o: Error) => void;
         static reTryTest = {};
         constructor(url: string, private assetmgr: assetMgr, guid?: number) {
@@ -58,11 +68,22 @@ namespace m4m.framework {
             this.name = url.substring(url.lastIndexOf("/") + 1);
             this.keyUrl = url.replace(assetMgr.cdnRoot, "");
         }
+
+        /**
+         * 生成GUID
+         * @returns 
+         */
         public static buildGuid() {
             //资源包自己的使用的GUID
             return --assetBundle.idNext;
         }
 
+        /**
+         * 获取Bundle的所有纹理
+         * @param texMap 纹理容器字典
+         * @param fileMap 文件字典
+         * @returns 所有纹理
+         */
         private getFixBundleTextures(texMap: fileIdMap, fileMap: fileIdMap): fileIdMap {
             let result: fileIdMap = {};
             let careBinMap = assetBundle.careBinTexMap;
@@ -90,7 +111,11 @@ namespace m4m.framework {
 
 
 
-        //解析资源包描述文件 和下载
+        /**
+         * 解析资源包描述文件 和下载
+         * @param data json文本字符串数据
+         * @returns Promise
+         */
         parseBundle(data: string) {
             return new Promise((resolve, reject) => {
                 this.parseResolve = resolve;
@@ -222,7 +247,9 @@ namespace m4m.framework {
             });
         }
 
-        //解包
+        /**
+         * 解包
+         */
         private unpkg() {
             for (let i = this.pkgsGuid.length - 1; i >= 0; --i) {
                 var pkgGuid = this.pkgsGuid[i];
@@ -275,7 +302,10 @@ namespace m4m.framework {
 
         }
 
-        //解析
+        /**
+         * 解析文件
+         * @returns Promise
+         */
         async parseFile() {
             if (this.onDownloadFinish)
                 this.onDownloadFinish();
@@ -354,6 +384,10 @@ namespace m4m.framework {
             this.parseResolve();
         }
 
+        /**
+         * 卸载资源
+         * @param disposeNow 
+         */
         unload(disposeNow: boolean = false) {
             this.isunload = true;
             for (let k in this.files) {
@@ -378,6 +412,10 @@ namespace m4m.framework {
             delete assetMgr.mapBundleNamed[this.guid];
             delete assetMgr.mapGuid[this.guid];
         }
+        /**
+         * 失败调用函数
+         * @param error 
+         */
         fail(error: Error) {
             assetBundle.reTryTest[this.name] = 1;
             // this.unload(true);

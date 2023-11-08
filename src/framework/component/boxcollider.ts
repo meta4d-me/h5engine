@@ -4,7 +4,13 @@ namespace m4m.framework {
     export interface ICollider {
         gameObject: gameObject;
         subTran: transform;
-        getBound();
+        /** 获取 边界包围数据对象*/
+        getBound() : any;
+        /**
+         * 与一个指定节点检测是否相交
+         * @param tran 指定节点对象
+         * @returns 是否相交
+         */
         intersectsTransform(tran: transform): boolean;
     }
     /**

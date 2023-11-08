@@ -6,7 +6,11 @@ namespace m4m {
     export var m4m_reflect_root:any = {};
     
     export namespace reflect {
-
+        /**
+         * 是组件？
+         * @param type 类型字符串
+         * @returns bool
+         */
         export function isComp(type:string)
         {
            return m4m_reflect_root.__gdmeta__[type] && 
@@ -14,6 +18,7 @@ namespace m4m {
             m4m_reflect_root.__gdmeta__[type].__gdmeta__.class.custom.nodecomp;
         }
         /**
+         * 注册类型
          * @private
          */
         function regType(constructorObj: any, customInfo: { [id: string]: string }) {
@@ -47,6 +52,7 @@ namespace m4m {
             }
         }
         /**
+         * 注册函数
          * @private
          */
         function regFunc(target: any, funcname: string, customInfo: { [id: string]: string }) {
@@ -77,6 +83,7 @@ namespace m4m {
             }
         }
         /**
+         * 注册字段
          * @private
          */
         function regField(target: Object, fieldName: string, customInfo: { [id: string]: any }) {
@@ -110,6 +117,8 @@ namespace m4m {
         }
 
         /**
+         * [已弃用]
+         * 获取原型列表 
          * @private
          */
         export function getPrototypes(): { [id: string]: any } {
@@ -117,12 +126,14 @@ namespace m4m {
             return m4m_reflect_root["__gdmeta__"];
         }
         /**
+         * 获取原型列表
          * @private
          */
         export function getPrototype(name: string) {
             return m4m_reflect_root["__gdmeta__"][name];
         }
         /**
+         * 创建实例对象
          * @private
          */
         export function createInstance(prototype: any, matchTag: { [id: string]: string }): any {
@@ -146,6 +157,7 @@ namespace m4m {
             }
         }
         /**
+         * 获取类名
          * @private
          */
         export function getClassName(prototype: any) {
@@ -153,6 +165,7 @@ namespace m4m {
             return info;
         }
         /**
+         * 获取类Tag
          * @private
          */
         export function getClassTag(prototype: any, tag: string) {
@@ -160,6 +173,7 @@ namespace m4m {
             return info[tag];
         }
         /**
+         * 获取引擎元标记数据
          * @private
          */
         export function getMeta(prototype: any): any {
@@ -167,6 +181,7 @@ namespace m4m {
             return meta;
         }
         /**
+         * [已弃用]
          * @private
          */
         export function attr_Class(constructorObj: any) {
@@ -175,6 +190,7 @@ namespace m4m {
 
 
         /**
+         * [已弃用]
          * @private
          */
         export function attr_Func(customInfo: { [id: string]: string } = null) {
@@ -183,6 +199,7 @@ namespace m4m {
             }
         }
         /**
+         * [已弃用]
          * @private
          */
         export function attr_Field(customInfo: { [id: string]: string } = null) {
@@ -191,32 +208,36 @@ namespace m4m {
             }
         }
 
-
         /**
+         * [已弃用]
          * @private
          */
         export function userCode(constructorObj: any) {
             regType(constructorObj, { "usercode": "1" });
         }
         /**
+         * [已弃用]
          * @private
          */
         export function editorCode(constructorObj: any) {
             regType(constructorObj, { "editorcode": "1" });
         }
         /**
+         * 装饰器 自我克隆
          * @private
          */
         export function selfClone(constructorObj: any) {
             regType(constructorObj, { "selfclone": "1" });
         }
         /**
+         * 装饰器 组件
          * @private
          */
         export function nodeComponent(constructorObj: any) {
             regType(constructorObj, { "nodecomp": "1" });
         }
         /**
+         * [已弃用]
          * @private
          */
         export function nodeComponentInspector(constructorObj: any) {
@@ -230,54 +251,63 @@ namespace m4m {
             regType(constructorObj, { "renderer": "1" });
         }
         /**
+         * 装饰器 相机
          * @private
          */
         export function nodeCamera(constructorObj: any) {
             regType(constructorObj, { "camera": "1" });
         }
         /**
+         * 装饰器 光源
          * @private
          */
         export function nodeLight(constructorObj: any) {
             regType(constructorObj, { "light": "1" });
         }
         /**
+         * 装饰器 box碰撞体
          * @private
          */
         export function nodeBoxCollider(constructorObj: any) {
             regType(constructorObj, { "boxcollider": "1" });
         }
         /**
+         * 装饰器 2d Box碰撞体
          * @private
          */
         export function nodeBoxCollider2d(constructorObj: any) {
             regType(constructorObj, { "boxcollider2d": "1" });
         }
         /**
+         * 装饰器 2D物理对象标记
          * @private
          */
         export function node2DPhysicsBody(constructorObj: any) {
             regType(constructorObj, { "node2dphysicsbody": "1" });
         }
         /**
+         * 装饰器 球碰撞体
          * @private
          */
         export function nodeSphereCollider(constructorObj: any) {
             regType(constructorObj, { "spherecollider": "1" });
         }
         /**
+         * 装饰器 特效合批
          * @private
          */
         export function nodeEffectBatcher(constructorObj: any) {
             regType(constructorObj, { "effectbatcher": "1" });
         }
         /**
+         * 装饰器 网格碰撞体
          * @private
          */
         export function nodeMeshCollider(constructorObj: any) {
             regType(constructorObj, { "meshcollider": "1" });
         }
         /**
+         * 装饰器 canvas渲染 碰撞体
          * @private
          */
         export function nodeCanvasRendererCollider(constructorObj: any) {
@@ -291,24 +321,28 @@ namespace m4m {
             regType(constructorObj, { "2dcomp": "1" });
         }
         /**
+         * [已弃用]
          * @private
          */
         export function pluginMenuItem(constructorObj: any) {
             regType(constructorObj, { "plugin_menuitem": "1" });
         }
         /**
+         * [已弃用]
          * @private
          */
         export function pluginWindow(constructorObj: any) {
             regType(constructorObj, { "plugin_window": "1" });
         }
         /**
+         * [已弃用]
          * @private
          */
         export function pluginExt(constructorObj: any) {
             regType(constructorObj, { "plugin_ext": "1" });
         }
         /**
+         * [已弃用]
          * @private
          */
         export function compValue(integer: boolean = false, defvalue: number = 0, min: number = Number.MIN_VALUE, max: number = Number.MAX_VALUE) {
@@ -324,6 +358,7 @@ namespace m4m {
         }
 
         /**
+         * 装饰器 组件调用
          * @private
          */
         export function compCall(customInfo: { [id: string]: string } = null) {
@@ -333,10 +368,8 @@ namespace m4m {
             }
         }
 
-
-
-
         /**
+         * 装饰器 序列化类型
          * @private
          */
         export function SerializeType(constructorObj: any) {

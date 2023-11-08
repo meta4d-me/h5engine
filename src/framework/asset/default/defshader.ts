@@ -428,6 +428,10 @@ namespace m4m.framework {
             }
         `;
 
+        /**
+         * 初始化默认着色器
+         * @param assetmgr 资源管理
+         */
         static initDefaultShader(assetmgr: assetMgr) {
             var pool = assetmgr.shaderPool;
             //鍙戠幇鏄簳灞備竴涓紩鐢ㄤ贡浜嗭紝鍘熺粨鏋勬病闂

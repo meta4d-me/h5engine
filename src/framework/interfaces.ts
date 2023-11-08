@@ -103,7 +103,12 @@ namespace m4m.framework {
         layer: RenderLayerEnum;
         renderLayer: number;  //后期发现 和 gameObject.layer 概念冲突 ，实现时 对接处理
         queue: number;
-
+        /**
+         * 执行渲染
+         * @param context 引擎渲染上下文对象
+         * @param assetmgr 引擎资源管理
+         * @param camera 相机对象
+         */
         render(context: renderContext, assetmgr: assetMgr, camera: camera);
     }
 

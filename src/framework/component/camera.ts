@@ -92,8 +92,19 @@ namespace m4m.framework
     {
         init: boolean;
         sortOrder: number;
+        /** 初始化调用一次 */
         start(camera: camera);
+        /**
+         * 执行渲染
+         * @param context 渲染上下文
+         * @param assetmgr 资源管理
+         * @param camera 相机
+         */
         render(context: renderContext, assetmgr: assetMgr, camera: camera);
+        /**
+         * 执行更新
+         * @param delta 上一循环间隔时间
+         */
         update(delta: number);
     }
     /**

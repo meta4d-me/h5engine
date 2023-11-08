@@ -34,7 +34,9 @@ namespace m4m.framework
             super.start();
         }
 
-        //校准 重心 初始位置
+        /**
+         * 校准 重心 初始位置
+         */
         private fixCenter(){
             let max = this.body.bounds.max;
             let min = this.body.bounds.min;
@@ -50,6 +52,12 @@ namespace m4m.framework
             poolv2_del(offset);
         }
 
+        /**
+         * 计算矩形包围 的中心点
+         * @param max 矩形包围的max坐标
+         * @param min 矩形包围的min坐标
+         * @param center 输出中心坐标
+         */
         private calceBoundingCenter(max:{x:number,y:number},min:{x:number,y:number},center:math.vector2){
             center.x = (max.x + min.x)/2;
             center.y = (max.y + min.y)/2;

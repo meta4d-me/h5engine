@@ -11,7 +11,10 @@ namespace m4m.framework
         static readonly pyramid = "pyramid";
         static readonly cylinder = "cylinder";
         static readonly circleline = "circleline";
-
+        /**
+         * 初始化默认mesh
+         * @param assetmgr 材质管理
+         */
         static initDefaultMesh(assetmgr: assetMgr)
         {
             assetmgr.mapDefaultMesh[this.cube] = this.createDefaultMesh(this.cube, m4m.render.meshData.genBoxCCW(1.0), assetmgr.webgl);
@@ -25,6 +28,13 @@ namespace m4m.framework
             assetmgr.mapDefaultMesh[this.circleline] = this.createDefaultMesh(this.circleline, m4m.render.meshData.genCircleLineCCW(1), assetmgr.webgl);
         }
 
+        /**
+         * 创建默认mesh
+         * @param name mesh名
+         * @param meshData mesh数据
+         * @param webgl webgl上下文
+         * @returns mesh
+         */
         private static createDefaultMesh(name: string, meshData: render.meshData, webgl: WebGL2RenderingContext): mesh
         {
             var _mesh: m4m.framework.mesh = new m4m.framework.mesh(name + ".mesh.bin");

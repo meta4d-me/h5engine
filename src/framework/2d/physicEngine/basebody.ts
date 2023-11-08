@@ -46,8 +46,9 @@ namespace m4m.framework {
         isSensor():boolean;
         /**是否是静态 */
         isStatic():boolean;
-
+        /** 物理一次计算执行前调用 */
         beforeStep();
+        /** 物理一次计算执行后调用 */
         afterStep();
     }
     export interface I2dPhyBodyData {
@@ -273,7 +274,10 @@ namespace m4m.framework {
             }
         }
 
-        //通过 物理设置角度
+        /**
+         * 通过 物理设置位置坐标
+         * @param pos 位置坐标
+         */
         private setPositionByPhy(pos: math.Ivec2){
             this._physicsEngine.setPosition(this.body , pos);
         }
@@ -292,7 +296,10 @@ namespace m4m.framework {
             }
         }
 
-        //通过 物理设置角度
+        /**
+         * 通过 物理设置角度
+         * @param angle 角度值
+         */
         private setAngleByPhy(angle:number){
             this._physicsEngine.setAngle(this.body,angle);
         }
@@ -393,7 +400,9 @@ namespace m4m.framework {
 
         private lastPos = new math.vector2();
         private lastRot = 0;
-        //设置物理的 旋转、位移
+        /**
+         * 设置物理的 旋转、位移
+         */
         private setPhyBodyTransformation(){
             let tran = this.transform;
             let lpos = tran.localTranslate;
@@ -424,7 +433,9 @@ namespace m4m.framework {
             this.beforeAngle = this.body.angle;
         }
 
-        //从物理 设置 旋转、位移
+        /**
+         * 从物理 设置 旋转、位移
+         */
         private setTransformationFormPhyBody(){
             let trans = this.transform;
             let bPos = this.body.position;
