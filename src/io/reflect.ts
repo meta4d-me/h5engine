@@ -117,7 +117,7 @@ namespace m4m {
         }
 
         /**
-         * [已弃用]
+         * @deprecated [已弃用]
          * 获取原型列表 
          * @private
          */
@@ -181,7 +181,7 @@ namespace m4m {
             return meta;
         }
         /**
-         * [已弃用]
+         * @deprecated [已弃用]
          * @private
          */
         export function attr_Class(constructorObj: any) {
@@ -190,7 +190,7 @@ namespace m4m {
 
 
         /**
-         * [已弃用]
+         * @deprecated [已弃用]
          * @private
          */
         export function attr_Func(customInfo: { [id: string]: string } = null) {
@@ -199,7 +199,7 @@ namespace m4m {
             }
         }
         /**
-         * [已弃用]
+         * @deprecated [已弃用]
          * @private
          */
         export function attr_Field(customInfo: { [id: string]: string } = null) {
@@ -209,14 +209,14 @@ namespace m4m {
         }
 
         /**
-         * [已弃用]
+         * @deprecated [已弃用]
          * @private
          */
         export function userCode(constructorObj: any) {
             regType(constructorObj, { "usercode": "1" });
         }
         /**
-         * [已弃用]
+         * @deprecated [已弃用]
          * @private
          */
         export function editorCode(constructorObj: any) {
@@ -237,7 +237,7 @@ namespace m4m {
             regType(constructorObj, { "nodecomp": "1" });
         }
         /**
-         * [已弃用]
+         * @deprecated [已弃用]
          * @private
          */
         export function nodeComponentInspector(constructorObj: any) {
@@ -321,28 +321,28 @@ namespace m4m {
             regType(constructorObj, { "2dcomp": "1" });
         }
         /**
-         * [已弃用]
+         * @deprecated [已弃用]
          * @private
          */
         export function pluginMenuItem(constructorObj: any) {
             regType(constructorObj, { "plugin_menuitem": "1" });
         }
         /**
-         * [已弃用]
+         * @deprecated [已弃用]
          * @private
          */
         export function pluginWindow(constructorObj: any) {
             regType(constructorObj, { "plugin_window": "1" });
         }
         /**
-         * [已弃用]
+         * @deprecated [已弃用]
          * @private
          */
         export function pluginExt(constructorObj: any) {
             regType(constructorObj, { "plugin_ext": "1" });
         }
         /**
-         * [已弃用]
+         * @deprecated [已弃用]
          * @private
          */
         export function compValue(integer: boolean = false, defvalue: number = 0, min: number = Number.MIN_VALUE, max: number = Number.MAX_VALUE) {

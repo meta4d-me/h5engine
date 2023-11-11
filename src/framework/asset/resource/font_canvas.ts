@@ -40,6 +40,8 @@ namespace m4m.framework {
             }
 
         }
+        
+        /** 是否是 SDF */
         IsSDF(): boolean {
             return false;
         }

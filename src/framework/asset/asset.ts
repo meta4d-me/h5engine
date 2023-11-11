@@ -19,6 +19,7 @@ namespace m4m.framework {
             return next;
         }
         private id: number;
+        /** 获取资源的唯一ID */
         getID(): number {
             return this.id;
         }
@@ -36,6 +37,10 @@ namespace m4m.framework {
             this.name = text;
         }
         private name: string;
+        /**
+         * 获取文本字符串数据
+         * @returns 文本字符串数据
+         */
         getText(): string {
             return this.name;
         }

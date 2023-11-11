@@ -762,25 +762,25 @@ namespace m4m.framework
             return this.assetUrlDic[asset.getGUID()];
         }
         maploaded: { [url: string]: IAsset };// = {};
-        /** [已弃用] */
+        /** @deprecated [已弃用] */
         savePrefab(trans: transform, prefabName: string, fun: (data: SaveInfo, resourses?: string[], contents?: any[]) => void)
         {
         }
-        /** [已弃用] */
+        /** @deprecated [已弃用] */
         loadCompressBundle(url: string, a?)
         {
         }
-        /** [已弃用] */
+        /** @deprecated [已弃用] */
         loadImmediate(url: string)
         {
             return null;
         }
-        /** [已弃用] */
+        /** @deprecated [已弃用] */
         getAssetBundle(url: string): assetBundle
         {
             return this.name_bundles[url];
         }
-        /** [已弃用] */
+        /** @deprecated [已弃用] */
         releaseUnuseAsset()
         {
         }

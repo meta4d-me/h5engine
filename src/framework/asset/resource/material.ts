@@ -231,6 +231,12 @@ namespace m4m.framework {
             glstate_lightmapRGBAF16: true
         }
 
+        /**
+         * 提交 uniform 数据到webgl API
+         * @param pass 绘制的 glDrawPass 对象
+         * @param context webgl 上下文
+         * @param lastMatSame 是否和上一次渲染提交的材质相同
+         */
         uploadUnifoms(pass: render.glDrawPass, context: renderContext, lastMatSame = false) {
             render.shaderUniform.texindex = 0;
             let udMap = this.uniformDirtyMap;
@@ -332,6 +338,11 @@ namespace m4m.framework {
         //     this.instanceAttribValMap[id] = arr;
         // }
 
+        /**
+         * 获取 GPU实例 Attrib值
+         * @param id AttribID
+         * @returns 值
+         */
         private getInstanceAttribValue(id: string) {
             if (this.instanceAttribIDValMap[id] == null) {
                 this.instanceAttribIDValMap[id] = [];
@@ -436,7 +447,9 @@ namespace m4m.framework {
         statedMapUniforms: { [id: string]: any } = {};
         //private mapUniformTemp: {[id: string]: UniformData}={};
         /**
-         * @private
+         * 设置 float 格式的 uniform 值 
+         * @param _id uniform ID
+         * @param _number 值
          */
         setFloat(_id: string, _number: number) {
             if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float) {
@@ -454,7 +467,11 @@ namespace m4m.framework {
                 arr[0] = _number ?? 0;
             }
         }
-
+        /**
+         * 设置 Int 格式的 uniform 值 
+         * @param _id uniform ID
+         * @param _number 值
+         */
         setInt(_id: string, _number: number) {
             if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Int) {
                 if (this.statedMapUniforms[_id] != _number) {
@@ -472,8 +489,10 @@ namespace m4m.framework {
             }
         }
         /**
-         * @private
-         */
+        * 设置 Float数组 格式的 uniform 值 
+        * @param _id uniform ID
+        * @param _number 值
+        */
         setFloatv(_id: string, _numbers: Float32Array) {
             if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Floatv) {
                 this.statedMapUniforms[_id] = _numbers;
@@ -488,8 +507,10 @@ namespace m4m.framework {
             }
         }
         /**
-         * @private
-         */
+        * 设置 Vector4 格式的 uniform 值 
+        * @param _id uniform ID
+        * @param _number 值
+        */
         setVector4(_id: string, _vector4: math.vector4) {
             if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float4) {
                 this.statedMapUniforms[_id] = _vector4;
@@ -512,8 +533,10 @@ namespace m4m.framework {
             }
         }
         /**
-         * @private
-         */
+        * 设置 Vector4数组 格式的 uniform 值 
+        * @param _id uniform ID
+        * @param _number 值
+        */
         setVector4v(_id: string, _vector4v: Float32Array) {
             if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float4v) {
                 this.statedMapUniforms[_id] = _vector4v;
@@ -528,8 +551,10 @@ namespace m4m.framework {
             }
         }
         /**
-         * @private
-         */
+        * 设置 矩阵 格式的 uniform 值 
+        * @param _id uniform ID
+        * @param _number 值
+        */
         setMatrix(_id: string, _matrix: math.matrix) {
             if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float4x4) {
                 this.statedMapUniforms[_id] = _matrix;
@@ -544,8 +569,10 @@ namespace m4m.framework {
             }
         }
         /**
-         * @private
-         */
+        * 设置 矩阵数组 格式的 uniform 值 
+        * @param _id uniform ID
+        * @param _number 值
+        */
         setMatrixv(_id: string, _matrixv: Float32Array) {
             if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float4x4v) {
                 this.statedMapUniforms[_id] = _matrixv;
@@ -559,11 +586,11 @@ namespace m4m.framework {
                 this.setInsAttribVal(_id, 16, _matrixv);
             }
         }
-
-
         /**
-         * @private
-         */
+        * 设置 纹理 格式的 uniform 值 
+        * @param _id uniform ID
+        * @param _number 值
+        */
         setTexture(_id: string, _texture: m4m.framework.texture, resname: string = "") {
             // if((this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Texture) || _id == "_LightmapTex"){
             if (!(this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Texture) && _id != "_LightmapTex") {
@@ -624,7 +651,10 @@ namespace m4m.framework {
             }
         }
 
-        //贴图使用唯一标识ID，gupInstance 使用
+        /**
+         * 贴图使用唯一标识ID，gupInstance 使用
+         * @param mat 材质
+         */
         private getTexGuid(mat: material) {
             let staMap = mat.statedMapUniforms;
             this._textureGUID = "";
@@ -636,6 +666,11 @@ namespace m4m.framework {
             }
         }
 
+        /**
+         * 获取指定shader的GUID
+         * @param sh 指定shader
+         * @returns guid
+         */
         private getShaderGuid(sh: m4m.framework.shader) {
             if (!sh) return;
             if (!sh.passes["instance"] && !sh.passes["instance_fog"]) {
@@ -645,6 +680,10 @@ namespace m4m.framework {
             }
         }
 
+        /**
+         * 刷新GPU实例 GUID
+         * @returns 
+         */
         private refreshGpuInstancingGUID() {
             if (!this._shaderGUID) {
                 this.gpuInstancingGUID = "";
@@ -653,6 +692,11 @@ namespace m4m.framework {
             this.gpuInstancingGUID = `${this._shaderGUID}_${this._textureGUID}`;
         }
 
+        /**
+        * 设置 cube纹理 格式的 uniform 值 
+        * @param _id uniform ID
+        * @param _number 值
+        */
         setCubeTexture(_id: string, _texture: m4m.framework.texture) {
             if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.CubeTexture) {
                 if (this.statedMapUniforms[_id] != null && (!this.statedMapUniforms[_id].defaultAsset)) {
@@ -877,6 +921,10 @@ namespace m4m.framework {
             return mat;
         }
 
+        /**
+         * 序列成字符串，方便保存
+         * @returns 序列json字符串数据
+         */
         public save(): string {
             let obj: any = {};
             obj["shader"] = this.shader.getName();

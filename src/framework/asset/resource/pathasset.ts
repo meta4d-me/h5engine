@@ -172,6 +172,9 @@ namespace m4m.framework
            return  this;
         }
         private lines:Array<m4m.math.vector3>[]=[];
+        /**
+         * 获取 路径
+         */
         private getpaths()
         {
             var line=new Array();
@@ -248,6 +251,13 @@ namespace m4m.framework
             }
         }
 
+        /**
+         * 沿曲线获取贝塞尔点
+         * @param points 点列表
+         * @param rate 比率
+         * @param clearflag 是否清理
+         * @returns 点
+         */
         private getBeisaierPointAlongCurve(points:any[],rate:number,clearflag:boolean=false):m4m.math.vector3
         {
             var length=points.length;
@@ -279,6 +289,14 @@ namespace m4m.framework
             }
             return this.getBeisaierPointAlongCurve(temptpoints,rate,true);
         }
+
+        /**
+         * 3维向量 差值
+         * @param start 开始值 
+         * @param end 结束值
+         * @param lerp 差值度
+         * @param out 输出结果
+         */
         private vec3Lerp(start:m4m.math.vector3,end:m4m.math.vector3,lerp:number,out:m4m.math.vector3)
         {
             m4m.math.vec3Subtract(end,start,out);

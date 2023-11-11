@@ -131,6 +131,11 @@ namespace m4m.framework {
             //throw "use too mush memory";
         }
 
+        /**
+         * 颜色编码 hex 转RGB
+         * @param hex hex Color 
+         * @returns RGB color
+         */
         hexToRgb = hex =>
             hex?.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i
                 , (m, r, g, b) => '#' + r + r + g + g + b + b)
@@ -138,6 +143,21 @@ namespace m4m.framework {
                 .map(x => parseInt(x, 16) / 255);
 
         buffers: bin[];
+        
+        /**
+         * 异步加载 glft资源
+         * @param mgr 资源管理器
+         * @param ctx webgl 上下文对象
+         * @param folder 文件目录路径
+         * @param brdf brdf 纹理
+         * @param env 间接光环境纹理（高频信息）
+         * @param irrSH 间接光环境纹理（低频信息）
+         * @param exposure HDR曝光度
+         * @param specFactor 镜面反射系数
+         * @param irrFactor 漫反射系数
+         * @param uvChecker 基础纹理
+         * @returns 引擎场景节点对象（异步） 
+         */
         async load(mgr: assetMgr, ctx: WebGL2RenderingContext, folder: string, brdf: texture, env: texture, irrSH: texture, exposure?, specFactor = 1, irrFactor = 1, uvChecker?: texture) {
             if (!this.data) {
                 console.error(`load fail , data is Null.`);
@@ -566,6 +586,18 @@ namespace m4m.framework {
             roots.forEach(r => scene.addChild(r));
             return scene;
         }
+        
+        /**
+         * 解析gltf mesh 的 ebo部分
+         * @param ctx webgl上下文
+         * @param mf mesh对象
+         * @param primitives gltf primitives数据
+         * @param accessors gltf accessors数据
+         * @param materials 使用渲染材质
+         * @param hasLightMap 是否有LightMap
+         * @param lightMapTexs LightMap的纹理索引
+         * @param info mesh附信息
+         */
         static loadgltfebo_mix(ctx: WebGL2RenderingContext, mf: mesh, primitives: any[], accessors: any[], materials: material[],
             hasLightMap: boolean, lightMapTexs: texture[], info: meshinfo): void {
             let mdata = mf.data;
@@ -582,6 +614,17 @@ namespace m4m.framework {
 
             mf.glMesh.initVAO();
         }
+        /**
+         * 解析gltf mesh 的 ebo 独立的(不共享vbo)
+         * @param ctx webgl上下文
+         * @param mf mesh对象
+         * @param primitive gltf primitives数据
+         * @param accessors gltf accessors数据
+         * @param materials 使用渲染材质
+         * @param hasLightMap 是否有LightMap
+         * @param lightMapTexs LightMap的纹理索引
+         * @param info mesh附信息
+         */
         static loadgltfebo_one(ctx: WebGL2RenderingContext, mf: mesh, primitive: any, accessors: any[], materials: material[],
             hasLightMap: boolean, lightMapTexs: texture[], info: meshinfo): void {
             let mdata = mf.data;
@@ -598,6 +641,16 @@ namespace m4m.framework {
 
             mf.glMesh.initVAO();
         }
+        /**
+         * 解析gltf mesh 的 ebo
+         * @param eboacc 
+         * @param mf mesh对象
+         * @param outMat 使用渲染材质
+         * @param hasLightMap 是否有LightMap
+         * @param lightMapTexs LightMap的纹理索引
+         * @param info mesh附信息
+         * @param extensions gltf 拓展信息
+         */
         static loadgltfebo(eboacc: GltfAttr, mf: mesh, outMat: material, hasLightMap: boolean, lightMapTexs: texture[], info: meshinfo, extensions: any): void {
             //let eboacc = accessors[indices] as GltfAttr;
             //let eboAcc = new Accessor(accessors[indices], "indices");
@@ -657,6 +710,14 @@ namespace m4m.framework {
             info.outmats.push(outMat);
             info.lightMapTexST.push(lightMapTexST);
         }
+
+        /**
+         * 解析gltf mesh 的 vbo
+         * @param ctx webgl上下文
+         * @param mf mesh对象
+         * @param primitive gltf primitives数据
+         * @param accessors gltf accessors数据
+         */
         static loadgltfvbo(ctx: WebGL2RenderingContext, mf: mesh, primitive: any, accessors: any[]): void {
 
             let mdata = mf.data = new m4m.render.meshData();

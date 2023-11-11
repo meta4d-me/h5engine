@@ -18,7 +18,7 @@ namespace m4m.framework
         private static pixelHeight: number;
 
         /**
-         * 
+         * 解析
          * @param gl WebGL2RenderingContext
          * @param arrayBuffer contents of the ASTC container file
          */
@@ -59,7 +59,11 @@ namespace m4m.framework
             return result;
         }
 
-        //解码 
+        /**
+         * 解码
+         * @param ext webgl astc 拓展
+         * @param _buf 二进制buffer数据
+         */ 
         private static decodeBuffer(ext: WEBGL_compressed_texture_astc, _buf: ArrayBuffer)
         {
             const header = new Uint8Array(_buf, 0, this.HEADER_MAX);

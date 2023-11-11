@@ -15,9 +15,16 @@
         atlasWidth: number;
         /** 字符容器图的高度 */
         atlasHeight: number;
-
+        /**
+         * 强制确保字体包含 指定文本内的字符串
+         * @param text 指定文本
+         */
         EnsureString(text: string): void;
+        /**
+         * 获取字体纹理
+         */
         GetTexture():texture;
+        /** 是否是SDF */
         IsSDF():boolean;
     }
     /**
@@ -250,6 +257,10 @@
          * 字符宽度
          */
         xAddvance: number;//字符宽度
+        /**
+         * 计算内存占用长度
+         * @returns 
+         */
         static caclByteLength(): number {
             return 36;
         }

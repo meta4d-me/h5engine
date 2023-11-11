@@ -5,7 +5,13 @@ namespace m4m.framework
         beloop: boolean = false;
         lifeTime: number = 100;
         layers: F14LayerData[] = [];
-
+        /**
+         * 解析 JSON数据
+         * @param json JSON数据
+         * @param assetmgr 资源管理器
+         * @param assetbundle bundle名
+         * @returns F14EffectData对象
+         */
         parsejson(json: any, assetmgr: assetMgr, assetbundle: string)
         {
              
@@ -54,6 +60,12 @@ namespace m4m.framework
         {
         }
 
+        /**
+         * 解析
+         * @param json JSON数据
+         * @param assetmgr 资源管理器
+         * @param assetbundle bundle名
+         */
         parse(json: any, assetmgr: assetMgr, assetbundle: string)
         {
             // return new threading.gdPromise((resolve) =>

@@ -187,6 +187,12 @@ namespace m4m.framework
             this.fillUnDefUniform(this.passes["base"][0]);
         }
 
+        /**
+         * 解析属性
+         * @param assetmgr 资源管理器
+         * @param properties 属性
+         * @returns 
+         */
         public _parseProperties(assetmgr: assetMgr, properties: any)
         {
             this.defaultMapUniform = {};
@@ -239,6 +245,14 @@ namespace m4m.framework
                 }
             }
         }
+
+        /**
+         * 解析定义的渲染通道
+         * @param assetmgr 资源管理器
+         * @param json 数据
+         * @param type 类型
+         * @returns glDrawPass对象
+         */
         private _parsePass(assetmgr: assetMgr, json: any,type:string): render.glDrawPass
         {
             var pass = new render.glDrawPass();
@@ -330,6 +344,10 @@ namespace m4m.framework
             }
             return pass;
         }
+        /**
+         * 填充默认的 uniform 值
+         * @param pass 
+         */
         fillUnDefUniform(pass:render.glDrawPass)
         {
             for(let key in pass.mapuniforms)

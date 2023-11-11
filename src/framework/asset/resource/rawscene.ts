@@ -103,6 +103,9 @@ namespace m4m.framework
             let total = 0;
             return total;
         }
+        /**
+         * 重置 LightMap
+         */
         resetLightMap(assetmgr: assetMgr, bundleName: string = null)
         {
             this.lightmaps.length = 0;

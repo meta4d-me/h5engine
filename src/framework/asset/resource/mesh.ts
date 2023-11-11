@@ -123,10 +123,11 @@ namespace m4m.framework {
          */
         static useThead: boolean = true;
         //加载完成事件
+        /** 当读取完毕回调 */
         public onReadFinish: () => void;
         // //分片加载状态变量
         private reading = false;
-        // //分片加载器
+        /** 分片加载器 */
         private readProcess(read, data, objVF, vcount, vec10tpose, callback) {
 
             if (this.reading) return;
@@ -303,7 +304,7 @@ namespace m4m.framework {
                 });
             });
         }
-        //分片加载完成
+        /** 分片加载完成 */
         private readFinish(read, data, buf, objVF, webgl) {
             var subcount = read.readUInt8();
             data.trisindex = [];
@@ -371,6 +372,11 @@ namespace m4m.framework {
             });
         }
 
+        /**
+         * 是否是空字符串
+         * @param s 字符串
+         * @returns 
+         */
         isEmptyStr(s: string) {
             if (s == undefined || s == null || s == '') {
                 return true;
@@ -378,6 +384,10 @@ namespace m4m.framework {
             return false;
         }
 
+        /**
+         * @deprecated [已弃用]
+         * 解析面
+         */
         static parseFace(row: string, data: Int32Array, n: number, vcnt: number): number {
             var j: number = 0;
             while (row.charAt(0) != '\0') {
@@ -715,10 +725,10 @@ namespace m4m.framework {
             this.submesh = [];
             for (var i = 0; i < len; ++i) {
                 var _submeshinfo: subMeshInfo = new subMeshInfo();
-		//原来这个格式定的不支持32bit index了，
+                //原来这个格式定的不支持32bit index了，
                 _submeshinfo.start = read.readUInt16();
-		//如果你也碰到这个毛病，有个临时的处理方法
-		//read.readUInt16();
+                //如果你也碰到这个毛病，有个临时的处理方法
+                //read.readUInt16();
                 //_submeshinfo.start = data.trisindex.length;
                 _submeshinfo.size = read.readUInt32();
                 _submeshinfo.matIndex = i;//read.readUInt8();

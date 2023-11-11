@@ -47,6 +47,11 @@ namespace m4m.framework {
             }
         }
 
+        /**
+         * 解析 纹理
+         * @param tool 二进制工具对象
+         * @returns 纹理
+         */
         private parseV3(tool: m4m.io.binTool) {
 
             const ext = sceneMgr.app.webgl.extensions.WEBGL_compressed_texture_pvrtc;

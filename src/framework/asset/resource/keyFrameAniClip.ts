@@ -32,7 +32,7 @@ namespace m4m.framework {
      */
     @m4m.reflect.SerializeType
     export class keyFrameAniClip implements IAsset {
-        static readonly ClassName:string="keyFrameAniClip";
+        static readonly ClassName: string = "keyFrameAniClip";
 
         @m4m.reflect.Field("constText")
         private name: constText;
@@ -257,11 +257,17 @@ namespace m4m.framework {
             return kFAniClipUtil._typePair;
         }
 
+        /** @deprecated [已弃用] */
         static isUnityExp(tag: string) {
             if (StringUtil.isNullOrEmptyObject(tag)) return false;
             return tag.indexOf("unity") != -1;
         }
 
+        /**
+         * unity定义类型 转换为引擎定义类型
+         * @param tyep unity定义类型
+         * @returns 引擎定义类型
+         */
         static converUnityType(tyep: string) {
             let result = "";
             if (StringUtil.isNullOrEmptyObject(tyep)) return result;
@@ -276,6 +282,12 @@ namespace m4m.framework {
             return result;
         }
 
+        /**
+         * unity定义类型属性 转换为引擎定义类型属性
+         * @param tyep unity定义类型
+         * @param propertyName unity定义属性
+         * @returns 引擎定义属性
+         */
         static converUnityTypeProperty(tyep: string, propertyName: string) {
             let result = propertyName;
             if (StringUtil.isNullOrEmptyObject(propertyName)) return "";
@@ -295,7 +307,10 @@ namespace m4m.framework {
             return result;
         }
 
-        //注册转换 类型
+        /**
+         * 注册转换 类型
+         * @returns 注册数据字典对象
+         */
         private static regType() {
             let result = {};
             result["Transform"] = { "type": transform["name"] };
@@ -306,13 +321,24 @@ namespace m4m.framework {
             kFAniClipUtil.regProperty(result);
             return result;
         }
-        //注册转换 具体属性
+        
+        /**
+         * 注册转换 具体属性
+         * @param obj 被注册的对象
+         */
         private static regProperty(obj) {
             //Transform
             kFAniClipUtil.assemblyProp(obj, "Transform", "m_LocalPosition", "localTranslate");
             kFAniClipUtil.assemblyProp(obj, "Transform", "m_LocalScale", "localScale");
             kFAniClipUtil.assemblyProp(obj, "Transform", "m_LocalRotation", "localRotate");
         }
+        /**
+         * 装配挂载属性
+         * @param obj 被装配对象
+         * @param Type 类型
+         * @param prop 属性
+         * @param replaceProp 替换属性
+         */
         private static assemblyProp(obj, Type: string, prop: string, replaceProp) {
             if (!obj["Transform"][kFAniClipUtil.propTag])
                 obj["Transform"][kFAniClipUtil.propTag] = {};

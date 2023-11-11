@@ -173,9 +173,7 @@
          */
         jsonstr: string;
         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
+         * @deprecated [已弃用]
          * 解析资源
          * @param jsonStr json数据
          * @param assetmgr 资源管理实例
@@ -211,6 +209,10 @@
             });
         }
 
+        /**
+         * 解析资源
+         * @param data 数据
+         */
         cParse(data: any)
         {
             this.jsonstr = data;
