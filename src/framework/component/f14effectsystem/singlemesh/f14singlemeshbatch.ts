@@ -5,10 +5,26 @@ namespace m4m.framework
         type:F14TypeEnum;
         effect:f14EffectSystem;
         //public F14Layer layer;
+        /**
+         * 渲染
+         * @param context 引擎渲染上下文 
+         * @param assetmgr 资源管理器
+         * @param camera 相机对象
+         * @param Effqueue 特效队列ID
+         */
         render(context: renderContext, assetmgr: assetMgr, camera: camera,Effqueue:number);
+        /**
+         * 取消渲染
+         */
         unRender();
-    
+        /**
+         * 销毁
+         */
         dispose();
+        /**
+         * 获取元素数量
+         * @returns 
+         */
         getElementCount():number;
     }
     

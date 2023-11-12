@@ -260,9 +260,6 @@ namespace m4m.framework {
             }
             return _mesh;
         }
-        /**
-        * @private
-        */
         remove() {
             if (this.subTran) {
                 this.subTran.dispose();

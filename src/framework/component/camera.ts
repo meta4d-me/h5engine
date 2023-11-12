@@ -6,6 +6,12 @@ namespace m4m.framework
      */
     export interface ICameraPostQueue
     {
+        /**
+         * 执行渲染
+         * @param scene 引擎场景 
+         * @param context 渲染上下文
+         * @param camera 相机
+         */
         render(scene: scene, context: renderContext, camera: camera);
         renderTarget: render.glRenderTarget;
     }
@@ -239,7 +245,7 @@ namespace m4m.framework
         get CurrContextIndex() { return this._contextIdx; }
         private _contextIdx = -1;
         /**
-         * @private
+         * @deprecated [已弃用]
          */
         @reflect.compCall({ "use": "dirty", "display": "刷新camera" })
         markDirty()
@@ -397,7 +403,10 @@ namespace m4m.framework
             this.sortOverLays(this.overlays);
         }
 
-        //overlays 排序
+        /**
+         * overlays 排序
+         * @param lays overlays列表
+         */
         private sortOverLays(lays: IOverLay[])
         {
             if (!lays || lays.length < 1) return;
@@ -654,17 +663,6 @@ namespace m4m.framework
         /**
          * @public
          * @language zh_CN
-         * @param app 主程序
-         * @param worldPos 世界坐标
-         * @param outScreenPos 屏幕坐标
-         * @classdesc
-         * 由世界坐标得到屏幕坐标
-         * @version m4m 1.0
-         */
-
-        /**
-         * @public
-         * @language zh_CN
          * @param app application
          * @param worldPos 世界空间坐标
          * @param outClipPos 计算返回裁剪空间坐标
@@ -682,8 +680,8 @@ namespace m4m.framework
         private lastCamRect = new math.rect();
         private paraArr = [NaN, NaN, NaN, NaN, NaN];  // [fov,near,far,opvalue,size]
         /**
-         * @private 计算相机框
-         * @param app
+         * 计算相机框
+         * @param app 引擎app对象
          */
         private calcCameraFrame(app: application)
         {
@@ -838,7 +836,11 @@ namespace m4m.framework
         }
 
         /**
-         * @private
+         * 通过屏幕空间坐标位置， 获取在view空间下，交汇到指定平面上的坐标位置
+         * @param screenPos 屏幕空间坐标
+         * @param app 引擎app对象
+         * @param z view 空间下Z轴值
+         * @param out 返回的结果坐标位置
          */
         getPosAtXPanelInViewCoordinateByScreenPos(screenPos: m4m.math.vector2, app: application, z: number, out: m4m.math.vector2)
         {
@@ -866,8 +868,10 @@ namespace m4m.framework
         private cullingMap = {};
         public isLastCamera = false;    // 场景渲染列表的最后一个相机, 用来清除物体frustumDirty
 
+
         /**
-        * @private
+        * 填充渲染节点
+        * @param scene 场景对象
         */
         fillRenderer(scene: scene)
         {
@@ -889,12 +893,15 @@ namespace m4m.framework
                 this.gameObject.transform.dirtiedOfFrustumCulling = false;
         }
 
-
-
         private static lastFID = -1;
         private needUpdateWpos = false;
 
-
+        /**
+         * 填充渲染节点
+         * @param scene 场景对象
+         * @param node 节点
+         * @param _isStatic 是否是静态节点
+         */
         private _fillRenderer(scene: scene, node: transform, _isStatic: boolean = false)
         {
             if (!node.needFillRenderer) return;  //强制不fill 
@@ -954,6 +961,11 @@ namespace m4m.framework
             nearRT: 7,
         }
         private _vec3cache = new m4m.math.vector3();
+        /**
+         * 检查节点是否被剔除
+         * @param node 被检查节点
+         * @returns 是被剔除？
+         */
         isCulling(node: transform)
         {
 
@@ -977,8 +989,8 @@ namespace m4m.framework
 
         /**
          * 剔除测试 ，返回 ture 确认为剔除
-         * @param radius 
-         * @param center 
+         * @param radius 半径
+         * @param center 中心点
          */
         cullTest(radius: number, center: math.vector3)
         {
@@ -1044,6 +1056,15 @@ namespace m4m.framework
 
         private _edge1 = new m4m.math.vector3();
         private _edge2 = new m4m.math.vector3();
+        /**
+         * 检测面与球面是否在面的右边
+         * @param v0 面的点0
+         * @param v1 面的点1
+         * @param v2 面的点2
+         * @param pos 球中心位置
+         * @param radius 球半径
+         * @returns 是在右边
+         */
         private isRight(v0: m4m.math.vector3, v1: m4m.math.vector3, v2: m4m.math.vector3, pos: m4m.math.vector3, radius: number)
         {
             const edge1 = this._edge1;
@@ -1061,8 +1082,7 @@ namespace m4m.framework
             return dis > 0;
         }
         /**
-         * [过时接口,完全弃用]
-        * @private
+         * @deprecated [已弃用]
         */
         testFrustumCulling(scene: scene, node: transform)
         {
@@ -1079,7 +1099,7 @@ namespace m4m.framework
             return true;
         }
         /**
-        * @private
+        *  刷新计算 RenderTarget 或 viewport 的绘制矩形区
         */
         _targetAndViewport(target: render.glRenderTarget, scene: scene, context: renderContext, withoutClear: boolean)
         {
@@ -1152,7 +1172,7 @@ namespace m4m.framework
             }
         }
         /**
-        * @private
+        * 将当前场景所有能渲染节点，执行渲染一次
         */
         _renderOnce(scene: scene, context: renderContext, drawtype: string)
         {
@@ -1216,8 +1236,11 @@ namespace m4m.framework
         */
         postQueues: ICameraPostQueue[] = [];
         /**
-        * @private
-        */
+         * 渲染场景
+         * @param scene 引擎场景 
+         * @param context 引擎渲染上下文
+         * @param contextIdx 上下文索引
+         */
         renderScene(scene: scene, context: renderContext, contextIdx: number)
         {
             this._contextIdx = contextIdx;// scene.renderContext.indexOf(context);
@@ -1278,16 +1301,10 @@ namespace m4m.framework
 
 
         }
-        /**
-        * @private
-        */
         remove()
         {
 
         }
-        /**
-        * @private
-        */
         clone()
         {
 

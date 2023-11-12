@@ -75,6 +75,11 @@ namespace m4m.framework
             this._delayTime = deley;
         }
 
+        /**
+         * 设置数据
+         * @param data 数据 
+         * @param bundleName bundle名 
+         */
         setData(data: F14EffectData, bundleName: string)
         {
             //-------------------准备各种需要访问
@@ -221,6 +226,9 @@ namespace m4m.framework
             //     this.elements[i].update(deltaTime, this.totalFrame, this.fps);
             // }
         }
+        /**
+         * 当结束一次循环后回调
+         */
         private OnEndOnceLoop()
         {
             for (let i = 0; i < this.elements.length; i++)
@@ -260,6 +268,13 @@ namespace m4m.framework
         private totalTime: number = 0;
         public restartFrame: number;
         totalFrame: number = 0;
+        /**
+         * 添加F14 层
+         * @param type F14 层
+         * @param layerdata 层数据
+         * @param bundleName bundle名
+         * @returns F14 层对象
+         */
         private addF14layer(type: F14TypeEnum, layerdata: F14LayerData, bundleName: string): F14Layer
         {
             if (type == F14TypeEnum.SingleMeshType)
@@ -327,7 +342,7 @@ namespace m4m.framework
             }
         }
 
-        //返回element个数（包含reflayer内部的）
+        /** 返回element个数（包含reflayer内部的） */
         public getElementCount(): number
         {
             let totalcount = 0;
@@ -349,6 +364,11 @@ namespace m4m.framework
         enabletimeFlow = false;
         enableDraw = false;
         private onFinish: any;
+        /**
+         * 播放F14 特效
+         * @param onFinish 当播放结束回调函数
+         * @param PlayRate 播放速率
+         */
         public play(onFinish: () => void = null, PlayRate: number = 1.0, )
         {
             if (this.allTime > 0)
@@ -371,6 +391,10 @@ namespace m4m.framework
             // this.playState=PlayStateEnum.play;
             // this.playRate=PlayRate;
         }
+
+        /**
+         * 结束播放
+         */
         public stop()
         {
             this.enabletimeFlow = false;
@@ -381,7 +405,9 @@ namespace m4m.framework
             // this.reset();
         }
 
-        //private bePause:boolean=false;
+        /**
+         * 暂停播放
+         */
         public pause()
         {
             // if(this.playState==PlayStateEnum.pause)
@@ -394,6 +420,10 @@ namespace m4m.framework
             this.enableDraw = true;
             this.enabletimeFlow = false;
         }
+        /**
+         * 改变颜色
+         * @param newcolor 颜色 
+         */
         public changeColor(newcolor: math.color)
         {
             for (let i = 0; i < this.elements.length; i++)
@@ -402,6 +432,10 @@ namespace m4m.framework
             }
         }
 
+        /**
+         * 改变透明度
+         * @param newAlpha 透明度 
+         */
         public changeAlpha(newAlpha: number)
         {
             for (let i = 0; i < this.elements.length; i++)
@@ -409,6 +443,8 @@ namespace m4m.framework
                 this.elements[i].changeAlpha(newAlpha);
             }
         }
+        
+        /** 重置 */
         reset()
         {
             this.allTime = 0;
@@ -418,10 +454,12 @@ namespace m4m.framework
                 this.elements[key].reset();
             }
         }
+        /** 克隆 */
         clone()
         {
 
         }
+        /** 移除 */
         remove()
         {
             this.data = null;

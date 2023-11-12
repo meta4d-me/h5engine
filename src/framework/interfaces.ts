@@ -61,7 +61,12 @@ namespace m4m.framework {
      */
     export interface ICollider2d {
         transform: transform2D;
+        /** 获取包围边界 */
         getBound(): obb2d;
+        /**
+         * 交叉检测
+         * @param tran 检测的节点 
+         */
         intersectsTransform(tran: transform2D): boolean;
     }
 

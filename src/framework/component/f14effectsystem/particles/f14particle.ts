@@ -61,6 +61,10 @@ namespace m4m.framework
         private emissionMatToWorld: math.matrix;
         private emissionWorldRotation: math.quaternion;
 
+        /**
+         * 获取发射到世界矩阵
+         * @returns 世界矩阵
+         */
         private getEmissionMatToWorld(): math.matrix
         {
             if (this.data.simulateInLocalSpace)
@@ -71,6 +75,11 @@ namespace m4m.framework
                 return this.emissionMatToWorld;
             }
         }
+
+        /**
+         * 获取发射到世界旋转
+         * @returns 世界旋转
+         */
         private getemissionWorldRotation(): math.quaternion
         {
             if (this.data.simulateInLocalSpace)
@@ -89,6 +98,11 @@ namespace m4m.framework
             this.element = element;
             this.initByEmissionData(data);
         }
+
+        /**
+         * 初始化通过发射数据
+         * @param data 发射数据
+         */
         public initByEmissionData(data: F14EmissionBaseData)
         {
             this.actived = true;
@@ -147,6 +161,10 @@ namespace m4m.framework
             // Vector3 worldStartPos = this.getElementMatToWorld() * this.StartPos;
         }
 
+        /**
+         * 更新
+         * @param deltaTime 上帧用时 
+         */
         public update(deltaTime: number)
         {
             if (!this.actived) return;
@@ -177,6 +195,9 @@ namespace m4m.framework
         private tempos = math.pool.new_vector3();
         private temcolor = math.pool.new_color();
         private temUv = math.pool.new_vector2();
+        /**
+         * 上传mesh data
+         */
         uploadMeshdata()
         {
             if (this.actived)
@@ -224,6 +245,9 @@ namespace m4m.framework
          */
 
         private transformVertex = new math.matrix();
+        /**
+         * 更新Local矩阵
+         */
         private updateLocalMatrix()
         {
             math.matrixMakeTransformRTS(this.localTranslate, this.localScale, this.localRotation, this.localMatrix);
@@ -236,6 +260,10 @@ namespace m4m.framework
                 m4m.math.matrixMultiply(this.emissionMatToWorld, this.localMatrix, this.transformVertex);
             }
         }
+
+        /**
+         * 更新位置
+         */
         private updatePos()
         {
             math.vec3ScaleByNum(this.speedDir, this.simulationSpeed * this.curLife, this.localTranslate);
@@ -249,6 +277,11 @@ namespace m4m.framework
                 math.pool.delete_vector3(moved);
             }
         }
+
+        /**
+         * 更新尺寸
+         * @returns 
+         */
         private updateSize()
         {
             if (this.data.enableSizeOverLifetime && this.sizeNodes.length > 0)
@@ -271,6 +304,9 @@ namespace m4m.framework
             }
         }
 
+        /**
+         * 更新Euler旋转
+         */
         private updateEuler()
         {
             if (this.data.enableRotOverLifeTime)
@@ -289,6 +325,10 @@ namespace m4m.framework
         private invParWorldRot = new math.quaternion();
 
         private worldStartPos = new math.vector3();
+        
+        /**
+         * 更新旋转
+         */
         private updateRot()
         {
             if (this.data.rendermodel == RenderModelEnum.Mesh)
@@ -376,6 +416,10 @@ namespace m4m.framework
 
             }
         }
+
+        /**
+         * 更新颜色
+         */
         private updateColor()
         {
             if (this.data.enableColorOverLifetime)
@@ -422,10 +466,20 @@ namespace m4m.framework
             this.Color.b = this.color.z;
             this.Color.a = this.alpha;
         }
+
+        /**
+         * 更新UV
+         */
         private updateUV()
         {
             this.getCurTex_ST(this.data);
         }
+
+        /**
+         * 更新当前纹理的 ST（缩放偏移）
+         * @param data 发射数据
+         * @returns 
+         */
         public getCurTex_ST(data: F14EmissionBaseData)
         {
             if (!data.enableTexAnimation) return;
@@ -445,6 +499,9 @@ namespace m4m.framework
             }
         }
 
+        /**
+         * 销毁
+         */
         dispose()
         {
             this.data = null;

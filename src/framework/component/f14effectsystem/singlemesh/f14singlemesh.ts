@@ -52,7 +52,10 @@ namespace m4m.framework
             this.dataforvbo=this.baseddata.mesh.data.genVertexDataArray(this.effect.VF);
             this.dataforebo=this.baseddata.mesh.data.genIndexDataArray() as Uint16Array;
         }
-    
+        
+        /**
+         * 刷新开始结束帧
+         */
         public refreshStartEndFrame()
         {
             if (this.layer.frameList.length == 0)
@@ -71,7 +74,6 @@ namespace m4m.framework
             }
         }
     
-        
         public update(deltaTime:number,frame:number, fps:number)
         {
             if (this.layer.frameList.length == 0)
@@ -124,6 +126,9 @@ namespace m4m.framework
         }
 
         targetMat:math.matrix=new math.matrix();
+        /**
+         * 刷新目标矩阵
+         */
         public refreshTargetMatrix()
         {
             // math.quatFromEulerAngles(this.euler.x, this.euler.y, this.euler.z,this.localRotate);
@@ -134,6 +139,9 @@ namespace m4m.framework
         private tempos=math.pool.new_vector3();
         private temColor=math.pool.new_color();
         private temUv=math.pool.new_vector2();
+        /**
+         * 上传mesh数据
+         */
         uploadMeshdata()
         {
             let batch=this.layer.batch as F14SingleMeshBath;
@@ -171,9 +179,13 @@ namespace m4m.framework
             batch.curIndexCount+=this.dataforebo.length;
             batch.curVertexcount+=this.vertexCount;
         }
-    
-    
-    
+        
+        /**
+         * 刷新当前纹理 ST
+         * @param curframe  当前帧 
+         * @param detalTime 上一帧用时
+         * @param fps 帧率
+         */
         public refreshCurTex_ST(curframe:number,detalTime:number,fps:number)
         {
             if (this.baseddata.uvType == UVTypeEnum.UVRoll)
@@ -197,6 +209,9 @@ namespace m4m.framework
         private lookDir=new math.vector3();
         private worldDirx=new math.vector3();
         private worldDiry=new math.vector3();
+        /**
+         * 上传旋转 通过Billboard
+         */
         public updateRotByBillboard()
         {
             if(this.baseddata.beBillboard)
@@ -253,7 +268,6 @@ namespace m4m.framework
                 math.quatFromEulerAngles(this.euler.x, this.euler.y, this.euler.z,this.localRotate);
             }
         }
-
         reset()
         {
             math.vec3Clone(this.baseddata.position,this.position);

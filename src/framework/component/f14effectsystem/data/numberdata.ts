@@ -8,16 +8,27 @@ namespace m4m.framework
         _valueLimitMax = 0;
         beInited:boolean = false;
         key:number;//random值（0--1）
+        /**
+         * 设置数据
+         * @param value 数据 
+         */
         public setValue(value:number)
         {
             this._value = value;
         }
+
+        /**
+         * 设置随机数
+         * @param max 最大值 
+         * @param min 最小值
+         */
         public setRandomValue(max:number,min:number)
         {
             this._valueLimitMax = max;
             this._valueLimitMin = min;
             this.isRandom = true;
         }
+
         /**
          * 针对随机类型，只要随机过一次就返回值不变（rerandom=false），返回新的随机值（rerandom=true）
          */
@@ -39,7 +50,12 @@ namespace m4m.framework
         {
             this._value = value;
         }
-    
+
+        /**
+         * 拷贝数据
+         * @param from 源数据 
+         * @param to 拷贝到的
+         */
         public static copyto(from:NumberData,to:NumberData)
         {
             to.isRandom = from.isRandom;
@@ -48,6 +64,11 @@ namespace m4m.framework
             to._valueLimitMax = from._valueLimitMax;
         }
 
+        /**
+         * 来自json
+         * @param json  JSON字符串 
+         * @param data  数据
+         */
         public static FormJson(json:string,data:NumberData)
         {
             if(json.indexOf("~")<0)
@@ -73,6 +94,12 @@ namespace m4m.framework
             this.y.setValue(y);
             this.z.setValue(z);
         }
+
+        /**
+         * 获取值
+         * @param reRandom 是否再次随机
+         * @returns 向量3
+         */
         public getValue(reRandom = false):math.vector3
         {
             let _out = new math.vector3();
@@ -81,7 +108,12 @@ namespace m4m.framework
             _out.z = this.z.getValue(reRandom);
             return _out;
         }
-    
+        
+        /**
+         * 拷贝到
+         * @param from  源 
+         * @param to    拷贝到
+         */
         public static copyto(from:Vector3Data,to:Vector3Data)
         {
             NumberData.copyto(from.x, to.x);
@@ -89,6 +121,11 @@ namespace m4m.framework
             NumberData.copyto(from.z, to.z);
         }
 
+        /**
+         * 设置从json 
+         * @param json  json数据 
+         * @param data  数据
+         */
         public static FormJson(json:string,data:Vector3Data)
         {
             let arr=json.split(",");

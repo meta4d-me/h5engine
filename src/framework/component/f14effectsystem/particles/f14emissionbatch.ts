@@ -64,6 +64,11 @@ namespace m4m.framework
                 this.mesh.submesh.push(sm);
             }
         }
+
+        /**
+         * 获取最大粒子数
+         * @returns 最大粒子数
+         */
         private getMaxParticleCount():number
         {
             let maxrate:number;
@@ -139,12 +144,15 @@ namespace m4m.framework
             //console.log("ebo leng="+this.dataForEbo.length+" vbo leng="+this.dataForVbo.length+" draw size="+this.curIndexCount+"particle count="+this.curVertexcount/this.emission.vertexCount+"max count:"+this.maxcoun);
             this.mat.draw(context,this.mesh,this.mesh.submesh[0]);    
         }
+
         unRender() {
             
         }
+        
         getElementCount(): number {
             return 1;
         }
+
         public dispose()
         {
             this.effect=null;
