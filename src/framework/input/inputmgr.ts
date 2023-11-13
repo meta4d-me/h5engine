@@ -65,6 +65,10 @@ namespace m4m.framework {
             this.disableContextMenu();
         }
 
+        /**
+         * 附加到html元素
+         * @param element html元素
+         */
         private attach(element: HTMLElement) {
             if (this._element) {
                 this.detach();
@@ -76,6 +80,9 @@ namespace m4m.framework {
             });
         }
 
+        /**
+         * 解除所有 附加绑定
+         */
         private detach() {
             if (!this._element) return;
             this.handlers.forEach(handler => {
@@ -85,7 +92,10 @@ namespace m4m.framework {
             this._element = null;
         }
 
-        //mouse
+        /**
+         * 当鼠标点下
+         * @param ev 鼠标事件
+         */
         private _mousedown(ev: MouseEvent) {
 
             this.CalcuPoint(ev.offsetX, ev.offsetY, this._point);
@@ -94,6 +104,10 @@ namespace m4m.framework {
 
             this.HtmlNativeEventer.Emit("mousedown", ev);
         }
+        /**
+         * 当鼠标点弹起
+         * @param ev 鼠标事件
+         */
         private _mouseup(ev: MouseEvent) {
 
             this._buttons[ev.button] = false;
@@ -101,12 +115,20 @@ namespace m4m.framework {
 
             this.HtmlNativeEventer.Emit("mouseup", ev);
         }
+        /**
+         * 当鼠标移动
+         * @param ev 鼠标事件
+         */
         private _mousemove(ev: MouseEvent) {
 
             this.CalcuPoint(ev.offsetX, ev.offsetY, this._point);
 
             this.HtmlNativeEventer.Emit("mousemove", ev);
         }
+        /**
+         * 当鼠标滚轮滚动
+         * @param ev 鼠标事件
+         */
         private _mousewheel(ev: WheelEvent) {
 
             this.hasWheel = true;
@@ -125,6 +147,10 @@ namespace m4m.framework {
         }
 
         //touch
+        /**
+         * 尝试添加 触摸点
+         * @param id 触摸ID
+         */
         private tryAddTouchP(id: number) {
             if (!this._touches[id]) {
                 this._touches[id] = new pointinfo();
@@ -132,6 +158,9 @@ namespace m4m.framework {
             }
         }
 
+        /**
+         * 通过所有的触摸状态 同步点
+         */
         private syncPointByTouches() {
             let count = 0;
             let xs = 0;
@@ -150,6 +179,10 @@ namespace m4m.framework {
             this._point.y = ys / count;
         }
 
+        /**
+         * 触摸开始
+         * @param ev    触摸事件
+         */
         private _touchstart(ev: TouchEvent) {
             ev.preventDefault();
 
@@ -181,6 +214,11 @@ namespace m4m.framework {
 
             this.HtmlNativeEventer.Emit("touchstart", ev);
         }
+
+        /**
+         * 触摸移动
+         * @param ev 触摸事件
+         */
         private _touchmove(ev: TouchEvent) {
             ev.preventDefault();    //避免 在触摸设备中，下拉 触发浏览器刷新监听。
 
@@ -209,6 +247,10 @@ namespace m4m.framework {
 
             this.HtmlNativeEventer.Emit("touchmove", ev);
         }
+        /**
+         * 触摸结束
+         * @param ev 触摸事件
+         */
         private _touchend(ev: TouchEvent) {
             ev.preventDefault();
 
@@ -229,6 +271,10 @@ namespace m4m.framework {
 
             this.HtmlNativeEventer.Emit("touchend", ev);
         }
+        /**
+         * 触摸取消
+         * @param ev 触摸事件
+         */
         private _touchcancel(ev: TouchEvent) {
             ev.preventDefault();
 
@@ -238,6 +284,10 @@ namespace m4m.framework {
         }
 
         //key
+        /**
+         * 键盘按下
+         * @param ev 键盘事件
+         */
         private _keydown(ev: KeyboardEvent) {
 
             this.keyboardMap[ev.keyCode] = true;
@@ -245,6 +295,10 @@ namespace m4m.framework {
 
             this.HtmlNativeEventer.Emit("keydown", ev);
         }
+        /**
+         * 键盘弹起
+         * @param ev 键盘事件
+         */
         private _keyup(ev: KeyboardEvent) {
 
             delete this.keyboardMap[ev.keyCode];
@@ -253,6 +307,10 @@ namespace m4m.framework {
             this.HtmlNativeEventer.Emit("keyup", ev);
         }
         //
+        /**
+         * 事件失焦
+         * @param ev 事件对象
+         */
         private _blur(ev) {
 
             this._point.touch = false;
@@ -273,6 +331,10 @@ namespace m4m.framework {
         private hasPointMove = false;
         private downPoint = new m4m.math.vector2();
         private lastPoint = new m4m.math.vector2();
+        /**
+         * 执行更新
+         * @param delta dtime
+         */
         update(delta) {
             this._lastbuttons[0] = this._buttons[0];
             this._lastbuttons[1] = this._buttons[1];
@@ -329,6 +391,9 @@ namespace m4m.framework {
 
         private keyDownCode: number = -1;
         private keyUpCode: number = -1;
+        /**
+         * 按键码检查
+         */
         private keyCodeCk() {
             if (this.keyDownCode != -1)
                 this.eventer.EmitEnum_key(event.KeyEventEnum.KeyDown, this.keyDownCode);
@@ -340,6 +405,9 @@ namespace m4m.framework {
 
         private hasWheel = false;
         private lastWheel = 0;
+        /**
+         * 鼠标滚动检查
+         */
         private mouseWheelCk() {
             if (this.hasWheel) {
                 this._wheel = this.lastWheel;
@@ -366,6 +434,10 @@ namespace m4m.framework {
             return (this._buttons[button] && !this._lastbuttons[button]);
         }
 
+        /**
+         * 上下文枚举
+         * @param ev 
+         */
         private _contextMenu = (ev) => { ev.preventDefault() };
         /**
          * 禁用右键菜单

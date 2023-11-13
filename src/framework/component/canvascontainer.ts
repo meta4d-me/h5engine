@@ -39,11 +39,19 @@ namespace m4m.framework
         //overlay2d
         @reflect.Field("reference")
         private _overlay2d:overlay2D;
+        /**
+         * 设置 OverLay
+         * @param lay OverLay
+         */
         setOverLay(lay:overlay2D){
             this._overlay2d = lay;
             this.canvasInit();
         }
         
+        /**
+         * 获取OverLay
+         * @returns OverLay对象
+         */
         getOverLay(){
             return this._overlay2d;
         }
@@ -58,6 +66,10 @@ namespace m4m.framework
         }
 
         private isCanvasinit = false;
+        /**
+         *  canvas初始化
+         * @returns 
+         */
         private canvasInit(){
             if(!this.gameObject || !this.gameObject.transform || !this.gameObject.transform.scene) return; 
             if(!this._overlay2d || !this._overlay2d.canvas) return;
@@ -83,7 +95,10 @@ namespace m4m.framework
             this._renderMode = mode;
             this.styleToMode();
         }
-
+        /**
+         * 设置样式模式
+         * @returns 
+         */
         private styleToMode(){
             switch(this._renderMode){
                 case canvasRenderMode.ScreenSpaceOverlay:

@@ -85,15 +85,16 @@
                 this.subTran.gameObject.visible = this._colliderVisible;
             }
         }
-         /**
-         * @private
-         */
+       
         intersectsTransform(tran: transform): boolean
         {
             //obb-mesh  obb-obb  mesh-mesh
             return false;
         }
         private _builded = false;
+        /**
+         * 检查构建mesh
+         */
         private ckbuildMesh()
         {
             if(this._builded || !this._filter) return;
@@ -112,6 +113,10 @@
             this._builded = true;
         }
 
+        /**
+         * 获取 碰撞mesh
+         * @returns 碰撞mesh
+         */
         private getColliderMesh(): mesh
         {
             var _mesh: mesh = new mesh();

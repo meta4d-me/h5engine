@@ -90,13 +90,21 @@ namespace m4m.framework
             }
             return this._endColor;
         }
-
+        /**
+         * 设置宽度
+         * @param startWidth 开始的宽度
+         * @param endWidth 结束的宽度
+         */
         public setWidth(startWidth: number, endWidth: number = 0)
         {
             this._startWidth = startWidth;
             this._endWidth = endWidth;
         }
         private activeMaxpointlimit: boolean = false;
+        /**
+         * 设置最大点限制值
+         * @param value 最大点限制值
+         */
         setMaxpointcontroll(value: boolean = false)
         {
             this.activeMaxpointlimit = value;
@@ -164,6 +172,10 @@ namespace m4m.framework
         {
 
         }
+        /**
+         * 刷新拖尾节点
+         * @param curTime 时间
+         */
         private refreshTrailNode(curTime: number)
         {
 
@@ -255,6 +267,11 @@ namespace m4m.framework
 
         private notRender: boolean = false;
 
+        /**
+         * 更新拖尾数据
+         * @param curTime 时间
+         * @returns 
+         */
         private updateTrailData(curTime: number)
         {
 
@@ -329,6 +346,9 @@ namespace m4m.framework
             }
         }
 
+        /**
+         * 检查缓冲区大小（小了扩容）
+         */
         private checkBufferSize()
         {
             var stickNumber = this.targetPath.length;

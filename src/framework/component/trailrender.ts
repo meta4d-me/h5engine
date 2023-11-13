@@ -279,6 +279,9 @@ namespace m4m.framework
          */ 
         lookAtCamera: boolean = false;
         //------------------------------------------------------------------------------------------------------
+        /**
+         * 初始mesh
+         */
         private initmesh()
         {
             this.mesh = new m4m.framework.mesh();
@@ -307,6 +310,10 @@ namespace m4m.framework
             //this.intidata();
         }
 
+        /**
+         * 再次初始化数据
+         * @returns 
+         */
         private reInitdata(){
             if(!this.inited) return;
 
@@ -323,6 +330,9 @@ namespace m4m.framework
         //透明渐变
         isAlphaGradual = false; 
         private inited = false;
+        /**
+         * 初始化数据
+         */
         private intidata()
         {
             //用棍子去刷顶点
@@ -402,6 +412,9 @@ namespace m4m.framework
 
         private speed: number = 0.5;
 
+        /**
+         * 更新拖尾数据
+         */
         private updateTrailData()
         {
             var length = this.vertexcount / 2;

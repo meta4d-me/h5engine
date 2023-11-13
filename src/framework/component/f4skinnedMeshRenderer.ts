@@ -261,6 +261,9 @@ namespace m4m.framework {
         boneMatrixChunks: Float32Array[];
         // Data texture
         boneMatricesTexture: m4m.framework.texture;
+        /**
+         * 初始化骨骼矩阵
+         */
         initBoneMatrices() {
             if (!this.boneMatrices) {
                 this.boneMatrices = new Float32Array(16 * (this.bones.length + 0));
@@ -273,6 +276,9 @@ namespace m4m.framework {
 
         }
 
+        /**
+         * 初始化静态骨骼姿态矩阵
+         */
         initStaticPoseMatrices() {
             this.ibm = [];
             if (this.bones && this.bones.length) {
@@ -293,6 +299,10 @@ namespace m4m.framework {
 
         private boneSamplerTexindex = -1;
         private texID = 0;
+        /**
+         * 更新骨骼纹理
+         * @param context 引擎渲染上下文
+         */
         updateBoneTexture(context: renderContext) {
             let ctx: WebGL2RenderingContext = context.webgl;
             if (!this.boneMatricesTexture) {
@@ -340,6 +350,9 @@ namespace m4m.framework {
 
         tempMatrix = new m4m.math.matrix();
         inverseRootBone = new m4m.math.matrix();
+        /**
+         * 更新骨骼矩阵
+         */
         updateBoneMatrix() {
             for (let i = 0; i < this.bones.length; i++) {
                 const bone = this.bones[i];
@@ -352,6 +365,12 @@ namespace m4m.framework {
             }
         }
 
+        /**
+         * 矩阵相乘输出到数组
+         * @param lhs 左边矩阵
+         * @param rhs 右边矩阵
+         * @param out 返回输出
+         */
         matrixMultiplyToArray(lhs: m4m.math.matrix, rhs: m4m.math.matrix, out: Float32Array): void {
             var a00 = lhs.rawData[0], a01 = lhs.rawData[1], a02 = lhs.rawData[2], a03 = lhs.rawData[3];
             var a10 = lhs.rawData[4], a11 = lhs.rawData[5], a12 = lhs.rawData[6], a13 = lhs.rawData[7];

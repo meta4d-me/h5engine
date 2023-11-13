@@ -395,7 +395,11 @@ namespace m4m.framework {
 
         }
 
-        //获取 李总修改 lightMap 第二图
+        /**
+         * 获取 李总修改 lightMap 第二图
+         * @param lightMapImg 光照纹理
+         * @returns 
+         */
         private static getLightMap_01Img(lightMapImg: texture): texture {
             let imgName = lightMapImg.getName();
             let srcImgName = `${imgName.substr(0, imgName.length - 13)}_01.imgdesc.json`;
@@ -409,11 +413,21 @@ namespace m4m.framework {
             return lightMapimg_01;
         }
 
+        /**
+         * 当GPU实例 关闭属性
+         * @param info GPU实例绘制信息
+         */
         private static onGpuInsDisableAttribute(info: meshGpuInstanceDrawInfo) {
             if (!info) return;
             meshGpuInstanceDrawInfo.del_info(info);
         }
 
+        /**
+         * 当GPU实例执行渲染
+         * @param context 渲染向下文
+         * @param instanceArray 渲染GPU实例列表
+         * @param cacheBuffer 缓存容器
+         */
         static GpuInstancingRender(context: renderContext, instanceArray: m4m.math.ReuseArray<IRendererGpuIns>, cacheBuffer?: Float32Array) {
             let insLen = instanceArray.length;
             if (insLen < 1) return;
@@ -459,6 +473,11 @@ namespace m4m.framework {
             }
         }
 
+        /**
+         * 当GPU实例执行渲染(合批)
+         * @param context 渲染向下文
+         * @param batcher GPU实例合批对象
+         */
         static GpuInstancingRenderBatcher(context: renderContext, batcher: meshGpuInsBatcher) {
             let insLen = batcher.count;
             if (insLen < 1) return;
@@ -518,6 +537,12 @@ namespace m4m.framework {
             return locMap[this.InstanceOffsetMatrixLoc] != null;
         }
 
+        /**
+         * 设置GPU实例 变换偏移矩阵
+         * @param tran 节点transform
+         * @param mat 材质对象
+         * @param pass 绘制通道对象
+         */
         private static _setInstanceOffsetMatrix(tran: m4m.framework.transform, mat: material, pass: render.glDrawPass) {
             let _wmat = tran.getWorldMatrix();
             let rawdata = _wmat.rawData;
@@ -535,6 +560,10 @@ namespace m4m.framework {
             }
         }
 
+        /**
+         * 获取GPU实例绘制类型标记
+         * @returns 绘制类型标记
+         */
         static instanceDrawType() {
             let drawtype = "instance";
             //fog
@@ -546,6 +575,11 @@ namespace m4m.framework {
         }
 
         private static _vbos: [WebGL2RenderingContext, WebGLBuffer][] = [];
+        /**
+         * 获取VBO 缓冲区
+         * @param gl webgl上下文对象
+         * @returns vbo webgl缓冲区对象
+         */
         private static _getVBO(gl: WebGL2RenderingContext) {
             for (let i = 0, n = this._vbos.length; i < n; i++) {
                 if (this._vbos[i][0] == gl)
@@ -556,6 +590,10 @@ namespace m4m.framework {
             return vbo;
         }
 
+        /**
+         * 是否是GPU实例
+         * @returns 是GPU实例？
+         */
         isGpuInstancing() {
             // if(!this.materials || !this.materials[0]) return false;
             if (!this.materials || this.materials.length < 1) return false;

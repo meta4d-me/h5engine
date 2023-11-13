@@ -486,6 +486,11 @@ namespace m4m.framework
             data.color = [];
         }
 
+        /**
+         * 上传mesh
+         * @param _mesh mesh对象 
+         * @param webgl webgl上下文
+         */
         static uploadMesh(_mesh: mesh, webgl: WebGL2RenderingContext)
         {
             var vf = m4m.render.VertexFormatMask.Position | m4m.render.VertexFormatMask.Normal | m4m.render.VertexFormatMask.Tangent | m4m.render.VertexFormatMask.Color | m4m.render.VertexFormatMask.UV0;

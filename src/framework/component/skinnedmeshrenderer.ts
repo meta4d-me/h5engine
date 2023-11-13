@@ -176,8 +176,9 @@ namespace m4m.framework {
 
 
         /**
-         * @private
-         * @param index
+         * 通过索引获取材质
+         * @param index 索引
+         * @param outMtx 输出矩阵
          */
         getMatByIndex(index: number, outMtx: m4m.math.matrix) {
             let data = this.mesh.data;
@@ -279,6 +280,11 @@ namespace m4m.framework {
         }
 
         private static VertexHelpMtx = new m4m.math.matrix();
+        /**
+         * 通过索引计算顶点
+         * @param index 索引
+         * @param t 
+         */
         calActualVertexByIndex(index: number, t: m4m.math.vector3) {
             let data = this.mesh.data;
             let verindex = data.trisindex[index];

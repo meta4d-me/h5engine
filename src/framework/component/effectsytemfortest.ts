@@ -133,7 +133,7 @@ namespace m4m.framework
             return this._data;
         }
         /**
-        * @private
+        * 初始化
         */
         init()
         {
@@ -425,7 +425,10 @@ namespace m4m.framework
             this.state = EffectPlayStateEnum.BeReady;
             this.beLoop = this.data.beLoop;
         }
-
+        /**
+         * 添加特效元素
+         * @param data 特效元素数据
+         */
         private addElement(data: EffectElementData)
         {
             // if (data.type == EffectElementTypeEnum.EmissionType)
@@ -442,6 +445,11 @@ namespace m4m.framework
             //     this.addInitFrame(data);
             // }
         }
+
+        /**
+         * 添加发射特效元素
+         * @param data 特效元素数据
+         */
         addEmissionElement(data:EffectElementData=null)
         {
             if(this.emissionElement==null)
@@ -454,7 +462,7 @@ namespace m4m.framework
 
 
         /**
-        * @private
+        * 设置 帧ID
         */
         public setFrameId(id: number)
         {
@@ -463,7 +471,7 @@ namespace m4m.framework
         }
 
         /**
-        * @private
+        * 获取 dt * FPS
         */
         public getDelayFrameCount(delayTime: number)
         {
@@ -491,9 +499,7 @@ namespace m4m.framework
             }
             return false;
         }
-        /**
-        * @private
-        */
+      
         remove()
         {
             this.state = EffectPlayStateEnum.Dispose;

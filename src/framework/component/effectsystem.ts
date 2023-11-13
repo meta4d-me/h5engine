@@ -125,7 +125,10 @@ namespace m4m.framework
             this._textasset = _jsonData;
             this.setJsonDataStr(this.jsonData.content);
         }
-
+        /**
+         * 设置json 格式数据
+         * @param _jsonStr json 格式数据
+         */
         setJsonDataStr(_jsonStr: string)
         {
             this.webgl = m4m.framework.sceneMgr.app.webgl;
@@ -142,6 +145,10 @@ namespace m4m.framework
             this.jsonData = _jsonData;
             this.updateJsonDataStr(this.jsonData.content);
         }
+        /**
+         * 更新特效数据(json字符串数据)
+         * @param _jsonStr json字符串数据
+         */
         updateJsonDataStr(_jsonStr: string)
         {
             this.remove();
@@ -164,7 +171,7 @@ namespace m4m.framework
             return this._data;
         }
         /**
-        * @private
+        * 初始化
         */
         init()
         {
@@ -562,6 +569,9 @@ namespace m4m.framework
             this.resetSingleMesh();
             this.resetparticle();
         }
+        /**
+         * 重置单mesh
+         */
         private resetSingleMesh()
         {
             for (let i in this.effectBatchers)
@@ -576,6 +586,9 @@ namespace m4m.framework
                 }
             }
         }
+        /**
+         * 重置粒子系统
+         */
         private resetparticle()
         {
             if (this.particles != undefined)
@@ -624,6 +637,10 @@ namespace m4m.framework
             this.beLoop = this.data.beLoop;
         }
 
+        /**
+         * 添加特效元素
+         * @param data 特效元素数据
+         */
         private addElement(data: EffectElementData)
         {
             if (data.type == EffectElementTypeEnum.EmissionType)
@@ -787,7 +804,7 @@ namespace m4m.framework
             }
         }
         /**
-        * @private
+        * 设置帧ID
         */
         public setFrameId(id: number)
         {
@@ -796,7 +813,7 @@ namespace m4m.framework
         }
 
         /**
-        * @private
+        * 获取 dt * FPS
         */
         public getDelayFrameCount(delayTime: number)
         {
