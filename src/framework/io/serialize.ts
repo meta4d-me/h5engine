@@ -15,7 +15,7 @@ namespace m4m.io
     export class SerializeDependent
     {
         static resourseDatas: any[] = [];
-        // static resourcesContent: any[] = [];
+        /** @deprecated [已弃用] */
         static GetAssetContent(asset: any)
         {
             let data: any = {};
@@ -32,6 +32,7 @@ namespace m4m.io
             // if (asset instanceof m4m.framework.texture)
             //     return { "name": asset.getName() + "_enginedefault.png", "type": SaveAssetType.DefaultAssets };
         }
+        /** @deprecated [已弃用] */
         static GetAssetUrl(asset: any, assetMgr: any)
         {
             if (!assetMgr || !asset)
@@ -113,19 +114,14 @@ namespace m4m.io
     }
 
 
-    /**
-     * @private
-     */
+    /** @deprecated [已弃用] */
     export function SerializeForInspector(obj: any): string
     {
         var str = JSON.stringify(serializeObjForInspector(obj, false));
         return str;
     }
 
-
-    /**
-     * @private
-     */
+    /** @deprecated [已弃用] */
     export function serializeObjForInspector(instanceObj: any, beComponent: boolean, serializedObj: any = undefined): any
     {
         let _flag: m4m.framework.HideFlags = m4m.framework.HideFlags.None;
@@ -194,9 +190,7 @@ namespace m4m.io
         }
         return serializedObj;
     }
-    /**
-     * @private
-     */
+    /** @deprecated [已弃用] */
     export function serializeOtherTypeOrArrayForInspector(instanceObj: any, serializedObj: any, key: string, beComponent: boolean)
     {
         if (boolInNull(instanceObj))
@@ -302,9 +296,7 @@ namespace m4m.io
         }
     }
 
-    /**
-     * @private
-     */
+    /** @deprecated [已弃用] */
     export function serializeOtherTypeForInspector(instanceObj: any, serializedObj: any, key: string, beComponent: boolean, arrayInst: any = null)
     {
         if (boolInNull(instanceObj))
@@ -431,21 +423,13 @@ namespace m4m.io
         }
     }
 
-    /**
-     * 序列化
-     */
-    /**
-     * @private
-     */
+    /** @deprecated [已弃用] */
     export function Serialize(obj: any, assetMgr: any = null): string
     {
         return JSON.stringify(serializeObj(obj, null, assetMgr));
     }
 
-    //根据反射类型将对象进行序列化
-    /**
-     * @private
-     */
+    /** @deprecated [已弃用] */
     export function serializeObj(instanceObj: any, serializedObj: any = undefined, assetMgr: any = null): any
     {
         if (boolInNull(instanceObj))
@@ -514,9 +498,7 @@ namespace m4m.io
         return serializedObj;
     }
 
-    /**
-     * @private
-     */
+    /** @deprecated [已弃用] */
     export function serializeOtherTypeOrArray(instanceObj: any, serializedObj: any, key: string, assetMgr: any = null)
     {
         if (boolInNull(instanceObj))
@@ -593,9 +575,7 @@ namespace m4m.io
         }
     }
 
-    /**
-     * @private
-     */
+    /** @deprecated [已弃用] */
     export function serializeOtherType(instanceObj: any, serializedObj: any, key: string, arrayInst: any = null, assetMgr: any = null)
     {
         if (boolInNull(instanceObj || boolInNull(serializedObj)))
@@ -706,9 +686,7 @@ namespace m4m.io
     /**
      * 反序列化  传入的源数据为json
      */
-    /**
-     * @private
-     */
+    /** @deprecated [已弃用] */
     export function deSerialize(serializedObj: string, instanceObj: any, assetMgr: any, bundlename: string = null)
     {
         if (boolInNull(serializedObj))
@@ -729,9 +707,7 @@ namespace m4m.io
         fillReference(serializedObj["value"], instanceObj);
     }
 
-    /**
-     * @private
-     */
+    /** @deprecated [已弃用] */
     export function fillReference(serializedObj: any, instanceObj: any)
     {
         if (boolInNull(instanceObj) || boolInNull(instanceObj["__gdmeta__"]))
@@ -769,9 +745,7 @@ namespace m4m.io
             }
         }
     }
-    /**
-     * @private
-     */
+    /** @deprecated [已弃用] */
     export function dofillReferenceOrArray(serializedObj: any, instanceObj: any, key: string)
     {
         if (boolInNull(serializedObj) || boolInNull(instanceObj))
@@ -829,9 +803,7 @@ namespace m4m.io
             }
         }
     }
-    /**
-     * @private
-     */
+    /** @deprecated [已弃用] */
     export function dofillReference(serializedObj: any, instanceObj: any, key: string)
     {
         if (boolInNull(instanceObj) || boolInNull(serializedObj) || boolInNull(serializedObj[key]))
@@ -884,9 +856,7 @@ namespace m4m.io
         }
     }
     //反序列化赋值
-    /**
-     * @private
-     */
+    /** @deprecated [已弃用] */
     export function deSerializeObj(serializedObj: any, instanceObj: any, assetMgr: any, bundlename: string = null)
     {
         if (instanceObj == undefined)
@@ -937,11 +907,7 @@ namespace m4m.io
         }
     }
 
-
-
-    /**
-     * @private
-     */
+    /** @deprecated [已弃用] */
     export function deSerializeOtherTypeOrArray(serializedObj: any, instanceObj: any, key: string, assetMgr: any, bundlename: string = null)
     {
         if (boolInNull(serializedObj) || boolInNull(instanceObj))
@@ -1040,9 +1006,7 @@ namespace m4m.io
         }
     }
 
-    /**
-     * @private
-     */
+    /** @deprecated [已弃用] */
     export function deSerializeOtherType(serializedObj: any, instanceObj: any, key: string, assetMgr: any, bundlename: string = null)
     {
         if (boolInNull(serializedObj) || boolInNull(instanceObj) || boolInNull(serializedObj[key]))
@@ -1147,10 +1111,7 @@ namespace m4m.io
         }
     }
 
-
-    /**
-     * @private
-     */
+    /** @deprecated [已弃用] */
     export function isArray(type: string)
     {
         if (type.indexOf("[]") > 0 || type.indexOf("array") >= 0)
@@ -1160,9 +1121,7 @@ namespace m4m.io
         return false;
     }
 
-    /**
-     * @private
-     */
+    /** @deprecated [已弃用] */
     export function isArrayOrDic(type: string)
     {
         if (type.indexOf("[]") > 0 || type.indexOf("array") >= 0 || type.indexOf("dic") >= 0)
@@ -1172,9 +1131,7 @@ namespace m4m.io
         return false;
     }
 
-    /**
-     * @private
-     */
+    /** @deprecated [已弃用] */
     export function isAsset(type: string)
     {
         //rawscene比较特殊、不可能存在结构中
@@ -1185,9 +1142,7 @@ namespace m4m.io
         return false;
     }
 
-    /**
-     * @private
-     */
+    /** @deprecated [已弃用] */
     export function isAssetInspector(type: string)
     {
         if (type == "prefab")
@@ -1249,6 +1204,7 @@ namespace m4m.io
     {
         static oldmap: { [id: number]: any } = {};
         static regtypelist: string[] = [];
+        /** @deprecated [已弃用] */
         static regDefaultType()
         {
             //referenceInfo.regType("vector3");
@@ -1271,11 +1227,12 @@ namespace m4m.io
             referenceInfo.regType("UniformData");
             referenceInfo.regType("f14eff");
         }
+        /** @deprecated [已弃用] */
         static regType(type: string)
         {
             referenceInfo.regtypelist.push(type);
         }
-
+        /** @deprecated [已弃用] */
         static isRegType(type: string): boolean
         {
             return this.regtypelist.indexOf(type) >= 0;
@@ -1289,7 +1246,7 @@ namespace m4m.io
     {
         static enumMap: { [id: string]: any } = {};
     }
-
+    /** @deprecated [已弃用] */
     function boolInNull(obj: any)
     {
         if (obj == null || obj == undefined)

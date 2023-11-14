@@ -3,6 +3,13 @@ namespace m4m.io
     var assetMgr: m4m.framework.assetMgr;
     const filter = { cls: true, insid: true, gameObject: true, components: true, children: true };
     const baseType = { string: true, number: true, boolean: true };
+    /**
+     * 节点序列化
+     * @param json json数据
+     * @param assetbundle 资源包名
+     * @param useAsset 是否标记被使用的资源？
+     * @returns 实例化的对象
+     */
     export function ndeSerialize<T extends framework.transform | framework.transform2D>(json: any, assetbundle: string, useAsset?: boolean): T
     {
         if (!assetMgr)
@@ -34,6 +41,14 @@ namespace m4m.io
         }
         return root;
     }
+    /**
+     * 填充变换节点
+     * @param json json数据
+     * @param node 挂载的父节点
+     * @param gos 节点数据数组
+     * @param instMap 实例ID-节点的字典
+     * @param bundlename 资源包名
+     */
     function fullTrasn(json: any, node: framework.transform | framework.transform2D,
         gos: Array<{ go: framework.gameObject, data: any }>, instMap: { [key: number]: framework.transform | framework.transform2D },
         bundlename: string)
@@ -48,6 +63,13 @@ namespace m4m.io
             }
         }
     }
+    /**
+     * 创建变换节点
+     * @param json json数据
+     * @param gos 节点数据数组
+     * @param instMap 实例ID-节点的字典
+     * @returns 变换节点对象
+     */
     function createTrasn(json, gos: Array<{ go: framework.gameObject, data: any }>, instMap: { [key: number]: framework.transform | framework.transform2D })
     {
         let trans = new framework[json.cls];
@@ -69,6 +91,16 @@ namespace m4m.io
         instMap[json.insid] = trans;
         return trans;
     }
+    /**
+     * 填充gameObject节点
+     * @param json json数据
+     * @param go gameObject节点
+     * @param bundlename 资源包名
+     * @param instMap 实例ID-节点的字典
+     * @param useAsset 是否标记被使用的资源？
+     * @param is2d 是否是2D节点
+     * @param comps 组件列表
+     */
     function fullGO(json: any, go: framework.gameObject, bundlename: string, instMap: { [key: number]: framework.transform | framework.transform2D }, useAsset?: boolean, is2d?: boolean, comps?: Array<any>)
     {
         go.layer = json.layer;
@@ -82,6 +114,18 @@ namespace m4m.io
                 fullProp(comp, jcomp, k, bundlename, instMap, useAsset, is2d, comps);
         }
     }
+
+    /**
+     * 填充 属性
+     * @param comp 组件
+     * @param jcomp j组件
+     * @param k key
+     * @param bundlename 资源包名
+     * @param instMap 实例ID-节点的字典
+     * @param useAsset 是否标记被使用的资源？
+     * @param is2d 是否是2D节点
+     * @param comps 组件列表
+     */
     function fullProp(comp, jcomp, k, bundlename: string, instMap: { [key: number]: any }, useAsset?: boolean, is2d?: boolean, comps?: Array<any>)
     {
         let prop = jcomp[k];
@@ -138,6 +182,13 @@ namespace m4m.io
             fullValue(comp, k, prop);
         // comp[k] = prop;
     }
+
+    /**
+     * 填充值
+     * @param obj 节点对象
+     * @param key key
+     * @param json json数据
+     */
     function fullValue(obj: any, key: string | number, json)
     {
         if (!json.cls || baseType[json.cls])
@@ -155,6 +206,15 @@ namespace m4m.io
             obj[key] = inst;
         }
     }
+
+    /**
+     * 获取资源值
+     * @param assetName 资源名
+     * @param type 类型
+     * @param bundlename 资源包名
+     * @param useAsset 是否标记被使用的资源？
+     * @returns 资源
+     */
     function getAssetValue(assetName: string, type: string, bundlename: string, useAsset?: boolean)
     {
         let asset: framework.IAsset;
