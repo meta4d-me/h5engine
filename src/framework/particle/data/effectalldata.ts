@@ -9,6 +9,7 @@ namespace m4m.framework
         public life: number;
         public beLoop: boolean = false;
         public elementDic: { [name: string]: EffectElementData } = {};
+        /** 克隆对象 */
         clone()
         {
             let data: EffectSystemData = new EffectSystemData();
@@ -20,6 +21,7 @@ namespace m4m.framework
             }
             return data;
         }
+        /** 销毁对象 */
         dispose()
         {
             for (let key in this.elementDic)
@@ -62,7 +64,7 @@ namespace m4m.framework
             this.initActions();
             this.recordElementLerpAttributes();
         }
-
+        /** 记录 例子元素 差值属性 */
         private recordElementLerpAttributes()
         {
             if (this.data.timelineFrame != undefined)
@@ -165,6 +167,9 @@ namespace m4m.framework
             }
         }
 
+        /**
+         * 初始化
+         */
         initActions()
         {
             this.actions = [];
@@ -210,7 +215,7 @@ namespace m4m.framework
             }
         }
 
-
+        /** 更新 */
         update()
         {
             if (this.curAttrData == undefined || this.curAttrData == null)
@@ -235,6 +240,10 @@ namespace m4m.framework
             }
         }
 
+        /**
+         * 更新元素旋转
+         * @returns 
+         */
         private updateElementRotation() 
         {
             let cameraTransform = m4m.framework.sceneMgr.app.getScene().mainCamera.gameObject.transform;
@@ -347,6 +356,7 @@ namespace m4m.framework
             return this.actionActive;
         }
 
+        /** 设置激活 */
         setActive(_active: boolean)
         {
             if (this.active == _active) return;
@@ -360,6 +370,7 @@ namespace m4m.framework
                 this.curAttrData.resetMatrix();
             }
         }
+        /** 销毁 */
         dispose()
         {
             this.data.dispose();
@@ -386,6 +397,7 @@ namespace m4m.framework
 
 
         public initFrameData: EffectFrameData;
+        /** 克隆 */
         clone()
         {
             let elementdata = new EffectElementData();
@@ -419,6 +431,7 @@ namespace m4m.framework
             }
             return elementdata;
         }
+        /** 销毁 */
         dispose()
         {
             if (this.actionData)
@@ -512,6 +525,11 @@ namespace m4m.framework
                     break;
             }
         }
+        /**
+         * 获取属性
+         * @param attribute 属性字符串数据
+         * @returns 属性
+         */
         getAttribute(attribute: string): any
         {
             switch (attribute)
@@ -547,6 +565,10 @@ namespace m4m.framework
             }
         }
 
+        /**
+         * 初始化属性
+         * @param attribute 属性字符串数据
+         */
         initAttribute(attribute: string)
         {
             switch (attribute)
@@ -580,10 +602,17 @@ namespace m4m.framework
                     break;
             }
         }
+        /**
+         * 重置矩阵
+         */
         resetMatrix()
         {
             math.matrixZero(this.matrix);
         }
+        /**
+         * 拷贝和初始化
+         * @returns 
+         */
         copyandinit(): EffectAttrsData//没有的数据初始化
         {
             let data = new EffectAttrsData();
@@ -640,6 +669,7 @@ namespace m4m.framework
             data.mesh = this.mesh;
             return data;
         }
+        /** 克隆 */
         clone(): EffectAttrsData
         {
             let data = new EffectAttrsData();
@@ -693,6 +723,7 @@ namespace m4m.framework
         public attrsData: EffectAttrsData;
         public lerpDatas: EffectLerpData[];
         public delayTime: number;
+        /** 克隆 */
         clone()
         {
             let framedata = new EffectFrameData();
@@ -705,6 +736,7 @@ namespace m4m.framework
             }
             return framedata;
         }
+        /** 销毁 */
         dispose()
         {
             this.attrsData = null;
@@ -722,6 +754,7 @@ namespace m4m.framework
         public toFrame: ValueData;
         public attrsData: EffectAttrsData;
         public attrsList = [];
+        /** 克隆 */
         clone()
         {
             let lerpdata = new EffectLerpData();
@@ -746,6 +779,7 @@ namespace m4m.framework
         public startFrame: number;
         public endFrame: number;
         public params: any;
+        /** 克隆 */
         clone()
         {
             let actiondata = new EffectActionData();
@@ -769,12 +803,12 @@ namespace m4m.framework
         public diffuseTexture: texture;
         public alphaTexture: texture;
         public alphaCut: number;
-
+        /** 是否相等 */
         static beEqual(data0: EffectMatData, data1: EffectMatData)
         {
             return data0.alphaCut === data1.alphaCut && data0.diffuseTexture === data1.diffuseTexture && data0.shader === data1.shader && data0.alphaTexture === data1.alphaTexture;
         }
-
+        /** 克隆 */
         clone(): EffectMatData
         {
             let data = new EffectMatData();
@@ -865,6 +899,7 @@ namespace m4m.framework
                 this.dataForVbo = new Float32Array(this._vbosize);
             }
         }
+        /** 销毁 */
         public dispose()
         {
             this.mesh.dispose();

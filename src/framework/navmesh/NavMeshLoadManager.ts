@@ -123,7 +123,12 @@
         callback();
     }
 
-    //构建mesh 并返回
+    /**
+     * 构建mesh 并返回
+     * @param meshData mesh数据
+     * @param webgl webgl上下文
+     * @returns 输出的mesh
+     */
     private createMesh(meshData: m4m.render.meshData, webgl: WebGL2RenderingContext): m4m.framework.mesh {
         var _mesh = new m4m.framework.mesh();
         // _mesh.setName("NavMesh" + ".mesh.bin");
@@ -153,6 +158,11 @@
         return _mesh;
     }
 
+    /**
+     * 渲染显示 导航网格
+     * @param isshow 是否显示
+     * @param material 渲染材质
+     */
     public showNavmesh(isshow: boolean , material:m4m.framework.material = null) {
         if (this.navTrans) {
             this.navTrans.gameObject.visible = isshow;
@@ -176,6 +186,9 @@
         }
     }
 
+    /**
+     * 销毁
+     */
     public dispose() {
         if (this.navTrans) {
             this.navTrans.parent.removeChild(this.navTrans);
@@ -194,6 +207,12 @@
         return NavMeshLoadManager._instance;
     }
 
+    /**
+     * 计算获取 从开始点 移动到 结束点 的所有路径坐标列表
+     * @param startPos 开始点
+     * @param endPos 结束点
+     * @returns 路径坐标列表
+     */
     public moveToPoints(startPos: m4m.math.vector3, endPos: m4m.math.vector3): Array<m4m.math.vector3> {
         
         let navTrans = NavMeshLoadManager.Instance.navTrans;
@@ -219,7 +238,12 @@
         return points;
     }
 
-    /** 获取指定位置的三角形索引*/
+    /**
+     * 获取指定位置的三角形面索引
+     * @param point 坐标
+     * @param trans 导航网格场景节点对象
+     * @returns 三角形面索引
+     */
     public static findtriIndex(point: m4m.math.vector3, trans: m4m.framework.transform): number {
         let result = -1;
         var ray = new m4m.framework.ray(new m4m.math.vector3(point.x, point.y + 500, point.z), new m4m.math.vector3(0, -1, 0));
