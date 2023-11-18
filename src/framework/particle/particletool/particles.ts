@@ -13,12 +13,19 @@ namespace m4m.framework
         {
             this.effectSys = sys;
         }
+        /**
+         * 添加粒子发射
+         * @param _emissionNew 特效元素数据
+         */
         addEmission(_emissionNew: EffectElementData)
         {
             let _emissionElement = new EmissionElement(_emissionNew, this.effectSys, this);
             this.emissionElements.push(_emissionElement);
         }
-
+        /**
+         * 通过发射更新粒子
+         * @param delta 
+         */
         updateForEmission(delta: number)
         {
             for (let key in this.emissionElements)
@@ -26,6 +33,10 @@ namespace m4m.framework
                 this.emissionElements[key].updateForEmission(delta);
             }
         }
+        /**
+         * 更新
+         * @param delta 
+         */
         update(delta: number)
         {
             for (let key in this.emissionElements)
@@ -33,6 +44,12 @@ namespace m4m.framework
                 this.emissionElements[key].update(delta);
             }
         }
+        /**
+         * 执行渲染
+         * @param context   渲染上下文 
+         * @param assetmgr 资源管理器
+         * @param camera 相机
+         */
         render(context: renderContext, assetmgr: assetMgr, camera: m4m.framework.camera)
         {
             for (let key in this.emissionElements)
@@ -40,6 +57,9 @@ namespace m4m.framework
                 this.emissionElements[key].render(context, assetmgr, camera);
             }
         }
+        /**
+         * 销毁
+         */
         dispose()
         {
             for (let key in this.emissionElements)

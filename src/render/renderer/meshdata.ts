@@ -53,7 +53,9 @@
 
         /** 三角形索引数据buffer */
         public triIndexBufferData: TriIndexTypeArray;
-
+        /**
+         * 执行生成mesh所有三角形的顶点法线数据
+         */
         public AutoGenNormal(): void {
             if (this.normal != undefined)
                 throw new Error("first set normal to undefined.");
@@ -132,7 +134,11 @@
          */
         private get tmpInxArr() { return this.triIndexBufferData; }
         private set tmpInxArr(val) { this.triIndexBufferData = val; }
-
+        /**
+         * 添加 四边形
+         * @param data mesh数据
+         * @param quad 四边形所有顶点
+         */
         static addQuadPos(data: meshData, quad: m4m.math.vector3[]): void {
             var istart = data.pos.length;
             meshData.addQuadVec3(data.pos, quad);
@@ -143,6 +149,11 @@
             data.trisindex.push(istart + 1);
             data.trisindex.push(istart + 3);
         }
+        /**
+         * 添加 四边形 (顶点复用模式)
+         * @param data mesh数据
+         * @param quad 四边形所有顶点
+         */
         static addQuadPos_Quad(data: meshData, quad: m4m.math.vector3[]): void {
             var istart = data.pos.length;
             meshData.addQuadVec3(data.pos, quad);
@@ -151,18 +162,34 @@
             data.trisindex.push(istart + 3);
             data.trisindex.push(istart + 2);
         }
+        /**
+         * 添加 四边形 顶点数到数组 ，通过统一v3填充
+         * @param array 顶点数到数组
+         * @param value v3
+         */
         static addQuadVec3ByValue(array: m4m.math.vector3[], value: m4m.math.vector3): void {
             for (var i = 0; i < 4; i++) {
                 var v = math.pool.clone_vector3(value);
                 array.push(v);
             }
         }
+        /**
+         * 添加 四边形 顶点数到数组 ，通过 v3 数组
+         * @param array 顶点数到数组
+         * @param quad v3数组
+         */
         static addQuadVec3(array: m4m.math.vector3[], quad: m4m.math.vector3[]): void {
             array.push(quad[0]);
             array.push(quad[1]);
             array.push(quad[2]);
             array.push(quad[3]);
         }
+
+        /**
+         * 添加 四边形 顶点数到数组 ，通过 v2数组
+         * @param array 顶点数到数组
+         * @param quad v2数组
+         */
         static addQuadVec2(array: m4m.math.vector2[], quad: m4m.math.vector2[]): void {
             array.push(quad[0]);
             array.push(quad[1]);
@@ -170,6 +197,11 @@
             array.push(quad[3]);
         }
 
+        /**
+         * 生成 四边形 mesh数据
+         * @param size 尺寸
+         * @returns mesh数据
+         */
         static genQuad(size: number): meshData {
             var half = size * 0.5;
             var data = new meshData();
@@ -196,6 +228,11 @@
             return data;
         }
 
+        /**
+         * 生成 粒子用 四边形 mesh数据
+         * @param size 尺寸
+         * @returns mesh数据
+         */
         static genQuad_forparticle(size: number): meshData {
             var half = size * 0.5;
             var data = new meshData();
@@ -221,6 +258,12 @@
             meshData.addQuadVec3ByValue(data.tangent, new math.vector3(1, 0, 0));
             return data;
         }
+
+        /**
+         * 生成 地板 mesh数据
+         * @param size 尺寸
+         * @returns mesh数据
+         */
         static genPlaneCCW(size: number): meshData {
             var half = size * 0.5;
             var data = new meshData();
@@ -246,6 +289,14 @@
             meshData.addQuadVec3ByValue(data.tangent, new math.vector3(1, 0, 0));
             return data;
         }
+
+        /**
+         * 生成 圆柱体 mesh数据
+         * @param height 高 
+         * @param radius 半径
+         * @param segment 分段
+         * @returns mesh数据
+         */
         static genCylinderCCW(height: number, radius: number, segment = 20): meshData {
             var data = new meshData();
             data.pos = [];
@@ -311,6 +362,12 @@
             }
             return data;
         }
+        /**
+         * 生成 椎体 mesh数据
+         * @param height 高
+         * @param halfsize 半尺寸
+         * @returns mesh数据
+         */
         static genPyramid(height: number, halfsize: number): meshData {
             var data = new meshData();
             data.pos = [];
@@ -416,6 +473,14 @@
 
             return data;
         }
+
+        /**
+         * 生成 球体 mesh数据
+         * @param radius 半径
+         * @param widthSegments 横向分段数 
+         * @param heightSegments 纵向分段数
+         * @returns mesh数据
+         */
         static genSphereCCW(radius: number = 1, widthSegments: number = 24, heightSegments: number = 12): meshData {
             var data = new meshData();
             data.pos = [];
@@ -487,6 +552,12 @@
 
             return data;
         }
+
+        /**
+         * 生成 正方体 mesh数据
+         * @param size 尺寸
+         * @returns mesh数据
+         */
         static genBoxCCW(size: number): meshData {
             var half = size * 0.5;
             var data = new meshData();
@@ -593,6 +664,12 @@
 
             return data;
         }
+
+        /**
+         * 生成 长方体 mesh数据
+         * @param array 长方体顶点数组
+         * @param outData 输出mesh数据
+         */
         static genBoxByArray(array: m4m.math.vector3[], outData: meshData) {
             if (!outData) return;
             // var data = new meshData();
@@ -662,6 +739,12 @@
 
             // return data;
         }
+
+        /**
+         * 生成 长方体 mesh数据
+         * @param array 长方体顶点数组
+         * @returns 输出mesh数据
+         */
         static genBoxByArray_Quad(array: m4m.math.vector3[]): meshData {
             var data = new meshData();
             data.pos = [];
@@ -732,6 +815,13 @@
             return data;
         }
 
+        /**
+         * 生成圆环
+         * @param radius 半径
+         * @param segment 分段
+         * @param wide 宽度
+         * @returns 输出mesh数据
+         */
         static genCircleLineCCW(radius: number, segment: number = 64, wide: number = 0.05): meshData {
             var data = new meshData();
             data.pos = [];
@@ -759,6 +849,10 @@
             return data;
         }
 
+        /**
+         * 计算内存占用长度
+         * @returns 内存占用长度
+         */
         caclByteLength(): number {
             let len = 0;
             if (this.pos != undefined) len += 12;
@@ -776,6 +870,12 @@
             len *= this.pos.length;
             return len;
         }
+
+        /**
+         * 计算字节大小
+         * @param vf 顶点格式
+         * @returns 字节大小
+         */
         static calcByteSize(vf: VertexFormatMask): number {
             var total = 0;//nothing
             if (vf & VertexFormatMask.Position) total += 12;
@@ -790,7 +890,10 @@
             return total;
         }
 
-        /** 获取顶点段落长度 */
+        /**
+         * 获取顶点段落长度
+         * @returns 段落长度
+         */
         private getSegmentSize() {
             const vf = this.originVF;
             return 3 +
@@ -805,7 +908,10 @@
                 ;
         }
 
-        /** 获取顶点数量 */
+        /**
+         * 获取顶点数量
+         * @returns 顶点数量
+         */
         public getVertexCount() {
             if (!this.isBufferDataMode) {
                 return this.pos.length;
@@ -816,7 +922,10 @@
             }
         }
 
-        /** 获取三角形索引数量 */
+        /**
+         * 获取三角形索引数量
+         * @returns 三角形索引数量
+         */
         public getTriIndexCount() {
             if (!this.isBufferDataMode) {
                 if (!this.trisindex) return 0;
@@ -1117,13 +1226,18 @@
         }
 
         /**
-         * 生成 三角形索引buffer数据
-         * @returns 三角形索引buffer数据
+         * 生成 三角形面索引buffer数据
+         * @returns 三角形面索引buffer数据
          */
         genIndexDataArray(): TriIndexTypeArray {
             if (this.isBufferDataMode) return this.triIndexBufferData;
             return this.triIndexUint32Mode ? new Uint32Array(this.trisindex) : new Uint16Array(this.trisindex);
         }
+
+        /**
+         * 生成  三角形线索引buffer数据
+         * @returns 三角形线索引buffer数据
+         */
         genIndexDataArrayTri2Line(): TriIndexTypeArray {
             var line: number[] = [];
             for (var i = 0; i < ((this.trisindex.length / 3) | 0); i++) {
@@ -1137,6 +1251,10 @@
             // return new Uint16Array(line);
             return this.triIndexUint32Mode ? new Uint32Array(line) : new Uint16Array(line);
         }
+        /**
+         * 生成  三角形线索引buffer数据
+         * @returns 三角形线索引buffer数据
+         */
         genIndexDataArrayQuad2Line(): TriIndexTypeArray {
             var line: number[] = [];
             for (var i = 0; i < ((this.trisindex.length / 4) | 0); i++) {
@@ -1151,6 +1269,11 @@
             return this.triIndexUint32Mode ? new Uint32Array(line) : new Uint16Array(line);
         }
 
+        /**
+         * 克隆
+         * @param target 克隆目标
+         * @returns 输出数据
+         */
         static cloneByObj(target: meshData): meshData {
             let md = new meshData();
             target.originVF = md.originVF;
@@ -1249,7 +1372,6 @@
 
         /**
          * 获取AABB
-         * 
          * @param recalculate 是否重新计算AABB
          */
         getAABB(recalculate = false) {

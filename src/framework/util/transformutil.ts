@@ -44,7 +44,7 @@ namespace m4m.framework {
 
     /**
      * 判断 函数对象代码实现内容是否是空的
-     * @param fun 
+     * @param fun 函数
      */
     export function functionIsEmpty(fun: Function) {
         if (!fun) true;
@@ -147,6 +147,17 @@ namespace m4m.framework {
             return t2d;
         }
 
+        /**
+         * 创建一个2D 节点
+         * @param name 名字
+         * @param parent 父节点
+         * @param lOpt 布局选项
+         * @param w 宽
+         * @param h 高
+         * @param px 坐标x
+         * @param py 坐标y
+         * @returns 2D 节点
+         */
         private static make2DNode(name: string, parent: transform2D = null, lOpt: layoutOption = layoutOption.NOTHING, w: number = 100, h: number = 100, px: number = 0, py: number = 0) {
             let node: transform2D = new transform2D();
             node.name = name;
@@ -160,18 +171,33 @@ namespace m4m.framework {
             return node;
         }
 
+        /**
+         * 构建一个 2D rawImage 节点
+         * @param img rawImage节点
+         * @param app 引擎app
+         */
         private static create2D_rawImage(img: rawImage2D, app: application) {
             img.transform.width = 100;
             img.transform.height = 100;
             img.image = app.getAssetMgr().getDefaultTexture("white");
         }
 
+        /**
+         * 构建一个 2D image2D 节点
+         * @param img image2D节点
+         * @param app 引擎app
+         */
         private static create2D_image2D(img: image2D, app: application) {
             img.transform.width = 100;
             img.transform.height = 100;
             img.sprite = app.getAssetMgr().getDefaultSprite("white_sprite");
         }
 
+        /**
+         * 构建一个 进度条
+         * @param progress 进度条节点
+         * @param app 引擎app
+         */
         private static create2D_progressbar(progress: progressbar, app: application) {
             progress.transform.width = 160;
             progress.transform.height = 20;
@@ -194,6 +220,11 @@ namespace m4m.framework {
             // progress.transform.markDirty();
         }
 
+        /**
+         * 构建一个 滑动矩形区
+         * @param scrollrect 滑动矩形区节点
+         * @param app 引擎app
+         */
         private static create2D_scrollRect(scrollrect: scrollRect, app: application) {
             scrollrect.transform.width = 200;
             scrollrect.transform.height = 200;
@@ -212,6 +243,11 @@ namespace m4m.framework {
             scrollrect.transform.markDirty();
         }
 
+        /**
+         * 构建一个 文本标签
+         * @param label 文本标签节点
+         * @param app 引擎app
+         */
         private static create2D_label(label: label, app: application) {
             label.transform.width = 150;
             label.transform.height = 50;
@@ -240,6 +276,11 @@ namespace m4m.framework {
             // }
         }
 
+        /**
+         * 构建一个 按钮
+         * @param btn 按钮节点
+         * @param app 引擎app
+         */
         private static create2D_button(btn: button, app: application) {
             btn.transform.width = 150;
             btn.transform.height = 50;
@@ -280,6 +321,11 @@ namespace m4m.framework {
             // }
         }
 
+        /**
+         * 构建一个 输入框
+         * @param ipt 输入框
+         * @param app 引擎app
+         */
         private static create2D_InputField(ipt: inputField, app: application) {
             let assetMgr = app.getAssetMgr();
             let opt = layoutOption;

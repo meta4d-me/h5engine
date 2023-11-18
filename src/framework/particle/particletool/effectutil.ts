@@ -5,7 +5,15 @@ namespace m4m.framework
      */
     export class EffectUtil
     {
-
+        /**
+         * 通过轴计算注视
+         * @param pos 眼睛的位置
+         * @param xAxis x轴
+         * @param yAxis y轴
+         * @param zAxis z轴
+         * @param targetpos 目标位置
+         * @param quat 四元数
+         */
         public static lookatbyXAxis(pos:m4m.math.vector3,xAxis:m4m.math.vector3,yAxis:m4m.math.vector3,zAxis:m4m.math.vector3,targetpos:m4m.math.vector3,quat:m4m.math.quaternion)
         {
             var dir=m4m.math.pool.new_vector3();
@@ -30,6 +38,13 @@ namespace m4m.framework
             m4m.math.pool.delete_vector3(dir);
             m4m.math.pool.delete_vector3(crossup);
         }
+
+        /**
+         * 通过旋转四元素获取欧拉旋转
+         * @param out 输出欧拉旋转
+         * @param q 旋转四元素
+         * @param order 排序方式
+         */
         public static eulerFromQuaternion(out:math.vector3, q:math.quaternion, order) {
             // Borrowed from Three.JS :)
             // q is assumed to be normalized
@@ -69,7 +84,13 @@ namespace m4m.framework
             }
         }
 
-        //范围内随机  isInteger是否为整数
+        /**
+         * 范围内随机  isInteger是否为整数
+         * @param min 最小值
+         * @param max 最大值
+         * @param isInteger 是Int
+         * @returns 输出值
+         */
         public static RandomRange(min: number, max: number, isInteger: boolean = false)
         {
             if (isInteger)
@@ -78,12 +99,24 @@ namespace m4m.framework
             }
             return Math.random() * (max - min) + min;
         }
+
+        /**
+         * 向量缩放 通过指定标量 
+         * @param vec 向量
+         * @param num 指定标量 
+         * @returns 输出向量
+         */
         public static vecMuliNum(vec: m4m.math.vector3, num: number): m4m.math.vector3
         {
             var v = new m4m.math.vector3(vec.x * num, vec.y * num, vec.z * num);
             return v;
         }
 
+        /**
+         * 解析向量
+         * @param value 数据
+         * @returns 向量
+         */
         public static parseVector3(value:any):m4m.math.vector3
         {
             var vector3=new m4m.math.vector3();
@@ -93,6 +126,11 @@ namespace m4m.framework
             return vector3;
         }
 
+        /**
+         * 解析特效三维向量 粒子节点
+         * @param value 数据
+         * @returns  向量粒子节点
+         */
         public static parseEffectVec3(value: any): ParticleNode
         {
             let node: ParticleNode = new ParticleNode();
@@ -118,6 +156,12 @@ namespace m4m.framework
             }
             return node;
         }
+
+        /**
+         * 解析特效二维向量粒子节点
+         * @param value 数据
+         * @returns 向量粒子节点
+         */
         public static parseEffectVec2(value: any): ParticleNodeVec2
         {
             let node: ParticleNodeVec2 = new ParticleNodeVec2();
@@ -143,6 +187,12 @@ namespace m4m.framework
             }
             return node;
         }
+
+        /**
+         * 解析特效 标量粒子节点
+         * @param value 数据
+         * @returns 标量粒子节点
+         */
         public static parseEffectNum(value: any): ParticleNodeNumber
         {
             let node = new ParticleNodeNumber();
@@ -159,6 +209,11 @@ namespace m4m.framework
             return node;
         }
 
+        /**
+         * 解析特效 标量粒子节点
+         * @param value 数据
+         * @returns 标量粒子节点
+         */
         public static parseEffectNumNode(value:any):ParticleNodeNumber
         {
             let node = new ParticleNodeNumber();
@@ -183,6 +238,11 @@ namespace m4m.framework
             return node;
         }
 
+        /**
+         * 解析特效 标量粒子节点
+         * @param value 数据
+         * @returns 标量粒子节点
+         */
         public static parseEffectValueData(value: any): ValueData
         {
             let val = new ValueData();
@@ -198,6 +258,12 @@ namespace m4m.framework
             }
             return val;
         }
+
+        /**
+         * 解析特效 UV节点
+         * @param value 数据
+         * @returns UV节点
+         */
         public static parseEffectUVSpeed(value: any): UVSpeedNode
         {
             let node: UVSpeedNode = new UVSpeedNode();
@@ -207,6 +273,14 @@ namespace m4m.framework
             }
             return node;
         }
+
+        /**
+         * 计算注视
+         * @param eye 眼睛的位置
+         * @param targetpos 目标位置
+         * @param out 输出的四元数旋转
+         * @param up 视窗上方向
+         */
         public static lookat(eye: m4m.math.vector3, targetpos: m4m.math.vector3, out: m4m.math.quaternion, up: m4m.math.vector3 = m4m.math.pool.vector3_up)
         {
 
@@ -242,9 +316,14 @@ namespace m4m.framework
             math.quatFromAxisAngle(right, pitch, quadRight);
             // math.quatMultiply(quadRight,out,out);
 
-        }
+        }   
 
-
+        /**
+         * 计算一个三维向量朝着 指定方向旋转
+         * @param source 三维向量
+         * @param direction 方向
+         * @param out 输出三维向量
+         */
         public static RotateVector3(source: m4m.math.vector3, direction: m4m.math.vector3, out: m4m.math.vector3)
         {
             math.vec3Normalize(source, source);
@@ -277,6 +356,11 @@ namespace m4m.framework
             m4m.math.pool.delete_quaternion(quatertion);
         }
 
+        /**
+         *  计算绑定轴 广告板旋转
+         * @param localAxis 本地轴
+         * @param out 输出旋转
+         */
         public static bindAxisBillboard(localAxis:m4m.math.vector3,out:m4m.math.quaternion)
         {
             math.vec3Normalize(localAxis, localAxis);
@@ -308,7 +392,13 @@ namespace m4m.framework
 
         }
 
-
+        /**
+         * 计算 注视 垂直 广告板 旋转
+         * @param eye 眼睛位置
+         * @param targetpos 目标位置
+         * @param out 输出旋转
+         * @param up 视窗上方向
+         */
         public static lookatVerticalBillboard(eye: m4m.math.vector3, targetpos: m4m.math.vector3, out: m4m.math.quaternion, up: m4m.math.vector3 = m4m.math.pool.vector3_up)
         {
             let dir = new m4m.math.vector3();

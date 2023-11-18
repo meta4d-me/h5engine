@@ -379,7 +379,10 @@ namespace m4m.framework
                 particle.velocity.z = particle.velocity.z / len * length;
             }
         }
-
+        
+        /**
+         * 当形状类型改变
+         */
         private _onShapeTypeChanged()
         {
             var preValue = this.activeShape;
@@ -476,6 +479,9 @@ namespace m4m.framework
             serialization.setValue(this.activeShape, preValue);
         }
 
+        /**
+         * 当形状改变
+         */
         private _onShapeChanged()
         {
             switch (this.shape)

@@ -64,6 +64,12 @@
         private _gray: boolean;
         get gray() { return this._gray; }
         get isDispose() { return this._isDispose; }
+        /**
+         * 获取纹理上的像素
+         * @param u 纹理坐标u
+         * @param v 纹理坐标v
+         * @returns 输出像素数据（rgba颜色 | 灰度值）
+         */
         getPixel(u: number, v: number): any {
             var x = (u * this._width) | 0;
             var y = (v * this._height) | 0;
@@ -77,7 +83,10 @@
             }
         }
 
-        /** 刷新data数据 */
+        /**
+         * 刷新data数据
+         * @param texRGBA 需要读取的源纹理
+         */
         refresh(texRGBA: WebGLTexture) {
             if (!texRGBA) {
                 console.warn(`texRGBA is null `);
@@ -102,7 +111,10 @@
                 }
             }
         }
-
+        
+        /**
+         * 销毁
+         */
         dispose() {
             this.webgl = null;
             this._data = null;
@@ -116,12 +128,23 @@
         texture: WebGLTexture;
         width: number;
         height: number;
+        /**
+         * 判断是 FBO
+         * @returns 是FBO
+         */
         isFrameBuffer(): boolean;
+        /**
+         * 销毁
+         * @param webgl webgl上下文 
+         */
         dispose(webgl: WebGL2RenderingContext);
+        /**
+         * 计算字节长度
+         */
         caclByteLength(): number;
     }
     /**
-     * @private
+     * 渲染输出目标纹理
      */
     export class glRenderTarget implements ITexture {
         width: number;
@@ -167,6 +190,10 @@
         fbo: WebGLFramebuffer;
         renderbuffer: WebGLRenderbuffer;
         texture: WebGLTexture;
+        /**
+         * 使用
+         * @param webgl webgl上下文
+         */
         use(webgl: WebGL2RenderingContext) {
             webgl.bindFramebuffer(webgl.FRAMEBUFFER, this.fbo);
             webgl.bindRenderbuffer(webgl.RENDERBUFFER, this.renderbuffer);
@@ -174,11 +201,16 @@
             //webgl.framebufferTexture2D(webgl.FRAMEBUFFER, webgl.COLOR_ATTACHMENT0, webgl.TEXTURE_2D, this.texture, 0);
 
         }
+        /**
+         * 渲染输出目使用状态设置为空
+         * @param webgl webgl上下文
+         */
         static useNull(webgl: WebGL2RenderingContext) {
             webgl.bindFramebuffer(webgl.FRAMEBUFFER, null);
             webgl.bindRenderbuffer(webgl.RENDERBUFFER, null);
 
         }
+   
         dispose(webgl: WebGL2RenderingContext) {
             //if (this.texture == null && this.img != null)
             //    this.disposeit = true;
@@ -190,10 +222,12 @@
                 this.texture = null;
             }
         }
+     
         caclByteLength(): number {
             //RGBA & no mipmap
             return this.width * this.height * 4;
         }
+     
         isFrameBuffer(): boolean {
             return true;
         }
@@ -221,7 +255,16 @@
             //    return;
             this.texture = webgl.createTexture();
         }
-
+        /**
+         * 上载 纹理像素数据 到webgl API
+         * @param img HTMLImageElement 的纹理像素数据
+         * @param mipmap 开mipmap？
+         * @param linear 开线性纹理采样？
+         * @param premultiply 开alpha 预乘？
+         * @param repeat uv 采样超出重复？
+         * @param mirroredU uv 采样超出 U 镜像翻转
+         * @param mirroredV uv 采样超出 V 镜像翻转
+         */
         uploadImage(img: HTMLImageElement, mipmap: boolean, linear: boolean, premultiply: boolean = true, repeat: boolean = false, mirroredU: boolean = false, mirroredV: boolean = false): void {
             this.width = img.width;
             this.height = img.height;
@@ -304,6 +347,20 @@
             //this.img = null;
             this.webgl.bindTexture(this.webgl.TEXTURE_2D, null);
         }
+        /**
+         * 上载 纹理像素数据 到webgl API
+         * @param mipmap 开mipmap？
+         * @param linear 开线性纹理采样？
+         * @param width 纹理像素宽度
+         * @param height 纹理像素高度
+         * @param data 二进制数据
+         * @param premultiply 开alpha 预乘？
+         * @param repeat uv 采样超出重复？
+         * @param mirroredU uv 采样超出 U 镜像翻转
+         * @param mirroredV uv 采样超出 V 镜像翻转
+         * @param flipY Y 翻转
+         * @param dataType 像素类型
+         */
         uploadByteArray(mipmap: boolean, linear: boolean, width: number, height: number, data: Uint8Array | Uint16Array | Float32Array, repeat: boolean = false, mirroredU: boolean = false, mirroredV: boolean = false, premultiplyAlpha = true, flipY = true, dataType: number = this.webgl.UNSIGNED_BYTE): void {
             this.width = width;
             this.height = height;
@@ -398,6 +455,10 @@
         width: number = 0;
         height: number = 0;
         mipmap: boolean = false;
+        /**
+         * 计算内存占用长度
+         * @returns 内存占用长度
+         */
         caclByteLength(): number {
             let pixellen = 1;
             if (this.format == TextureFormatEnum.RGBA) {
@@ -415,6 +476,11 @@
 
         //创建读取器，有可能失败
         reader: textureReader;
+        /**
+         * 获取一个纹理阅读器
+         * @param redOnly 灰色模式（）
+         * @returns 纹理阅读器
+         */
         getReader(redOnly: boolean = false): textureReader {
             if (this.reader != null) {
                 if (this.reader.gray != redOnly)
@@ -442,7 +508,10 @@
         isFrameBuffer(): boolean {
             return false;
         }
-
+        /**
+         * 获取 纹理 GL 格式
+         * @returns 
+         */
         private getGLFormat(): { internalformatGL: number, formatGL: number } {
             let formatGL: number = this.webgl.RGBA;
             let internalformatGL = formatGL;
@@ -471,6 +540,14 @@
             return { internalformatGL, formatGL };
         }
         private static mapTexture: { [id: string]: glTexture2D } = {};
+        /**
+         * 通过 二进制数据 生成一个灰图
+         * @param webgl webgl上下文
+         * @param array 二进制数据
+         * @param width 纹理宽
+         * @param height 纹理高
+         * @returns 灰图纹理
+         */
         static formGrayArray(webgl: WebGL2RenderingContext, array: number[] | Float32Array | Float64Array, width: number, height: number) {
             var mipmap = false;
             var linear = true;
@@ -492,6 +569,12 @@
             return t;
         }
 
+        /**
+         * 生成 一个 引擎内建样式纹理
+         * @param webgl webgl上下文
+         * @param name 样式名字
+         * @returns 纹理
+         */
         static staticTexture(webgl: WebGL2RenderingContext, name: "grid" | "gray" | "white" | "black" | "normal") {
             let t = glTexture2D.mapTexture[name];
             if (t != undefined) return t;
@@ -549,7 +632,12 @@
             glTexture2D.mapTexture[name] = t;
             return t;
         }
-
+        /**
+         * 生成 一个 引擎内建粒子系统使用样式纹理
+         * @param webgl webgl上下文
+         * @param name 样式名字
+         * @returns 纹理
+         */
         static particleTexture(webgl: WebGL2RenderingContext, name = framework.defTexture.particle) {
             var t = glTexture2D.mapTexture[name];
             if (t != undefined)
@@ -599,6 +687,18 @@
 
             this.texture = webgl.createTexture();
         }
+        /**
+         * 上载 纹理像素数据 到webgl API
+         * @param Texture_NEGATIVE_X 反面纹理X
+         * @param Texture_NEGATIVE_Y 反面纹理Y
+         * @param Texture_NEGATIVE_Z 反面纹理Z
+         * @param Texture_POSITIVE_X 正面纹理X
+         * @param Texture_POSITIVE_Y 正面纹理Y
+         * @param Texture_POSITIVE_Z 正面纹理Z
+         * @param min 最小值
+         * @param max 最大值
+         * @param mipmap 开启mipmap？
+         */
         uploadImages(
             Texture_NEGATIVE_X: framework.texture,
             Texture_NEGATIVE_Y: framework.texture,
@@ -631,6 +731,13 @@
 
         }
 
+        /**
+         * 上载 纹理像素数据 到webgl API
+         * @param data 纹理像素数据
+         * @param width 宽
+         * @param height 高
+         * @param TEXTURE_CUBE_MAP_ cube map的索引
+         */
         private upload(data: HTMLImageElement | Uint8Array, width: number, height: number, TEXTURE_CUBE_MAP_: number): void {
             this.width = width;
             this.height = height;
@@ -853,6 +960,14 @@
         repeat: boolean = false;
         mirroredU: boolean = false;
         mirroredV: boolean = false
+        /**
+         * 更新纹理 指定矩形区域的像素数据
+         * @param data 纹理数据
+         * @param x 坐标x
+         * @param y 坐标y
+         * @param width 宽
+         * @param height 高
+         */
         updateRect(data: Uint8Array | Uint8ClampedArray, x: number, y: number, width: number, height: number) {
             this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
             this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this.premultiply ? 1 : 0);
@@ -864,6 +979,13 @@
                 this.webgl.UNSIGNED_BYTE,
                 data);
         }
+
+        /**
+         * 更新纹理 指定矩形区域的像素数据
+         * @param data 纹理数据
+         * @param x 坐标x
+         * @param y 坐标y
+         */
         updateRectImg(data: ImageData | HTMLVideoElement | HTMLImageElement | HTMLCanvasElement, x: number, y: number) {
             this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
             this.webgl.texSubImage2D(this.webgl.TEXTURE_2D, 0,
@@ -872,7 +994,6 @@
                 this.webgl.UNSIGNED_BYTE,
                 data);
         }
-
 
         isFrameBuffer(): boolean {
             return false;

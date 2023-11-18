@@ -17,14 +17,26 @@
         {
 
         }
+        /**
+         * 获取值
+         * @returns 值 
+         */
         getValue(): m4m.math.vector3
         {
             return new m4m.math.vector3(this.x.getValue(), this.y.getValue(), this.z.getValue());
         }
+        /**
+         * 获取一个随机值
+         * @returns 一个随机值
+         */
         getValueRandom(): m4m.math.vector3
         {
             return new m4m.math.vector3(this.x.getValueRandom(), this.y.getValueRandom(), this.z.getValueRandom());
         }
+        /**
+         * 克隆
+         * @returns 克隆一个节点
+         */
         clone()
         {
             let node = new ParticleNode();
@@ -47,7 +59,10 @@
     {
         alpha: ValueData = new ValueData();
         key: number;
-
+        /**
+         * 获取值
+         * @returns 值 
+         */
         getValue(): number
         {
             return this.alpha.getValue();
@@ -62,15 +77,26 @@
         u: ValueData = new ValueData();
         v: ValueData = new ValueData();
         key: number;
-
+        /**
+         * 获取值
+         * @returns 值 
+         */
         getValue(): m4m.math.vector2
         {
             return new m4m.math.vector2(this.u.getValue(), this.v.getValue());
         }
+        /**
+         * 获取随机值
+         * @returns 随机值
+         */
         getValueRandom(): m4m.math.vector2
         {
             return new m4m.math.vector2(this.u.getValueRandom(), this.v.getValueRandom());
         }
+        /**
+         * 克隆
+         * @returns 
+         */
         clone()
         {
             let node = new UVSpeedNode();
@@ -90,15 +116,23 @@
         x: ValueData = new ValueData();
         y: ValueData = new ValueData();
         key: number;
-
+        /**
+         * 获取值
+         * @returns 值 
+         */
         getValue(): m4m.math.vector2
         {
             return new m4m.math.vector2(this.x.getValue(), this.y.getValue());
         }
+        /**
+         * 获取随机值
+         * @returns 随机值
+         */
         getValueRandom(): m4m.math.vector2
         {
             return new m4m.math.vector2(this.x.getValueRandom(), this.y.getValueRandom());
         }
+        /** 克隆 */
         clone()
         {
             let vec = new ParticleNodeVec2();
@@ -117,14 +151,26 @@
     {
         num: ValueData = new ValueData();
         key: number;
+        /**
+         * 获取值
+         * @returns 值 
+         */
         getValue(): number
         {
             return this.num.getValue();
         }
+        /**
+         * 获取随机值
+         * @returns 随机值
+         */
         getValueRandom(): number
         {
             return this.num.getValueRandom();
         }
+        /**
+         * 克隆
+         * @returns 
+         */
         clone()
         {
             let num = new ParticleNodeNumber();

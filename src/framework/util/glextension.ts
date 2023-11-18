@@ -39,6 +39,10 @@ namespace m4m.framework {
             // }
         }
 
+        /**
+         * 初始化 webgl 拓展绑定
+         * @param gl 
+         */
         private initExtensions(gl: WebGL2RenderingContext) {
             this.EXT_color_buffer_half_float = gl.getExtension("EXT_color_buffer_half_float");
             this.EXT_texture_filter_anisotropic = gl.getExtension('EXT_texture_filter_anisotropic') || gl.getExtension('MOZ_EXT_texture_filter_anisotropic') || gl.getExtension('WEBKIT_EXT_texture_filter_anisotropic');

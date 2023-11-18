@@ -23,7 +23,7 @@ namespace m4m.framework
             this.initMesh();
 
         }
-
+        /** 初始化mesh */
         private initMesh()
         {
             this.mesh = new mesh();
@@ -48,6 +48,9 @@ namespace m4m.framework
         }
         public curVerCount: number = 0;
         public curIndexCount: number = 0;
+        /**
+         * 添加 粒子
+         */
         addParticle()
         {
             this.refreshBuffer();
@@ -68,7 +71,9 @@ namespace m4m.framework
             
             this.mesh.submesh[0].size = this.curIndexCount;
         }
-
+        /**
+         * 刷新 缓冲区
+         */
         private refreshBuffer()
         {
             var needvercount = this.curVerCount + this.emission.perVertexCount;
@@ -92,6 +97,10 @@ namespace m4m.framework
             }
         }
 
+        /**
+         * 更新
+         * @param delta 
+         */
         update(delta: number)
         {
             for (let key in this.particles)
@@ -101,6 +110,12 @@ namespace m4m.framework
             }
         }
 
+        /**
+         * 执行渲染
+         * @param context 渲染上下文
+         * @param assetmgr 资源管理器
+         * @param camera 相机
+         */
         render(context: renderContext, assetmgr: assetMgr, camera: m4m.framework.camera)
         {
             let mesh = this.mesh;
@@ -116,6 +131,9 @@ namespace m4m.framework
                 this.mat.draw(context, mesh, mesh.submesh[0], "base");
             }
         }
+        /**
+         * 销毁
+         */
         dispose()
         {
             this.dataForVbo = null;

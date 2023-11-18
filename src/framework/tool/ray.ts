@@ -82,6 +82,13 @@
             return ishided;
         }
 
+        /**
+         * 判断 与一个平面 是否相交
+         * @param planePoint 平面上的点
+         * @param planeNormal 平面法向量
+         * @param outHitPoint 输出的碰撞点坐标
+         * @returns 碰撞了？
+         */
         public intersectPlane(planePoint: m4m.math.vector3, planeNormal: m4m.math.vector3, outHitPoint: m4m.math.vector3): boolean {
             var vp1 = planeNormal.x;
             var vp2 = planeNormal.y;

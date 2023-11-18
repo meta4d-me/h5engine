@@ -173,6 +173,10 @@ namespace m4m.framework {
          * @classdesc
          * 引擎的启动方法
          * @param div 绘制区域的dom
+         * @param type HTMLCanvasElement 自适应模式
+         * @param val 自适应模式参数值
+         * @param webglDebug 开启webgl 调试模式？
+         * @param opt_attribs webgl上下文初始化选项
          * @version m4m 1.0
          */
         start(div: HTMLDivElement, type: CanvasFixedType = CanvasFixedType.Free, val: number = 1200, webglDebug = false, opt_attribs: WebGLContextAttributes = null) {
@@ -234,6 +238,14 @@ namespace m4m.framework {
             //this.showDrawCall();
         }
 
+        /**
+         * 启动引擎 通过 给定 HTMLCanvasElement 对象
+         * @param canvas HTMLCanvasElement 对象
+         * @param type HTMLCanvasElement 自适应模式
+         * @param val 自适应模式参数值
+         * @param webglDebug 开启webgl 调试模式？
+         * @param opt_attribs webgl上下文初始化选项
+         */
         startForCanvas(canvas: HTMLCanvasElement, type: CanvasFixedType = CanvasFixedType.Free, val: number = 1200, webglDebug = false, opt_attribs: WebGLContextAttributes = null) {
             console.log("engine version: " + version.VERSION);
 
@@ -318,10 +330,23 @@ namespace m4m.framework {
             }
         }
 
+        /**
+         * @deprecated [已弃用]
+         * 通报
+         * @param trans 
+         * @param type 
+         */
         markNotify(trans: any, type: NotifyType) {
             // this.doNotify(trans, type);
         }
 
+        /**
+         * @deprecated [已弃用]
+         * 触发通报
+         * @param trans 
+         * @param type 
+         * @returns 
+         */
         private doNotify(trans: transform, type: NotifyType) {
             if (trans == null)
                 return;
@@ -335,9 +360,12 @@ namespace m4m.framework {
                 }
             }
         }
+
         /**
-         * @private
-         * @param trans
+         * @deprecated [已弃用]
+         * 检查 HideInHierarchy 过滤
+         * @param trans 节点
+         * @returns 是通过？
          */
         checkFilter(trans: any) {
             if (trans instanceof m4m.framework.transform) {
@@ -352,7 +380,6 @@ namespace m4m.framework {
             }
             return true;
         }
-
 
         /**
          * @public
@@ -389,16 +416,25 @@ namespace m4m.framework {
             }
         }
 
+        /**
+         * 显示 绘制 DrawCall 信息GUI
+         */
         showDrawCall() {
             DrawCallInfo.inc.showDrawcallInfo();
         }
+        /**
+         * 关闭 绘制 DrawCall 信息GUI
+         */
         closeDrawCall() {
             DrawCallInfo.inc.closeDrawCallInfo();
         }
         private _frameID = 0;
         get frameID() { return this._frameID; };
         private beStepNumber = 0;
-        //delta 单位秒
+        /**
+         * 引擎Loop 更新
+         * @param delta 上一帧间隔时间（delta 单位秒）
+         */
         private update(delta: number) {
             this._frameID++;
 
@@ -431,6 +467,9 @@ namespace m4m.framework {
             }
         }
 
+        /**
+         * 更新屏幕的 ASP
+         */
         private updateScreenAsp() {
             if (!this.outcontainer)
                 return;
@@ -469,7 +508,9 @@ namespace m4m.framework {
             }
         }
 
-        //设置屏幕的 ASP
+        /**
+         * 设置屏幕的 ASP
+         */
         private setScreenAsp() {
             if (!this.webgl || !this.webgl.canvas) return;
             let canvas = this.webgl.canvas;
@@ -503,11 +544,12 @@ namespace m4m.framework {
          */
         public preusercodetimer: number;
         /**
-         * @private
+         * @deprecated [已弃用]
          */
         public usercodetime: number;
         /**
-         * @private
+         * @deprecated [已弃用]
+         * 获取用户 更新时间
          */
         getUserUpdateTimer() {
             return this.usercodetime;
@@ -516,7 +558,7 @@ namespace m4m.framework {
         private lastTimer;
         private totalTime;
         /**
-         * @private
+         * 获取引擎启动到现在的总时间
          */
         getTotalTime(): number {
             return this.totalTime;
@@ -532,7 +574,7 @@ namespace m4m.framework {
         private pretimer: number = 0;
         private updateTimer;
         /**
-         * @private
+         * 获取上一帧的时间差（秒）
          */
         getUpdateTimer() {
             return this.updateTimer;
@@ -542,6 +584,9 @@ namespace m4m.framework {
          * @private
          */
         public isFrustumCulling: boolean = true;
+        /**
+         * 引擎的循环函数
+         */
         private loop() {
             var now = Date.now() / 1000;
             this._deltaTime = now - this.lastTimer;
@@ -583,12 +628,18 @@ namespace m4m.framework {
         //我们只留一个控制层即可
 
         private _scene: scene;
+        /**
+         * 初始化场景
+         */
         private initScene() {
             if (this._scene == null) {
                 this._scene = new scene(this);
                 sceneMgr.scene = this._scene;
             }
         }
+        /**
+         * 初始化渲染
+         */
         private initRender(): any {
             uniformSetter.initAutouniform();
             render.shaderUniform.webgl = this.webgl;
@@ -606,6 +657,9 @@ namespace m4m.framework {
         }
 
         private _assetmgr: assetMgr
+        /**
+         * 初始化资源管理器
+         */
         private initAssetMgr() {
             if (this._assetmgr == null) {
                 assetMgr.Instance = this._assetmgr = new assetMgr(this);
@@ -624,6 +678,9 @@ namespace m4m.framework {
         }
 
         private _inputmgr: inputMgr
+        /**
+         * 初始化输入管理器
+         */
         private initInputMgr() {
             if (this._inputmgr == null) {
                 this._inputmgr = new inputMgr(this);
@@ -692,7 +749,10 @@ namespace m4m.framework {
         public set beStepForward(value: boolean) {
             this._beStepForward = value;
         }
-
+        /**
+         * 更新 用户逻辑代码
+         * @param delta 
+         */
         private updateUserCode(delta: number) {
             //add new code;
             while (this._userCodeNew.length > 0) {
@@ -748,6 +808,10 @@ namespace m4m.framework {
             */
         }
 
+        /**
+         * 更新编辑器逻辑代码
+         * @param delta 
+         */
         private updateEditorCode(delta: number) {
             for (let i = this._editorCodeNew.length - 1; i >= 0; i--) {
                 let c = this._editorCodeNew[i];
@@ -839,6 +903,9 @@ namespace m4m.framework {
         private lastWidth = 0;
         private lastHeight = 0;
         public OffOrientationUpdate = false;  //关闭更新
+        /**
+         * 更新 画面旋转方向模式
+         */
         private updateOrientationMode() {
             if (this.OffOrientationUpdate || !this.outcontainer) return;
             let screenRect = this.outcontainer.getBoundingClientRect();
@@ -959,9 +1026,19 @@ namespace m4m.framework {
      * @version m4m 1.0
      */
     export interface IUserCode {
+        /**
+         * 开始时触发
+         * @param app   引擎app 
+         */
         onStart(app: m4m.framework.application);
-        //以秒为单位的间隔
+        /**
+         * 更新触发
+         * @param delta 上一帧间隔时间（以秒为单位的间隔） 
+         */
         onUpdate(delta: number);
+        /**
+         * 是关闭？
+         */
         isClosed(): boolean;
     }
     /**
@@ -972,9 +1049,19 @@ namespace m4m.framework {
      * @version m4m 1.0
      */
     export interface IEditorCode {
+        /**
+         * 开始时触发
+         * @param app   引擎app 
+         */
         onStart(app: m4m.framework.application);
-        //以秒为单位的间隔
+        /**
+         * 更新触发
+         * @param delta 上一帧间隔时间（以秒为单位的间隔） 
+         */
         onUpdate(delta: number);
+        /**
+         * 是关闭？
+         */
         isClosed(): boolean;
     }
 
@@ -1004,7 +1091,10 @@ namespace m4m.framework {
     let currentPrefix: string = null;
 
     /**
-     * @private
+     * 获取 html元素 前缀
+     * @param name 名
+     * @param element html元素
+     * @returns 前缀
      */
     export function getPrefixStyleName(name: string, element?: any): string {
         let header: string = "";
@@ -1028,7 +1118,10 @@ namespace m4m.framework {
     }
 
     /**
-     * @private
+     * 获取 html元素 前缀
+     * @param name 名
+     * @param element html元素
+     * @returns 前缀
      */
     export function getPrefix(name: string, element: any): string {
         if (name in element) {

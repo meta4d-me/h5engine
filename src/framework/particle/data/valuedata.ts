@@ -25,6 +25,10 @@
             this._valueLimitMax = _v;
             this.isRandom = true;
         }
+        /**
+         * 克隆
+         * @returns 
+         */
         clone()
         {
             let valu = new ValueData();
@@ -76,6 +80,13 @@
 
         }
 
+        /**
+         * 计算一个随机变量值
+         * @param min 最小数
+         * @param max 最大数
+         * @param isInteger 是Int 类型
+         * @returns 值
+         */
         public static RandomRange(min: number, max: number, isInteger: boolean = false)
         {
             if (isInteger)

@@ -34,7 +34,7 @@ namespace m4m.framework {
          */
         constructor() {
             this.canvas = new canvas();
-            sceneMgr.app.markNotify(this.canvas.getRoot(), NotifyType.AddChild);
+            // sceneMgr.app.markNotify(this.canvas.getRoot(), NotifyType.AddChild);
         }
 
         private _hasListenerEvent = false;

@@ -8,6 +8,7 @@ namespace m4m.framework
         attributeValType: AttributeValType;
         attributeType: AttributeType;
         actions: { [frameIndex: number]: IEffectAction[] };
+        /** 初始化 */
         init();
     }
     @m4m.reflect.SerializeType
@@ -23,6 +24,7 @@ namespace m4m.framework
         {
             this.init();
         }
+        /** 初始化 */
         init()
         {
             this.data = {};
@@ -43,7 +45,6 @@ namespace m4m.framework
             if (func != null)
                 func();
         }
-
         removeFramePoint(frameId: number, data: any, func?: Function)
         {
             if (this.data[frameId] == undefined)
@@ -87,6 +88,7 @@ namespace m4m.framework
         {
             this.init();
         }
+        /** 初始化 */
         init()
         {
             this.data = {};
@@ -151,6 +153,7 @@ namespace m4m.framework
         {
             this.init();
         }
+        /** 初始化 */
         init()
         {
             this.data = {};
@@ -204,8 +207,24 @@ namespace m4m.framework
 
     export interface ILerpAttributeInterface
     {
+        /**
+         * 添加帧数据
+         * @param data  帧点数据 
+         * @param func 回调函数
+         */
         addFramePoint(data: any, func?: Function);
+        /**
+         * 移除帧数据
+         * @param frameId 帧ID 
+         * @param data 数据
+         * @param func 回调函数
+         */
         removeFramePoint(frameId: number, data: any, func?: Function);
+        /**
+         * 更新帧数据
+         * @param data 数据
+         * @param func 回调函数
+         */
         updateFramePoint(data: any, func?: Function);
     }
 
@@ -244,6 +263,11 @@ namespace m4m.framework
 
     export class AttributeUtil
     {
+        /**
+         * 添加指定帧数据
+         * @param datas 数据 
+         * @param index 帧索引
+         */
         public static addFrameIndex(datas: number[], index: number)
         {
             for (let i = 0; i < datas.length - 1; i++)

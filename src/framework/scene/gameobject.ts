@@ -256,7 +256,7 @@ namespace m4m.framework
             if (val != this._visible)
             {
                 this._visible = val;
-                sceneMgr.app.markNotify(this.transform, NotifyType.ChangeVisible);
+                // sceneMgr.app.markNotify(this.transform, NotifyType.ChangeVisible);
             }
         }
 
@@ -444,10 +444,10 @@ namespace m4m.framework
             {
                 this.components.push(nodeObj);
                 this.componentsInit.push(nodeObj);
-                if (reflect.getClassTag(comp["__proto__"], "camera") == "1")
-                    sceneMgr.app.markNotify(this.transform, NotifyType.AddCamera);
-                if (reflect.getClassTag(comp["__proto__"], "canvasRenderer") == "1")
-                    sceneMgr.app.markNotify(this.transform, NotifyType.AddCanvasRender);                
+                // if (reflect.getClassTag(comp["__proto__"], "camera") == "1")
+                //     sceneMgr.app.markNotify(this.transform, NotifyType.AddCamera);
+                // if (reflect.getClassTag(comp["__proto__"], "canvasRenderer") == "1")
+                //     sceneMgr.app.markNotify(this.transform, NotifyType.AddCanvasRender);                
                 this.transform.markHaveInitComp();
                 this.transform.markHaveOnplayComp();
                 // this.transform.markHaveComponent();
@@ -508,7 +508,12 @@ namespace m4m.framework
             this._getComponentsInChildren(type, this, components);
             return components;
         }
-
+        /**
+         * 获取指定类型的所有组件在子节点中
+         * @param type 组件类型
+         * @param obj go节点
+         * @param array 输出的组件数组
+         */
         private _getComponentsInChildren(type: string, obj: gameObject, array: INodeComponent[])
         {
             let len = obj.components.length;
@@ -543,8 +548,8 @@ namespace m4m.framework
 
         /**
          * 获取节点的第一个组件
-         * @param node 
-         * @param _type 
+         * @param node go节点
+         * @param _type 组件类型
          */
         private getNodeFirstComponent(node: gameObject, type: string)
         {
@@ -727,6 +732,10 @@ namespace m4m.framework
             tran.hasOnPlayComp = false;
         }
 
+        /**
+         * 清理 移除的组件
+         * @param cComp 组件
+         */
         private clearOfCompRemove(cComp: nodeComponent){
             let comp = cComp.comp;
             if(cComp.init){

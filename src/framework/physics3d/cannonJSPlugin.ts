@@ -220,6 +220,13 @@ namespace m4m.framework {
             this.world.removeConstraint(impostorJoint.joint.physicsJoint);
         }
 
+        /**
+         * 添加物理材质
+         * @param name 名
+         * @param friction 摩擦力
+         * @param restitution 恢复系数
+         * @returns 物理材质
+         */
         private _addMaterial(name: string, friction: number, restitution: number) {
             var index;
             var mat;
@@ -240,10 +247,20 @@ namespace m4m.framework {
             return currentMat;
         }
 
+        /**
+         * 检查最小值
+         * @param value 值 
+         * @returns 结果值
+         */
         private _checkWithEpsilon(value: number): number {
             return value < PhysicsEngine.Epsilon ? PhysicsEngine.Epsilon : value;
         }
 
+        /**
+         * 创建图形
+         * @param impostor 物理体
+         * @returns 图形对象
+         */
         private _createShape(impostor: PhysicsImpostor) {
             let object = impostor.object;
 
@@ -490,7 +507,11 @@ namespace m4m.framework {
         //     impostor.physicsBody.position.copy(this._tmpPosition);
         //     impostor.physicsBody.quaternion.copy(quaternion);
         // }
-
+        /**
+         * 向量复制
+         * @param from 源向量
+         * @param to 输出向量
+         */
         private vec3Copy(from: any, to: math.vector3) {
             // to.rawData[0]=from.x;
             // to.rawData[1]=from.y;
@@ -499,6 +520,11 @@ namespace m4m.framework {
             to.y = from.y;
             to.z = from.z;
         }
+        /**
+         * 四元数复制
+         * @param from 源四元数
+         * @param to 输四元数
+         */
         private QuatCopy(from: any, to: math.quaternion) {
             // to.rawData[0] = from.x;
             // to.rawData[1] = from.y;
@@ -509,6 +535,7 @@ namespace m4m.framework {
             to.z = from.z;
             to.w = from.w;
         }
+
         public setTransformationFromPhysicsBody(impostor: PhysicsImpostor) {
             this.vec3Copy(impostor.physicsBody.position, impostor.object.localPosition);
             this.QuatCopy(impostor.physicsBody.quaternion, impostor.object.localRotate);

@@ -278,6 +278,10 @@
             return aabb;
         }
 
+        /**
+         * 克隆
+         * @param to 输出的aabb
+         */
         public cloneTo(to:aabb)
         {
             math.vec3Clone(this.minimum,to.minimum);

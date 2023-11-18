@@ -54,7 +54,10 @@ namespace m4m.framework {
         needFillRenderer: boolean = true;
         /** 需要gpuInstanceBatcher 模式渲染 (减少渲染消耗 , 仅适合静态物)*/
         needGpuInstancBatcher: boolean = false;
-
+        /**
+         * 检查 本地 位移、旋转、缩放 是否改变
+         * @returns 改变了？
+         */
         private checkLRTSChange(): boolean {
             if (!this.fastEqual(this.helpLPos, this._localTranslate))
                 return true;
@@ -65,6 +68,12 @@ namespace m4m.framework {
             return false;
         }
 
+        /**
+         * 判断是否相等
+         * @param d_0 数据a
+         * @param d_1 数据b
+         * @returns 相等？
+         */
         private fastEqual(d_0, d_1): boolean {
             if (d_0.x != d_1.x) return false;
             if (d_0.y != d_1.y) return false;
@@ -490,7 +499,7 @@ namespace m4m.framework {
             this.children.splice(index, 0, node);
             node.scene = this.scene;
             node._parent = this;
-            sceneMgr.app.markNotify(node, NotifyType.AddChild);
+            // sceneMgr.app.markNotify(node, NotifyType.AddChild);
             // if (node.hasComponent || node.hasComponentChild)
             //     this.markHaveComponent();
 
@@ -543,7 +552,7 @@ namespace m4m.framework {
             var i = this.children.indexOf(node);
             if (i >= 0) {
                 this.children.splice(i, 1);
-                sceneMgr.app.markNotify(node, NotifyType.RemoveChild);
+                // sceneMgr.app.markNotify(node, NotifyType.RemoveChild);
                 node._parent = null;
             }
 
@@ -607,6 +616,13 @@ namespace m4m.framework {
             this.doImpact(this.scene.getRoot(), trans);
             return trans;
         }
+
+        /**
+         * 判断是否在场景中发生了碰撞
+         * @param tran 节点
+         * @param impacted 节点列表
+         * @returns 碰撞了？
+         */
         private doImpact(tran: transform, impacted: Array<transform>) {
             if (tran == this) return;
             if (tran.gameObject != null && tran.gameObject.collider != null) {
@@ -623,7 +639,10 @@ namespace m4m.framework {
 
         private dirtyLocal: boolean = false;
         private dirtyWorld: boolean = false;
-
+        /**
+         * 执行脏化标记
+         * @param local 本地模式
+         */
         private dirtify(local = false) {
             this.dirtiedOfFrustumCulling = true;
             if ((!local || (local && this.dirtyLocal)) && this.dirtyWorld) {
@@ -650,7 +669,9 @@ namespace m4m.framework {
             this._dirtyAABB = true;
         }
 
-        //同步自己的 W 、L 矩阵
+        /**
+         * 同步自己的 W 、L 矩阵
+         */
         private sync() {
             if (this.dirtyLocal) {
                 math.matrixMakeTransformRTS(this._localTranslate, this._localScale, this._localRotate, this.localMatrix);
@@ -697,6 +718,10 @@ namespace m4m.framework {
         //         p = p._parent;
         //     }
         // }
+        /**
+         * 向上标记有渲染组件
+         * @param selfHas 当前节点就有渲染组件
+         */
         markHaveRendererComp(selfHas = true) {
             this.hasRendererComp = this.hasRendererComp || selfHas;
             var p = this._parent;
@@ -706,6 +731,10 @@ namespace m4m.framework {
             }
         }
 
+        /**
+         * 向上标记有 Update函数执行 组件
+         * @param selfHas 当前节点就有 Update函数执行 组件
+         */
         markHaveUpdateComp(selfHas = true) {
             this.hasUpdateComp = this.hasUpdateComp || selfHas;
             var p = this._parent;
@@ -715,6 +744,10 @@ namespace m4m.framework {
             }
         }
 
+        /**
+         * 向上标记有 Init函数执行 组件
+         * @param selfHas 当前节点就有 Init函数执行 组件
+         */
         markHaveInitComp(selfHas = true) {
             this.hasInitComp = this.hasInitComp || selfHas;
             var p = this._parent;
@@ -724,6 +757,10 @@ namespace m4m.framework {
             }
         }
 
+        /**
+         * 向上标记有 Onplay函数执行 组件
+         * @param selfHas 当前节点就有 Onplay函数执行 组件
+         */
         markHaveOnplayComp(selfHas = true) {
             this.hasOnPlayComp = this.hasOnPlayComp || selfHas;
             var p = this._parent;
@@ -1044,7 +1081,10 @@ namespace m4m.framework {
 
             return this.worldMatrix;
         }
-
+        
+        /**
+         * 向上检查 看是否有变化
+         */
         private checkToTop() {
             let top: transform;
             let temp: transform = this;
@@ -1145,6 +1185,10 @@ namespace m4m.framework {
             this.calcLookAt(point);
         }
 
+        /**
+         * 计算注视
+         * @param point 注视的点 
+         */
         private calcLookAt(point: math.vector3) {
             math.quatLookat(this.getWorldTranslate(), point, this.worldRotate);
             this.setWorldRotate(this.worldRotate);
@@ -1196,6 +1240,9 @@ namespace m4m.framework {
         }
         private _beDispose: boolean = false;//是否被释放了
 
+        /**
+         * 当销毁时触发
+         */
         public onDispose: () => void;
         /**
          * @public
@@ -1209,6 +1256,9 @@ namespace m4m.framework {
             this._dispose();
         }
 
+        /**
+         * 执行销毁
+         */
         private _dispose() {
             if (this._beDispose) return;
             // if (this.children)

@@ -937,7 +937,7 @@ namespace m4m.framework {
             if (this.rootNode == null) {
                 this.rootNode = new transform2D();
                 this.rootNode.canvas = this;
-                this.scene.app.markNotify(this.rootNode, NotifyType.AddChild);
+                // this.scene.app.markNotify(this.rootNode, NotifyType.AddChild);
             }
             return this.rootNode;
         }

@@ -63,11 +63,21 @@
         mapuniforms: { [id: string]: uniform };
         //static mapUniformDic:{[type:number]:(webgl: WebGL2RenderingContext, key: WebGLUniformLocation, value: any)=>void};
         //uniformallchange: boolean = false;
+        /**
+         * 设置 当前 引擎着色器 program
+         * @param program 引擎着色器 program
+         * @param uniformDefault 默认uniform？[已弃用]
+         */
         setProgram(program: glProgram, uniformDefault: boolean = false)
         {
             this.program = program;
             this.mapuniforms=program.mapUniform;
         }
+
+        /**
+         * 设置半透混合模式
+         * @param mode 半透混合模式
+         */
         setAlphaBlend(mode: BlendModeEnum)
         {
             this.state_blendMode=mode;
@@ -211,6 +221,11 @@
 
         private static lastPassID = -1;
 
+        /**
+         * 使用pass
+         * @param webgl webgl上下文
+         * @returns 
+         */
         use(webgl: WebGL2RenderingContext)
         {
             let ID = this.id.getID(); 

@@ -23,11 +23,19 @@
             this.bu = _bu;
             this.bv = _bv;
         }
+        /**
+         * 初始化
+         */
         init(){
             this.pickedtran = null;
             this.hitposition.x = this.hitposition.y = this.hitposition.z = this.distance = this.bu = this.bv = this.subMeshId = 0;
             this.faceId = -1;
         }
+
+        /**
+         * 重一个对象克隆属性到自己
+         * @param from 克隆的对象
+         */
         cloneFrom(from:pickinfo){
             math.vec3Clone(from.normal,this.normal);
             this.pickedtran = from.pickedtran;

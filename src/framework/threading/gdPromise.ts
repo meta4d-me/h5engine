@@ -3,6 +3,7 @@ namespace m4m.threading
     export class gdPromise<T>
     {
         private execQueue: Array<(value?: T) => void> = new Array<(value?: T) => void>();
+        /** 异常捕获函数 */
         private catchMethod: (val: T) => void;
         // private thenCall: (val: T) => void;
 
@@ -14,6 +15,10 @@ namespace m4m.threading
             }, 0);
         }
 
+        /**
+         * 执行决定
+         * @param value 数据 
+         */
         public resolve(value?: T)
         {
             try
@@ -29,7 +34,11 @@ namespace m4m.threading
 
 
         }
-
+        /**
+         * 执行拒绝
+         * @param reason 
+         * @returns 
+         */
         public reject(reason?: any)
         {
             console.error(reason);
@@ -38,6 +47,11 @@ namespace m4m.threading
 
         }
 
+        /**
+         * 执行完然后
+         * @param thenCall 
+         * @returns 
+         */
         public then(thenCall: (value?: T) => void): gdPromise<T>
         {
             // this.thenCall = thenCall;
@@ -45,6 +59,11 @@ namespace m4m.threading
             return this;
         }
 
+        /**
+         * 异常捕获
+         * @param callbcack 
+         * @returns 
+         */
         public catch(callbcack: (val: any) => void): gdPromise<T>
         {
             this.catchMethod = callbcack;

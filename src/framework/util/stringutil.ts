@@ -238,7 +238,11 @@ namespace m4m.framework
             return firstChar + other;
         }
 
-
+        /**
+         * 判断对象是空或null
+         * @param obj 对象
+         * @returns 是空或null
+         */
         static isNullOrEmptyObject(obj: any): boolean
         {
             if (!obj)

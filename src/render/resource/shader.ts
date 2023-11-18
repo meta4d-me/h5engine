@@ -80,6 +80,10 @@ namespace m4m.render {
 
         // private _strideInsAttrib: number = 0;
         // get strideInsAttrib() { return this._strideInsAttrib; }
+        /**
+         * 初始化 属性 Attribute
+         * @param webgl webgl上下文
+         */
         initAttribute(webgl: WebGL2RenderingContext) {
             let attributesLen = webgl.getProgramParameter(this.program, webgl.ACTIVE_ATTRIBUTES);
             // let attMap = glProgram.buildInAtrribute;
@@ -154,10 +158,18 @@ namespace m4m.render {
         // //------------------------------------
 
         mapUniform: { [id: string]: uniform } = {};
+        /**
+         * 使用当前 webgl program
+         * @param webgl webgl上下文
+         */
         use(webgl: WebGL2RenderingContext) {
             webgl.useProgram(this.program);
         }
 
+        /**
+         * 初始化 program 使用的 Uniform 
+         * @param webgl webgl上下文
+         */
         initUniforms(webgl: WebGL2RenderingContext) {
             var numUniforms = webgl.getProgramParameter(this.program, webgl.ACTIVE_UNIFORMS);
             for (var i = 0; i < numUniforms; i++) {
@@ -219,15 +231,35 @@ namespace m4m.render {
         mapVS: { [id: string]: glShader } = {};
         mapFS: { [id: string]: glShader } = {};
         mapProgram: { [id: string]: glProgram } = {};
+        /**
+         * 销毁 指定 webgl顶点着色器
+         * @param webgl webgl上下文
+         * @param id 顶点着色器ID
+         */
         disposeVS(webgl: WebGL2RenderingContext, id: string) {
             webgl.deleteShader(this.mapVS[id].shader);
         }
+        /**
+         * 销毁 指定 webgl片元着色器
+         * @param webgl webgl上下文
+         * @param id 片元着色器ID
+         */
         disposeFS(webgl: WebGL2RenderingContext, id: string) {
             webgl.deleteShader(this.mapFS[id].shader);
         }
+        /**
+         * 销毁指定 webgl Program
+         * @param webgl webgl上下文
+         * @param id Program ID
+         */
         disposeProgram(webgl: WebGL2RenderingContext, id: string) {
             webgl.deleteProgram(this.mapProgram[id].program);
         }
+
+        /**
+         * 销毁所有着色器
+         * @param webgl webgl上下文
+         */
         disposeAll(webgl: WebGL2RenderingContext) {
             for (var key in this.mapVS) {
                 this.disposeVS(webgl, key);
@@ -242,7 +274,13 @@ namespace m4m.render {
             this.mapFS = {};
             this.mapProgram = {};
         }
-        //编译并扫描 attribute 和 uniform
+        /**
+         * 编译 顶点着色器 并扫描 attribute 和 uniform
+         * @param webgl webgl上下文
+         * @param name  名字 
+         * @param code  着色器代码
+         * @returns webgl 着色器
+         */
         compileVS(webgl: WebGL2RenderingContext, name: string, code: string): glShader {
             var vs = webgl.createShader(webgl.VERTEX_SHADER);
             webgl.shaderSource(vs, code);
@@ -259,7 +297,14 @@ namespace m4m.render {
             this.mapVS[name] = s;
             return s;
         }
-        //编译并扫描 attribute 和 uniform
+
+        /**
+         * 编译 片元着色器 并扫描 attribute 和 uniform
+         * @param webgl webgl上下文
+         * @param name  名字 
+         * @param code  着色器代码
+         * @returns webgl 着色器
+         */
         compileFS(webgl: WebGL2RenderingContext, name: string, code: string): glShader {
             var fs = webgl.createShader(webgl.FRAGMENT_SHADER);
             webgl.shaderSource(fs, code);
@@ -276,7 +321,14 @@ namespace m4m.render {
             this.mapFS[name] = s;
             return s;
         }
-        //link 并寻找出 attribute pos 和 uniform组
+
+        /**
+         * 链接 一个顶点着色器 、片元着色器 , 为一个webgl Program 
+         * @param webgl webgl上下文
+         * @param nameVS 顶点着色器名
+         * @param nameFS 片元着色器名
+         * @returns webgl Program
+         */
         linkProgram(webgl: WebGL2RenderingContext, nameVS: string, nameFS: string): glProgram {
             var program = webgl.createProgram();
 
@@ -302,7 +354,16 @@ namespace m4m.render {
         //--------------------------------------shader 版本2
         mapVSString: { [id: string]: string } = {};
         mapFSString: { [id: string]: string } = {};
-
+        /**
+         * 通过 type 从shader pass 配置中筛选符合条件的 顶点着色器 、片元着色器
+         * 链接 一个顶点着色器 、片元着色器 , 为一个webgl Program 
+         * @param webgl webgl上下文
+         * @param type pass 类型标记
+         * @param nameVS 顶点着色器名
+         * @param nameFS 片元着色器名
+         * @param globalMacros 着色器中 附加全局宏定义
+         * @returns webgl Program
+         */
         linkProgrambyPassType(webgl: WebGL2RenderingContext, type: string, nameVS: string, nameFS: string, globalMacros: string[]): glProgram {
             let vsStr = this.mapVSString[nameVS];
             let fsStr = this.mapFSString[nameFS];

@@ -53,6 +53,14 @@
         v1: number;
         v2: number;
         v3: number;
+        /**
+         * 设置 数据
+         * @param data  数据 
+         * @param _v0   值0
+         * @param _v1   值1
+         * @param _v2   值2
+         * @param _v3   值3
+         */
         public static set(data: number4, _v0: number, _v1: number, _v2: number, _v3: number) {
             data.v0 = _v0;
             data.v1 = _v1;
@@ -124,7 +132,13 @@
             }
             return map[vf];
         }
-
+        /**
+         * 初始化 webgl 缓冲区
+         * @param webgl webgl上下文
+         * @param vf 顶点格式
+         * @param vertexCount 顶点数量
+         * @param mode 模式
+         */
         initBuffer(webgl: WebGL2RenderingContext, vf: VertexFormatMask, vertexCount: number, mode: MeshTypeEnum = MeshTypeEnum.Static) {
             if (this.vbo != null)
                 throw new Error("you can only initbuffer once.");
@@ -148,6 +162,12 @@
             // this.indexCounts = []
             // this.ebos = [];
         }
+        /**
+         * 通过长度初始化 EBO
+         * @param webgl webgl上下文
+         * @param indexcount 索引数
+         * @returns 
+         */
         addIndex(webgl: WebGL2RenderingContext, indexcount: number): number {
             // let index = this.ebos.length;
             let index = 0;
@@ -160,11 +180,23 @@
             this.indexCount = indexcount;
             return index;
         }
+
+        /**
+         * 重置VBO 尺寸
+         * @param webgl webgl上下文
+         * @param vertexCount 顶点数
+         */
         resetVboSize(webgl: WebGL2RenderingContext, vertexCount: number) {
             this.vertexCount = vertexCount;
             webgl.bindBuffer(webgl.ARRAY_BUFFER, this.vbo);
             webgl.bufferData(webgl.ARRAY_BUFFER, vertexCount * this.vertexByteSize, this.mode);
         }
+        /**
+         * 重置EBO 尺寸
+         * @param webgl webgl上下文
+         * @param eboindex [已弃用]
+         * @param indexcount 索引数
+         */
         resetEboSize(webgl: WebGL2RenderingContext, eboindex: number, indexcount: number) {
             if (!this.ebo) return;
             // this.indexCounts[eboindex] = indexcount;
@@ -173,6 +205,9 @@
             webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, this.ebo);
             webgl.bufferData(webgl.ELEMENT_ARRAY_BUFFER, indexcount * 2, this.mode);
         }
+        /**
+         * 销毁
+         */
         dispose() {
             // if (this.ebos) {
             //     for (var i = 0; i < this.ebos.length; i++)
@@ -186,6 +221,11 @@
             this.vbo = null;
             this.vao = null;
         }
+
+        /**
+         * 计算内存占用长度
+         * @returns 内存占用长度
+         */
         caclByteLength(): number {
             let total = 0;
             total += this.vertexByteSize * this.vertexCount;
@@ -324,16 +364,34 @@
         //     // webglkit.SetMaxVertexAttribArray(webgl, channel);
         // }
 
+        /**
+         * 上载顶点子数据 到 webgl API
+         * @param webgl webgl上下文
+         * @param varray 数据
+         * @param offset 偏移
+         */
         uploadVertexSubData(webgl: WebGL2RenderingContext, varray: Float32Array, offset: number = 0) {
             webgl.bindBuffer(webgl.ARRAY_BUFFER, this.vbo);
             webgl.bufferSubData(webgl.ARRAY_BUFFER, offset, varray);
         }
 
+        /**
+         * 上载顶点数据 到 webgl API
+         * @param webgl webgl上下文
+         * @param varray 数据
+         */
         uploadVertexData(webgl: WebGL2RenderingContext, varray: Float32Array) {
             webgl.bindBuffer(webgl.ARRAY_BUFFER, this.vbo);
             webgl.bufferData(webgl.ARRAY_BUFFER, varray, this.mode);
         }
 
+        /**
+         * 上载顶点索引 子数据 到 webgl API
+         * @param webgl webgl上下文
+         * @param eboindex [已弃用]
+         * @param data 数据
+         * @param offset 偏移
+         */
         uploadIndexSubData(webgl: WebGL2RenderingContext, eboindex: number, data: TriIndexTypeArray, offset: number = 0) {
             if (!this.ebo) return;
             // webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, this.ebos[eboindex]);
@@ -341,6 +399,13 @@
             webgl.bufferSubData(webgl.ELEMENT_ARRAY_BUFFER, offset, data);
         }
 
+        /**
+         * 上载顶点索引 数据 到 webgl API
+         * @param webgl webgl上下文
+         * @param eboindex [已弃用]
+         * @param data 数据
+         * @param dataType 数据类型
+         */
         uploadIndexData(webgl: WebGL2RenderingContext, eboindex: number, data: TriIndexTypeArray, dataType = WebGL2RenderingContext.UNSIGNED_SHORT) {
             if (!this.ebo) return;
             // this.eboDataType = dataType;
@@ -359,7 +424,13 @@
             webgl.bufferData(webgl.ELEMENT_ARRAY_BUFFER, data, this.mode);
         }
 
-        /** 顶点数组绘制三角面 */
+        /**
+         * 顶点数组绘制三角面
+         * @param webgl webgl上下文
+         * @param start buffer中开始位置
+         * @param count 数量
+         * @param instanceCount gpuInstance数量
+         */
         drawArrayTris(webgl: WebGL2RenderingContext, start: number = 0, count: number = -1, instanceCount = 1) {
             if (count < 0)
                 count = ((this.vertexCount / 3) | 0) * 3;
@@ -372,7 +443,14 @@
                 webgl.drawArrays(webgl.TRIANGLES, start, count);
             }
         }
-        /** 顶点数组绘制线段 */
+        
+        /**
+         * 顶点数组绘制线段
+         * @param webgl webgl上下文
+         * @param start buffer中开始位置
+         * @param count 数量
+         * @param instanceCount gpuInstance数量
+         */
         drawArrayLines(webgl: WebGL2RenderingContext, start: number = 0, count: number = -1, instanceCount = 1) {
             if (count < 0)
                 count = ((this.vertexCount / 2) | 0) * 2;
@@ -384,7 +462,14 @@
                 webgl.drawArrays(webgl.LINES, start, count);
             }
         }
-        /** EBO 绘制三角面 */
+
+        /**
+         * EBO 绘制三角面
+         * @param webgl webgl上下文
+         * @param start buffer中开始位置
+         * @param count 数量
+         * @param instanceCount gpuInstance数量
+         */
         drawElementTris(webgl: WebGL2RenderingContext, start: number = 0, count: number = -1, instanceCount = 1) {
             // if (count < 0) count = ((this.indexCounts[this.bindIndex] / 3) | 0) * 3;
             if (count < 0) count = ((this.indexCount / 3) | 0) * 3;
@@ -397,7 +482,14 @@
                 webgl.drawElements(webgl.TRIANGLES, count, this.eboDataType, start * this.eboElementSize);
             }
         }
-        /** EBO 绘制线段 */
+
+        /**
+         * EBO 绘制线段
+         * @param webgl webgl上下文
+         * @param start buffer中开始位置
+         * @param count 数量
+         * @param instanceCount gpuInstance数量
+         */
         drawElementLines(webgl: WebGL2RenderingContext, start: number = 0, count: number = -1, instanceCount = 1) {
             // if (count < 0) count = ((this.indexCounts[this.bindIndex] / 2) | 0) * 2;
             if (count < 0) count = ((this.indexCount / 2) | 0) * 2;

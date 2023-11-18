@@ -131,7 +131,9 @@ namespace m4m.framework
 
             this.addBatcher();
         }
-        //设置默认值
+        /**
+         * 初始化 设置默认值粒子数据
+         */
         private initDefparticleData()
         {
             //emissiontype
@@ -147,11 +149,20 @@ namespace m4m.framework
             this.mat=sceneMgr.app.getAssetMgr().getDefParticleMat();
             this.mesh=sceneMgr.app.getAssetMgr().getDefaultMesh("quad");
         }
+        /**
+         * 初始化发射数据
+         * @param data 数据
+         */
         private initByEmissonData(data:EffectElementData)
         {
 
         }
+
         private worldRotation: m4m.math.quaternion = new m4m.math.quaternion();
+        /**
+         * 获取世界旋转
+         * @returns 旋转四元数
+         */
         getWorldRotation(): m4m.math.quaternion
         {
             var parRot = this.gameObject.transform.getWorldRotate();
@@ -161,12 +172,19 @@ namespace m4m.framework
 
         matToObj: m4m.math.matrix = new m4m.math.matrix();
         private matToWorld: m4m.math.matrix = new m4m.math.matrix();
+        /**
+         * 计算 转到 Object 空间的 矩阵
+         */
         public getmatrixToObj()//-----------------------------------------------------------------------------------------------------改变pos.rot.scale
         {
             m4m.math.quatFromEulerAngles(this.rotRotation.x, this.rotRotation.y, this.rotRotation.z, this.rotQuta);
             m4m.math.matrixMakeTransformRTS(this.rotTranslate, this.rotScale, this.rotQuta, this.matToObj);
         }
 
+        /**
+         *   计算 转到 世界 空间的 矩阵
+         * @returns 矩阵
+         */
         public getmatrixToWorld(): m4m.math.matrix
         {
             var mat = this.gameObject.transform.getWorldMatrix();
@@ -174,12 +192,17 @@ namespace m4m.framework
             return this.matToWorld;
         }
 
+        /** 更新 */
         public update(delta: number)
         {
             this.updateLife(delta);
             this.updateBatcher(delta);
         }
 
+        /**
+         * 更新 合批
+         * @param delta 
+         */
         private updateBatcher(delta: number)
         {
             for (let key in this.emissionBatchers)
@@ -188,6 +211,11 @@ namespace m4m.framework
             }
         }
 
+        /**
+         * 更新 发射粒子生命周期
+         * @param delta 
+         * @returns 
+         */
         private updateLife(delta: number)
         {
             if (this.beover) return;
@@ -207,6 +235,10 @@ namespace m4m.framework
                 }
             }
         }
+
+        /**
+         * 重新初始化
+         */
         private reInit()
         {
             this.beover=false;
@@ -214,6 +246,9 @@ namespace m4m.framework
             this.beBurst=false;
         }
 
+        /**
+         * 更新粒子发射
+         */
         private updateEmission()
         {
             if (this.emissionType == ParticleEmissionType.continue)
@@ -235,6 +270,10 @@ namespace m4m.framework
             }
         }
 
+        /**
+         * 添加粒子
+         * @param count 数量
+         */
         private addParticle(count: number = 1)
         {
             for (var i = 0; i < count; i++) 
@@ -261,6 +300,9 @@ namespace m4m.framework
             }
         }
 
+        /**
+         * 添加合批
+         */
         private addBatcher()
         {
             var batcher = new EmissionBatcher_new(this);
@@ -279,6 +321,12 @@ namespace m4m.framework
                 return m4m.framework.sceneMgr.app.getScene().mainCamera;
             }
         }
+        /**
+         * 执行渲染
+         * @param context 渲染上下文
+         * @param assetmgr 资源管理器
+         * @param camera 相机
+         */
         render(context: renderContext, assetmgr: assetMgr, camera: m4m.framework.camera)
         {
             this._renderCamera=camera;
@@ -295,6 +343,10 @@ namespace m4m.framework
                 this.emissionBatchers[key].render(context, assetmgr, camera);
             }
         }
+
+        /**
+         * 销毁
+         */
         dispose()
         {
             for (let key in this.emissionBatchers)
@@ -306,6 +358,10 @@ namespace m4m.framework
 
         vbo:Float32Array;
         private ebo:Uint16Array;
+        /**
+         * 获取mesh
+         * @returns mesh
+         */
         private getMesh()
         {
             if(this.rendermodel==RenderModel.Mesh)
@@ -319,6 +375,10 @@ namespace m4m.framework
                 this.mesh=m4m.framework.sceneMgr.app.getAssetMgr().getDefaultMesh("quad");
             }
         }
+        /**
+         * 克隆mesh 的vBO
+         * @returns 
+         */
         cloneMeshVBO()
         {
             if(this.vbo==null)
@@ -327,6 +387,10 @@ namespace m4m.framework
             }
             return new Float32Array(this.vbo);
         }
+        /**
+         * 克隆mesh 的EBO
+         * @returns 
+         */
         cloneMeshEBO()
         {
             if(this.ebo==null)
@@ -336,6 +400,10 @@ namespace m4m.framework
             return new Uint16Array(this.ebo);
         }
 
+        /**
+         * 写成json数据
+         * @param obj 
+         */
         writeToJson(obj: any) {
             throw new Error("Method not implemented.");
         }

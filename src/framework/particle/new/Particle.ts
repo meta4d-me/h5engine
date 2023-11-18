@@ -63,10 +63,17 @@ namespace m4m.framework
             //计算得出初始vbo ebo
         }
 
+        /**
+         * 更新数据
+         * @param array 数据
+         */
         public uploadData(array: Float32Array)
         {
             array.set(this.dataForVbo, this.vertexStartIndex * this.emisson.vertexSize);
         }
+        /**
+         * 初始化数据
+         */
         initByData()
         {
             this.totalLife=this.emisson.lifeTime.getValue();
@@ -117,6 +124,10 @@ namespace m4m.framework
             }
         }
         actived:boolean=true;
+        /**
+         * 更新
+         * @param delta 
+         */
         update(delta: number)
         {
             if(!this.actived) return;
@@ -147,6 +158,10 @@ namespace m4m.framework
          * 在emission是在simulate in world space 时候，为matToWorld
          */
         private transformVertex:m4m.math.matrix=new m4m.math.matrix();
+        /**
+         * 更新本地矩阵
+         * @param delta 
+         */
         private _updateLocalMatrix(delta: number)
         {
             m4m.math.matrixMakeTransformRTS(this.localTranslate, this.localScale, this.localRotation, this.localMatrix);
@@ -161,6 +176,9 @@ namespace m4m.framework
         }
 
         private matToworld:m4m.math.matrix=new m4m.math.matrix();
+        /**
+         * 刷新粒子发射数据
+         */
         private refreshEmissionData()
         {
             if(this.emisson.simulateInLocalSpace)
@@ -169,7 +187,10 @@ namespace m4m.framework
                 this.emissionWorldRotation=this.emisson.getWorldRotation();
             }
         }
-
+        /**
+         * 更新旋转
+         * @param delta 
+         */
         private _updateRotation(delta: number)
         {
             if(this.emisson.rendermodel==RenderModel.Mesh)
@@ -251,6 +272,10 @@ namespace m4m.framework
                 m4m.math.pool.delete_quaternion(invTransformRotation);
             }
         }
+        /**
+         * 更新位置
+         * @param delta 
+         */
         private _updatePos(delta: number)
         {
             let currentTranslate = EffectUtil.vecMuliNum(this.speedDir, this.simulationSpeed);
@@ -263,6 +288,10 @@ namespace m4m.framework
             }
 
         }
+        /**
+         * 更新欧拉旋转
+         * @param delta 
+         */
         private _updateEuler(delta: number)
         {
             if(this.emisson.enableRotOverLifeTime)
@@ -270,7 +299,10 @@ namespace m4m.framework
                 this.rotAngle= this.eulerSpeed * this.curLife;
             }
         }
-
+        /**
+         * 更新缩放
+         * @param delta 
+         */
         private _updateScale(delta: number)
         {
             if(this.emisson.enableSizeOverLifetime)
@@ -286,7 +318,10 @@ namespace m4m.framework
                 }
             }
         }
-
+        /**
+         * 更新颜色
+         * @param delta 
+         */
         private _updateColor(delta: number)
         {
             if(this.emisson.enableColorOverLifetime)
@@ -317,6 +352,10 @@ namespace m4m.framework
         }
 
         private spriteIndex: number;
+        /**
+         * 更新UV
+         * @param delta 
+         */
         private _updateUV(delta: number)
         {
             if(this.emisson.uvType==UVTypeEnum.UVRoll)
@@ -329,6 +368,9 @@ namespace m4m.framework
                 m4m.math.spriteAnimation(this.emisson.row,this.emisson.column,spriteindex,this.tex_ST);
             }
         }
+        /**
+         * 更新VBO
+         */
         private _updateVBO()
         {
             let vertexSize = this.emisson.vertexSize;
@@ -385,7 +427,7 @@ namespace m4m.framework
                 }
             }
         }
-
+        /** 销毁 */
         dispose()
         {
             this.dataForVbo = null;

@@ -37,6 +37,11 @@ namespace m4m.threading
                 this.worker = thread.workerInstance;
             }
         }
+
+        /**
+         * 当消息接收
+         * @param e 
+         */
         public OnMessage(e: MessageEvent)
         {
             if (e.data && this.callMap[e.data.id]){
@@ -45,6 +50,12 @@ namespace m4m.threading
             }
         }
 
+        /**
+         * 执行
+         * @param name 
+         * @param data 
+         * @param callback 
+         */
         public Call(name: string, data: any, callback: (result) => void)
         {
             this.worker.postMessage({

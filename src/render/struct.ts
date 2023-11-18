@@ -1,7 +1,6 @@
 ﻿/// <reference path="../io/reflect.ts" />
 
-namespace m4m.math
-{
+namespace m4m.math {
     export interface Ivec2 { x: number, y: number };
     export interface Ivec3 { x: number, y: number, z: number };
     export interface Iquat { x: number, y: number, z: number, w: number };
@@ -24,64 +23,94 @@ namespace m4m.math
     var _float32: Float32Array = new Float32Array(1);
     var _float64: Float64Array = new Float64Array(1);
 
-    export function UByte(v: number | string = 0): ubyte
-    {
+    /**
+     * 格式化数据为 UByte
+     * @param v 输入数据
+     * @returns UByte
+     */
+    export function UByte(v: number | string = 0): ubyte {
         if (typeof (v) == "string")
             v = Number(v);
         _ubyte[0] = v;
         return _ubyte[0];
     }
-    export function Byte(v: number | string = 0): byte
-    {
+    /**
+     * 格式化数据为 Byte
+     * @param v 输入数据
+     * @returns Byte
+     */
+    export function Byte(v: number | string = 0): byte {
         if (typeof (v) == "string")
             v = Number(v);
         _byte[0] = v;
         return _byte[0];
     }
-
-    export function Int16(v: number | string = 0): short
-    {
+    /**
+     * 格式化数据为 Int16
+     * @param v 输入数据
+     * @returns Int16
+     */
+    export function Int16(v: number | string = 0): short {
         if (typeof (v) == "string")
             v = Number(v);
         _int16[0] = v;
         return _int16[0];
     }
 
-    export function Int32(v: number | string = 0): int
-    {
+    /**
+     * 格式化数据为 Int32
+     * @param v 输入数据
+     * @returns Int32
+     */
+    export function Int32(v: number | string = 0): int {
         if (typeof (v) == "string")
             v = Number(v);
         _int32[0] = v;
         return _int32[0];
     }
 
-
-    export function UInt16(v: number | string = 0): ushort
-    {
+    /**
+     * 格式化数据为 UInt16
+     * @param v 输入数据
+     * @returns UInt16
+     */
+    export function UInt16(v: number | string = 0): ushort {
         if (typeof (v) == "string")
             v = Number(v);
         _uint16[0] = v;
         return _uint16[0];
     }
 
-    export function UInt32(v: number | string = 0): uint
-    {
+    /**
+     * 格式化数据为 UInt32
+     * @param v 输入数据
+     * @returns UInt32
+     */
+    export function UInt32(v: number | string = 0): uint {
         if (typeof (v) == "string")
             v = Number(v);
         _uint32[0] = v;
         return _uint32[0];
     }
 
-    export function Float(v: number | string = 0): float
-    {
+    /**
+     * 格式化数据为 Float
+     * @param v 输入数据
+     * @returns Float
+     */
+    export function Float(v: number | string = 0): float {
         if (typeof (v) == "string")
             v = Number(v);
         _float32[0] = v;
         return _float32[0];
     }
 
-    export function Double(v: number | string = 0): double
-    {
+    /**
+     * 格式化数据为 Double
+     * @param v 输入数据
+     * @returns Double
+     */
+    export function Double(v: number | string = 0): double {
         if (typeof (v) == "string")
             v = Number(v);
         _float64[0] = v;
@@ -93,11 +122,9 @@ namespace m4m.math
      * @private
      */
     @m4m.reflect.SerializeType
-    export class vector2 implements Ivec2
-    {
+    export class vector2 implements Ivec2 {
         static readonly ClassName: string = "vector2";
-        constructor(x: number = 0, y: number = 0)
-        {
+        constructor(x: number = 0, y: number = 0) {
             this.x = x;
             this.y = y;
         }
@@ -141,13 +168,11 @@ namespace m4m.math
      * @private
      */
     @m4m.reflect.SerializeType
-    export class rect
-    {
+    export class rect {
         static readonly ClassName: string = "rect";
 
         // public rawData = new Float32Array(4);
-        constructor(x: float = 0, y: float = 0, w: float = 0, h: float = 0)
-        {
+        constructor(x: float = 0, y: float = 0, w: float = 0, h: float = 0) {
             // this.rawData[0] = x;
             // this.rawData[1] = y;
             // this.rawData[2] = w;
@@ -199,8 +224,7 @@ namespace m4m.math
         //     this.rawData[3] = h;
         // }
 
-        toString(): string
-        {
+        toString(): string {
             return `${this.x},${this.y},${this.w},${this.h}`;
         }
     }
@@ -209,13 +233,11 @@ namespace m4m.math
      * @private
      */
     @m4m.reflect.SerializeType
-    export class border
-    {
+    export class border {
         static readonly ClassName: string = "border";
 
         // public rawData = new Float32Array(4);
-        constructor(l: float = 0, t: float = 0, r: float = 0, b: float = 0)
-        {
+        constructor(l: float = 0, t: float = 0, r: float = 0, b: float = 0) {
             // this.rawData[0] = l;
             // this.rawData[1] = t;
             // this.rawData[2] = r;
@@ -266,8 +288,7 @@ namespace m4m.math
         //     this.rawData[3] = b;
         // }
 
-        toString(): string
-        {
+        toString(): string {
             return `${this.r},${this.t},${this.r},${this.b}`;
         }
     }
@@ -276,13 +297,11 @@ namespace m4m.math
      * @private
      */
     @m4m.reflect.SerializeType
-    export class color
-    {
+    export class color {
         static readonly ClassName: string = "color";
 
         // public rawData = new Float32Array(4);
-        constructor(r: float = 1, g: float = 1, b: float = 1, a: float = 1)
-        {
+        constructor(r: float = 1, g: float = 1, b: float = 1, a: float = 1) {
             // this.rawData[0] = r;
             // this.rawData[1] = g;
             // this.rawData[2] = b;
@@ -332,8 +351,7 @@ namespace m4m.math
         // {
         //     this.rawData[3] = a;
         // }
-        toString(): string
-        {
+        toString(): string {
             return `${this.r},${this.g},${this.b},${this.a}`;
         }
     }
@@ -342,11 +360,9 @@ namespace m4m.math
      * @private
      */
     @m4m.reflect.SerializeType
-    export class vector3 implements Ivec3
-    {
+    export class vector3 implements Ivec3 {
         static readonly ClassName: string = "vector3";
-        constructor(x: float = 0, y: float = 0, z: float = 0)
-        {
+        constructor(x: float = 0, y: float = 0, z: float = 0) {
             this.x = x;
             this.y = y;
             this.z = z;
@@ -389,8 +405,7 @@ namespace m4m.math
         //     this.rawData[2] = z;
         // }
 
-        toString(): string
-        {
+        toString(): string {
             // return `${this.rawData[0]},${this.rawData[1]},${this.rawData[2]}`;
             return `${this.x},${this.y},${this.z}`;
         }
@@ -400,13 +415,11 @@ namespace m4m.math
      * @private
      */
     @m4m.reflect.SerializeType
-    export class vector4
-    {
+    export class vector4 {
         static readonly ClassName: string = "vector4";
 
         // public rawData = new Float32Array(4);
-        constructor(x: float = 0, y: float = 0, z: float = 0, w: float = 0)
-        {
+        constructor(x: float = 0, y: float = 0, z: float = 0, w: float = 0) {
             // this.rawData[0] = x;
             // this.rawData[1] = y;
             // this.rawData[2] = z;
@@ -456,8 +469,7 @@ namespace m4m.math
         // {
         //     this.rawData[3] = w;
         // }
-        toString(): string
-        {
+        toString(): string {
             return `${this.x},${this.y},${this.z},${this.w}`;
         }
     }
@@ -466,13 +478,11 @@ namespace m4m.math
      * @private
      */
     @m4m.reflect.SerializeType
-    export class quaternion implements Iquat
-    {
+    export class quaternion implements Iquat {
         static readonly ClassName: string = "quaternion";
 
         // public rawData = new Float32Array(4);
-        constructor(x: float = 0, y: float = 0, z: float = 0, w: float = 1)
-        {
+        constructor(x: float = 0, y: float = 0, z: float = 0, w: float = 1) {
             // this.rawData[0] = x;
             // this.rawData[1] = y;
             // this.rawData[2] = z;
@@ -522,8 +532,7 @@ namespace m4m.math
         // {
         //     this.rawData[3] = w;
         // }
-        toString(): string
-        {
+        toString(): string {
             // return `${this.rawData[0]},${this.rawData[1]},${this.rawData[2]},${this.rawData[3]}`;
             return `${this.x},${this.y},${this.z},${this.w}`;
         }
@@ -532,8 +541,7 @@ namespace m4m.math
     /**
      * @private
      */
-    export class matrix
-    {
+    export class matrix {
         static readonly ClassName: string = "matrix";
 
         public rawData: Array<number>;
@@ -546,15 +554,13 @@ namespace m4m.math
             // }
             // else
             //     this.rawData = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
-            if (datas)
-            {
+            if (datas) {
                 this.rawData = datas;
             }
             else
                 this.rawData = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
         }
-        toString(): string
-        {
+        toString(): string {
             return "[" + this.rawData[0] + "," + this.rawData[1] + "," + this.rawData[2] + "," + this.rawData[3] + "],"
                 + "[" + this.rawData[4] + "," + this.rawData[5] + "," + this.rawData[6] + "," + this.rawData[7] + "],"
                 + "[" + this.rawData[8] + "," + this.rawData[9] + "," + this.rawData[10] + "," + this.rawData[11] + "],"
@@ -564,8 +570,7 @@ namespace m4m.math
     /**
      * @private
      */
-    export class matrix3x2
-    {
+    export class matrix3x2 {
         // public rawData: Float32Array;
         public rawData: Array<number>;
         constructor(datas: Array<number> = null)//datas: Float32Array = null)
@@ -576,15 +581,13 @@ namespace m4m.math
             // }
             // else
             //     this.rawData = new Float32Array([1, 0, 0, 1, 0, 0]);
-            if (datas)
-            {
+            if (datas) {
                 this.rawData = datas;
             }
             else
                 this.rawData = [1, 0, 0, 1, 0, 0];
         }
-        toString(): string
-        {
+        toString(): string {
             return "[" + this.rawData[0] + "," + this.rawData[1] + "," + this.rawData[2] + "],"
                 + "[" + this.rawData[3] + "," + this.rawData[4] + "," + this.rawData[5] + "]";
         }
@@ -602,13 +605,13 @@ namespace m4m.math
         get buffer() { return this._buffer; };
         /** 已经使用到数量 */
         get count() { return this._buoy + 1; };
-        set count(val : number) {
-            if(val < 0) val = 0;
-            if(val > this._length) {
-                let needSize =  Math.ceil( val / this._length ) * this._length;
+        set count(val: number) {
+            if (val < 0) val = 0;
+            if (val > this._length) {
+                let needSize = Math.ceil(val / this._length) * this._length;
                 this.exlength(needSize);
             }
-            this._buoy = val -1; 
+            this._buoy = val - 1;
         };
 
         /**
@@ -616,32 +619,28 @@ namespace m4m.math
          * @param bufferType buffer类型
          * @param initSize 初始array 长度
          */
-        constructor(private bufferType: new (size: number) => T, initSize: number = 32)
-        {
+        constructor(private bufferType: new (size: number) => T, initSize: number = 32) {
             this._length = initSize;
             // this._buffer = new T(initSize);
             this._buffer = new bufferType(initSize);
         }
 
         /** push添加到array */
-        push(num: number)
-        {
+        push(num: number) {
             this._buoy++;
-            if (this._buoy >= this._length)
-            {
+            if (this._buoy >= this._length) {
                 this.exlength();
             }
             this._buffer[this._buoy] = num;
         }
 
-        private exlength(mult : number = 2)
-        {
+        /** 延长 长度 */
+        private exlength(mult: number = 2) {
             let _nlength = this._length * mult;
             let _buffer = this._buffer;
             // let _nbuffer = new T(_nlength);
             let _nbuffer = new this.bufferType(_nlength);
-            for (let i = 0, len = this._length; i < len; i++)
-            {
+            for (let i = 0, len = this._length; i < len; i++) {
                 _nbuffer[i] = _buffer[i];
             }
             this._buffer = _nbuffer;
@@ -649,7 +648,7 @@ namespace m4m.math
         }
 
         /** 对象清理 */
-        dispose(){
+        dispose() {
             this._buffer = null;
         }
 
@@ -659,36 +658,44 @@ namespace m4m.math
      * 复用数组 ，用于频繁重复创建数组容器的场景(减少GC消耗)
      */
     export class ReuseArray<T>{
-        private arr : Array<T>= [];
-        private buoy = -1 ;
+        private arr: Array<T> = [];
+        private buoy = -1;
 
         /** 获取 Array 对象 */
-        getArray(){
+        getArray() {
             return this.arr;
         }
 
         /** 获取当前长度 */
-        get length(){ return this.buoy + 1; };
-        set length(val){ this.buoy = val - 1;};
+        get length() { return this.buoy + 1; };
+        set length(val) { this.buoy = val - 1; };
 
-        push(val : T){
+        /**
+         * 添加到数组
+         * @param val 添加的数据
+         */
+        push(val: T) {
             this.buoy++;
             this.arr[this.buoy] = val;
         }
 
-        /** 获取指定索引的值 */
-        get(index: number){
-            if(index > this.buoy ) return null;
+        /**
+         * 获取指定索引的值
+         * @param index 指定索引
+         * @returns 输出的值
+         */
+        get(index: number) {
+            if (index > this.buoy) return null;
             return this.arr[index];
         }
 
         /** 数组所有值置为null  */
-        clear(){
+        clear() {
             var len = this.arr.length;
-            for(var i=0; i < len ;i++){
-                if(this.arr[i] == null && i >= this.buoy) break;
+            for (var i = 0; i < len; i++) {
+                if (this.arr[i] == null && i >= this.buoy) break;
                 this.arr[i] = null;
-            } 
+            }
             this.buoy = -1;
         }
     }
@@ -708,8 +715,12 @@ namespace m4m.math
     //     tran: vector3 = new vector3();
     // }
 
-    export function vec4FormJson(json: string, vec4: vector4)
-    {
+    /**
+     * json 数据转 四维向量
+     * @param json json 数据
+     * @param vec4 四维向量
+     */
+    export function vec4FormJson(json: string, vec4: vector4) {
         json = json.replace("(", "");
         json = json.replace(")", "");
         let arr = json.split(",");
@@ -718,8 +729,12 @@ namespace m4m.math
         vec4.z = Number(arr[2]);
         vec4.w = Number(arr[3]);
     }
-    export function vec3FormJson(json: string, vec3: vector3)
-    {
+    /**
+     * json 数据转 三维向量
+     * @param json json 数据
+     * @param vec4 三维向量
+     */
+    export function vec3FormJson(json: string, vec3: vector3) {
         json = json.replace("(", "");
         json = json.replace(")", "");
 
@@ -728,16 +743,24 @@ namespace m4m.math
         vec3.y = Number(arr[1]);
         vec3.z = Number(arr[2]);
     }
-    export function vec2FormJson(json: string, vec2: vector2)
-    {
+    /**
+    * json 数据转 二维向量
+    * @param json json 数据
+    * @param vec4 二维向量
+    */
+    export function vec2FormJson(json: string, vec2: vector2) {
         json = json.replace("(", "");
         json = json.replace(")", "");
         let arr = json.split(",");
         vec2.x = Number(arr[0]);
         vec2.y = Number(arr[1]);
     }
-    export function colorFormJson(json: string, _color: color)
-    {
+    /**
+    * json 数据转 颜色
+    * @param json json 数据
+    * @param vec4 颜色
+    */
+    export function colorFormJson(json: string, _color: color) {
         json = json.replace("RGBA(", "");
         json = json.replace(")", "");
         let arr = json.split(",");

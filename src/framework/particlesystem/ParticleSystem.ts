@@ -24,6 +24,12 @@ namespace m4m.framework
             super.On(event, func, thisArg);
         }
 
+        /**
+         * 移除事件监听者
+         * @param event 事件类型
+         * @param func 事件触发回调方法
+         * @param thisArg 回调方法执行者
+         */
         Off<K extends keyof GameObjectEventMap>(event: K, func: (args: GameObjectEventMap[K]) => void, thisArg: any)
         {
             super.RemoveListener(event, func, thisArg);
@@ -542,7 +548,7 @@ namespace m4m.framework
         private _startDelay_rate = Math.random();
 
         /**
-         * @private
+         * 更新开始延迟
          */
         updateStartDelay()
         {
@@ -723,6 +729,11 @@ namespace m4m.framework
         }
 
         private _vbos: [WebGL2RenderingContext, WebGLBuffer][] = [];
+        /**
+         * 获取VBO
+         * @param gl webgl上下文 
+         * @returns webgl buffer
+         */
         private _getVBO(gl: WebGL2RenderingContext)
         {
             for (let i = 0, n = this._vbos.length; i < n; i++)
@@ -977,6 +988,9 @@ namespace m4m.framework
             particle.updateState(preTime, this._realTime);
         }
 
+        /**
+         * 模拟形状改变
+         */
         _simulationSpaceChanged()
         {
             if (!this.transform) return;

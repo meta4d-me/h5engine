@@ -3,6 +3,9 @@ namespace m4m.framework
     export class DeviceInfo
     {
         private static debuginfo;
+        /**
+         * 获取拓展
+         */
         private static getExtension()
         {
             // this.debuginfo= sceneMgr.app.webgl.getExtension('WEBGL_debug_renderer_info');
