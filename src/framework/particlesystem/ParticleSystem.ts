@@ -434,7 +434,9 @@ namespace m4m.framework
         }
 
         gameObject: gameObject;
-
+        /**
+         * 粒子系统
+         */
         constructor()
         {
             this.main = new ParticleMainModule();

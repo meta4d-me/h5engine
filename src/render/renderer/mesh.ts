@@ -106,7 +106,10 @@
         ebo: WebGLBuffer;
         indexCount: number = 0;
         vertexFormat: VertexFormatMask = VertexFormatMask.Position;
-
+        /**
+         * 引擎 mesh
+         * @param webgl webgl上下文
+         */
         constructor(webgl?: WebGL2RenderingContext) {
             this.webgl = webgl != null ? webgl : framework.sceneMgr.app.webgl;
         }

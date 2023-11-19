@@ -53,7 +53,10 @@ namespace m4m.framework
             TrailRendererData._datas[v] = this;
         }
         private _value: string;
-
+        /**
+         * 拖尾渲染数据
+         * @param assetName 资源名 
+         */
         constructor(assetName: string = null)
         {
             if (!assetName)

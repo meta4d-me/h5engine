@@ -27,7 +27,9 @@ namespace m4m.framework {
         private static readonly help_mtx_2 = new m4m.math.matrix();
         private static readonly help_mtx_3 = new m4m.math.matrix();
 
-
+        /**
+         * 骨骼蒙皮mesh渲染器
+         */
         constructor() {
         }
         /**

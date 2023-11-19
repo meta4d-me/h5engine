@@ -115,7 +115,9 @@ namespace m4m.framework {
             }
         };
         protected _physicsEngine: physicEngine2D;
-
+        /**
+         * 2D 物理体
+         */
         constructor() {
             super();
             this._physicsEngine = physics2D;

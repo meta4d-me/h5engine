@@ -51,6 +51,10 @@
          * @version m4m 1.0
          */
         defaultAsset: boolean;//是否为系统默认资源
+        /**
+         * 字体资源
+         * @param assetName 资源名 
+         */
         constructor(assetName: string = null) {
             if (!assetName) {
                 assetName = "font_" + this.getGUID();

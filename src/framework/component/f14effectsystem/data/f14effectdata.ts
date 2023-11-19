@@ -55,7 +55,9 @@ namespace m4m.framework
 
         //frames:F14FrameData[]=[];
         frames: { [frame: number]: F14FrameData } = {};
-
+        /**
+         * F14 层数据
+         */
         constructor()
         {
         }
@@ -148,7 +150,11 @@ namespace m4m.framework
 
         singlemeshAttDic: { [name: string]: any };
         EmissionData: F14EmissionBaseData;
-
+        /**
+         * F14 帧数据
+         * @param index 索引 
+         * @param type F14类型
+         */
         constructor(index: number, type: F14TypeEnum)
         {
             this.frameindex = index;

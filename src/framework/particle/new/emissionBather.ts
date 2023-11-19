@@ -14,7 +14,10 @@ namespace m4m.framework
         public dataForEbo: Uint16Array;
 
         public particles: Particle_new[] = [];
-
+        /**
+         * 发射器合批
+         * @param emissionElement 特效发射器元素
+         */
         constructor(emissionElement: EffectElementEmission)
         {
             this.emission = emissionElement;

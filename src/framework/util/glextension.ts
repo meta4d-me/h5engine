@@ -25,7 +25,10 @@ namespace m4m.framework {
         WEBGL_debug_renderer_info: WEBGL_debug_renderer_info;
         WEBGL_debug_shaders: WEBGL_debug_shaders;
         WEBGL_lose_context: any;
-
+        /**
+         * 引擎 webgl 拓展管理 
+         * @param gl webgl 上下文
+         */
         constructor(gl: WebGL2RenderingContext) {
             gl.extensions = this;
 

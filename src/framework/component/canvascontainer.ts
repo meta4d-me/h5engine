@@ -11,7 +11,9 @@ namespace m4m.framework
     export class canvascontainer implements INodeComponent
     {
         static readonly ClassName:string="canvascontainer";
-
+        /**
+         * canvas容器
+         */
         constructor(){
             
         }

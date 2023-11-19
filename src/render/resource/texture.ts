@@ -34,6 +34,14 @@
      * @private
      */
     export class textureReader {
+        /**
+         *  纹理像素阅读器
+         * @param webgl webgl上下文
+         * @param texRGBA webgl 纹理
+         * @param width 宽
+         * @param height 高
+         * @param gray 是灰模式
+         */
         constructor(webgl: WebGL2RenderingContext, texRGBA: WebGLTexture, width: number, height: number, gray: boolean = false) {
             this._gray = gray;
             this._width = width;
@@ -149,6 +157,15 @@
     export class glRenderTarget implements ITexture {
         width: number;
         height: number;
+        /**
+         * 渲染目标
+         * @param webgl webgl上下文 
+         * @param width 宽
+         * @param height 高
+         * @param depth 使用深度？
+         * @param stencil 使用模板？
+         * @param fbo webgl fbo
+         */
         constructor(webgl: WebGL2RenderingContext, width: number, height: number, depth: boolean = false, stencil: boolean = false, fbo: WebGLFramebuffer = null) {
             this.width = width;
             this.height = height;
@@ -242,6 +259,13 @@
         private mirroredU: boolean = true;
         private mirroredV: boolean = true;
 
+        /**
+         * 2D纹理
+         * @param webgl webgl上下文
+         * @param format 纹理格式
+         * @param mipmap 开启mipmap？
+         * @param linear 线性纹理采样？
+         */
         constructor(webgl: WebGL2RenderingContext, format: TextureFormatEnum = TextureFormatEnum.RGBA, mipmap: boolean = false, linear: boolean = true) {
             this.webgl = webgl;
             this.format = format;
@@ -676,6 +700,13 @@
     }
 
     export class glTextureCube implements ITexture {
+        /**
+         * cube 纹理
+         * @param webgl webgl上下文
+         * @param format 纹理格式
+         * @param mipmap 开启mipmap？
+         * @param linear 线性纹理采样？
+         */
         constructor(webgl: WebGL2RenderingContext, format: TextureFormatEnum = TextureFormatEnum.RGBA, mipmap: boolean = false, linear: boolean = true) {
             this.webgl = webgl;
             this.format = format;
@@ -886,6 +917,18 @@
      * @private
      */
     export class WriteableTexture2D implements ITexture {
+        /**
+         * 可写入的 2D纹理
+         * @param webgl webgl上下文
+         * @param format 纹理格式
+         * @param width 宽
+         * @param height 高
+         * @param linear 线性纹理采样？
+         * @param premultiply alpha 预乘？
+         * @param repeat 超出UV后重复？
+         * @param mirroredU 超出UV后U镜像填充？
+         * @param mirroredV 超出UV后V镜像填充？
+         */
         constructor(webgl: WebGL2RenderingContext, format: TextureFormatEnum = TextureFormatEnum.RGBA, width: number, height: number, linear: boolean, premultiply: boolean = true, repeat: boolean = false, mirroredU: boolean = false, mirroredV: boolean = false) {
             this.webgl = webgl;
             this.width = width;
@@ -1040,6 +1083,10 @@
         public repeat: boolean = true;
         public mirroredU: boolean = false;
         public mirroredV: boolean = false;
+        /**
+         * 视频纹理
+         * @param video HTMLVideoElement 视频对象
+         */
         constructor(video: HTMLVideoElement) {
             this._video = video;
             const gl = m4m.framework.sceneMgr.app.webgl;

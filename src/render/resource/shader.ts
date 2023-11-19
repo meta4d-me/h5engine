@@ -43,6 +43,13 @@ namespace m4m.render {
      * @private
      */
     export class glShader {
+        /**
+         * 引擎 着色器
+         * @param name 名
+         * @param type 类型
+         * @param shader webgl 着色器
+         * @param code [已弃用]
+         */
         constructor(name: string, type: ShaderTypeEnum, shader: WebGLShader, code: string) {
             this.name = name;
             this.type = type;
@@ -64,7 +71,12 @@ namespace m4m.render {
         // static isBuildInAttrib(attribID: string) {
         //     return this.buildInAtrribute[attribID] != null;
         // }
-
+        /**
+         * 引擎 着色器 Program
+         * @param vs 引擎顶点着色器
+         * @param fs 引擎片元着色器
+         * @param program webgl Program
+         */
         constructor(vs: glShader, fs: glShader, program: WebGLProgram) {
             this.vs = vs;
             this.fs = fs;

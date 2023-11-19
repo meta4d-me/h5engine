@@ -53,6 +53,11 @@ namespace m4m.framework {
         engineRunner: IRunner;
         private eventer: event.Physic2dEvent = new event.Physic2dEvent();
         private _bodysObjMap: { [id: number]: I2DPhysicsBody } = {};
+        /**
+         * 物理2D引擎
+         * @param op 引擎2D选项
+         * @returns 物理2D引擎
+         */
         public constructor(op: IEngine2DOP = null) {
             op = op || {};
             if (Matter == undefined) {

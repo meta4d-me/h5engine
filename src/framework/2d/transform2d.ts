@@ -109,6 +109,11 @@ namespace m4m.framework
         comp: I2DComponent;
         init: boolean;
         OnPlayed: boolean = false;
+        /**
+         * 2D组件实例接口
+         * @param comp 组件
+         * @param init 初始化？
+         */
         constructor(comp: I2DComponent, init: boolean = false)
         {
             this.comp = comp;

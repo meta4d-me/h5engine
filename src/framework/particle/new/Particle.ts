@@ -47,7 +47,10 @@ namespace m4m.framework
         private sizeNodes:NumberKey[];
         private colorNodes:Vector3Key[];
         private alphaNodes:NumberKey[];
-        //根据发射器定义 初始化
+        /**
+         * 根据发射器定义 初始化
+         * @param batcher 发射器合批
+         */
         constructor(batcher: EmissionBatcher_new)//, _data: EmissionNew, startIndex: number, format: number
         {
             this.batcher = batcher;

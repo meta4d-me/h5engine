@@ -14,7 +14,12 @@ namespace m4m.framework {
         // public BJSCANNON = CANNON;
 
 
-
+        /**
+         * Cannon 物理插件
+         * @param _useDeltaForWorldStep 
+         * @param iterations 迭代数
+         * @returns 
+         */
         public constructor(private _useDeltaForWorldStep: boolean = true, iterations: number = 10) {
             if (!this.isSupported()) {
                 console.error("CannonJS is not available. Please make sure you included the js file.");

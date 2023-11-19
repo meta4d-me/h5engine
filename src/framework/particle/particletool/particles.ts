@@ -9,6 +9,10 @@ namespace m4m.framework
         public emissionElements: EmissionElement[] = [];//一个特效系统可以有多个发射器元素
         public vf: number = m4m.render.VertexFormatMask.Position | render.VertexFormatMask.Color | render.VertexFormatMask.UV0;//法线切线不要
         public effectSys: effectSystem;
+        /**
+         * 粒子发射器
+         * @param sys 粒子系统
+         */
         constructor(sys: effectSystem)
         {
             this.effectSys = sys;
@@ -109,7 +113,12 @@ namespace m4m.framework
         private numcount: number;
         private isover: boolean = false;
         //-----------------------------------------------------------------
-
+        /**
+         * 粒子
+         * @param _emission 发射器数据
+         * @param sys 特效系统
+         * @param mgr 粒子管理器
+         */
         constructor(_emission: EffectElementData, sys: effectSystem, mgr: Particles)
         {
             this.webgl = m4m.framework.sceneMgr.app.webgl;

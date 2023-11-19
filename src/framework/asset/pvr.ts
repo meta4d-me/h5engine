@@ -14,6 +14,10 @@ namespace m4m.framework {
         private mipMapCount = 1;
         private metaDataSize = 0;
         private gl: WebGL2RenderingContext;
+        /**
+         * pvr 纹理 解析器
+         * @param gl 
+         */
         constructor(gl: WebGL2RenderingContext) {
             this.gl = gl;
         }

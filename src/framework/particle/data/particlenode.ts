@@ -12,7 +12,9 @@
         y: ValueData = new ValueData();
         z: ValueData = new ValueData();
         key: number;
-
+        /**
+         * 粒子节点
+         */
         constructor()
         {
 

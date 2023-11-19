@@ -14,7 +14,12 @@ namespace m4m.framework {
         defaultValue: any;
 
         resname: string;
-
+        /**
+         * uniform数据
+         * @param type 类型 
+         * @param value 值
+         * @param defaultValue 默认值 
+         */
         constructor(type: render.UniformTypeEnum, value: any, defaultValue: any = null) {
             this.type = type;
             this.value = value;
@@ -92,7 +97,10 @@ namespace m4m.framework {
         private _textureGUID: string = "";
         /** gpuInstancing 材质唯一ID */
         gpuInstancingGUID: string = "";
-
+        /**
+         * 材质资源
+         * @param assetName 资源名 
+         */
         constructor(assetName: string = null) {
             if (!assetName) {
                 assetName = "material_" + this.getGUID();

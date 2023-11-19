@@ -2,7 +2,11 @@
     export class Navigate {
         public navindexmap: { [id: number]: number };
         public navinfo: navMeshInfo
-
+        /**
+         * 导航器
+         * @param navinfo  导航信息
+         * @param navindexmap 导航索引字典
+         */
         constructor(navinfo: m4m.framework.navMeshInfo, navindexmap: any) {
             this.navinfo = navinfo;
             this.navindexmap = navindexmap;

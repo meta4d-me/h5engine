@@ -1157,6 +1157,12 @@ namespace m4m.io
         value: any;
         type: string;
         parse: string;
+        /**
+         * 值信息
+         * @param value 值
+         * @param type 类型
+         * @param _parse 解析方式
+         */
         constructor(value: any, type: string, _parse: string = "direct")
         {
             if (isAsset(type))
@@ -1186,6 +1192,12 @@ namespace m4m.io
         max: number;
         defvalue: any;
         parse: string;
+        /**
+         * inspector 数据信息
+         * @param _value 值
+         * @param _type 类型
+         * @param _parse 解析方式
+         */
         constructor(_value: any, _type: string, _parse: string = "direct")
         {
             this.value = _value;

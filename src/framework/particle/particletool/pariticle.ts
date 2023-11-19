@@ -53,7 +53,10 @@ namespace m4m.framework
         //在emission是在simulate in local space 时候，为动态的
         private emissionMatToWorld:m4m.math.matrix;
         private emissionWorldRotation:m4m.math.quaternion;
-        //根据发射器定义 初始化
+        /**
+         * 根据发射器定义 初始化
+         * @param batcher 发射器合批
+         */
         constructor(batcher: EmissionBatcher)//, _data: EmissionNew, startIndex: number, format: number
         {
             this.batcher = batcher;

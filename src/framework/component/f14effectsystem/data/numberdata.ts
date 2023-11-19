@@ -45,7 +45,10 @@ namespace m4m.framework
             }
             return this._value;
         }
-    
+        /**
+         * 标量值数据
+         * @param value 数据 
+         */
         public constructor(value:number = 0)
         {
             this._value = value;
@@ -87,7 +90,12 @@ namespace m4m.framework
         x = new NumberData();
         y = new NumberData();
         z = new NumberData();
-    
+        /**
+         * 三维向量数据
+         * @param x x值
+         * @param y y值
+         * @param z z值
+         */
         public constructor(x = 0,y = 0,z = 0)
         {
             this.x.setValue(x);
@@ -139,6 +147,11 @@ namespace m4m.framework
     {
         public key:number;
         public value:number;
+        /**
+         * 标量值
+         * @param _key key 
+         * @param _value 值
+         */
         public constructor(_key:number,_value:number)
         {
             this.key = _key;
@@ -150,6 +163,11 @@ namespace m4m.framework
     {
         public key:number;
         public value:math.vector3;
+        /**
+         * 三维向量 可以
+         * @param _key key
+         * @param _value 值
+         */
         public constructor(_key:number,_value:math.vector3)
         {
             this.key = _key;
@@ -161,6 +179,11 @@ namespace m4m.framework
     {
         public key:number;
         public value:math.vector2;
+        /**
+         * 二维向量 可以
+         * @param _key key
+         * @param _value 值
+         */
         public constructor(_key:number,_value:math.vector2)
         {
             this.key = _key;

@@ -14,7 +14,7 @@ namespace m4m.framework {
         static readonly ClassName: string = "image2D";
 
         /**
-         * @private
+         * 2d图片组件
          */
         constructor() {
             m4m.io.enumMgr.enumMap["ImageType"] = ImageType;

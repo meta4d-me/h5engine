@@ -124,6 +124,11 @@ namespace m4m.math {
     @m4m.reflect.SerializeType
     export class vector2 implements Ivec2 {
         static readonly ClassName: string = "vector2";
+        /**
+         * 二维向量
+         * @param x x值
+         * @param y y值
+         */
         constructor(x: number = 0, y: number = 0) {
             this.x = x;
             this.y = y;
@@ -172,6 +177,13 @@ namespace m4m.math {
         static readonly ClassName: string = "rect";
 
         // public rawData = new Float32Array(4);
+        /**
+         * 矩形
+         * @param x x值
+         * @param y y值
+         * @param w 宽
+         * @param h 高
+         */
         constructor(x: float = 0, y: float = 0, w: float = 0, h: float = 0) {
             // this.rawData[0] = x;
             // this.rawData[1] = y;
@@ -237,6 +249,13 @@ namespace m4m.math {
         static readonly ClassName: string = "border";
 
         // public rawData = new Float32Array(4);
+        /**
+         * 矩形边界
+         * @param l 左值
+         * @param t 上值
+         * @param r 右值
+         * @param b 下值
+         */
         constructor(l: float = 0, t: float = 0, r: float = 0, b: float = 0) {
             // this.rawData[0] = l;
             // this.rawData[1] = t;
@@ -301,6 +320,13 @@ namespace m4m.math {
         static readonly ClassName: string = "color";
 
         // public rawData = new Float32Array(4);
+        /**
+         * rgba颜色
+         * @param r r值
+         * @param g g值
+         * @param b b值
+         * @param a a值
+         */
         constructor(r: float = 1, g: float = 1, b: float = 1, a: float = 1) {
             // this.rawData[0] = r;
             // this.rawData[1] = g;
@@ -362,6 +388,12 @@ namespace m4m.math {
     @m4m.reflect.SerializeType
     export class vector3 implements Ivec3 {
         static readonly ClassName: string = "vector3";
+        /**
+         * 三维向量
+         * @param x x值 
+         * @param y y值
+         * @param z z值
+         */
         constructor(x: float = 0, y: float = 0, z: float = 0) {
             this.x = x;
             this.y = y;
@@ -419,6 +451,13 @@ namespace m4m.math {
         static readonly ClassName: string = "vector4";
 
         // public rawData = new Float32Array(4);
+        /**
+         * 四维向量
+         * @param x x值
+         * @param y y值
+         * @param z z值
+         * @param w w值
+         */
         constructor(x: float = 0, y: float = 0, z: float = 0, w: float = 0) {
             // this.rawData[0] = x;
             // this.rawData[1] = y;
@@ -482,6 +521,13 @@ namespace m4m.math {
         static readonly ClassName: string = "quaternion";
 
         // public rawData = new Float32Array(4);
+        /**
+         * 四元数
+         * @param x x值
+         * @param y y值
+         * @param z z值
+         * @param w w值
+         */
         constructor(x: float = 0, y: float = 0, z: float = 0, w: float = 1) {
             // this.rawData[0] = x;
             // this.rawData[1] = y;
@@ -546,6 +592,10 @@ namespace m4m.math {
 
         public rawData: Array<number>;
         // public rawData: Float32Array;
+        /**
+         * 4x4 矩阵
+         * @param datas raw 数据
+         */
         constructor(datas: Array<number> = null)//: Float32Array = null)
         {
             // if (datas)
@@ -573,6 +623,10 @@ namespace m4m.math {
     export class matrix3x2 {
         // public rawData: Float32Array;
         public rawData: Array<number>;
+        /**
+         * 3x2 矩阵
+         * @param datas raw数据
+         */
         constructor(datas: Array<number> = null)//datas: Float32Array = null)
         {
             // if (datas)

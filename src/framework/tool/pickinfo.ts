@@ -17,6 +17,12 @@
         public bv: number = 0;
         public faceId: number = -1;
         public subMeshId: number = 0;
+        /**
+         * 点 拾取信息
+         * @param _bu u
+         * @param _bv v
+         * @param _distance 距离 
+         */
         constructor(_bu: number =0, _bv: number =0, _distance: number = 0)
         {
             this.distance = _distance;

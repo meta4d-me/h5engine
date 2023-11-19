@@ -3,6 +3,10 @@ namespace m4m.framework {
      * @private
      */
     export class renderContext {
+        /**
+         * 渲染上下文
+         * @param webgl webgl上下文
+         */
         constructor(webgl: WebGL2RenderingContext) {
             this.webgl = webgl;
         }
@@ -268,6 +272,9 @@ namespace m4m.framework {
      * @private
      */
     export class renderList {
+        /**
+         * 渲染列表
+         */
         constructor() {
             this.renderLayers = [];
             var common = new renderLayer(false);
@@ -357,6 +364,10 @@ namespace m4m.framework {
         needSort: boolean = false;
         //先暂时分配 透明与不透明两组
         list: IRenderer[] = [];
+        /**
+         * 渲染层
+         * @param _sort 排序？
+         */
         constructor(_sort: boolean = false) {
             this.needSort = _sort;
         }

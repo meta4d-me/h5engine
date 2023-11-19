@@ -403,7 +403,12 @@ namespace m4m.framework
         handle: m4m.math.vector3;
 
         trailNodes: trailNode[];
-
+        /**
+         * 拖尾节点
+         * @param p 点
+         * @param updir 方向 
+         * @param t 值
+         */
         constructor(p: m4m.math.vector3, updir: m4m.math.vector3, t: number)
         {
             this.location = p;

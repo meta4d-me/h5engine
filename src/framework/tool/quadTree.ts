@@ -38,6 +38,11 @@ namespace m4m.framework {
         nodes: qtNode[] = []; //四个象限对应的子节点
         level: number; //该节点的深度 ， 根节点为0
         bounds: math.rect; //该节点的范围
+        /**
+         * 四叉树节点
+         * @param bounds 边界矩形
+         * @param level 深度
+         */
         constructor(bounds: math.rect, level: number = 0) {
             this.level = isNaN(level) || level < 0 ? 0 : level;
             this.bounds = bounds;

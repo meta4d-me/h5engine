@@ -57,7 +57,11 @@ namespace m4m.framework
         curIndexCount:number=0;
 
         vertexLength:number=0;
-
+        /**
+         * f14 单mesh 合批
+         * @param mat 材质
+         * @param effect 特效系统
+         */
         public constructor(mat:material, effect:f14EffectSystem)
         {
             this.type=F14TypeEnum.SingleMeshType;

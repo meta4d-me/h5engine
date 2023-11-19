@@ -647,6 +647,10 @@ namespace m4m.framework
         shaderPool: m4m.render.shaderPool;
         webgl: WebGL2RenderingContext;
         mapRes: { [id: number]: any } = {};
+        /**
+         * 资源管理器
+         * @param app 引擎app
+         */
         constructor(app: application)
         {
             this.app = app;

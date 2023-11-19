@@ -23,6 +23,11 @@ namespace m4m.framework
 
         vertexLength:number=0;
         //private maxcoun:number;
+        /**
+         * F14 发射合批
+         * @param effect F14 特效系统
+         * @param element F14发射器
+         */
         public constructor(effect:f14EffectSystem,element:F14Emission)
         {
             this.type= F14TypeEnum.particlesType;

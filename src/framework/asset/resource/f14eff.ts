@@ -14,6 +14,10 @@ namespace m4m.framework
         defaultAsset: boolean = false;
         private name: constText = null;
         private id: resID = new resID();
+        /**
+         * F14特效 资源
+         * @param assetName 资源名
+         */
         constructor(assetName: string = null)
         {
             if (!assetName)

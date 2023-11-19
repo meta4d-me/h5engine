@@ -16,7 +16,11 @@ namespace m4m.framework {
         defaultAsset: boolean = false;
         public szContent: string = "";
         public bObjRes: boolean = false;
-
+        /**
+         * mesh 资源
+         * @param assetName 资源名 
+         * @param isObject 是obj？
+         */
         constructor(assetName: string = null, isObject: boolean = false) {
             if (!assetName) {
                 assetName = "mesh_" + this.getGUID();

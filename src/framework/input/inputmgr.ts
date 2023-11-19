@@ -42,6 +42,10 @@ namespace m4m.framework {
 
         private rMtr_90 = new m4m.math.matrix3x2();
         private rMtr_n90 = new m4m.math.matrix3x2();
+        /**
+         * 输入管理器
+         * @param app 引擎app 
+         */
         constructor(app: application) {
             this.app = app;
             m4m.math.matrix3x2MakeRotate(Math.PI * 90 / 180, this.rMtr_90);

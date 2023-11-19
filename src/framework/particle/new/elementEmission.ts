@@ -99,7 +99,11 @@ namespace m4m.framework
         private numcount: number;
         private beover: boolean = false;
         //-----------------------------------------------------------------
-
+        /**
+         * 特效元素发射器
+         * @param sys test特效系统
+         * @param data 特效数据
+         */
         constructor(sys: TestEffectSystem,data:EffectElementData=null)
         {
             this.webgl = m4m.framework.sceneMgr.app.webgl;

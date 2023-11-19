@@ -9,6 +9,9 @@ namespace m4m.framework {
     //二，加载而来，也是这个使用引用计数管理
     //三，静态管理，这个是特殊的，不要为他设计
     export class resID {
+        /**
+         * 资源ID
+         */
         constructor() {
             this.id = resID.next();
         }
@@ -33,6 +36,10 @@ namespace m4m.framework {
      */
     @m4m.reflect.SerializeType
     export class constText {
+        /**
+         * 静态text
+         * @param text text字符串数据
+         */
         constructor(text: string) {
             this.name = text;
         }

@@ -20,6 +20,9 @@ namespace m4m.framework
      */
     export class cameraPostQueue_Depth implements ICameraPostQueue
     {
+        /**
+         * 相机后处理 深度
+         */
         constructor()
         {
             this.renderTarget = null;
@@ -48,6 +51,9 @@ namespace m4m.framework
     export class cameraPostQueue_Quad implements ICameraPostQueue
     {
         material: material;//shader & uniform
+        /**
+         * 相机后处理 方块
+         */
         constructor()
         {
             this.renderTarget = null;
@@ -79,6 +85,9 @@ namespace m4m.framework
      */
     export class cameraPostQueue_Color implements ICameraPostQueue
     {
+        /**
+         * 相机后处理颜色队列
+         */
         constructor()
         {
             this.renderTarget = null;
@@ -125,7 +134,9 @@ namespace m4m.framework
     export class camera implements INodeComponent
     {
         static readonly ClassName: string = "camera";
-
+        /**
+         * 相机
+         */
         constructor()
         {
             for (let i = 0; i < 8; i++)

@@ -61,6 +61,12 @@ namespace m4m.framework {
          */
         parseReject: (o: Error) => void;
         static reTryTest = {};
+        /**
+         * 资源包
+         * @param url url
+         * @param assetmgr 资源管理器 
+         * @param guid id
+         */
         constructor(url: string, private assetmgr: assetMgr, guid?: number) {
             this.guid = guid || assetBundle.buildGuid();
             this.url = url;

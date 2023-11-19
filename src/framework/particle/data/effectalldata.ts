@@ -55,6 +55,10 @@ namespace m4m.framework
         public actionActive: boolean = false;//当前帧action状态
         public loopFrame: number = Number.MAX_VALUE;//循环帧数
         public active: boolean = true;//激活状态
+        /**
+         * 特效元素
+         * @param _data 元素数据 
+         */
         constructor(_data: EffectElementData)
         {
             this.data = _data;
@@ -918,6 +922,10 @@ namespace m4m.framework
          * @memberof effect
          */
         public vertexSize: number = 0;
+        /**
+         * 特效数据
+         * @param formate 
+         */
         constructor(formate: number)
         {
             this.vertexSize = m4m.render.meshData.calcByteSize(formate) / 4;

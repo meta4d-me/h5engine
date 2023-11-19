@@ -74,7 +74,9 @@
             return this._value;
         }
 
-
+        /**
+         * 值数据
+         */
         constructor()
         {
 

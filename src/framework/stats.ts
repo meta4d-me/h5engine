@@ -9,6 +9,10 @@ namespace Stats
      */
     export class Stats
     {
+        /**
+         * 状态面板
+         * @param app 
+         */
         constructor(app:m4m.framework.application)
         {
             this.app = app;
@@ -144,6 +148,12 @@ namespace Stats
      */
     class Panel
     {
+        /**
+         * 状态 面板
+         * @param name ming 
+         * @param fg 
+         * @param bg 
+         */
         constructor(name: string, fg: string, bg: string)
         {
             this.name = name;

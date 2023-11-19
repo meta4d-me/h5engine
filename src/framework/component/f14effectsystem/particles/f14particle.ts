@@ -92,6 +92,11 @@ namespace m4m.framework
         }
 
         //private float startTime = 0;
+        /**
+         * F14 粒子
+         * @param element F14 发射器
+         * @param data F14F发射数据
+         */
         public constructor(element: F14Emission, data: F14EmissionBaseData)
         {
             this.data = data;

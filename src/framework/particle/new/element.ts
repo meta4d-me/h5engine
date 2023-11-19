@@ -59,7 +59,11 @@ namespace m4m.framework
 
         public rotationByEuler: math.quaternion = new math.quaternion();
         public localRotation: math.quaternion = new math.quaternion();
-
+        /**
+         * 特效元素
+         * @param sys test特效系统
+         * @param data 特效元素数据
+         */
         constructor(sys: TestEffectSystem,data:EffectElementData=null)
         {
             this.effectSys = sys;

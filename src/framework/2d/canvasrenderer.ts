@@ -20,7 +20,7 @@ namespace m4m.framework
         static readonly ClassName:string="canvasRenderer";
 
         /**
-         * @private
+         * 3DUI的容器
          */
         constructor()
         {

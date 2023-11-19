@@ -15,6 +15,11 @@ namespace m4m.framework
     
         public element:F14Element;
         public batch:F14Basebatch;
+        /**
+         * F14 层
+         * @param effect F14特效系统 
+         * @param data F14 层数据
+         */
         constructor(effect:f14EffectSystem,data:F14LayerData)
         {
             this.effect = effect;
@@ -105,6 +110,11 @@ namespace m4m.framework
         public layer:F14Layer;
         public data:F14FrameData;
         public attDic:{[name:string]:any};//自行设置的data 包含5种关键数据
+        /**
+         * F14 帧
+         * @param layer F14 层
+         * @param data F14 帧数据
+         */
         constructor(layer:F14Layer,data:F14FrameData)
         {
             this.layer = layer;

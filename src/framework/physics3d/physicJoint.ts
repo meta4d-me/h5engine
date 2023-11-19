@@ -36,7 +36,11 @@ namespace m4m.framework {
 
         private _physicsJoint: any;
         protected _physicsPlugin: IPhysicsEnginePlugin;
-
+        /**
+         * 关节
+         * @param type 类型
+         * @param jointData 关节数据
+         */
         constructor(public type: number, public jointData: PhysicsJointData) {
             jointData.nativeParams = jointData.nativeParams || {};
         }
@@ -124,6 +128,10 @@ namespace m4m.framework {
      * A class representing a physics distance joint.
      */
     export class DistanceJoint extends PhysicsJoint {
+        /**
+         * 距离关节
+         * @param jointData 关节数据
+         */
         constructor(jointData: DistanceJointData) {
             super(PhysicsJoint.DistanceJoint, jointData);
         }
@@ -142,7 +150,11 @@ namespace m4m.framework {
      * Represents a Motor-Enabled Joint
      */
     export class MotorEnabledJoint extends PhysicsJoint implements IMotorEnabledJoint {
-        
+        /**
+         * 马达关节
+         * @param type 类型
+         * @param jointData 关节数据
+         */
         constructor(type: number, jointData:PhysicsJointData) {
             super(type, jointData);
         }
@@ -160,7 +172,10 @@ namespace m4m.framework {
      * This class represents a single hinge physics joint
      */
     export class HingeJoint extends MotorEnabledJoint {
-        
+        /**
+         * 铰链关节
+         * @param jointData 关节数据
+         */
         constructor(jointData:PhysicsJointData) {
             super(PhysicsJoint.HingeJoint, jointData);
         }
@@ -178,7 +193,10 @@ namespace m4m.framework {
      * This class represents a dual hinge physics joint (same as wheel joint)
      */
     export class Hinge2Joint extends MotorEnabledJoint {
-        
+        /**
+         * 铰链2关节
+         * @param jointData 关节数据
+         */
         constructor(jointData:PhysicsJointData) {
             super(PhysicsJoint.Hinge2Joint, jointData);
         }

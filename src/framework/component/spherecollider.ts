@@ -35,6 +35,11 @@ namespace m4m.framework
         public srcradius:number;//collider定义的源半径
         private tempScale:m4m.math.vector3 = new m4m.math.vector3();
         private srcCenter : m4m.math.vector3 = new m4m.math.vector3();
+        /**
+         * 球形
+         * @param _center 中心点
+         * @param _r 半径
+         */
         constructor(_center:math.vector3, _r:number)
         {
             math.vec3Clone(_center,this.srcCenter);

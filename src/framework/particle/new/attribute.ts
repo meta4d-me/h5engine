@@ -20,6 +20,9 @@ namespace m4m.framework
         public data: { [frameIndex: number]: FrameKeyPointData };
         public frameIndexs: number[];
         public actions: { [frameIndex: number]: IEffectAction[] }
+        /**
+         * 三维向量属性数据
+         */
         constructor()
         {
             this.init();
@@ -84,6 +87,9 @@ namespace m4m.framework
         public frameIndexs: number[];
         public data: { [frameIndex: number]: FrameKeyPointData };
         public actions: { [frameIndex: number]: IEffectAction[] }
+        /**
+         * 二维向量属性数据
+         */
         constructor()
         {
             this.init();
@@ -149,6 +155,9 @@ namespace m4m.framework
         public frameIndexs: number[];
         public timeLine: { [frameIndex: number]: number };
         public actions: { [frameIndex: number]: IEffectAction[] };
+        /**
+         * 标量属性数据
+         */
         constructor()
         {
             this.init();
@@ -253,7 +262,12 @@ namespace m4m.framework
     {
         public frameIndex: number;
         public val: any;
-        public actions: IEffectAction[];
+        public actions: IEffectAction[]
+        /**
+         * 关键帧数据
+         * @param frameIndex 帧索引
+         * @param val 值
+         */
         constructor(frameIndex: number, val: any)
         {
             this.frameIndex = frameIndex;

@@ -272,6 +272,10 @@ namespace m4m.io {
         private buffer: Uint8Array;
         public r_offset: number = 0;
         public w_offset: number = 0;
+        /**
+         * 二进制工具
+         * @param size 
+         */
         constructor(size: number = undefined) {
             //this.buffer = new Array(size);
             // if (size)
@@ -779,6 +783,9 @@ namespace m4m.io {
             return memoryPool.instnace;
         };
         private pool: Array<Uint8Array> = new Array();
+        /**
+         * 内存池
+         */
         constructor() {
             // for (let i = 0; i < 30; ++i)
             //     this.pool.push(new Uint8Array(1024));

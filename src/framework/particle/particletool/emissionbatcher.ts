@@ -18,7 +18,10 @@ namespace m4m.framework
         public particles: Particle[] = [];
         private vertexSize: number = 0;
         public vf: number = 0;
-
+        /**
+         * 发射器合批
+         * @param emissionElement 发射器元素
+         */
         constructor(emissionElement: EmissionElement)
         {
             this.emissionElement = emissionElement;

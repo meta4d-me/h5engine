@@ -99,7 +99,10 @@ namespace m4m.framework
                 }
             }
         }
-
+        /**
+         * F14 特效系统
+         * @param bundleName 资源包名
+         */
         constructor(private bundleName: string)
         {
 

@@ -19,6 +19,12 @@ namespace m4m.framework {
         passArr: m4m.render.glDrawPass[];
         /** passId 对应 passArr 中的索引map*/
         passIdMap: { [id: number]: number };
+        /**
+         * meshGPUIns合批
+         * @param _glayer 层级
+         * @param _mesh mesh
+         * @param _mats 材质列表
+         */
         constructor(_glayer: number, _mesh: m4m.framework.mesh, _mats: m4m.framework.material[]) {
             this.gameLayer = _glayer;
             this.mesh = _mesh;
@@ -190,7 +196,9 @@ namespace m4m.framework {
     @reflect.nodeComponent
     export class meshRenderer implements IRendererGpuIns {
         static readonly ClassName: string = "meshRenderer";
-
+        /**
+         * mesh渲染组件
+         */
         constructor() {
 
         }

@@ -16,6 +16,9 @@ namespace m4m.threading
         private worker: Worker;// = new Worker("lib/m4m.thread.js");
         private callID: number = 0;
         private callMap: { [id: number]: { callback: (result) => void } } = {};//new Map<number, { resolve: any }>();
+        /**
+         * 多线程
+         */
         constructor()
         {
             if (!thread.workerInstance)

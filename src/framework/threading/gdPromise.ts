@@ -6,7 +6,10 @@ namespace m4m.threading
         /** 异常捕获函数 */
         private catchMethod: (val: T) => void;
         // private thenCall: (val: T) => void;
-
+        /**
+         * 自定义 Promise
+         * @param executor 
+         */
         constructor(executor: (resolve: (value?: T) => void, reject: (reason?: any) => void) => void)
         {
             setTimeout(() =>

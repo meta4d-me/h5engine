@@ -35,6 +35,11 @@ namespace m4m.framework {
      * 自动大小的 字体选择器 
      */
     export class FontSelector_autoSize implements IFontSelector {
+        /**
+         * 自动大小的 字体选择器 
+         * @param overlay 
+         * @param name 
+         */
         constructor(overlay: overlay2D, name: string) {
 
             this.overlay = overlay;
@@ -123,6 +128,9 @@ namespace m4m.framework {
     @reflect.node2DComponent
     @reflect.nodeRender
     export class label implements IRectRenderer {
+        /**
+         * 2d文本组件
+         */
         constructor() {
 
         }
@@ -1444,6 +1452,10 @@ namespace m4m.framework {
      * 富文本选项 颜色
      */
     class richOptColor implements IRichTextOpt {
+        /**
+         * 富文本选项 颜色
+         * @param _c 
+         */
         constructor(_c: math.color) {
             this.value = new math.color();
             math.colorClone(_c, this.value);
@@ -1480,6 +1492,10 @@ namespace m4m.framework {
      * 富文本选项 文本图
      */
     class richOptImage implements IRichTextOpt {
+        /**
+         * 富文本 图 选项
+         * @param imgSrc 
+         */
         constructor(imgSrc: string) {
             this.value = imgSrc;
         }

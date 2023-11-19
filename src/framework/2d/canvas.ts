@@ -156,7 +156,7 @@ namespace m4m.framework {
          * @public
          * @language zh_CN
          * @classdesc
-         * 构造函数
+         * 2d节点的容器类 构造函数
          * @version m4m 1.0
          */
         constructor() {

@@ -275,7 +275,9 @@ namespace m4m.framework
         private _shapeBox = new ParticleSystemShapeBox(this);
         private _shapeCircle = new ParticleSystemShapeCircle(this);
         private _shapeEdge = new ParticleSystemShapeEdge(this);
-
+        /**
+         * 粒子形状模块
+         */
         constructor()
         {
             super();

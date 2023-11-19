@@ -30,6 +30,11 @@ namespace m4m.framework {
          * @version m4m 1.0
          */
         defaultAsset: boolean = false;
+        /**
+         * gltf 资源
+         * @param assetName 资源名 
+         * @param data 数据
+         */
         constructor(assetName: string = null, public data: any) {
             if (!assetName) {
                 assetName = "json_" + this.getGUID();
@@ -958,6 +963,11 @@ namespace m4m.framework {
         min: number[];
         size: number;
         private _data: AccTypedArray | AccTypedArray[];
+        /**
+         * gltf 内存访问器
+         * @param param0 参数0
+         * @param name 名
+         */
         constructor({ bufferView, byteOffset = 0, componentType, normalized = false, count, type, max = [], min = [] }, name = '') {
             this.attribute = name;
             this.bufferView = bufferView;

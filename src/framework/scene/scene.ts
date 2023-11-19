@@ -28,8 +28,8 @@ namespace m4m.framework
          */
         webgl: WebGL2RenderingContext;
         /**
-         * @private
-         * @param app
+         * 引擎场景
+         * @param 引擎 app
          */
         constructor(app: application)
         {

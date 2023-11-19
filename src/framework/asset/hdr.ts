@@ -9,7 +9,10 @@ class HdrParser
      * @version m4m 1.0
      */
     public textDecoder = new TextDecoder();
-
+    /**
+     * hdr 纹理解析器
+     * @param gl webgl上下文
+     */
     constructor(private gl: WebGL2RenderingContext) {
     }
 

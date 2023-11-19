@@ -27,7 +27,11 @@ namespace m4m.framework
         private uvArr:math.vector2[];
         dataforvbo:Float32Array;
         dataforebo:Uint16Array;
-        
+        /**
+         * f14 单mesh
+         * @param effect 特效系统
+         * @param layer F14层
+         */
         constructor(effect:f14EffectSystem,layer:F14Layer)
         {
             this.type = F14TypeEnum.SingleMeshType;

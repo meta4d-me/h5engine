@@ -4,6 +4,12 @@ namespace m4m.framework {
         _webgl: WebGL2RenderingContext;
         static _canvas: HTMLCanvasElement;
         static _c2d: CanvasRenderingContext2D;
+        /**
+         * canvas 自填充字体资源
+         * @param webgl webgl 上下文
+         * @param fontname 字体名
+         * @param fontsize 字体尺寸
+         */
         constructor(webgl: WebGL2RenderingContext, fontname: string = "serif", fontsize: number = 16) {
             this.name = new constText("canvasfont_" + fontname + "_" + fontsize);
             this._webgl = webgl;

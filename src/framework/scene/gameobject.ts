@@ -82,7 +82,11 @@ namespace m4m.framework
          * onPlay是否调用过了
          */
         OnPlayed: boolean = false;
-
+        /**
+         * 组件节点
+         * @param comp 组件
+         * @param init 初始化
+         */
         constructor(comp: INodeComponent, init: boolean = false)
         {
             this.comp = comp;

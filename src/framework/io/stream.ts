@@ -6,6 +6,11 @@ namespace m4m.io {
      */
     export class binReader {
         private _data: DataView;
+        /**
+         * 二进制阅读器
+         * @param buf 二进制数据
+         * @param seek 偏移
+         */
         constructor(buf: ArrayBuffer, seek: number = 0) {
             this._seek = seek;
             if (!(buf instanceof ArrayBuffer))
@@ -324,7 +329,9 @@ namespace m4m.io {
         private _data: DataView;
         private _length: number;
         private _seek: number;
-
+        /**
+         * 二进制写
+         */
         constructor() {
             //if (buf == null)
             {

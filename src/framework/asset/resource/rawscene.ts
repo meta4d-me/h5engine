@@ -30,6 +30,10 @@ namespace m4m.framework
          * @version m4m 1.0
          */
         fog: Fog;
+        /**
+         * raw 场景资源
+         * @param assetName 资源名 
+         */
         constructor(assetName: string = null)
         {
             if (!assetName)

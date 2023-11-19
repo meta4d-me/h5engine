@@ -24,6 +24,10 @@
         defaultAsset: boolean = false;
 
         isCab = false;
+        /**
+         * 预制体资源
+         * @param assetName 资源名
+         */
         constructor(assetName: string = null)
         {
             if (!assetName)

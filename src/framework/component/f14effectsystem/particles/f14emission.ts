@@ -37,7 +37,11 @@ namespace m4m.framework {
         uvArr: math.vector2[];
 
         private frameGap: number;
-
+        /**
+         * F14 发射器
+         * @param effect F14特效系统 
+         * @param layer F14 层
+         */
         constructor(effect: f14EffectSystem, layer: F14Layer) {
             this.type = F14TypeEnum.particlesType;
             this.effect = effect;

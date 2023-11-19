@@ -1193,6 +1193,10 @@ namespace m4m.framework {
             math.quatLookat(this.getWorldTranslate(), point, this.worldRotate);
             this.setWorldRotate(this.worldRotate);
         }
+
+        /**
+         * 引擎变换节点
+         */
         constructor() {
             this.gameObject = new gameObject();
             this.gameObject.transform = this;
@@ -1294,6 +1298,9 @@ namespace m4m.framework {
      * @version m4m 1.0
      */
     export class insID {
+        /**
+         * 实例ID
+         */
         constructor() {
             this.id = insID.next();
         }
