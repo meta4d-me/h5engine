@@ -129,15 +129,42 @@ declare namespace m4m.framework {
          * @classdesc
          * 引擎的启动方法
          * @param div 绘制区域的dom
+         * @param type HTMLCanvasElement 自适应模式
+         * @param val 自适应模式参数值
+         * @param webglDebug 开启webgl 调试模式？
+         * @param opt_attribs webgl上下文初始化选项
          * @version m4m 1.0
          */
         start(div: HTMLDivElement, type?: CanvasFixedType, val?: number, webglDebug?: boolean, opt_attribs?: WebGLContextAttributes): void;
+        /**
+         * 启动引擎 通过 给定 HTMLCanvasElement 对象
+         * @param canvas HTMLCanvasElement 对象
+         * @param type HTMLCanvasElement 自适应模式
+         * @param val 自适应模式参数值
+         * @param webglDebug 开启webgl 调试模式？
+         * @param opt_attribs webgl上下文初始化选项
+         */
         startForCanvas(canvas: HTMLCanvasElement, type?: CanvasFixedType, val?: number, webglDebug?: boolean, opt_attribs?: WebGLContextAttributes): void;
+        /**
+         * @deprecated [已弃用]
+         * 通报
+         * @param trans
+         * @param type
+         */
         markNotify(trans: any, type: NotifyType): void;
+        /**
+         * @deprecated [已弃用]
+         * 触发通报
+         * @param trans
+         * @param type
+         * @returns
+         */
         private doNotify;
         /**
-         * @private
-         * @param trans
+         * @deprecated [已弃用]
+         * 检查 HideInHierarchy 过滤
+         * @param trans 节点
+         * @returns 是通过？
          */
         checkFilter(trans: any): boolean;
         /**
@@ -157,31 +184,48 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         closeFps(): void;
+        /**
+         * 显示 绘制 DrawCall 信息GUI
+         */
         showDrawCall(): void;
+        /**
+         * 关闭 绘制 DrawCall 信息GUI
+         */
         closeDrawCall(): void;
         private _frameID;
         get frameID(): number;
         private beStepNumber;
+        /**
+         * 引擎Loop 更新
+         * @param delta 上一帧间隔时间（delta 单位秒）
+         */
         private update;
+        /**
+         * 更新屏幕的 ASP
+         */
         private updateScreenAsp;
+        /**
+         * 设置屏幕的 ASP
+         */
         private setScreenAsp;
         /**
          * @private
          */
         preusercodetimer: number;
         /**
-         * @private
+         * @deprecated [已弃用]
          */
         usercodetime: number;
         /**
-         * @private
+         * @deprecated [已弃用]
+         * 获取用户 更新时间
          */
         getUserUpdateTimer(): number;
         private beginTimer;
         private lastTimer;
         private totalTime;
         /**
-         * @private
+         * 获取引擎启动到现在的总时间
          */
         getTotalTime(): number;
         private _deltaTime;
@@ -192,16 +236,25 @@ declare namespace m4m.framework {
         private pretimer;
         private updateTimer;
         /**
-         * @private
+         * 获取上一帧的时间差（秒）
          */
         getUpdateTimer(): any;
         /**
          * @private
          */
         isFrustumCulling: boolean;
+        /**
+         * 引擎的循环函数
+         */
         private loop;
         private _scene;
+        /**
+         * 初始化场景
+         */
         private initScene;
+        /**
+         * 初始化渲染
+         */
         private initRender;
         /**
          * @public
@@ -212,6 +265,9 @@ declare namespace m4m.framework {
          */
         getScene(): scene;
         private _assetmgr;
+        /**
+         * 初始化资源管理器
+         */
         private initAssetMgr;
         /**
          * @public
@@ -222,6 +278,9 @@ declare namespace m4m.framework {
          */
         getAssetMgr(): assetMgr;
         private _inputmgr;
+        /**
+         * 初始化输入管理器
+         */
         private initInputMgr;
         /**
          * @public
@@ -262,7 +321,15 @@ declare namespace m4m.framework {
          * @private
          */
         set beStepForward(value: boolean);
+        /**
+         * 更新 用户逻辑代码
+         * @param delta
+         */
         private updateUserCode;
+        /**
+         * 更新编辑器逻辑代码
+         * @param delta
+         */
         private updateEditorCode;
         private _beRendering;
         /**
@@ -312,6 +379,9 @@ declare namespace m4m.framework {
         private lastWidth;
         private lastHeight;
         OffOrientationUpdate: boolean;
+        /**
+         * 更新 画面旋转方向模式
+         */
         private updateOrientationMode;
         /**
          * 刷新 一次,视窗朝向数据。
@@ -329,8 +399,19 @@ declare namespace m4m.framework {
      * @version m4m 1.0
      */
     interface IUserCode {
+        /**
+         * 开始时触发
+         * @param app   引擎app
+         */
         onStart(app: m4m.framework.application): any;
+        /**
+         * 更新触发
+         * @param delta 上一帧间隔时间（以秒为单位的间隔）
+         */
         onUpdate(delta: number): any;
+        /**
+         * 是关闭？
+         */
         isClosed(): boolean;
     }
     /**
@@ -341,8 +422,19 @@ declare namespace m4m.framework {
      * @version m4m 1.0
      */
     interface IEditorCode {
+        /**
+         * 开始时触发
+         * @param app   引擎app
+         */
         onStart(app: m4m.framework.application): any;
+        /**
+         * 更新触发
+         * @param delta 上一帧间隔时间（以秒为单位的间隔）
+         */
         onUpdate(delta: number): any;
+        /**
+         * 是关闭？
+         */
         isClosed(): boolean;
     }
     const OrientationMode: {
@@ -364,17 +456,26 @@ declare namespace m4m.framework {
         LANDSCAPE_FLIPPED: string;
     };
     /**
-     * @private
+     * 获取 html元素 前缀
+     * @param name 名
+     * @param element html元素
+     * @returns 前缀
      */
     function getPrefixStyleName(name: string, element?: any): string;
     /**
-     * @private
+     * 获取 html元素 前缀
+     * @param name 名
+     * @param element html元素
+     * @returns 前缀
      */
     function getPrefix(name: string, element: any): string;
 }
 declare namespace m4m.framework {
     class DeviceInfo {
         private static debuginfo;
+        /**
+         * 获取拓展
+         */
         private static getExtension;
         /**
          * GPU类型
@@ -429,7 +530,14 @@ declare namespace m4m.framework {
 declare namespace m4m.framework {
     class error {
         static openQueue: boolean;
+        /**
+         * 当异常时
+         */
         static onError: (err: Error) => void;
+        /**
+         * 添加异常
+         * @param err 异常
+         */
         static push(err: Error): void;
     }
 }
@@ -446,10 +554,18 @@ declare namespace m4m.framework {
      * @version m4m 1.0
      */
     interface INodeComponent {
+        /** 初始化时调用  在start 之后*/
         onPlay(): any;
+        /** 初始化时调用 */
         start(): any;
+        /**
+        * 每帧调用一次
+        * @param delta 上一帧的消耗时间(单位s)
+        */
         update(delta: number): any;
+        /** 节点对象 */
         gameObject: gameObject;
+        /** 销毁时调用 */
         remove(): any;
     }
     /**
@@ -460,10 +576,18 @@ declare namespace m4m.framework {
      * @version m4m 1.0
      */
     interface I2DComponent {
+        /** 初始化时调用  在start 之后*/
         onPlay(): any;
+        /** 初始化时调用 */
         start(): any;
+        /**
+         * 每帧调用一次
+         * @param delta 上一帧的消耗时间(单位s)
+         */
         update(delta: number): any;
+        /** 节点变换对象 */
         transform: transform2D;
+        /** 销毁时调用 */
         remove(): any;
     }
     /**
@@ -475,7 +599,12 @@ declare namespace m4m.framework {
      */
     interface ICollider2d {
         transform: transform2D;
+        /** 获取包围边界 */
         getBound(): obb2d;
+        /**
+         * 交叉检测
+         * @param tran 检测的节点
+         */
         intersectsTransform(tran: transform2D): boolean;
     }
     /**
@@ -486,9 +615,22 @@ declare namespace m4m.framework {
      * @version m4m 1.0
      */
     interface IRectRenderer extends I2DComponent {
+        /**
+         * 执行渲染
+         * @param canvas 引擎 canvas 对象
+         */
         render(canvas: canvas): any;
+        /**
+         * 刷新顶点信息
+         */
         updateTran(): any;
+        /**
+         * 获取渲染材质
+         */
         getMaterial(): material;
+        /**
+         * 获取渲染边界(合并渲染深度排序会使用到)
+         */
         getDrawBounds(): m4m.math.rect;
     }
     /**
@@ -502,6 +644,12 @@ declare namespace m4m.framework {
         layer: RenderLayerEnum;
         renderLayer: number;
         queue: number;
+        /**
+         * 执行渲染
+         * @param context 引擎渲染上下文对象
+         * @param assetmgr 引擎资源管理
+         * @param camera 相机对象
+         */
         render(context: renderContext, assetmgr: assetMgr, camera: camera): any;
     }
     /**
@@ -532,7 +680,14 @@ declare namespace Stats {
      * @private
      */
     class Stats {
+        /**
+         * 状态面板
+         * @param app
+         */
         constructor(app: m4m.framework.application);
+        /**
+         * 更新
+         */
         update(): void;
         app: m4m.framework.application;
         container: HTMLDivElement;
@@ -546,147 +701,200 @@ declare namespace Stats {
         private memPanel;
         private ratePanel;
         private userratePanel;
+        /**
+         * 显示 状态监控Panel GUI
+         * @param id id
+         */
         private showPanel;
+        /**
+         * 添加监控Panel
+         * @param panel 监控Panel
+         * @returns
+         */
         private addPanel;
+        /**
+         * 开始
+         */
         private begin;
+        /**
+         * 结束
+         * @returns
+         */
         private end;
     }
 }
 declare namespace m4m {
     var m4m_reflect_root: any;
     namespace reflect {
+        /**
+         * 是组件？
+         * @param type 类型字符串
+         * @returns bool
+         */
         function isComp(type: string): any;
         /**
+         * @deprecated [已弃用]
+         * 获取原型列表
          * @private
          */
         function getPrototypes(): {
             [id: string]: any;
         };
         /**
+         * 获取原型列表
          * @private
          */
         function getPrototype(name: string): any;
         /**
+         * 创建实例对象
          * @private
          */
         function createInstance(prototype: any, matchTag: {
             [id: string]: string;
         }): any;
         /**
+         * 获取类名
          * @private
          */
         function getClassName(prototype: any): any;
         /**
+         * 获取类Tag
          * @private
          */
         function getClassTag(prototype: any, tag: string): any;
         /**
+         * 获取引擎元标记数据
          * @private
          */
         function getMeta(prototype: any): any;
         /**
+         * @deprecated [已弃用]
          * @private
          */
         function attr_Class(constructorObj: any): void;
         /**
+         * @deprecated [已弃用]
          * @private
          */
         function attr_Func(customInfo?: {
             [id: string]: string;
         }): (target: any, propertyKey: string, value: any) => void;
         /**
+         * @deprecated [已弃用]
          * @private
          */
         function attr_Field(customInfo?: {
             [id: string]: string;
         }): (target: Object, propertyKey: string) => void;
         /**
+         * @deprecated [已弃用]
          * @private
          */
         function userCode(constructorObj: any): void;
         /**
+         * @deprecated [已弃用]
          * @private
          */
         function editorCode(constructorObj: any): void;
         /**
+         * 装饰器 自我克隆
          * @private
          */
         function selfClone(constructorObj: any): void;
         /**
+         * 装饰器 组件
          * @private
          */
         function nodeComponent(constructorObj: any): void;
         /**
+         * @deprecated [已弃用]
          * @private
          */
         function nodeComponentInspector(constructorObj: any): void;
         /**
+         * 装饰器 可渲染节点对象
          * @private
          */
         function nodeRender(constructorObj: any): void;
         /**
+         * 装饰器 相机
          * @private
          */
         function nodeCamera(constructorObj: any): void;
         /**
+         * 装饰器 光源
          * @private
          */
         function nodeLight(constructorObj: any): void;
         /**
+         * 装饰器 box碰撞体
          * @private
          */
         function nodeBoxCollider(constructorObj: any): void;
         /**
+         * 装饰器 2d Box碰撞体
          * @private
          */
         function nodeBoxCollider2d(constructorObj: any): void;
         /**
+         * 装饰器 2D物理对象标记
          * @private
          */
         function node2DPhysicsBody(constructorObj: any): void;
         /**
+         * 装饰器 球碰撞体
          * @private
          */
         function nodeSphereCollider(constructorObj: any): void;
         /**
+         * 装饰器 特效合批
          * @private
          */
         function nodeEffectBatcher(constructorObj: any): void;
         /**
+         * 装饰器 网格碰撞体
          * @private
          */
         function nodeMeshCollider(constructorObj: any): void;
         /**
+         * 装饰器 canvas渲染 碰撞体
          * @private
          */
         function nodeCanvasRendererCollider(constructorObj: any): void;
         /**
+         * 装饰器 2D组件标记
          * @private
          */
         function node2DComponent(constructorObj: any): void;
         /**
+         * @deprecated [已弃用]
          * @private
          */
         function pluginMenuItem(constructorObj: any): void;
         /**
+         * @deprecated [已弃用]
          * @private
          */
         function pluginWindow(constructorObj: any): void;
         /**
+         * @deprecated [已弃用]
          * @private
          */
         function pluginExt(constructorObj: any): void;
         /**
+         * @deprecated [已弃用]
          * @private
          */
         function compValue(integer?: boolean, defvalue?: number, min?: number, max?: number): (target: Object, propertyKey: string) => void;
         /**
+         * 装饰器 组件调用
          * @private
          */
         function compCall(customInfo?: {
             [id: string]: string;
         }): (target: any, propertyKey: string, value: any) => void;
         /**
+         * 装饰器 序列化类型
          * @private
          */
         function SerializeType(constructorObj: any): void;
@@ -694,7 +902,7 @@ declare namespace m4m {
          * @public
          * @language zh_CN
          * @classdesc
-         * Field
+         * 装饰器 Field （字段）标记
          * @version m4m 1.0
          * @param valueType 值类型
          * @param defaultValue 默认值
@@ -728,7 +936,7 @@ declare namespace m4m {
          * @public
          * @language zh_CN
          * @classdesc
-         * 属性面板显示方式修饰
+         * 装饰器 属性面板显示方式修饰
          * @version m4m 1.0
          */
         function UIStyle(style: string, min?: number, max?: number, defvalue?: any): (target: Object, propertyKey: string) => void;
@@ -758,19 +966,64 @@ declare namespace m4m.math {
     type uint = number;
     type float = number;
     type double = number;
+    /**
+     * 格式化数据为 UByte
+     * @param v 输入数据
+     * @returns UByte
+     */
     function UByte(v?: number | string): ubyte;
+    /**
+     * 格式化数据为 Byte
+     * @param v 输入数据
+     * @returns Byte
+     */
     function Byte(v?: number | string): byte;
+    /**
+     * 格式化数据为 Int16
+     * @param v 输入数据
+     * @returns Int16
+     */
     function Int16(v?: number | string): short;
+    /**
+     * 格式化数据为 Int32
+     * @param v 输入数据
+     * @returns Int32
+     */
     function Int32(v?: number | string): int;
+    /**
+     * 格式化数据为 UInt16
+     * @param v 输入数据
+     * @returns UInt16
+     */
     function UInt16(v?: number | string): ushort;
+    /**
+     * 格式化数据为 UInt32
+     * @param v 输入数据
+     * @returns UInt32
+     */
     function UInt32(v?: number | string): uint;
+    /**
+     * 格式化数据为 Float
+     * @param v 输入数据
+     * @returns Float
+     */
     function Float(v?: number | string): float;
+    /**
+     * 格式化数据为 Double
+     * @param v 输入数据
+     * @returns Double
+     */
     function Double(v?: number | string): double;
     /**
      * @private
      */
     class vector2 implements Ivec2 {
         static readonly ClassName: string;
+        /**
+         * 二维向量
+         * @param x x值
+         * @param y y值
+         */
         constructor(x?: number, y?: number);
         x: number;
         y: number;
@@ -780,6 +1033,13 @@ declare namespace m4m.math {
      */
     class rect {
         static readonly ClassName: string;
+        /**
+         * 矩形
+         * @param x x值
+         * @param y y值
+         * @param w 宽
+         * @param h 高
+         */
         constructor(x?: float, y?: float, w?: float, h?: float);
         x: number;
         y: number;
@@ -792,6 +1052,13 @@ declare namespace m4m.math {
      */
     class border {
         static readonly ClassName: string;
+        /**
+         * 矩形边界
+         * @param l 左值
+         * @param t 上值
+         * @param r 右值
+         * @param b 下值
+         */
         constructor(l?: float, t?: float, r?: float, b?: float);
         l: number;
         t: number;
@@ -804,6 +1071,13 @@ declare namespace m4m.math {
      */
     class color {
         static readonly ClassName: string;
+        /**
+         * rgba颜色
+         * @param r r值
+         * @param g g值
+         * @param b b值
+         * @param a a值
+         */
         constructor(r?: float, g?: float, b?: float, a?: float);
         r: number;
         g: number;
@@ -816,6 +1090,12 @@ declare namespace m4m.math {
      */
     class vector3 implements Ivec3 {
         static readonly ClassName: string;
+        /**
+         * 三维向量
+         * @param x x值
+         * @param y y值
+         * @param z z值
+         */
         constructor(x?: float, y?: float, z?: float);
         x: number;
         y: number;
@@ -827,6 +1107,13 @@ declare namespace m4m.math {
      */
     class vector4 {
         static readonly ClassName: string;
+        /**
+         * 四维向量
+         * @param x x值
+         * @param y y值
+         * @param z z值
+         * @param w w值
+         */
         constructor(x?: float, y?: float, z?: float, w?: float);
         x: number;
         y: number;
@@ -839,6 +1126,13 @@ declare namespace m4m.math {
      */
     class quaternion implements Iquat {
         static readonly ClassName: string;
+        /**
+         * 四元数
+         * @param x x值
+         * @param y y值
+         * @param z z值
+         * @param w w值
+         */
         constructor(x?: float, y?: float, z?: float, w?: float);
         x: number;
         y: number;
@@ -852,6 +1146,10 @@ declare namespace m4m.math {
     class matrix {
         static readonly ClassName: string;
         rawData: Array<number>;
+        /**
+         * 4x4 矩阵
+         * @param datas raw 数据
+         */
         constructor(datas?: Array<number>);
         toString(): string;
     }
@@ -860,6 +1158,10 @@ declare namespace m4m.math {
      */
     class matrix3x2 {
         rawData: Array<number>;
+        /**
+         * 3x2 矩阵
+         * @param datas raw数据
+         */
         constructor(datas?: Array<number>);
         toString(): string;
     }
@@ -884,6 +1186,7 @@ declare namespace m4m.math {
         constructor(bufferType: new (size: number) => T, initSize?: number);
         /** push添加到array */
         push(num: number): void;
+        /** 延长 长度 */
         private exlength;
         /** 对象清理 */
         dispose(): void;
@@ -899,15 +1202,43 @@ declare namespace m4m.math {
         /** 获取当前长度 */
         get length(): number;
         set length(val: number);
+        /**
+         * 添加到数组
+         * @param val 添加的数据
+         */
         push(val: T): void;
-        /** 获取指定索引的值 */
+        /**
+         * 获取指定索引的值
+         * @param index 指定索引
+         * @returns 输出的值
+         */
         get(index: number): T;
         /** 数组所有值置为null  */
         clear(): void;
     }
+    /**
+     * json 数据转 四维向量
+     * @param json json 数据
+     * @param vec4 四维向量
+     */
     function vec4FormJson(json: string, vec4: vector4): void;
+    /**
+     * json 数据转 三维向量
+     * @param json json 数据
+     * @param vec4 三维向量
+     */
     function vec3FormJson(json: string, vec3: vector3): void;
+    /**
+    * json 数据转 二维向量
+    * @param json json 数据
+    * @param vec4 二维向量
+    */
     function vec2FormJson(json: string, vec2: vector2): void;
+    /**
+    * json 数据转 颜色
+    * @param json json 数据
+    * @param vec4 颜色
+    */
     function colorFormJson(json: string, _color: color): void;
 }
 declare namespace m4m.framework {
@@ -927,19 +1258,23 @@ declare namespace m4m.framework {
         private dataForVbo;
         private dataForEbo;
         /**
+         * 初始化 2D batcher 的mesh buffer
          * @private
          */
         initBuffer(webgl: WebGL2RenderingContext, vf: render.VertexFormatMask, drawMode: render.DrawModeEnum): void;
         /**
+         * batcher 且换到开始状态
          * @private
          */
         begin(webgl: WebGL2RenderingContext, pass: render.glDrawPass): void;
         private static limitCount;
         /**
+         * batcher 填入增加部分mesh数据
          * @private
          */
         push(webgl: WebGL2RenderingContext, vbodata: number[], ebodata: number[]): void;
         /**
+         * batcher 且换到结束状态，停止填入mesh
          * @private
          */
         end(webgl: WebGL2RenderingContext): void;
@@ -959,7 +1294,7 @@ declare namespace m4m.framework {
          * @public
          * @language zh_CN
          * @classdesc
-         * 构造函数
+         * 2d节点的容器类 构造函数
          * @version m4m 1.0
          */
         constructor();
@@ -1109,9 +1444,21 @@ declare namespace m4m.framework {
          * @param multiTouch 多点
          */
         burstPointEvent(touch: boolean, XOnModelSpace: number, YOnModelSpace: number, multiTouch?: boolean): void;
+        /**
+         * 捕获阶段流
+         */
         private capturePointFlow;
+        /**
+         * 冒泡阶段流
+         */
         private popPointFlow;
         private _insIdFrameMap;
+        /**
+         * 场景节点树更新
+         * @param node
+         * @param delta
+         * @returns
+         */
         private objupdate;
         private lastMat;
         /**
@@ -1180,6 +1527,10 @@ declare namespace m4m.framework {
          * @param node 节点
          */
         private ckViewOutside;
+        /**
+         * 渲染强制 Top模式的文本
+         * @returns
+         */
         private renderTopLabels;
         static readonly depthTag = "__depthTag__";
         static readonly flowIndexTag = "__flowIndexTag__";
@@ -1272,7 +1623,7 @@ declare namespace m4m.framework {
     class canvasRenderer implements IRenderer, ICollider {
         static readonly ClassName: string;
         /**
-         * @private
+         * 3DUI的容器
          */
         constructor();
         get renderLayer(): number;
@@ -1290,13 +1641,7 @@ declare namespace m4m.framework {
          * @private
          */
         subTran: transform;
-        /**
-         * @private
-         */
         getBound(): any;
-        /**
-         * @private
-         */
         intersectsTransform(tran: transform): boolean;
         /**
          * @public
@@ -1314,9 +1659,6 @@ declare namespace m4m.framework {
         canvas: canvas;
         inputmgr: inputMgr;
         cameraTouch: camera;
-        /**
-         * @private
-         */
         start(): void;
         onPlay(): void;
         /**
@@ -1361,9 +1703,6 @@ declare namespace m4m.framework {
          */
         getChild(index: number): transform2D;
         private m_lastAsp;
-        /**
-         * @private
-         */
         update(delta: number): void;
         /**
          * @public
@@ -1416,15 +1755,10 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         calCanvasPosToWorldPos(from: math.vector2, out: math.vector3): void;
-        /**
-         * @private
-         */
         render(context: renderContext, assetmgr: assetMgr, camera: m4m.framework.camera): void;
-        /**
-         * @private
-         */
         remove(): void;
         /**
+         * [无效弃用接口]
          * @private
          */
         clone(): void;
@@ -1474,11 +1808,14 @@ declare namespace m4m.framework {
         private camera;
         private app;
         private inputmgr;
-        /**
-         * @private
-         */
         start(camera: camera): void;
+        /**
+         * 注册相关事件
+         */
         private regEvnets;
+        /**
+         * 注销所有注册的事件
+         */
         private unRegEvents;
         /**
          * @private
@@ -1590,6 +1927,9 @@ declare namespace m4m.framework {
         private lastScreenMR;
         private lastMR_width;
         private lastMR_height;
+        /**
+         * 检查缩放模式 改变
+         */
         private ckScaleMode;
         /**
          * @public
@@ -1653,7 +1993,15 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         calClipPosToScreenPos(clipPos: m4m.math.vector2, outScreenPos: m4m.math.vector2): void;
+        /**
+         * 获取高度的缩放值
+         * @returns
+         */
         getScaleHeight(): number;
+        /**
+         * 获取宽度的缩放值
+         * @returns
+         */
         getScaleWidth(): number;
     }
 }
@@ -1682,6 +2030,12 @@ declare namespace m4m.framework {
      * @version m4m 1.0
      */
     interface I2DPointListener {
+        /**
+         * Point(点)事件触发
+         * @param canvas 引擎 canvas 对象
+         * @param ev Point(点)事件
+         * @param oncap 是捕获阶段？
+         */
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): any;
     }
     /**
@@ -1701,6 +2055,11 @@ declare namespace m4m.framework {
         comp: I2DComponent;
         init: boolean;
         OnPlayed: boolean;
+        /**
+         * 2D组件实例接口
+         * @param comp 组件
+         * @param init 初始化？
+         */
         constructor(comp: I2DComponent, init?: boolean);
     }
     /**
@@ -2323,6 +2682,7 @@ declare namespace m4m.framework {
         onPlay(): void;
         /** 每帧调用一次 */
         update(delta: number): void;
+        /** 销毁时调用 */
         remove(): void;
     }
 }
@@ -2468,26 +2828,16 @@ declare namespace m4m.framework {
          */
         get fadeDuration(): number;
         set fadeDuration(duration: number);
-        /**
-         * @private
-         */
         start(): void;
         onPlay(): void;
-        /**
-         * @private
-         */
         update(delta: number): void;
         transform: transform2D;
-        /**
-         * @private
-         */
         remove(): void;
         private downPointV2;
         private isMovedLimit;
         private readonly movedLimit;
-        /**
-         * @private
-         */
+        private isInTransform;
+        private isMultitouch;
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
         /**
          * @public
@@ -2514,19 +2864,30 @@ declare namespace m4m.framework {
         private _downInThis;
         private _dragOut;
         /**
+         * 展示 Normal（正常）状态
          * @private
          */
         private showNormal;
         /**
+         * 展示 Press（按压）状态
          * @private
          */
         private showPress;
+        /**
+         * 尝试获取 sprite 资源
+         * @param spriteName sprite 资源名
+         * @returns sprite 资源
+         */
         private tryGetSprite;
         /**
+         * 改变按钮颜色
+         * @param targetColor 目标颜色
          * @private
          */
         private changeColor;
         /**
+         * 改变按钮图案
+         * @param sprite sprite 资源
          * @private
          */
         private changeSprite;
@@ -2545,7 +2906,7 @@ declare namespace m4m.framework {
     class image2D implements IRectRenderer {
         static readonly ClassName: string;
         /**
-         * @private
+         * 2d图片组件
          */
         constructor();
         private _unitLen;
@@ -2577,15 +2938,13 @@ declare namespace m4m.framework {
          * @classdesc
          * 获取rander 的材质
          * @version m4m 1.0
+         * @returns 引擎材质对象
          */
         getMaterial(): material;
         private _darwRect;
         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
          * 获取渲染绘制矩形边界
-         * @version m4m 1.0
+         * @returns rect (矩形边界)数据对象
          */
         getDrawBounds(): math.rect;
         /**
@@ -2644,62 +3003,46 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         get imageBorder(): math.border;
-        /**
-         * @private
-         */
         render(canvas: canvas): void;
+        /**
+         * 资源管理器中寻找 指定的贴图资源
+         */
         private searchTexture;
         private _cacheMaskV4;
-        /**
-         * @private
-         */
         start(): void;
         onPlay(): void;
-        /**
-         * @private
-         */
         update(delta: number): void;
-        /**
-         * @private
-         */
         remove(): void;
         /**
-         * @private
          * 根据显示方式来准备数据
          */
         private prepareData;
-        /**
-         * @private
-         */
         updateTran(): void;
         private min_x;
         private max_x;
         private min_y;
         private max_y;
-        /** 计算drawRect */
+        /**
+         * 计算实际渲染绘制覆盖到的区域 Rect
+         */
         private calcDrawRect;
         /**
-         * @private
          * 更新quad的顶点数据
          */
         private updateQuadData;
         /**
-         * @private
          * 更新常规数据
          */
         private updateSimpleData;
         /**
-         * @private
          * 更新9宫数据
          */
         private updateSlicedData;
         /**
-         * @private
          * 更新填充数据
          */
         private updateFilledData;
         /**
-         * @private
          * 更新瓦片数据。这里只是没有border的瓦片。如果有border就要复杂很多
          */
         private updateTiledData;
@@ -2857,40 +3200,47 @@ declare namespace m4m.framework {
         private layoutRefresh;
         /**设置 通用 样式 */
         private setStyleEle;
+        /**
+         * 创建 Html的InputElement 对象
+         */
         private createInputEle;
+        /**
+         * 创建 Html的TextareaElement 对象
+         * 多行文本输入会使用到
+         */
         private createTextAreaEle;
+        /**
+         * 设置 TextareaElement 对象 的Overflow模式
+         */
         private setTextAreaOverflow;
         /** 初始化 html 元素 */
         private initEle;
-        private updateEleStyle;
-        private removeEle;
         /**
-         * @private
+         * 更新 html 元素的Style（样式）
+         * @returns
          */
+        private updateEleStyle;
+        /**
+         * 销毁 html 元素
+         * @returns
+         */
+        private removeEle;
         start(): void;
+        /**
+         * 检查是否是 移动设备
+         */
         private ckIsMobile;
         onPlay(): void;
         /**
-        * @private
         * inputElement 位置、宽高刷新
         */
         private inputElmLayout;
         /**
-         * @private
          * 输入文本刷新
          */
         private textRefresh;
-        /**
-         * @private
-         */
         update(delta: number): void;
-        /**
-         * @private
-         */
         remove(): void;
-        /**
-         * @private
-         */
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
         /**
          * 设置 输入聚焦状态
@@ -2955,14 +3305,45 @@ declare namespace m4m.framework {
     }
 }
 declare namespace m4m.framework {
+    /**
+     * 字体选择器接口
+     */
     interface IFontSelector {
+        /**
+         * 更新
+         * @param label label对象
+         */
         Update(label: label): void;
         get pixelPerfact(): boolean;
+        /**
+         * 计算屏幕高度
+         * @param label  label对象
+         */
         calcScreenHeight(label: label): number;
+        /**
+         * 辅助将顶点对齐到屏幕坐标，能改善清晰度
+         * @param label label对象
+         * @param vec2 坐标
+         * @param screenAddX 屏幕空间坐标增量 X
+         * @param screenAddY 屏幕空间坐标增量 Y
+         */
         pixelFit(label: label, vec2: m4m.math.vector2, screenAddX: number, screenAddY: number): void;
+        /**
+         * 像素宽度
+         * @param label  label对象
+         * @param screenwidth 屏幕空间宽度
+         */
         pixelWidth(label: label, screenwidth: number): number;
     }
+    /**
+     * 自动大小的 字体选择器
+     */
     class FontSelector_autoSize implements IFontSelector {
+        /**
+         * 自动大小的 字体选择器
+         * @param overlay
+         * @param name
+         */
         constructor(overlay: overlay2D, name: string);
         get pixelPerfact(): boolean;
         calcScreenHeight(label: label): number;
@@ -2983,6 +3364,9 @@ declare namespace m4m.framework {
      * @version m4m 1.0
      */
     class label implements IRectRenderer {
+        /**
+         * 2d文本组件
+         */
         constructor();
         private static readonly defUIShader;
         private static readonly defMaskUIShader;
@@ -2993,7 +3377,9 @@ declare namespace m4m.framework {
         static readonly ClassName: string;
         /**字段 用于快速判断实例是否是label */
         readonly isLabel = true;
-        /** 当需渲染字符被 加入排列时 的回调*/
+        /**
+         * 当需渲染字符被 加入排列时 的回调
+         */
         onAddRendererText: (x: number, y: number) => void;
         /** 有图片字符需要渲染 */
         private _hasImageChar;
@@ -3007,6 +3393,11 @@ declare namespace m4m.framework {
          */
         get text(): string;
         set text(text: string);
+        /**
+         * 初始化 绘制网格数据
+         * @param textLen 文本长度
+         * @param datar 网格数据数组容器
+         */
         private initdater;
         srcfontsize: number;
         fontSelector: IFontSelector;
@@ -3087,18 +3478,26 @@ declare namespace m4m.framework {
         private lastStr;
         /** 检查文字,是否需要 动态添加 */
         /**
-         * @private
+         * 更新数据
+         * @param _font 引擎字体对象
          */
         updateData(_font: m4m.framework.IFont): void;
-        /** 更新数据 富文本 模式 */
+        /**
+         * 更新数据 富文本 模式
+         * @param _font 引擎字体对象
+         */
         private updateDataRich;
         /**
          * 通过 block 设置数据
-         * @param _font
-         * @param blocks
+         * @param _font 引擎字体对象
+         * @param blocks 文本数据块队列
          */
         private setDataByBlock;
-        /**获取 图片字符 选项 */
+        /**
+         * 获取 图片字符 选项
+         * @param opts 选项队列
+         * @returns Image选项
+         */
         private getImgOpt;
         /** 获取富文本选项 对象 */
         private getOptObj;
@@ -3162,11 +3561,8 @@ declare namespace m4m.framework {
         private _drityRich;
         private _CustomShaderName;
         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
          * 设置rander Shader名字
-         * @version m4m 1.0
+         * @param shaderName shader 资源名
          */
         setShaderByName(shaderName: string): void;
         /**
@@ -3175,6 +3571,7 @@ declare namespace m4m.framework {
          * @classdesc
          * 获取rander 的材质
          * @version m4m 1.0
+         * @returns 材质
          */
         getMaterial(): material;
         private _darwRect;
@@ -3184,9 +3581,19 @@ declare namespace m4m.framework {
          * @classdesc
          * 获取渲染绘制矩形边界
          * @version m4m 1.0
+         * @returns rect 对象
          */
         getDrawBounds(): math.rect;
-        /** 获取材质 通过 shaderName*/
+        /**
+         * 获取材质 通过 shaderName
+         * @param oldMat
+         * @param _tex
+         * @param cShaderName
+         * @param defMaskSh
+         * @param defSh
+         * @param newMatCB
+         * @returns 材质对象
+         */
         private getMatByShader;
         /**
           * @private
@@ -3200,37 +3607,39 @@ declare namespace m4m.framework {
         private _imgUIMat;
         private get imgUIMat();
         private _dirtyData;
-        /**
-         * @private
-         */
         render(canvas: canvas): void;
+        /**
+         * 设置矩形裁剪遮罩数据
+         * @param mat 材质对象
+         * @param needRMask 是否需要裁剪遮罩？
+         */
         private setMaskData;
+        /**
+         * 资源管理器中寻找 指定的贴图资源
+         */
         private searchTexture;
+        /**
+         * 资源管理器中寻找 指定的图集资源
+         */
         private searchTextureAtlas;
         private _cacheMaskV4;
-        /**
-         * @private
-         */
         updateTran(): void;
         private min_x;
         private max_x;
         private min_y;
         private max_y;
-        /** 计算drawRect */
+        /**
+         * 计算 渲染绘制覆盖到的矩形范围 Rect
+         * @returns
+         */
         private calcDrawRect;
         /**
          * 解析 富文本
-         * @param text
+         * @param text 原始文本字符串
          */
         private parseRichText;
-        /**
-         * @private
-         */
         start(): void;
         onPlay(): void;
-        /**
-         * @private
-         */
         update(delta: number): void;
         /**
          * @public
@@ -3240,9 +3649,6 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         transform: transform2D;
-        /**
-         * @private
-         */
         remove(): void;
     }
     /**
@@ -3304,15 +3710,12 @@ declare namespace m4m.framework {
          */
         get value(): number;
         set value(value: number);
-        /**
-         * @private
-         */
         start(): void;
         onPlay(): void;
-        /**
-         * @private
-         */
         update(delta: number): void;
+        /**
+         * 刷新调
+         */
         private refreshBar;
         /** 调整overimg 宽高*/
         private adjustOverImg;
@@ -3324,9 +3727,6 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         transform: transform2D;
-        /**
-         * @private
-         */
         remove(): void;
     }
 }
@@ -3382,6 +3782,7 @@ declare namespace m4m.framework {
          * @classdesc
          * 获取rander 的材质
          * @version m4m 1.0
+         * @returns 材质对象
          */
         getMaterial(): material;
         private _darwRect;
@@ -3391,6 +3792,7 @@ declare namespace m4m.framework {
          * @classdesc
          * 获取渲染绘制矩形边界
          * @version m4m 1.0
+         * @returns 矩形区域 Rect对象
          */
         getDrawBounds(): math.rect;
         /**
@@ -3399,29 +3801,20 @@ declare namespace m4m.framework {
          */
         private _uimat;
         private get uimat();
-        /**
-         * @private
-         */
         render(canvas: canvas): void;
         private _cacheMaskV4;
-        /**
-         * @private
-         */
         updateTran(): void;
         private min_x;
         private max_x;
         private min_y;
         private max_y;
-        /** 计算drawRect */
-        private calcDrawRect;
         /**
-         * @private
+         * 计算 渲染绘制覆盖到的矩形范围 Rect
+         * @returns
          */
+        private calcDrawRect;
         start(): void;
         onPlay(): void;
-        /**
-         * @private
-         */
         update(delta: number): void;
         /**
          * @public
@@ -3430,26 +3823,6 @@ declare namespace m4m.framework {
          * 当前组件的2d节点
          * @version m4m 1.0
          */
-        transform: transform2D;
-        /**
-         * @private
-         */
-        remove(): void;
-    }
-}
-declare namespace m4m.framework {
-    /**
-     * 富文本版 lable
-     * 支持表情字符，自定义样式段落
-     */
-    class richLabel implements IRectRenderer {
-        render(canvas: canvas): void;
-        updateTran(): void;
-        getMaterial(): material;
-        getDrawBounds(): math.rect;
-        onPlay(): void;
-        start(): void;
-        update(delta: number): void;
         transform: transform2D;
         remove(): void;
     }
@@ -3518,21 +3891,50 @@ declare namespace m4m.framework {
         private lastPoint;
         private strPoint;
         private strPos;
+        /**
+         * 滑动一定距离
+         * @param addtransX 滑动 X轴增量
+         * @param addtransY 滑动 Y轴增量
+         * @returns
+         */
         private SlideTo;
         private readonly collectNum;
         private points;
+        /**
+         * 收集点数据
+         * @returns
+         */
         private collectPointing;
         private flyVelocity;
+        /**
+         * 连续滑动后释放时触发
+         */
         private onInertiaSliderUp;
         private canfly;
         private readonly threshold;
         private readonly cgTime;
         private cgCount;
         private lastfv;
+        /**
+         * 惯性滑动 更新
+         * @param delta 上一帧间隔时间（s）
+         */
         private flyingSlidr;
+        /**
+         * 当移动时触发
+         */
         onMoveFun: (x: number, y: number) => {};
+        /**
+         * 当点击下时触发
+         */
         onDownFun: (x: number, y: number) => {};
+        /**
+         * 当点击释放时触发
+         */
         onUpFun: () => {};
+        /**
+         * 当惯性滑动 结束时触发
+         */
         onSlideEndFun: () => {};
         remove(): void;
     }
@@ -3570,8 +3972,17 @@ declare namespace m4m.framework {
         update(delta: number): void;
         transform: transform2D;
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
+        /**
+         * 当移动时触发
+         */
         onMoveFun: (x: number, y: number) => {};
+        /**
+         * 当点击下时触发
+         */
         onDownFun: (x: number, y: number) => {};
+        /**
+         * 当点击释放时触发
+         */
         onUpFun: () => {};
         private isPointDown;
         private lastPoint;
@@ -3591,6 +4002,11 @@ declare namespace m4m.framework {
     }
 }
 declare namespace m4m.math {
+    /**
+     * 获取矩阵的位移变换
+     * @param src 矩阵
+     * @param out 移变换向量
+     */
     function matrixGetTranslation(src: matrix, out: vector3): void;
     /**
     * @language zh_CN
@@ -3599,65 +4015,308 @@ declare namespace m4m.math {
     * @platform Web,Native
     */
     function matrixTranspose(src: matrix, out: matrix): void;
+    /**
+     * 矩阵分解 到 缩放、旋转、位移
+     * @param src 矩阵
+     * @param scale 缩放
+     * @param rotation 旋转
+     * @param translation 位移
+     * @returns 缩放不为0？
+     */
     function matrixDecompose(src: matrix, scale: vector3, rotation: quaternion, translation: vector3): boolean;
     class angelref {
         v: number;
     }
+    /**
+     * 矩阵3x2 解 到 缩放、旋转、位移
+     * @param src 矩阵3x2
+     * @param scale 缩放
+     * @param rotation 旋转
+     * @param translation 位移
+     * @returns 缩放不为0？
+     */
     function matrix3x2Decompose(src: matrix3x2, scale: vector2, rotation: angelref, translation: vector2): boolean;
+    /**
+     * 矩阵 中获取 Euler旋转
+     * @param src 矩阵
+     * @param order 旋转方向
+     * @param rotation Euler旋转（vector3）
+     */
     function matrixGetEuler(src: matrix, order: RotationOrder, rotation: vector3): void;
+    /**
+     * 矩阵 中获取 旋转
+     * @param src 矩阵
+     * @param result 旋转
+     */
     function matrixGetRotation(src: matrix, result: quaternion): void;
+    /**
+     * 矩阵 中获取 旋转
+     * @param matrix 矩阵
+     * @param result 旋转
+     */
     function matrix2Quaternion(matrix: matrix, result: quaternion): void;
+    /**
+     * 通过xyz轴 获取 旋转
+     * @param xAxis x轴
+     * @param yAxis y轴
+     * @param zAxis z轴
+     * @param out 旋转
+     */
     function unitxyzToRotation(xAxis: vector3, yAxis: vector3, zAxis: vector3, out: quaternion): void;
+    /**
+     * 克隆一个矩阵
+     * @param src 源矩阵
+     * @param out 克隆输出矩阵
+     */
     function matrixClone(src: matrix, out: matrix): void;
+    /**
+     * 克隆一个矩阵3x2
+     * @param src 源矩阵3x2
+     * @param out 克隆输出矩阵
+     */
     function matrix3x2Clone(src: matrix3x2, out: matrix3x2): void;
+    /**
+     * 矩阵单位化
+     * @param out 被单位化的矩阵
+     */
     function matrixMakeIdentity(out: matrix): void;
+    /**
+     * 矩阵3x2单位化
+     * @param out 被单位化的矩阵3x2
+     */
     function matrix3x2MakeIdentity(out: matrix3x2): void;
+    /**
+     * 转为逆矩阵
+     * @param src 源矩阵
+     * @param out 输出的逆矩阵
+     */
     function matrixInverse(src: matrix, out: matrix): void;
+    /**
+     * 转为逆矩阵3x2
+     * @param src 源矩阵3x2
+     * @param out 输出的逆矩阵3x2
+     */
     function matrix3x2Inverse(src: matrix3x2, out: matrix3x2): void;
+    /**
+     * 通过 缩放、旋转、位移 来构建矩阵
+     * @param pos 位移
+     * @param scale 缩放
+     * @param rot 旋转
+     * @param out 构建输出的矩阵
+     */
     function matrixMakeTransformRTS(pos: vector3, scale: vector3, rot: quaternion, out: matrix): void;
+    /**
+     * 通过 缩放、旋转、位移 来构建矩阵3x2
+     * @param pos 位移
+     * @param scale 缩放
+     * @param rot 旋转
+     * @param out 构建输出的矩阵3x2
+     */
     function matrix3x2MakeTransformRTS(pos: vector2, scale: vector2, rot: number, out: matrix3x2): void;
+    /**
+     * 通过 位移 来构建矩阵
+     * @param x 位移x
+     * @param y 位移y
+     * @param z 位移z
+     * @param out 构建输出的矩阵
+     */
     function matrixMakeTranslate(x: number, y: number, z: number, out: matrix): void;
+    /**
+     * 通过 位移 来构建矩阵3x2
+     * @param x 位移x
+     * @param y 位移y
+     * @param out 构建输出的矩阵3x2
+     */
     function matrix3x2MakeTranslate(x: number, y: number, out: matrix3x2): void;
+    /**
+     * 从矩阵中获取缩放
+     * @param src 矩阵
+     * @param scale 缩放
+     */
     function matrixGetScale(src: matrix, scale: vector3): void;
+    /**
+     * 通过 缩放 来构建矩阵
+     * @param xScale 缩放x
+     * @param yScale 缩放y
+     * @param zScale 缩放z
+     * @param out 构建输出的矩阵
+     */
     function matrixMakeScale(xScale: number, yScale: number, zScale: number, out: matrix): void;
+    /**
+     * 矩阵3x2 变换 输入向量
+     * @param mat 矩阵3x2
+     * @param inp 输入向量
+     * @param out 输出向量
+     */
     function matrix3x2TransformVector2(mat: matrix, inp: vector2, out: vector2): void;
+    /**
+     * 矩阵3x2 变换 输入法向量
+     * @param mat 矩阵3x2
+     * @param inp 输入法向量
+     * @param out 输出法向量
+     */
     function matrix3x2TransformNormal(mat: matrix, inp: vector2, out: vector2): void;
+    /**
+     * 通过 缩放 来构建矩阵3x2
+     * @param xScale 缩放x
+     * @param yScale 缩放y
+     * @param out 构建输出的矩阵3x2
+     */
     function matrix3x2MakeScale(xScale: number, yScale: number, out: matrix3x2): void;
     /**
      * 从欧拉旋转初始化矩阵
-     *
      * @param rotation 旋转弧度值
      * @param order 旋转顺序
      * @param out 输出矩阵
      */
     function matrixMakeEuler(rotation: vector3, order: RotationOrder, out: matrix): void;
+    /**
+     * 通过 一个轴 和围绕的旋转度 来构建矩阵
+     * @param axis 旋转围绕轴
+     * @param angle 旋转度
+     * @param out 输出矩阵
+     */
     function matrixMakeRotateAxisAngle(axis: vector3, angle: number, out: matrix): void;
+    /**
+     * 通过 旋转度 来构建矩阵3x2
+     * @param angle 旋转度
+     * @param out 构建输出的矩阵3x2
+     */
     function matrix3x2MakeRotate(angle: number, out: matrix3x2): void;
+    /**
+     * 计算 两个矩阵 相乘
+     * @param lhs 左矩阵
+     * @param rhs 右矩阵
+     * @param out 输出结果的矩阵
+     */
     function matrixMultiply(lhs: matrix, rhs: matrix, out: matrix): void;
+    /**
+     * 计算 两个矩阵3x2 相乘
+     * @param lhs 左矩阵3x2
+     * @param rhs 右矩阵3x2
+     * @param out 输出结果的矩阵3x2
+     */
     function matrix3x2Multiply(lhs: matrix3x2, rhs: matrix3x2, out: matrix3x2): void;
+    /**
+     * 判断两个 矩阵3x2 是否相等
+     * @param mtx1 矩阵a
+     * @param mtx2 矩阵b
+     * @param threshold 误差范围
+     * @returns 是相等？
+     */
     function matrix3x2Equal(mtx1: matrix3x2, mtx2: matrix3x2, threshold?: number): boolean;
+    /**
+     * 通过 左手坐标系的透视相机参数 来构建矩阵
+     * @param fov 视场度
+     * @param aspect 视窗宽高比
+     * @param znear 近平面值
+     * @param zfar 远平面值
+     * @param out 输出构建的矩阵
+     */
     function matrixProject_PerspectiveLH(fov: number, aspect: number, znear: number, zfar: number, out: matrix): void;
+    /**
+     * 通过 左手坐标系的正交相机参数 来构建矩阵
+     * @param width 视窗宽
+     * @param height 视窗高
+     * @param znear 近平面值
+     * @param zfar 远平面值
+     * @param out 输出构建的矩阵
+     */
     function matrixProject_OrthoLH(width: number, height: number, znear: number, zfar: number, out: matrix): void;
     /**
      * 看向目标位置
-     *
      * @param position  所在位置
      * @param target    目标位置
      * @param upAxis    向上朝向
      */
     function matrixLookat(position: vector3, target: vector3, upAxis: vector3, out: matrix): void;
+    /**
+     * 构建 矩阵 看向 一个位置
+     * @param forward 前方向
+     * @param up 上方向
+     * @param out 输出构建的矩阵
+     */
     function matrixLookatLH(forward: vector3, up: vector3, out: matrix): void;
+    /**
+     * 构建 矩阵 视窗看向 一个位置
+     * @param eye 视窗位置
+     * @param forward 前方向
+     * @param up 上方向
+     * @param out 输出构建的矩阵
+     */
     function matrixViewLookatLH(eye: vector3, forward: vector3, up: vector3, out: matrix): void;
+    /**
+     * 差值两个矩阵
+     * @param left 左矩阵
+     * @param right 右矩阵
+     * @param v 差值
+     * @param out 输出差值过的矩阵
+     */
     function matrixLerp(left: matrix, right: matrix, v: number, out: matrix): void;
+    /**
+     * 矩阵 变换 向量
+     * @param vector 向量
+     * @param transformation 矩阵
+     * @param result 输出变换过的向量
+     */
     function matrixTransformVector3(vector: vector3, transformation: matrix, result: vector3): void;
+    /**
+     * 矩阵 变换 向量
+     * @param src 向量
+     * @param mtx 矩阵
+     * @param out 输出变换过的向量
+     */
     function matrixTransformVector4(src: m4m.math.vector4, mtx: m4m.math.matrix, out: m4m.math.vector4): void;
+    /**
+     * 矩阵 变换 法向量
+     * @param vector 法向量
+     * @param transformation 矩阵
+     * @param result 输出变换过的向量
+     */
     function matrixTransformNormal(vector: vector3, transformation: matrix, result: vector3): void;
+    /**
+     * 读取矩阵的值到v3向量 通过 索引偏移
+     * @param src 矩阵
+     * @param offset 索引
+     * @param result v3向量
+     */
     function matrixGetVector3ByOffset(src: matrix, offset: number, result: vector3): void;
+    /**
+     * 单位化矩阵
+     * @param mat 矩阵
+     */
     function matrixReset(mat: matrix): void;
+    /**
+     * 归零化矩阵
+     * @param mat 矩阵
+     */
     function matrixZero(mat: matrix): void;
+    /**
+     * 缩放矩阵
+     * @param value 缩放值
+     * @param mat 矩阵
+     */
     function matrixScaleByNum(value: number, mat: matrix): void;
+    /**
+     * 两个矩阵相加
+     * @param left 左矩阵
+     * @param right 右矩阵
+     * @param out 输出相加的矩阵
+     */
     function matrixAdd(left: matrix, right: matrix, out: matrix): void;
+    /**
+     * 判断矩阵是否相等
+     * @param mtx1 左矩阵
+     * @param mtx2 右矩阵
+     * @param threshold 误差范围
+     * @returns 是相等？
+     */
     function matrixEqual(mtx1: matrix, mtx2: matrix, threshold?: number): boolean;
+    /**
+     * 判断 是否为单位矩阵
+     * @param mtx 矩阵
+     * @returns 是矩阵？
+     */
     function matrixIsIdentity(mtx: matrix): boolean;
 }
 declare namespace m4m.framework {
@@ -3706,7 +4365,9 @@ declare namespace m4m.framework {
         isSensor(): boolean;
         /**是否是静态 */
         isStatic(): boolean;
+        /** 物理一次计算执行前调用 */
         beforeStep(): any;
+        /** 物理一次计算执行后调用 */
         afterStep(): any;
     }
     interface I2dPhyBodyData {
@@ -3765,6 +4426,9 @@ declare namespace m4m.framework {
         /** 2d物理引擎实例对象 */
         get physicsEngine(): physicEngine2D;
         protected _physicsEngine: physicEngine2D;
+        /**
+         * 2D 物理体
+         */
         constructor();
         private lastScale;
         private beforePos;
@@ -3850,12 +4514,20 @@ declare namespace m4m.framework {
          * @param pos 位置vec2
          */
         setPosition(pos: math.Ivec2): void;
+        /**
+         * 通过 物理设置位置坐标
+         * @param pos 位置坐标
+         */
         private setPositionByPhy;
         /**
          * 设置旋转角度
          * @param angle
          */
         setAngle(angle: number): void;
+        /**
+         * 通过 物理设置角度
+         * @param angle 角度值
+         */
         private setAngleByPhy;
         private bodyWorldScale;
         setScale(scale: math.Ivec2): void;
@@ -3901,7 +4573,13 @@ declare namespace m4m.framework {
         afterStep(): void;
         private lastPos;
         private lastRot;
+        /**
+         * 设置物理的 旋转、位移
+         */
         private setPhyBodyTransformation;
+        /**
+         * 从物理 设置 旋转、位移
+         */
         private setTransformationFormPhyBody;
         remove(): void;
     }
@@ -3976,7 +4654,16 @@ declare namespace m4m.framework {
         minimumArea: number;
         transform: transform2D;
         start(): void;
+        /**
+         * 校准 重心 初始位置
+         */
         private fixCenter;
+        /**
+         * 计算矩形包围 的中心点
+         * @param max 矩形包围的max坐标
+         * @param min 矩形包围的min坐标
+         * @param center 输出中心坐标
+         */
         private calceBoundingCenter;
         onPlay(): void;
     }
@@ -4020,6 +4707,10 @@ declare namespace m4m.framework {
         };
     }
     interface IRunner {
+        /**
+         * 循环周期执行函数
+         * @param delta 上一周期执行时间（s）
+         */
         tick(delta: number): any;
     }
     class physicEngine2D {
@@ -4030,9 +4721,26 @@ declare namespace m4m.framework {
         engineRunner: IRunner;
         private eventer;
         private _bodysObjMap;
+        /**
+         * 物理2D引擎
+         * @param op 引擎2D选项
+         * @returns 物理2D引擎
+         */
         constructor(op?: IEngine2DOP);
+        /**
+         * 执行循环周期
+         * @param runner 执行主体对象
+         * @param engine 物理引擎实例对象
+         * @param delta 上一周期执行时间（s）
+         */
         private RunnerTick;
+        /**
+         * 物理一次计算执行前调用
+         */
         private beforeStep;
+        /**
+         * 物理一次计算执行后调用
+         */
         private afterStep;
         update(delta: number): void;
         /** Matter.Engine update 调用前 */
@@ -4192,8 +4900,24 @@ declare namespace m4m.framework {
         getBody(bodyId: number): I2DPhysicsBody;
         /** 清理世界 */
         clearWorld(keepStatic?: boolean): void;
+        /**
+         * 给2d物理体 应用一个力
+         * @param body 2d物理体
+         * @param positon 应用一个力的位置
+         * @param force 应用的力
+         */
         applyForce(body: Ibody, positon: math.Ivec2, force: math.Ivec2): void;
+        /**
+         * 给2d物理体 在中心位置 应用一个力
+         * @param body 2d物理体
+         * @param force  应用的力
+         */
         applyForceAtCenter(body: Ibody, force: math.Ivec2): void;
+        /**
+         * 设置重力
+         * @param x 重力矢量x的值
+         * @param y 重力矢量y的值
+         */
         setGravity(x: number, y: number): void;
         set enableSleeping(val: boolean);
         get enableSleeping(): boolean;
@@ -4370,10 +5094,14 @@ declare namespace m4m.framework {
 }
 declare namespace m4m.framework {
     class resID {
+        /**
+         * 资源ID
+         */
         constructor();
         static idAll: number;
         static next(): number;
         private id;
+        /** 获取资源的唯一ID */
         getID(): number;
     }
     /**
@@ -4384,8 +5112,16 @@ declare namespace m4m.framework {
      * @version m4m 1.0
      */
     class constText {
+        /**
+         * 静态text
+         * @param text text字符串数据
+         */
         constructor(text: string);
         private name;
+        /**
+         * 获取文本字符串数据
+         * @returns 文本字符串数据
+         */
         getText(): string;
     }
     /**
@@ -4446,11 +5182,16 @@ declare namespace m4m.framework {
         private static pixelWidth;
         private static pixelHeight;
         /**
-         *
+         * 解析
          * @param gl WebGL2RenderingContext
          * @param arrayBuffer contents of the ASTC container file
          */
         static parse(gl: WebGL2RenderingContext, arrayBuffer: ArrayBuffer): render.glTexture2D;
+        /**
+         * 解码
+         * @param ext webgl astc 拓展
+         * @param _buf 二进制buffer数据
+         */
         private static decodeBuffer;
         private static getTextureFormat;
     }
@@ -4466,12 +5207,26 @@ declare class HdrParser {
      * @version m4m 1.0
      */
     textDecoder: TextDecoder;
+    /**
+     * hdr 纹理解析器
+     * @param gl webgl上下文
+     */
     constructor(gl: WebGL2RenderingContext);
+    /**
+     * 解析 RGBE
+     * @param raw 二进制数据
+     * @returns
+     */
     parseRGBE(raw: ArrayBuffer): {
         width: number;
         height: number;
         buffer: Uint8Array;
     };
+    /**
+     * 获取纹理对象
+     * @param raw 二进制数据
+     * @returns 纹理对象
+     */
     get2DTexture(raw: ArrayBuffer): m4m.render.glTexture2D;
 }
 declare namespace m4m.framework {
@@ -4507,6 +5262,10 @@ declare namespace m4m.framework {
         private mipMapCount;
         private metaDataSize;
         private gl;
+        /**
+         * pvr 纹理 解析器
+         * @param gl
+         */
         constructor(gl: WebGL2RenderingContext);
         /**
          * @public
@@ -4517,6 +5276,11 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         parse(_buffer: ArrayBuffer): m4m.render.glTexture2D;
+        /**
+         * 解析 纹理
+         * @param tool 二进制工具对象
+         * @returns 纹理
+         */
         private parseV3;
     }
 }
@@ -4992,20 +5756,68 @@ declare namespace m4m.framework {
         name: string;
         dw_imgCount: number;
         dw_fileCount: number;
+        /**
+         * onReady
+         */
         onReady: () => void;
+        /**
+         * 加载完毕回调
+         */
         onDownloadFinish: () => void;
         ready: boolean;
         isunload: boolean;
+        /**
+         * 解析成功执行函数
+         */
         parseResolve: (o?: any) => void;
+        /**
+         * 解析失败执行函数
+         */
         parseReject: (o: Error) => void;
         static reTryTest: {};
+        /**
+         * 资源包
+         * @param url url
+         * @param assetmgr 资源管理器
+         * @param guid id
+         */
         constructor(url: string, assetmgr: assetMgr, guid?: number);
+        /**
+         * 生成GUID
+         * @returns
+         */
         static buildGuid(): number;
+        /**
+         * 获取Bundle的所有纹理
+         * @param texMap 纹理容器字典
+         * @param fileMap 文件字典
+         * @returns 所有纹理
+         */
         private getFixBundleTextures;
+        /**
+         * 解析资源包描述文件 和下载
+         * @param data json文本字符串数据
+         * @returns Promise
+         */
         parseBundle(data: string): Promise<unknown>;
+        /**
+         * 解包
+         */
         private unpkg;
+        /**
+         * 解析文件
+         * @returns Promise
+         */
         parseFile(): Promise<void>;
+        /**
+         * 卸载资源
+         * @param disposeNow
+         */
         unload(disposeNow?: boolean): void;
+        /**
+         * 失败调用函数
+         * @param error
+         */
         fail(error: Error): void;
     }
     export {};
@@ -5015,8 +5827,23 @@ declare namespace m4m.framework {
     export const assetParseMap: {
         [key: number]: IAssetFactory;
     };
+    /**
+     * 资源处理装饰器
+     * @param type 类型
+     * @returns
+     */
     export function assetF(type: AssetTypeEnum): (ctor: any) => void;
+    /**
+     * 通过url获取资源类型
+     * @param url 资源路径
+     * @returns 资源类型
+     */
     export function calcType(url: string | any): AssetTypeEnum;
+    /**
+     * 获取http请求的类型
+     * @param type 资源类型
+     * @returns http请求类型
+     */
     export function calcReqType(type: AssetTypeEnum): "text" | "arraybuffer";
     export class assetMgr {
         static urlmapGuid: {
@@ -5064,23 +5891,86 @@ declare namespace m4m.framework {
         mapShader: {
             [id: string]: shader;
         };
+        /**
+         * 外部才能确定在哪用,初始化全局资源记录
+         */
         static initGuidList(): void;
+        /**
+         * 设置加载中
+         * @param guid id
+         * @param data 加载中的数据对象
+         */
         static setLoading(guid: number, data: any): void;
+        /**
+         * 加载资源
+         * @param url 资源路径
+         * @param type 资源类型
+         * @param onstate 状态时变化回调
+         * @param downloadFinish 加载结束
+         */
         load(url: string, type?: AssetTypeEnum, 
         /** 这是解析完成的回调 */
         onstate?: loadCallback, downloadFinish?: () => void): void;
+        /**
+         * 设置状态异常
+         * @param state 状态
+         * @param onstate 状态时变化回调函数
+         * @param err 异常
+         */
         static setStateError(state: stateLoad, onstate: (state?: stateLoad) => void, err: Error): void;
+        /**
+         * 执行下载资源
+         * @param guid id
+         * @param url 资源路径
+         * @param type 资源类型
+         * @param finish 结束回调
+         * @param errcb 异常回调
+         * @param bundle bundle包对象
+         * @returns
+         */
         download(guid: number, url: string, type: AssetTypeEnum, finish: () => void, errcb?: (err: Error) => void, bundle?: assetBundle): void;
+        /**
+         * 加载图片
+         * @param guid id
+         * @param url 资源路径
+         * @param cb 回调
+         * @param bundle bundle包对象
+         */
         loadImg(guid: number, url: string, cb: (img: any, err?: any) => void, bundle?: assetBundle): void;
+        /**
+         * 微信可复写
+         * @param url 资源路径
+         * @param cb 回调
+         */
         protected _loadImg(url: string, cb: (img: any, err?: any) => void): void;
+        /**
+         * 注册使用资源
+         * @param asset
+         */
         use(asset: IAsset): void;
+        /**
+         * 取消使用资源
+         * @param asset
+         */
         unuse(asset: IAsset, disposeNow?: boolean): void;
+        /**
+         * 解析资源
+         * @param asset 资源
+         * @param bundle bundle包对象
+         * @returns 资源Promise
+         */
         parseRes(asset: {
             guid: number;
             type: number;
             name: string;
             dwguid?: number;
         }, bundle?: assetBundle): Promise<IAsset>;
+        /**
+         * 通过资源名获取资源
+         * @param name 资源名
+         * @param bundlename bundle名
+         * @returns 资源
+         */
         getAssetByName<T extends IAsset>(name: string, bundlename?: string): T;
         mapDefaultMesh: {
             [id: string]: mesh;
@@ -5097,10 +5987,35 @@ declare namespace m4m.framework {
         mapMaterial: {
             [id: string]: material;
         };
+        /**
+         * 获取默认mesh
+         * @param name mesh名
+         * @returns mesh
+         */
         getDefaultMesh(name: string): mesh;
+        /**
+         * 获取默认纹理
+         * @param name 纹理名
+         * @returns 纹理
+         */
         getDefaultTexture(name: string): texture;
+        /**
+         * 获取默认cube纹理
+         * @param name cube纹理名
+         * @returns cube纹理
+         */
         getDefaultCubeTexture(name: string): texture;
+        /**
+         * 获取默认sprite
+         * @param name sprite名
+         * @returns sprite
+         */
         getDefaultSprite(name: string): sprite;
+        /**
+         * 获取默认材质
+         * @param name 材质名
+         * @returns 材质
+         */
         getMaterial(name: string): material;
         static useBinJs: boolean;
         static txt: string;
@@ -5111,27 +6026,81 @@ declare namespace m4m.framework {
         mapRes: {
             [id: number]: any;
         };
+        /**
+         * 资源管理器
+         * @param app 引擎app
+         */
         constructor(app: application);
+        /**
+         * 修正文件名
+         * @param name 文件名
+         * @returns 修正的文件名
+         */
         static correctFileName(name: string): string;
+        /**
+         * 修正文本文件名
+         * @param name 文件名
+         * @returns 修正的文件名
+         */
         static correctTxtFileName(name: string): string;
+        /**
+         * 获取着色器
+         * @param name 着色器名
+         * @returns 着色器
+         */
         getShader(name: string): m4m.framework.shader;
         private linerenderermat;
+        /**
+         * 获取默认线渲染材质
+         * @returns 材质
+         */
         getDefLineRendererMat(): material;
         private particlemat;
+        /**
+         * 获取默认粒子渲染材质
+         * @returns 材质
+         */
         getDefParticleMat(): material;
         private assetUrlDic;
+        /**
+         * 设置资源url
+         * @param asset 资源
+         * @param url url
+         */
         setAssetUrl(asset: IAsset, url: string): void;
+        /**
+         * 获取资源url
+         * @param asset 资源
+         * @returns 资源url
+         */
         getAssetUrl(asset: IAsset): string;
         maploaded: {
             [url: string]: IAsset;
         };
+        /** @deprecated [已弃用] */
         savePrefab(trans: transform, prefabName: string, fun: (data: SaveInfo, resourses?: string[], contents?: any[]) => void): void;
+        /** @deprecated [已弃用] */
         loadCompressBundle(url: string, a?: any): void;
+        /** @deprecated [已弃用] */
         loadImmediate(url: string): any;
+        /** @deprecated [已弃用] */
         getAssetBundle(url: string): assetBundle;
+        /** @deprecated [已弃用] */
         releaseUnuseAsset(): void;
+        /**
+         * 初始默认资源
+         */
         initDefAsset(): void;
+        /**
+         * 加载场景
+         * @param sceneName 场景名
+         * @param onComplete 结束回调
+         */
         loadScene(sceneName: string, onComplete: (firstChilds: Array<transform>) => void): void;
+        /**
+         * 卸载
+         * @param url 资源url
+         */
         unload(url: string): void;
     }
     export class SaveInfo {
@@ -5143,6 +6112,10 @@ declare namespace m4m.framework {
 }
 declare namespace m4m.framework {
     class defmaterial {
+        /**
+         * 初始化默认材质
+         * @param assetmgr 资源管理
+         */
         static initDefaultMaterial(assetmgr: assetMgr): void;
     }
 }
@@ -5157,7 +6130,18 @@ declare namespace m4m.framework {
         static readonly pyramid = "pyramid";
         static readonly cylinder = "cylinder";
         static readonly circleline = "circleline";
+        /**
+         * 初始化默认mesh
+         * @param assetmgr 材质管理
+         */
         static initDefaultMesh(assetmgr: assetMgr): void;
+        /**
+         * 创建默认mesh
+         * @param name mesh名
+         * @param meshData mesh数据
+         * @param webgl webgl上下文
+         * @returns mesh
+         */
         private static createDefaultMesh;
     }
 }
@@ -5184,6 +6168,10 @@ declare namespace m4m.framework {
         static vslinetrail: string;
         static linetrailShader: string;
         static fslinetrail: string;
+        /**
+         * 初始化默认着色器
+         * @param assetmgr 资源管理
+         */
         static initDefaultShader(assetmgr: assetMgr): void;
     }
 }
@@ -5192,6 +6180,10 @@ declare namespace m4m.framework {
         static readonly white_sprite = "white_sprite";
         static readonly gray_sprite = "gray_sprite";
         static readonly grid_sprite = "grid_sprite";
+        /**
+         * 初始化默认Sprite
+         * @param assetmgr 资源管理
+         */
         static initDefaultSprite(assetmgr: assetMgr): void;
     }
 }
@@ -5203,12 +6195,28 @@ declare namespace m4m.framework {
         static readonly normal = "normal";
         static readonly grid = "grid";
         static readonly particle = "particle";
+        /**
+         * 初始化默认纹理
+         * @param assetmgr 资源管理
+         */
         static initDefaultTexture(assetmgr: assetMgr): void;
+        /**
+         * 初始化默认cube纹理
+         * @param assetmgr 资源管理
+         */
         private static initDefaultCubeTexture;
     }
 }
 declare namespace m4m.framework {
     class AssetFactory_Aniclip implements IAssetFactory {
+        /**
+         * 解析
+         * @param assetmgr 资源管理器
+         * @param bundle bundle包
+         * @param filename 文件名
+         * @param bytes 资源二进制数据
+         * @returns Promise动画片段
+         */
         parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, bytes: ArrayBuffer): Promise<animationClip>;
     }
 }
@@ -5280,18 +6288,42 @@ declare namespace m4m.framework {
 }
 declare namespace m4m.framework {
     interface IAssetFactory {
+        /** @deprecated [已弃用] */
         newAsset?(assetName?: string): IAsset;
+        /** @deprecated [已弃用] */
         load?(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: IAsset, call: (handle: () => void) => void): void;
+        /** @deprecated [已弃用] */
         loadByPack?(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: IAsset, call: (handle: () => void) => void): void;
+        /**
+         * 解析引擎资源
+         * @param assetMgr 资源管理器
+         * @param bundle bundle包
+         * @param name 资源名
+         * @param data 资源数据（二进制或字符串）
+         * @param dwguid (纹理资源会用到的 标记GUID)
+         */
         parse(assetMgr: assetMgr, bundle: assetBundle, name: string, data: string | ArrayBuffer, dwguid?: number): IAsset | Promise<IAsset> | void;
+        /**
+         * (仅 TextureDesc 资源会用到)
+         * @param textJSON
+         */
         needDownload?(textJSON: string): string;
     }
     class AssetFactoryTools {
+        /** @deprecated [已弃用] */
         static catchError(err: Error, onstate: (state: stateLoad) => void, state: stateLoad): boolean;
+        /** @deprecated [已弃用] */
         static useAsset(assetMgr: assetMgr, onstate: (state: stateLoad) => void, state: stateLoad, asset: IAsset, url: string): void;
+        /** @deprecated [已弃用] */
         static onProgress(loadedLength: number, totalLength: number, onstate: (state: stateLoad) => void, state: stateLoad, filename: string): void;
+        /** @deprecated [已弃用] */
         static onRefProgress(loadedLength: number, totalLength: number, onstate: (state: stateLoad) => void, state: stateLoad, filename: string): void;
     }
+    /**
+     * 通过url 获取资源文件名
+     * @param url
+     * @returns
+     */
     function getFileName(url: string): string;
 }
 declare namespace m4m.framework {
@@ -5337,6 +6369,13 @@ declare namespace m4m.framework {
 declare namespace m4m.framework {
     class AssetFactory_Shader implements IAssetFactory {
         private TryParseMap;
+        /**
+         * 解析shader资源
+         * @param sd shader资源对象
+         * @param assetMgr 资源管理器
+         * @param txt shader 源字符串数据
+         * @param filename 文件名
+         */
         private parseShader;
         parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, txt: string): shader;
     }
@@ -5388,6 +6427,10 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         defaultAsset: boolean;
+        /**
+         * 动画片段
+         * @param assetName 资源名
+         */
         constructor(assetName?: string);
         /**
          * @public
@@ -5512,31 +6555,104 @@ declare namespace m4m.framework {
         subclips: subClip[];
     }
     /**
-     * @private
+     * 姿势的 骨骼+矩阵
      */
     class PoseBoneMatrix {
         static readonly ClassName: string;
         t: math.vector3;
         r: math.quaternion;
         s: math.float;
+        /**
+         * 计算内存占用数据长度
+         * @returns 数据长度
+         */
         static caclByteLength(): number;
+        /**
+         * 拷贝一个实例
+         * @returns 骨骼+矩阵对象
+         */
         Clone(): PoseBoneMatrix;
+        /**
+         * 加载
+         * @param read 二进制读对象
+         * @param hasScaled 是否有缩放
+         * @param optimizeSize 优化尺寸
+         */
         load(read: io.binReader, hasScaled?: boolean, optimizeSize?: {
             minVals: number[];
             maxVals: number[];
         }): void;
+        /**
+         * 创建一个默认的对象
+         */
         static createDefault(): PoseBoneMatrix;
+        /**
+         * 从一个 （骨骼+矩阵）对象复制属性
+         * @param src
+         */
         copyFrom(src: PoseBoneMatrix): void;
+        /**
+         * 从一个 数据对象复制属性
+         * @param src
+         * @param seek
+         */
         copyFromData(src: Float32Array, seek: number): void;
+        /**
+         * 骨骼+矩阵 逆转置
+         */
         invert(): void;
+        /**
+         * @deprecated [已弃用]
+         * 世界空间中差值运算
+         */
         lerpInWorld(_tpose: PoseBoneMatrix, from: PoseBoneMatrix, to: PoseBoneMatrix, v: number): void;
+        /**
+         * 用数据计算 在世界空间中差值
+         * @param _tpose tpose
+         * @param from 起始值
+         * @param todata 结束的数据
+         * @param toseek
+         * @param v 差值进度百分比值
+         */
         lerpInWorldWithData(_tpose: PoseBoneMatrix, from: PoseBoneMatrix, todata: Float32Array, toseek: number, v: number): void;
+        /**
+         * 相乘计算
+         * @param left 左值
+         * @param right 右值
+         * @param target 结果承接对象
+         * @returns 结果对象
+         */
         static sMultiply(left: PoseBoneMatrix, right: PoseBoneMatrix, target?: PoseBoneMatrix): PoseBoneMatrix;
+        /** @deprecated [已弃用] */
         static sMultiplytpose(left: PoseBoneMatrix, right: tPoseInfo, target?: PoseBoneMatrix): PoseBoneMatrix;
+        /**
+         * 用数据计算 相乘计算
+         * @param leftdata 左值
+         * @param leftseek
+         * @param right 右值
+         * @param target 结果承接对象
+         * @returns 结果对象
+         */
         static sMultiplyDataAndMatrix(leftdata: Float32Array, leftseek: number, right: PoseBoneMatrix, target?: PoseBoneMatrix): PoseBoneMatrix;
+        /**
+         * 球形差值计算
+         * @param left 左值
+         * @param right 右值
+         * @param v 差值进度百分比值
+         * @param target 结果承接对象
+         * @returns 结果对象
+         */
         static sLerp(left: PoseBoneMatrix, right: PoseBoneMatrix, v: number, target?: PoseBoneMatrix): PoseBoneMatrix;
         private static poolmats;
+        /**
+         * 对象回收到池
+         * @param mat 骨骼+矩阵对象
+         */
         static recycle(mat: PoseBoneMatrix): void;
+        /**
+         * 从池里面获取一个对象
+         * @returns 骨骼+矩阵对象
+         */
         static create(): PoseBoneMatrix;
     }
     /**
@@ -5547,6 +6663,10 @@ declare namespace m4m.framework {
         loop: boolean;
         startframe: number;
         endframe: number;
+        /**
+         * 计算内存数据长度
+         * @returns
+         */
         static caclByteLength(): number;
     }
 }
@@ -5570,6 +6690,10 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         defaultAsset: boolean;
+        /**
+         * 图集资源
+         * @param assetName 资源名
+         */
         constructor(assetName?: string);
         /**
          * @public
@@ -5696,6 +6820,11 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         defaultAsset: boolean;
+        /**
+         * 二进制数据资源
+         * @param assetName 资源名
+         * @param data 数据
+         */
         constructor(assetName: string, data: ArrayBuffer);
         /**
          * @public
@@ -5774,6 +6903,10 @@ declare namespace m4m.framework {
         defaultAsset: boolean;
         private name;
         private id;
+        /**
+         * F14特效 资源
+         * @param assetName 资源名
+         */
         constructor(assetName?: string);
         assetbundle: string;
         getName(): string;
@@ -5784,9 +6917,21 @@ declare namespace m4m.framework {
         caclByteLength(): number;
         data: F14EffectData;
         delayTime: number;
+        /**
+         * 解析 f14 特效系统对象
+         * @param jsonStr 字符串数据（josn）
+         * @param assetmgr 资源管理器
+         * @returns F14Data
+         */
         Parse(jsonStr: string, assetmgr: assetMgr): F14EffectData;
         /** 获取依赖资源 （mesh 、material） */
         getDependents(): IAsset[];
+        /**
+         * 执行搜索
+         * @param obj 对象
+         * @param arr 数组
+         * @returns
+         */
         private doSearch;
     }
 }
@@ -5809,8 +6954,16 @@ declare namespace m4m.framework {
         atlasWidth: number;
         /** 字符容器图的高度 */
         atlasHeight: number;
+        /**
+         * 强制确保字体包含 指定文本内的字符串
+         * @param text 指定文本
+         */
         EnsureString(text: string): void;
+        /**
+         * 获取字体纹理
+         */
         GetTexture(): texture;
+        /** 是否是SDF */
         IsSDF(): boolean;
     }
     /**
@@ -5833,6 +6986,10 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         defaultAsset: boolean;
+        /**
+         * 字体资源
+         * @param assetName 资源名
+         */
         constructor(assetName?: string);
         /**
          * @public
@@ -5962,6 +7119,10 @@ declare namespace m4m.framework {
          * 字符宽度
          */
         xAddvance: number;
+        /**
+         * 计算内存占用长度
+         * @returns
+         */
         static caclByteLength(): number;
     }
 }
@@ -5970,7 +7131,14 @@ declare namespace m4m.framework {
         _webgl: WebGL2RenderingContext;
         static _canvas: HTMLCanvasElement;
         static _c2d: CanvasRenderingContext2D;
+        /**
+         * canvas 自填充字体资源
+         * @param webgl webgl 上下文
+         * @param fontname 字体名
+         * @param fontsize 字体尺寸
+         */
         constructor(webgl: WebGL2RenderingContext, fontname?: string, fontsize?: number);
+        /** 是否是 SDF */
         IsSDF(): boolean;
         private name;
         private id;
@@ -6031,6 +7199,11 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         defaultAsset: boolean;
+        /**
+         * gltf 资源
+         * @param assetName 资源名
+         * @param data 数据
+         */
         constructor(assetName: string, data: any);
         /**
          * @public
@@ -6098,12 +7271,70 @@ declare namespace m4m.framework {
          */
         set realName(name: string);
         static dumpmem(): void;
+        /**
+         * 颜色编码 hex 转RGB
+         * @param hex hex Color
+         * @returns RGB color
+         */
         hexToRgb: (hex: any) => any;
         buffers: bin[];
+        /**
+         * 异步加载 glft资源
+         * @param mgr 资源管理器
+         * @param ctx webgl 上下文对象
+         * @param folder 文件目录路径
+         * @param brdf brdf 纹理
+         * @param env 间接光环境纹理（高频信息）
+         * @param irrSH 间接光环境纹理（低频信息）
+         * @param exposure HDR曝光度
+         * @param specFactor 镜面反射系数
+         * @param irrFactor 漫反射系数
+         * @param uvChecker 基础纹理
+         * @returns 引擎场景节点对象（异步）
+         */
         load(mgr: assetMgr, ctx: WebGL2RenderingContext, folder: string, brdf: texture, env: texture, irrSH: texture, exposure?: any, specFactor?: number, irrFactor?: number, uvChecker?: texture): Promise<transform>;
+        /**
+         * 解析gltf mesh 的 ebo部分
+         * @param ctx webgl上下文
+         * @param mf mesh对象
+         * @param primitives gltf primitives数据
+         * @param accessors gltf accessors数据
+         * @param materials 使用渲染材质
+         * @param hasLightMap 是否有LightMap
+         * @param lightMapTexs LightMap的纹理索引
+         * @param info mesh附信息
+         */
         static loadgltfebo_mix(ctx: WebGL2RenderingContext, mf: mesh, primitives: any[], accessors: any[], materials: material[], hasLightMap: boolean, lightMapTexs: texture[], info: meshinfo): void;
+        /**
+         * 解析gltf mesh 的 ebo 独立的(不共享vbo)
+         * @param ctx webgl上下文
+         * @param mf mesh对象
+         * @param primitive gltf primitives数据
+         * @param accessors gltf accessors数据
+         * @param materials 使用渲染材质
+         * @param hasLightMap 是否有LightMap
+         * @param lightMapTexs LightMap的纹理索引
+         * @param info mesh附信息
+         */
         static loadgltfebo_one(ctx: WebGL2RenderingContext, mf: mesh, primitive: any, accessors: any[], materials: material[], hasLightMap: boolean, lightMapTexs: texture[], info: meshinfo): void;
+        /**
+         * 解析gltf mesh 的 ebo
+         * @param eboacc
+         * @param mf mesh对象
+         * @param outMat 使用渲染材质
+         * @param hasLightMap 是否有LightMap
+         * @param lightMapTexs LightMap的纹理索引
+         * @param info mesh附信息
+         * @param extensions gltf 拓展信息
+         */
         static loadgltfebo(eboacc: GltfAttr, mf: mesh, outMat: material, hasLightMap: boolean, lightMapTexs: texture[], info: meshinfo, extensions: any): void;
+        /**
+         * 解析gltf mesh 的 vbo
+         * @param ctx webgl上下文
+         * @param mf mesh对象
+         * @param primitive gltf primitives数据
+         * @param accessors gltf accessors数据
+         */
         static loadgltfvbo(ctx: WebGL2RenderingContext, mf: mesh, primitive: any, accessors: any[]): void;
         /**
          * 获取实时灯光列表详细
@@ -6158,6 +7389,11 @@ declare namespace m4m.framework {
         min: number[];
         size: number;
         private _data;
+        /**
+         * gltf 内存访问器
+         * @param param0 参数0
+         * @param name 名
+         */
         constructor({ bufferView, byteOffset, componentType, normalized, count, type, max, min }: {
             bufferView: any;
             byteOffset?: number;
@@ -6240,7 +7476,17 @@ declare namespace m4m.framework {
         needFillRenderer: boolean;
         /** 需要gpuInstanceBatcher 模式渲染 (减少渲染消耗 , 仅适合静态物)*/
         needGpuInstancBatcher: boolean;
+        /**
+         * 检查 本地 位移、旋转、缩放 是否改变
+         * @returns 改变了？
+         */
         private checkLRTSChange;
+        /**
+         * 判断是否相等
+         * @param d_0 数据a
+         * @param d_1 数据b
+         * @returns 相等？
+         */
         private fastEqual;
         private _scene;
         /**
@@ -6432,10 +7678,23 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         checkImpact(): Array<transform>;
+        /**
+         * 判断是否在场景中发生了碰撞
+         * @param tran 节点
+         * @param impacted 节点列表
+         * @returns 碰撞了？
+         */
         private doImpact;
         private dirtyLocal;
         private dirtyWorld;
+        /**
+         * 执行脏化标记
+         * @param local 本地模式
+         */
         private dirtify;
+        /**
+         * 同步自己的 W 、L 矩阵
+         */
         private sync;
         /**
          * @public
@@ -6445,9 +7704,25 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         markDirty(): void;
+        /**
+         * 向上标记有渲染组件
+         * @param selfHas 当前节点就有渲染组件
+         */
         markHaveRendererComp(selfHas?: boolean): void;
+        /**
+         * 向上标记有 Update函数执行 组件
+         * @param selfHas 当前节点就有 Update函数执行 组件
+         */
         markHaveUpdateComp(selfHas?: boolean): void;
+        /**
+         * 向上标记有 Init函数执行 组件
+         * @param selfHas 当前节点就有 Init函数执行 组件
+         */
         markHaveInitComp(selfHas?: boolean): void;
+        /**
+         * 向上标记有 Onplay函数执行 组件
+         * @param selfHas 当前节点就有 Onplay函数执行 组件
+         */
         markHaveOnplayComp(selfHas?: boolean): void;
         private _localRotate;
         /**
@@ -6577,6 +7852,9 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         getWorldMatrix(): math.matrix;
+        /**
+         * 向上检查 看是否有变化
+         */
         private checkToTop;
         /**
          * @public
@@ -6629,7 +7907,14 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         lookatPoint(point: math.vector3): void;
+        /**
+         * 计算注视
+         * @param point 注视的点
+         */
         private calcLookAt;
+        /**
+         * 引擎变换节点
+         */
         constructor();
         /**
          * @public
@@ -6656,6 +7941,9 @@ declare namespace m4m.framework {
          */
         get beDispose(): boolean;
         private _beDispose;
+        /**
+         * 当销毁时触发
+         */
         onDispose: () => void;
         /**
          * @public
@@ -6665,6 +7953,9 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         dispose(): void;
+        /**
+         * 执行销毁
+         */
         private _dispose;
     }
     /**
@@ -6675,6 +7966,9 @@ declare namespace m4m.framework {
      * @version m4m 1.0
      */
     class insID {
+        /**
+         * 实例ID
+         */
         constructor();
         private static idAll;
         private static next;
@@ -6693,7 +7987,13 @@ declare namespace m4m.framework {
     interface ICollider {
         gameObject: gameObject;
         subTran: transform;
+        /** 获取 边界包围数据对象*/
         getBound(): any;
+        /**
+         * 与一个指定节点检测是否相交
+         * @param tran 指定节点对象
+         * @returns 是否相交
+         */
         intersectsTransform(tran: transform): boolean;
     }
     /**
@@ -6818,9 +8118,6 @@ declare namespace m4m.framework {
         * @version m4m 1.0
         */
         private getColliderMesh;
-        /**
-        * @private
-        */
         remove(): void;
         /**
         * @private
@@ -6883,12 +8180,16 @@ declare namespace m4m.framework {
         * @version m4m 1.0
         */
         set colliderVisible(value: boolean);
-        /**
-        * @private
-        */
         intersectsTransform(tran: transform): boolean;
         private _builded;
+        /**
+         * 检查构建mesh
+         */
         private ckbuildMesh;
+        /**
+         * 获取 碰撞mesh
+         * @returns 碰撞mesh
+         */
         private getColliderMesh;
         /**
         * @private
@@ -6974,6 +8275,12 @@ declare namespace m4m.framework {
         passIdMap: {
             [id: number]: number;
         };
+        /**
+         * meshGPUIns合批
+         * @param _glayer 层级
+         * @param _mesh mesh
+         * @param _mats 材质列表
+         */
         constructor(_glayer: number, _mesh: m4m.framework.mesh, _mats: m4m.framework.material[]);
         /** 清理 */
         dispose(): void;
@@ -7010,6 +8317,9 @@ declare namespace m4m.framework {
     */
     class meshRenderer implements IRendererGpuIns {
         static readonly ClassName: string;
+        /**
+         * mesh渲染组件
+         */
         constructor();
         /**
          * @public
@@ -7092,9 +8402,29 @@ declare namespace m4m.framework {
         refreshLayerAndQue(): void;
         update(delta: number): void;
         render(context: renderContext, assetmgr: assetMgr, camera: m4m.framework.camera): void;
+        /**
+         * 获取 李总修改 lightMap 第二图
+         * @param lightMapImg 光照纹理
+         * @returns
+         */
         private static getLightMap_01Img;
+        /**
+         * 当GPU实例 关闭属性
+         * @param info GPU实例绘制信息
+         */
         private static onGpuInsDisableAttribute;
+        /**
+         * 当GPU实例执行渲染
+         * @param context 渲染向下文
+         * @param instanceArray 渲染GPU实例列表
+         * @param cacheBuffer 缓存容器
+         */
         static GpuInstancingRender(context: renderContext, instanceArray: m4m.math.ReuseArray<IRendererGpuIns>, cacheBuffer?: Float32Array): void;
+        /**
+         * 当GPU实例执行渲染(合批)
+         * @param context 渲染向下文
+         * @param batcher GPU实例合批对象
+         */
         static GpuInstancingRenderBatcher(context: renderContext, batcher: meshGpuInsBatcher): void;
         /**
          * 设置 OffsetMatrix
@@ -7109,10 +8439,29 @@ declare namespace m4m.framework {
          * @param pass 绘制通道对象
          */
         static hasInstanceOffsetMatrix(pass: render.glDrawPass): boolean;
+        /**
+         * 设置GPU实例 变换偏移矩阵
+         * @param tran 节点transform
+         * @param mat 材质对象
+         * @param pass 绘制通道对象
+         */
         private static _setInstanceOffsetMatrix;
+        /**
+         * 获取GPU实例绘制类型标记
+         * @returns 绘制类型标记
+         */
         static instanceDrawType(): string;
         private static _vbos;
+        /**
+         * 获取VBO 缓冲区
+         * @param gl webgl上下文对象
+         * @returns vbo webgl缓冲区对象
+         */
         private static _getVBO;
+        /**
+         * 是否是GPU实例
+         * @returns 是GPU实例？
+         */
         isGpuInstancing(): boolean;
         /**
         * @private
@@ -7146,6 +8495,9 @@ declare namespace m4m.framework {
         private static readonly help_mtx_1;
         private static readonly help_mtx_2;
         private static readonly help_mtx_3;
+        /**
+         * 骨骼蒙皮mesh渲染器
+         */
         constructor();
         /**
          * 挂载的gameobject
@@ -7220,11 +8572,17 @@ declare namespace m4m.framework {
         start(): void;
         onPlay(): void;
         /**
-         * @private
-         * @param index
+         * 通过索引获取材质
+         * @param index 索引
+         * @param outMtx 输出矩阵
          */
         getMatByIndex(index: number, outMtx: m4m.math.matrix): any;
         private static VertexHelpMtx;
+        /**
+         * 通过索引计算顶点
+         * @param index 索引
+         * @param t
+         */
         calActualVertexByIndex(index: number, t: m4m.math.vector3): void;
         private static readonly inteRayHelp_v3;
         private static readonly inteRayHelp_v3_1;
@@ -7287,6 +8645,10 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         defaultAsset: boolean;
+        /**
+         * 关键帧片段 资源
+         * @param assetName 资源名
+         */
         constructor(assetName?: string);
         /**
          * @public
@@ -7412,6 +8774,12 @@ declare namespace m4m.framework {
         value: any;
         defaultValue: any;
         resname: string;
+        /**
+         * uniform数据
+         * @param type 类型
+         * @param value 值
+         * @param defaultValue 默认值
+         */
         constructor(type: render.UniformTypeEnum, value: any, defaultValue?: any);
     }
     /**
@@ -7464,6 +8832,10 @@ declare namespace m4m.framework {
         private _textureGUID;
         /** gpuInstancing 材质唯一ID */
         gpuInstancingGUID: string;
+        /**
+         * 材质资源
+         * @param assetName 资源名
+         */
         constructor(assetName?: string);
         /**
          * @public
@@ -7514,6 +8886,12 @@ declare namespace m4m.framework {
          */
         caclByteLength(): number;
         private static sameMatPassMap;
+        /**
+         * 提交 uniform 数据到webgl API
+         * @param pass 绘制的 glDrawPass 对象
+         * @param context webgl 上下文
+         * @param lastMatSame 是否和上一次渲染提交的材质相同
+         */
         uploadUnifoms(pass: render.glDrawPass, context: renderContext, lastMatSame?: boolean): void;
         /** GPUinstance Attrib ID 数据 map  */
         instanceAttribIDValMap: {
@@ -7530,6 +8908,11 @@ declare namespace m4m.framework {
          * @param pass 绘制通道
          */
         getInstanceAtteributeSize(pass: render.glDrawPass): number;
+        /**
+         * 获取 GPU实例 Attrib值
+         * @param id AttribID
+         * @returns 值
+         */
         private getInstanceAttribValue;
         /**
          * @public
@@ -7583,39 +8966,76 @@ declare namespace m4m.framework {
             [id: string]: any;
         };
         /**
-         * @private
+         * 设置 float 格式的 uniform 值
+         * @param _id uniform ID
+         * @param _number 值
          */
         setFloat(_id: string, _number: number): void;
+        /**
+         * 设置 Int 格式的 uniform 值
+         * @param _id uniform ID
+         * @param _number 值
+         */
         setInt(_id: string, _number: number): void;
         /**
-         * @private
-         */
+        * 设置 Float数组 格式的 uniform 值
+        * @param _id uniform ID
+        * @param _number 值
+        */
         setFloatv(_id: string, _numbers: Float32Array): void;
         /**
-         * @private
-         */
+        * 设置 Vector4 格式的 uniform 值
+        * @param _id uniform ID
+        * @param _number 值
+        */
         setVector4(_id: string, _vector4: math.vector4): void;
         /**
-         * @private
-         */
+        * 设置 Vector4数组 格式的 uniform 值
+        * @param _id uniform ID
+        * @param _number 值
+        */
         setVector4v(_id: string, _vector4v: Float32Array): void;
         /**
-         * @private
-         */
+        * 设置 矩阵 格式的 uniform 值
+        * @param _id uniform ID
+        * @param _number 值
+        */
         setMatrix(_id: string, _matrix: math.matrix): void;
         /**
-         * @private
-         */
+        * 设置 矩阵数组 格式的 uniform 值
+        * @param _id uniform ID
+        * @param _number 值
+        */
         setMatrixv(_id: string, _matrixv: Float32Array): void;
         /**
-         * @private
-         */
+        * 设置 纹理 格式的 uniform 值
+        * @param _id uniform ID
+        * @param _number 值
+        */
         setTexture(_id: string, _texture: m4m.framework.texture, resname?: string): void;
         /** 设置 GPU instance attribute 的值 */
         private setInsAttribVal;
+        /**
+         * 贴图使用唯一标识ID，gupInstance 使用
+         * @param mat 材质
+         */
         private getTexGuid;
+        /**
+         * 获取指定shader的GUID
+         * @param sh 指定shader
+         * @returns guid
+         */
         private getShaderGuid;
+        /**
+         * 刷新GPU实例 GUID
+         * @returns
+         */
         private refreshGpuInstancingGUID;
+        /**
+        * 设置 cube纹理 格式的 uniform 值
+        * @param _id uniform ID
+        * @param _number 值
+        */
         setCubeTexture(_id: string, _texture: m4m.framework.texture): void;
         private uniformDirtyMap;
         private static lastDrawMatID;
@@ -7651,6 +9071,10 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         clone(): material;
+        /**
+         * 序列成字符串，方便保存
+         * @returns 序列json字符串数据
+         */
         save(): string;
     }
 }
@@ -7671,6 +9095,11 @@ declare namespace m4m.framework {
         defaultAsset: boolean;
         szContent: string;
         bObjRes: boolean;
+        /**
+         * mesh 资源
+         * @param assetName 资源名
+         * @param isObject 是obj？
+         */
         constructor(assetName?: string, isObject?: boolean);
         /**
          * @public
@@ -7745,9 +9174,12 @@ declare namespace m4m.framework {
          * 是否使用多线程解析
          */
         static useThead: boolean;
+        /** 当读取完毕回调 */
         onReadFinish: () => void;
         private reading;
+        /** 分片加载器 */
         private readProcess;
+        /** 分片加载完成 */
         private readFinish;
         /**
          * @public
@@ -7759,7 +9191,16 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         Parse(inData: ArrayBuffer | string | any, webgl: WebGL2RenderingContext): Promise<IAsset>;
+        /**
+         * 是否是空字符串
+         * @param s 字符串
+         * @returns
+         */
         isEmptyStr(s: string): boolean;
+        /**
+         * @deprecated [已弃用]
+         * 解析面
+         */
         static parseFace(row: string, data: Int32Array, n: number, vcnt: number): number;
         parseObjMesh(inData: string, webgl: any, meshdata_: m4m.render.meshData): void;
         parseCMesh(inData: any, webgl: any): void;
@@ -7826,6 +9267,10 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         defaultAsset: boolean;
+        /**
+         * 路径资源
+         * @param assetName 资源名
+         */
         constructor(assetName?: string);
         /**
          * @public
@@ -7896,8 +9341,25 @@ declare namespace m4m.framework {
          */
         Parse(json: JSON): this;
         private lines;
+        /**
+         * 获取 路径
+         */
         private getpaths;
+        /**
+         * 沿曲线获取贝塞尔点
+         * @param points 点列表
+         * @param rate 比率
+         * @param clearflag 是否清理
+         * @returns 点
+         */
         private getBeisaierPointAlongCurve;
+        /**
+         * 3维向量 差值
+         * @param start 开始值
+         * @param end 结束值
+         * @param lerp 差值度
+         * @param out 输出结果
+         */
         private vec3Lerp;
     }
     /**
@@ -7944,6 +9406,10 @@ declare namespace m4m.framework {
          */
         defaultAsset: boolean;
         isCab: boolean;
+        /**
+         * 预制体资源
+         * @param assetName 资源名
+         */
         constructor(assetName?: string);
         /**
          * @public
@@ -8032,15 +9498,17 @@ declare namespace m4m.framework {
          */
         jsonstr: string;
         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
+         * @deprecated [已弃用]
          * 解析资源
          * @param jsonStr json数据
          * @param assetmgr 资源管理实例
          * @version m4m 1.0
          */
         Parse(jsonStr: string, assetmgr: assetMgr): Promise<unknown>;
+        /**
+         * 解析资源
+         * @param data 数据
+         */
         cParse(data: any): void;
     }
 }
@@ -8072,6 +9540,10 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         fog: Fog;
+        /**
+         * raw 场景资源
+         * @param assetName 资源名
+         */
         constructor(assetName?: string);
         /**
          * @public
@@ -8121,6 +9593,9 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         caclByteLength(): number;
+        /**
+         * 重置 LightMap
+         */
         resetLightMap(assetmgr: assetMgr, bundleName?: string): void;
         private lightmapData;
         /**
@@ -8210,6 +9685,10 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         defaultAsset: boolean;
+        /**
+         * 着色器资源
+         * @param assetName 资源名
+         */
         constructor(assetName?: string);
         /**
          * @public
@@ -8292,8 +9771,25 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         parse(assetmgr: assetMgr, json: any): void;
+        /**
+         * 解析属性
+         * @param assetmgr 资源管理器
+         * @param properties 属性
+         * @returns
+         */
         _parseProperties(assetmgr: assetMgr, properties: any): void;
+        /**
+         * 解析定义的渲染通道
+         * @param assetmgr 资源管理器
+         * @param json 数据
+         * @param type 类型
+         * @returns glDrawPass对象
+         */
         private _parsePass;
+        /**
+         * 填充默认的 uniform 值
+         * @param pass
+         */
         fillUnDefUniform(pass: render.glDrawPass): void;
     }
 }
@@ -8318,6 +9814,10 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         defaultAsset: boolean;
+        /**
+         * sprite 图资源
+         * @param assetName 资源名
+         */
         constructor(assetName?: string);
         /**
          * @public
@@ -8449,6 +9949,10 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         defaultAsset: boolean;
+        /**
+         * 文本字符串资源
+         * @param assetName 资源名
+         */
         constructor(assetName?: string);
         /**
          * @public
@@ -8528,6 +10032,10 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         defaultAsset: boolean;
+        /**
+         * 纹理资源
+         * @param assetName 资源名
+         */
         constructor(assetName?: string);
         /**
          * @public
@@ -8605,6 +10113,9 @@ declare namespace m4m.framework {
         private static g_this;
         static instance(): AudioEx;
         audioContext: AudioContext;
+        /**
+         * 音效Ex
+         */
         private constructor();
         /**
          * @public
@@ -8719,6 +10230,9 @@ declare namespace m4m.framework {
          * 动画循环播放次数
          */
         get playCount(): number;
+        /**
+         * 初始化
+         */
         private init;
         /**
          * 收集所有的 asbone 到 更新列表
@@ -8736,6 +10250,9 @@ declare namespace m4m.framework {
         /** 所有的动画片段名列表，包含待加载的列表 */
         allClipNames(): string[];
         private collected;
+        /**
+         * 收集所有片段名
+         */
         private collectClipNames;
         /** 添加动画片段 通过名字加载 */
         addClipByNameLoad(_assetMgr: assetMgr, resPath: string, clipName: string, callback?: (state: stateLoad, clipName: string) => any): void;
@@ -8776,8 +10293,26 @@ declare namespace m4m.framework {
         playCross(animName: string, crosstimer: number, onPlayEnd?: () => void, speed?: number, beRevert?: boolean): void;
         private beActivedEndFrame;
         private endFrame;
+        /**
+         * 播放到指定帧
+         * @param animName 动画名
+         * @param endframe 结束帧
+         * @param crosstimer 融合时间
+         * @param onPlayEnd 当播放结束回调
+         * @param speed 速度
+         */
         playToXFrame(animName: string, endframe: number, crosstimer?: number, onPlayEnd?: () => void, speed?: number): void;
+        /**
+         * 记录上帧数据
+         */
         private recordeLastFrameData;
+        /**
+         * 播放动画片段
+         * @param aniclip 动画片段
+         * @param onPlayEnd 当播放结束回调
+         * @param speed 播放速度
+         * @param beRevert 是否翻转
+         */
         private playAniclip;
         /**
          * @public
@@ -8787,6 +10322,9 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         stop(): void;
+        /**
+         * 暂停播放
+         */
         pause(): void;
         /**
          * 是否在播放动画
@@ -8796,19 +10334,29 @@ declare namespace m4m.framework {
          * 是否在停止动画
          */
         isStop(): boolean;
-        /**
-         * @private
-         */
         remove(): void;
-        /**
-         * @private
-         */
+        /** @deprecated [已弃用] */
         clone(): void;
+        /**
+         * 检查帧ID
+         * @param delay dt
+         */
         private checkFrameId;
+        /**
+         * 当片段播放结束是回调
+         */
         private OnClipPlayEnd;
         private beActived;
         private boneCache;
+        /**
+         * 回收缓存
+         */
         private recyclecache;
+        /**
+         * 填充骨骼姿态数据
+         * @param data 数据
+         * @param bones 骨骼列表
+         */
         fillPoseData(data: Float32Array, bones: transform[]): void;
     }
 }
@@ -8838,6 +10386,9 @@ declare namespace m4m.framework {
      */
     class asbone implements INodeComponent {
         static readonly ClassName: string;
+        /**
+         * 是骨骼
+         */
         constructor();
         /**
          * @public
@@ -8850,13 +10401,7 @@ declare namespace m4m.framework {
         start(): void;
         onPlay(): void;
         update(delta: number): void;
-        /**
-         * @private
-         */
         remove(): void;
-        /**
-         * @private
-         */
         clone(): void;
     }
 }
@@ -8949,8 +10494,16 @@ declare namespace m4m.framework {
         remove(): void;
         clone(): void;
         private beActive;
+        /**
+         * 设置是否激活
+         * @param active 是否激活
+         */
         setActive(active: boolean): void;
         private target;
+        /**
+         * 设置目标
+         * @param trans 目标
+         */
         setTarget(trans: transform): void;
     }
 }
@@ -9071,6 +10624,12 @@ declare namespace m4m.framework {
      * @private
      */
     interface ICameraPostQueue {
+        /**
+         * 执行渲染
+         * @param scene 引擎场景
+         * @param context 渲染上下文
+         * @param camera 相机
+         */
         render(scene: scene, context: renderContext, camera: camera): any;
         renderTarget: render.glRenderTarget;
     }
@@ -9078,6 +10637,9 @@ declare namespace m4m.framework {
      * @private
      */
     class cameraPostQueue_Depth implements ICameraPostQueue {
+        /**
+         * 相机后处理 深度
+         */
         constructor();
         render(scene: scene, context: renderContext, camera: camera): void;
         renderTarget: render.glRenderTarget;
@@ -9087,6 +10649,9 @@ declare namespace m4m.framework {
      */
     class cameraPostQueue_Quad implements ICameraPostQueue {
         material: material;
+        /**
+         * 相机后处理 方块
+         */
         constructor();
         render(scene: scene, context: renderContext, camera: camera): void;
         renderTarget: render.glRenderTarget;
@@ -9095,6 +10660,9 @@ declare namespace m4m.framework {
      * @private
      */
     class cameraPostQueue_Color implements ICameraPostQueue {
+        /**
+         * 相机后处理颜色队列
+         */
         constructor();
         render(scene: scene, context: renderContext, camera: camera): void;
         renderTarget: render.glRenderTarget;
@@ -9105,8 +10673,19 @@ declare namespace m4m.framework {
     interface IOverLay {
         init: boolean;
         sortOrder: number;
+        /** 初始化调用一次 */
         start(camera: camera): any;
+        /**
+         * 执行渲染
+         * @param context 渲染上下文
+         * @param assetmgr 资源管理
+         * @param camera 相机
+         */
         render(context: renderContext, assetmgr: assetMgr, camera: camera): any;
+        /**
+         * 执行更新
+         * @param delta 上一循环间隔时间
+         */
         update(delta: number): any;
     }
     /**
@@ -9118,6 +10697,9 @@ declare namespace m4m.framework {
     */
     class camera implements INodeComponent {
         static readonly ClassName: string;
+        /**
+         * 相机
+         */
         constructor();
         private static helpv3;
         private static helpv3_1;
@@ -9197,7 +10779,7 @@ declare namespace m4m.framework {
         get CurrContextIndex(): number;
         private _contextIdx;
         /**
-         * @private
+         * @deprecated [已弃用]
          */
         markDirty(): void;
         isEditorCam: boolean;
@@ -9280,6 +10862,10 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         removeOverLay(overLay: IOverLay): void;
+        /**
+         * overlays 排序
+         * @param lays overlays列表
+         */
         private sortOverLays;
         private LastCamWorldMtx;
         /**
@@ -9367,16 +10953,6 @@ declare namespace m4m.framework {
         /**
          * @public
          * @language zh_CN
-         * @param app 主程序
-         * @param worldPos 世界坐标
-         * @param outScreenPos 屏幕坐标
-         * @classdesc
-         * 由世界坐标得到屏幕坐标
-         * @version m4m 1.0
-         */
-        /**
-         * @public
-         * @language zh_CN
          * @param app application
          * @param worldPos 世界空间坐标
          * @param outClipPos 计算返回裁剪空间坐标
@@ -9389,8 +10965,8 @@ declare namespace m4m.framework {
         private lastCamRect;
         private paraArr;
         /**
-         * @private 计算相机框
-         * @param app
+         * 计算相机框
+         * @param app 引擎app对象
          */
         private calcCameraFrame;
         private viewMatrix;
@@ -9431,41 +11007,65 @@ declare namespace m4m.framework {
         set opvalue(val: number);
         get opvalue(): number;
         /**
-         * @private
+         * 通过屏幕空间坐标位置， 获取在view空间下，交汇到指定平面上的坐标位置
+         * @param screenPos 屏幕空间坐标
+         * @param app 引擎app对象
+         * @param z view 空间下Z轴值
+         * @param out 返回的结果坐标位置
          */
         getPosAtXPanelInViewCoordinateByScreenPos(screenPos: m4m.math.vector2, app: application, z: number, out: m4m.math.vector2): void;
         private cullingMap;
         isLastCamera: boolean;
         /**
-        * @private
+        * 填充渲染节点
+        * @param scene 场景对象
         */
         fillRenderer(scene: scene): void;
         private static lastFID;
         private needUpdateWpos;
+        /**
+         * 填充渲染节点
+         * @param scene 场景对象
+         * @param node 节点
+         * @param _isStatic 是否是静态节点
+         */
         private _fillRenderer;
         private fruMap;
         private _vec3cache;
+        /**
+         * 检查节点是否被剔除
+         * @param node 被检查节点
+         * @returns 是被剔除？
+         */
         isCulling(node: transform): boolean;
         /**
          * 剔除测试 ，返回 ture 确认为剔除
-         * @param radius
-         * @param center
+         * @param radius 半径
+         * @param center 中心点
          */
         cullTest(radius: number, center: math.vector3): boolean;
         private _edge1;
         private _edge2;
+        /**
+         * 检测面与球面是否在面的右边
+         * @param v0 面的点0
+         * @param v1 面的点1
+         * @param v2 面的点2
+         * @param pos 球中心位置
+         * @param radius 球半径
+         * @returns 是在右边
+         */
         private isRight;
         /**
-         * [过时接口,完全弃用]
-        * @private
+         * @deprecated [已弃用]
         */
         testFrustumCulling(scene: scene, node: transform): boolean;
         /**
-        * @private
+        *  刷新计算 RenderTarget 或 viewport 的绘制矩形区
         */
         _targetAndViewport(target: render.glRenderTarget, scene: scene, context: renderContext, withoutClear: boolean): void;
         /**
-        * @private
+        * 将当前场景所有能渲染节点，执行渲染一次
         */
         _renderOnce(scene: scene, context: renderContext, drawtype: string): void;
         /**
@@ -9473,16 +11073,13 @@ declare namespace m4m.framework {
         */
         postQueues: ICameraPostQueue[];
         /**
-        * @private
-        */
+         * 渲染场景
+         * @param scene 引擎场景
+         * @param context 引擎渲染上下文
+         * @param contextIdx 上下文索引
+         */
         renderScene(scene: scene, context: renderContext, contextIdx: number): void;
-        /**
-        * @private
-        */
         remove(): void;
-        /**
-        * @private
-        */
         clone(): void;
     }
 }
@@ -9496,6 +11093,9 @@ declare namespace m4m.framework {
      */
     class canvascontainer implements INodeComponent {
         static readonly ClassName: string;
+        /**
+         * canvas容器
+         */
         constructor();
         /**
          * @public
@@ -9514,11 +11114,23 @@ declare namespace m4m.framework {
          */
         get canvas(): canvas;
         private _overlay2d;
+        /**
+         * 设置 OverLay
+         * @param lay OverLay
+         */
         setOverLay(lay: overlay2D): void;
+        /**
+         * 获取OverLay
+         * @returns OverLay对象
+         */
         getOverLay(): overlay2D;
         get sortOrder(): number;
         set sortOrder(order: number);
         private isCanvasinit;
+        /**
+         *  canvas初始化
+         * @returns
+         */
         private canvasInit;
         private _lastMode;
         private _renderMode;
@@ -9531,6 +11143,10 @@ declare namespace m4m.framework {
          */
         get renderMode(): canvasRenderMode;
         set renderMode(mode: canvasRenderMode);
+        /**
+         * 设置样式模式
+         * @returns
+         */
         private styleToMode;
         start(): void;
         onPlay(): void;
@@ -9654,12 +11270,20 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         setJsonData(_jsonData: textasset): void;
+        /**
+         * 设置json 格式数据
+         * @param _jsonStr json 格式数据
+         */
         setJsonDataStr(_jsonStr: string): void;
         /**
          * 更新特效数据
          * @param _jsonData
          */
         updateJsonData(_jsonData: textasset): void;
+        /**
+         * 更新特效数据(json字符串数据)
+         * @param _jsonStr json字符串数据
+         */
         updateJsonDataStr(_jsonStr: string): void;
         /**
         * @private
@@ -9670,7 +11294,7 @@ declare namespace m4m.framework {
         */
         get data(): EffectSystemData;
         /**
-        * @private
+        * 初始化
         */
         init(): void;
         private _data;
@@ -9764,7 +11388,13 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         reset(restSinglemesh?: boolean, resetParticle?: boolean): void;
+        /**
+         * 重置单mesh
+         */
         private resetSingleMesh;
+        /**
+         * 重置粒子系统
+         */
         private resetparticle;
         private delayElements;
         private refElements;
@@ -9772,17 +11402,21 @@ declare namespace m4m.framework {
          * 向特效中增加元素
          */
         private addElements;
+        /**
+         * 添加特效元素
+         * @param data 特效元素数据
+         */
         private addElement;
         /**
         * 根据初始化帧的数据，初始effectbatcher。根据mesh的材质增加或者合并mesh。同材质的就合并。
         */
         private addInitFrame;
         /**
-        * @private
+        * 设置帧ID
         */
         setFrameId(id: number): void;
         /**
-        * @private
+        * 获取 dt * FPS
         */
         getDelayFrameCount(delayTime: number): number;
         private beExecuteNextFrame;
@@ -9913,7 +11547,7 @@ declare namespace m4m.framework {
         */
         get data(): EffectSystemData;
         /**
-        * @private
+        * 初始化
         */
         init(): void;
         private _data;
@@ -9990,14 +11624,22 @@ declare namespace m4m.framework {
          * 向特效中增加元素
          */
         private addElements;
+        /**
+         * 添加特效元素
+         * @param data 特效元素数据
+         */
         private addElement;
+        /**
+         * 添加发射特效元素
+         * @param data 特效元素数据
+         */
         addEmissionElement(data?: EffectElementData): void;
         /**
-        * @private
+        * 设置 帧ID
         */
         setFrameId(id: number): void;
         /**
-        * @private
+        * 获取 dt * FPS
         */
         getDelayFrameCount(delayTime: number): number;
         private beExecuteNextFrame;
@@ -10009,9 +11651,6 @@ declare namespace m4m.framework {
          * @memberof effectSystem
          */
         private checkFrameId;
-        /**
-        * @private
-        */
         remove(): void;
         /**
         * @private
@@ -10103,14 +11742,33 @@ declare namespace m4m.framework {
         private boneMatrices;
         boneMatrixChunks: Float32Array[];
         boneMatricesTexture: m4m.framework.texture;
+        /**
+         * 初始化骨骼矩阵
+         */
         initBoneMatrices(): void;
+        /**
+         * 初始化静态骨骼姿态矩阵
+         */
         initStaticPoseMatrices(): void;
         private boneSamplerTexindex;
         private texID;
+        /**
+         * 更新骨骼纹理
+         * @param context 引擎渲染上下文
+         */
         updateBoneTexture(context: renderContext): void;
         tempMatrix: math.matrix;
         inverseRootBone: math.matrix;
+        /**
+         * 更新骨骼矩阵
+         */
         updateBoneMatrix(): void;
+        /**
+         * 矩阵相乘输出到数组
+         * @param lhs 左边矩阵
+         * @param rhs 右边矩阵
+         * @param out 返回输出
+         */
         matrixMultiplyToArray(lhs: m4m.math.matrix, rhs: m4m.math.matrix, out: Float32Array): void;
     }
 }
@@ -10124,6 +11782,9 @@ declare namespace m4m.framework {
      */
     class frustumculling implements INodeComponent {
         static readonly ClassName: string;
+        /**
+         * 锥剔除组件
+         */
         constructor();
         /**
         * @public
@@ -10222,6 +11883,9 @@ declare namespace m4m.framework {
          */
         lookforward: boolean;
         private loopCount;
+        /**
+         * 当完成时回调函数
+         */
         private oncomplete;
         /**
          * @public
@@ -10314,6 +11978,11 @@ declare namespace m4m.framework {
          * @param clipName
          */
         getClip(clipName: string): keyFrameAniClip;
+        /**
+         * 播放到指定时间状态
+         * @param clip 关键帧动画片段对象
+         * @param playTime 播放到指定时间
+         */
         private displayByTime;
         private static lhvec;
         private static rhvec;
@@ -10321,14 +11990,45 @@ declare namespace m4m.framework {
         private static rhquat;
         private static resvec;
         private static resquat;
+        /**
+         * 计算vec3 差值函数
+         */
         private static vec3lerp;
+        /**
+         * 计算四元数 球形差值函数
+         */
         private static quatSlerp;
+        /**
+         * 通过时间轴在曲线上计算数值
+         * @param curve 曲线
+         * @param playTime 时间轴上的时间
+         * @returns 返回的数据值
+         */
         private calcValueByTime;
         private eulerStatusMap;
         private eulerMap;
+        /**
+         * 刷新curve 的属性
+         * @param curve 曲线
+         * @param playTime 时间轴上的时间
+         */
         private refrasCurveProperty;
+        /**
+         * 按时间筛选需要播放的 curve
+         * @param clip 动画片段
+         * @param nowTime 时间
+         * @returns 曲线列表
+         */
         private timeFilterCurves;
+        /**
+         * 检查播放是否完毕
+         * @param clip 动画片段
+         * @returns 是播放结束了？
+         */
         private checkPlayEnd;
+        /**
+         * 初始化
+         */
         private init;
         /**
          * 动画是否在播放
@@ -10365,8 +12065,21 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         rewind(): void;
+        /**
+         * 添加片段
+         * @param clip 动画片段
+         */
         addClip(clip: keyFrameAniClip): void;
+        /**
+         * 收集动画片段的属性
+         * @param clip 动画片段
+         */
         private collectPropertyObj;
+        /**
+         * children对象收集路径
+         * @param clip 动画片段
+         * @param pathMap 路径字典容器
+         */
         private collectPathPropertyObj;
         private serchChild;
         clone(): void;
@@ -10488,7 +12201,16 @@ declare namespace m4m.framework {
         srcradius: number;
         private tempScale;
         private srcCenter;
+        /**
+         * 球形
+         * @param _center 中心点
+         * @param _r 半径
+         */
         constructor(_center: math.vector3, _r: number);
+        /**
+         * 更新
+         * @param worldmatrix 世界变换矩阵
+         */
         update(worldmatrix: math.matrix): void;
         /**
          * @public
@@ -10616,8 +12338,12 @@ declare namespace m4m.framework {
         */
         set colliderVisible(value: boolean);
         /**
-        * @private
-        */
+         * 判断一个平面在球内
+         * @param v0 面点0
+         * @param v1 面点1
+         * @param v2 面点2
+         * @returns 是在球内？
+         */
         caclPlaneInDir(v0: math.vector3, v1: math.vector3, v2: math.vector3): boolean;
         /**
         * @public
@@ -10644,6 +12370,9 @@ declare namespace m4m.framework {
         * @version m4m 1.0
         */
         private buildMesh;
+        /**
+         * 设置mesh 的 渲染器
+         */
         private setMeshRenderer;
         /**
         * @private
@@ -10817,12 +12546,25 @@ declare namespace m4m.framework {
         * @version m4m 1.0
         */
         lookAtCamera: boolean;
+        /**
+         * 初始mesh
+         */
         private initmesh;
+        /**
+         * 再次初始化数据
+         * @returns
+         */
         private reInitdata;
         isAlphaGradual: boolean;
         private inited;
+        /**
+         * 初始化数据
+         */
         private intidata;
         private speed;
+        /**
+         * 更新拖尾数据
+         */
         private updateTrailData;
         /**
         * @public
@@ -10886,8 +12628,17 @@ declare namespace m4m.framework {
         set startColor(color: m4m.math.color);
         set endColor(color: m4m.math.color);
         get endColor(): m4m.math.color;
+        /**
+         * 设置宽度
+         * @param startWidth 开始的宽度
+         * @param endWidth 结束的宽度
+         */
         setWidth(startWidth: number, endWidth?: number): void;
         private activeMaxpointlimit;
+        /**
+         * 设置最大点限制值
+         * @param value 最大点限制值
+         */
         setMaxpointcontroll(value?: boolean): void;
         start(): void;
         onPlay(): void;
@@ -10899,9 +12650,21 @@ declare namespace m4m.framework {
         * @private
         */
         remove(): void;
+        /**
+         * 刷新拖尾节点
+         * @param curTime 时间
+         */
         private refreshTrailNode;
         private notRender;
+        /**
+         * 更新拖尾数据
+         * @param curTime 时间
+         * @returns
+         */
         private updateTrailData;
+        /**
+         * 检查缓冲区大小（小了扩容）
+         */
         private checkBufferSize;
         render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
         /**
@@ -10915,6 +12678,12 @@ declare namespace m4m.framework {
         time: number;
         handle: m4m.math.vector3;
         trailNodes: trailNode[];
+        /**
+         * 拖尾节点
+         * @param p 点
+         * @param updir 方向
+         * @param t 值
+         */
         constructor(p: m4m.math.vector3, updir: m4m.math.vector3, t: number);
     }
 }
@@ -10945,6 +12714,9 @@ declare namespace m4m.framework {
              */
         gameObject: gameObject;
         private _init;
+        /**
+         * 初始化
+         */
         private init;
         start(): void;
         onPlay(): void;
@@ -10989,7 +12761,16 @@ declare namespace m4m.framework {
          */
         get delay(): number;
         set delay(deley: number);
+        /**
+         * 设置数据
+         * @param data 数据
+         * @param bundleName bundle名
+         */
         setData(data: F14EffectData, bundleName: string): void;
+        /**
+         * F14 特效系统
+         * @param bundleName 资源包名
+         */
         constructor(bundleName: string);
         /**
          * ref effect 增加transform层控制
@@ -11003,6 +12784,9 @@ declare namespace m4m.framework {
         private renderActive;
         beref: boolean;
         update(deltaTime: number): void;
+        /**
+         * 当结束一次循环后回调
+         */
         private OnEndOnceLoop;
         private _renderCamera;
         get renderCamera(): camera;
@@ -11011,19 +12795,49 @@ declare namespace m4m.framework {
         private totalTime;
         restartFrame: number;
         totalFrame: number;
+        /**
+         * 添加F14 层
+         * @param type F14 层
+         * @param layerdata 层数据
+         * @param bundleName bundle名
+         * @returns F14 层对象
+         */
         private addF14layer;
+        /** 返回element个数（包含reflayer内部的） */
         getElementCount(): number;
         private playRate;
         enabletimeFlow: boolean;
         enableDraw: boolean;
         private onFinish;
+        /**
+         * 播放F14 特效
+         * @param onFinish 当播放结束回调函数
+         * @param PlayRate 播放速率
+         */
         play(onFinish?: () => void, PlayRate?: number): void;
+        /**
+         * 结束播放
+         */
         stop(): void;
+        /**
+         * 暂停播放
+         */
         pause(): void;
+        /**
+         * 改变颜色
+         * @param newcolor 颜色
+         */
         changeColor(newcolor: math.color): void;
+        /**
+         * 改变透明度
+         * @param newAlpha 透明度
+         */
         changeAlpha(newAlpha: number): void;
+        /** 重置 */
         reset(): void;
+        /** 克隆 */
         clone(): void;
+        /** 移除 */
         remove(): void;
     }
     enum PlayStateEnum {
@@ -11040,11 +12854,34 @@ declare namespace m4m.framework {
     }
     interface F14Element {
         type: F14TypeEnum;
+        /**
+         * 更新
+         * @param deltaTime 上一帧用时
+         * @param frame 帧数
+         * @param fps 帧率
+         */
         update(deltaTime: number, frame: number, fps: number): any;
+        /**
+         * 销毁
+         */
         dispose(): any;
+        /**
+         * 重置
+         */
         reset(): any;
+        /***
+         * 当结束一次循环后执行函数
+         */
         OnEndOnceLoop(): any;
+        /**
+         * 改变颜色
+         * @param value 颜色
+         */
         changeColor(value: math.color): any;
+        /**
+         * 改变透明度
+         * @param value 透明度
+         */
         changeAlpha(value: number): any;
         layer: F14Layer;
         drawActive: boolean;
@@ -11065,9 +12902,27 @@ declare namespace m4m.framework {
         };
         element: F14Element;
         batch: F14Basebatch;
+        /**
+         * F14 层
+         * @param effect F14特效系统
+         * @param data F14 层数据
+         */
         constructor(effect: f14EffectSystem, data: F14LayerData);
+        /**
+         * 添加帧
+         * @param index 帧索引
+         * @param framedata 帧数据
+         * @returns F14 帧
+         */
         addFrame(index: number, framedata: F14FrameData): F14Frame;
+        /**
+         * 移除帧
+         * @param frame 帧索引
+         */
         removeFrame(frame: number): void;
+        /**
+         * 销毁
+         */
         dispose(): void;
     }
     class F14Frame {
@@ -11076,22 +12931,62 @@ declare namespace m4m.framework {
         attDic: {
             [name: string]: any;
         };
+        /**
+         * F14 帧
+         * @param layer F14 层
+         * @param data F14 帧数据
+         */
         constructor(layer: F14Layer, data: F14FrameData);
+        /**
+         * 设置数据
+         * @param name 数据名
+         * @param obj 数据
+         */
         setdata(name: string, obj: any): void;
+        /**
+         * 移除数据
+         * @param name 数据名
+         */
         removedata(name: string): void;
+        /**
+         * 获取数据
+         * @param name 数据名
+         * @returns
+         */
         getdata(name: string): any;
     }
     class F14AttTimeLine {
         name: string;
+        /**
+         * 差值函数
+         */
         lerpFunc: (from: any, to: any, lerp: any, out: any) => void;
+        /**
+         * 克隆函数
+         */
         cloneFunc: (from: any, to: any) => void;
         constructor(name: string, lerpfunc: (from: any, to: any, lerp: any, out: any) => void, clonefunc: (from: any, to: any) => void);
         frameList: number[];
         line: {
             [index: number]: any;
         };
+        /**
+         * 添加节点
+         * @param frame  帧ID
+         * @param value 值
+         */
         addNode(frame: number, value: any): void;
+        /**
+         * 移除
+         * @param frame 帧ID
+         */
         remove(frame: number): void;
+        /**
+         * 获取值
+         * @param frame 帧ID
+         * @param basedate 数据
+         * @param out 返回值
+         */
         getValue(frame: number, basedate: F14SingleMeshBaseData, out: any): void;
     }
 }
@@ -11100,6 +12995,13 @@ declare namespace m4m.framework {
         beloop: boolean;
         lifeTime: number;
         layers: F14LayerData[];
+        /**
+         * 解析 JSON数据
+         * @param json JSON数据
+         * @param assetmgr 资源管理器
+         * @param assetbundle bundle名
+         * @returns F14EffectData对象
+         */
         parsejson(json: any, assetmgr: assetMgr, assetbundle: string): this;
     }
     class F14LayerData {
@@ -11109,7 +13011,16 @@ declare namespace m4m.framework {
         frames: {
             [frame: number]: F14FrameData;
         };
+        /**
+         * F14 层数据
+         */
         constructor();
+        /**
+         * 解析
+         * @param json JSON数据
+         * @param assetmgr 资源管理器
+         * @param assetbundle bundle名
+         */
         parse(json: any, assetmgr: assetMgr, assetbundle: string): void;
     }
     class F14FrameData {
@@ -11118,11 +13029,17 @@ declare namespace m4m.framework {
             [name: string]: any;
         };
         EmissionData: F14EmissionBaseData;
+        /**
+         * F14 帧数据
+         * @param index 索引
+         * @param type F14类型
+         */
         constructor(index: number, type: F14TypeEnum);
     }
 }
 declare namespace m4m.framework {
     interface F14ElementData {
+        /** 解析 */
         parse(json: any, assetmgr: assetMgr, assetbundle: string): any;
     }
 }
@@ -11134,38 +13051,97 @@ declare namespace m4m.framework {
         _valueLimitMax: number;
         beInited: boolean;
         key: number;
+        /**
+         * 设置数据
+         * @param value 数据
+         */
         setValue(value: number): void;
+        /**
+         * 设置随机数
+         * @param max 最大值
+         * @param min 最小值
+         */
         setRandomValue(max: number, min: number): void;
         /**
          * 针对随机类型，只要随机过一次就返回值不变（rerandom=false），返回新的随机值（rerandom=true）
          */
         getValue(reRandom?: boolean): number;
+        /**
+         * 标量值数据
+         * @param value 数据
+         */
         constructor(value?: number);
+        /**
+         * 拷贝数据
+         * @param from 源数据
+         * @param to 拷贝到的
+         */
         static copyto(from: NumberData, to: NumberData): void;
+        /**
+         * 来自json
+         * @param json  JSON字符串
+         * @param data  数据
+         */
         static FormJson(json: string, data: NumberData): void;
     }
     class Vector3Data {
         x: NumberData;
         y: NumberData;
         z: NumberData;
+        /**
+         * 三维向量数据
+         * @param x x值
+         * @param y y值
+         * @param z z值
+         */
         constructor(x?: number, y?: number, z?: number);
+        /**
+         * 获取值
+         * @param reRandom 是否再次随机
+         * @returns 向量3
+         */
         getValue(reRandom?: boolean): math.vector3;
+        /**
+         * 拷贝到
+         * @param from  源
+         * @param to    拷贝到
+         */
         static copyto(from: Vector3Data, to: Vector3Data): void;
+        /**
+         * 设置从json
+         * @param json  json数据
+         * @param data  数据
+         */
         static FormJson(json: string, data: Vector3Data): void;
     }
     class NumberKey {
         key: number;
         value: number;
+        /**
+         * 标量值
+         * @param _key key
+         * @param _value 值
+         */
         constructor(_key: number, _value: number);
     }
     class Vector3Key {
         key: number;
         value: math.vector3;
+        /**
+         * 三维向量 可以
+         * @param _key key
+         * @param _value 值
+         */
         constructor(_key: number, _value: math.vector3);
     }
     class Vector2Key {
         key: number;
         value: math.vector2;
+        /**
+         * 二维向量 可以
+         * @param _key key
+         * @param _value 值
+         */
         constructor(_key: number, _value: math.vector2);
     }
 }
@@ -11197,24 +13173,85 @@ declare namespace m4m.framework {
         colorArr: math.color[];
         uvArr: math.vector2[];
         private frameGap;
+        /**
+         * F14 发射器
+         * @param effect F14特效系统
+         * @param layer F14 层
+         */
         constructor(effect: f14EffectSystem, layer: F14Layer);
         private lastFrame;
+        /**
+         * 执行更新
+         * @param deltaTime 上一帧时间
+         * @param frame
+         * @param fps 帧率
+         */
         update(deltaTime: number, frame: number, fps: number): void;
+        /**
+         * 刷新
+         * @param fps 帧率
+         */
         private refreshByFrameData;
+        /**
+         * 改变当前的基础数据
+         * @param data 数据
+         */
         changeCurrentBaseData(data: F14EmissionBaseData): void;
+        /**
+         * 初始化当前数据
+         */
         private initBycurrentdata;
+        /**
+         * 获取世界变换矩阵
+         * @returns 世界变换矩阵
+         */
         getWorldMatrix(): math.matrix;
+        /**
+         * 获取世界旋转
+         * @returns 世界旋转四元数
+         */
         getWorldRotation(): math.quaternion;
+        /**
+         * 更新生存时间
+         * @returns
+         */
         private updateLife;
+        /**
+         * 再次初始化
+         */
         private reInit;
         private bursts;
+        /**
+         * 更新粒子发射
+         */
         private updateEmission;
+        /**
+         * 添加 粒子
+         * @param count 粒子数量
+         */
         private addParticle;
+        /**
+         * 重置，例子啥的消失
+         */
         reset(): void;
+        /**
+         * 改变颜色
+         * @param value 颜色
+         */
         changeColor(value: math.color): void;
         private settedAlpha;
+        /**
+         * 改变透明度
+         * @param value 透明度
+         */
         changeAlpha(value: number): void;
+        /***
+         * 当结束一次循环后执行函数
+         */
         OnEndOnceLoop(): void;
+        /**
+         * 销毁
+         */
         dispose(): void;
     }
 }
@@ -11273,15 +13310,40 @@ declare namespace m4m.framework {
         row: number;
         column: number;
         count: number;
+        /**
+         *  解析
+         * @param json json数据
+         * @param assetmgr 资源管理器
+         * @param assetbundle assetbundle名
+         */
         parse(json: any, assetmgr: assetMgr, assetbundle: string): void;
+        /**
+         * 获取发射数据的随机方向和位置
+         * @param emission 发射数据
+         * @param outDir 输出方向
+         * @param outPos 输出位置
+         */
         static getRandomDirAndPosByZEmission(emission: F14EmissionBaseData, outDir: m4m.math.vector3, outPos: m4m.math.vector3): void;
     }
     class busrtInfo {
         time: number;
         count: NumberData;
         private _beburst;
+        /**
+         * 是否射出
+         * @returns
+         */
         beburst(): boolean;
+        /**
+         * 设置射出状态
+         * @param bebusrt  是否射出
+         */
         burst(bebusrt?: boolean): void;
+        /**
+         * 创建通过JSON数据
+         * @param json json数据
+         * @returns busrtInfo对象
+         */
         static CreatformJson(json: any): busrtInfo;
     }
 }
@@ -11298,7 +13360,16 @@ declare namespace m4m.framework {
         curVertexcount: number;
         curIndexCount: number;
         vertexLength: number;
+        /**
+         * F14 发射合批
+         * @param effect F14 特效系统
+         * @param element F14发射器
+         */
         constructor(effect: f14EffectSystem, element: F14Emission);
+        /**
+         * 获取最大粒子数
+         * @returns 最大粒子数
+         */
         private getMaxParticleCount;
         render(context: renderContext, assetmgr: assetMgr, camera: camera, Effqueue: number): void;
         unRender(): void;
@@ -11350,23 +13421,60 @@ declare namespace m4m.framework {
         actived: boolean;
         private emissionMatToWorld;
         private emissionWorldRotation;
+        /**
+         * 获取发射到世界矩阵
+         * @returns 世界矩阵
+         */
         private getEmissionMatToWorld;
+        /**
+         * 获取发射到世界旋转
+         * @returns 世界旋转
+         */
         private getemissionWorldRotation;
+        /**
+         * F14 粒子
+         * @param element F14 发射器
+         * @param data F14F发射数据
+         */
         constructor(element: F14Emission, data: F14EmissionBaseData);
+        /**
+         * 初始化通过发射数据
+         * @param data 发射数据
+         */
         initByEmissionData(data: F14EmissionBaseData): void;
+        /**
+         * 更新
+         * @param deltaTime 上帧用时
+         */
         update(deltaTime: number): void;
         private tempos;
         private temcolor;
         private temUv;
+        /**
+         * 上传mesh data
+         */
         uploadMeshdata(): void;
         /**
          * 在emission是在simulate in local space 时候，为matTobathcer
          * 在emission是在simulate in world space 时候，为matToWorld
          */
         private transformVertex;
+        /**
+         * 更新Local矩阵
+         */
         private updateLocalMatrix;
+        /**
+         * 更新位置
+         */
         private updatePos;
+        /**
+         * 更新尺寸
+         * @returns
+         */
         private updateSize;
+        /**
+         * 更新Euler旋转
+         */
         private updateEuler;
         private angleRot;
         private worldpos;
@@ -11377,10 +13485,27 @@ declare namespace m4m.framework {
         private worldRotation;
         private invParWorldRot;
         private worldStartPos;
+        /**
+         * 更新旋转
+         */
         private updateRot;
+        /**
+         * 更新颜色
+         */
         private updateColor;
+        /**
+         * 更新UV
+         */
         private updateUV;
+        /**
+         * 更新当前纹理的 ST（缩放偏移）
+         * @param data 发射数据
+         * @returns
+         */
         getCurTex_ST(data: F14EmissionBaseData): void;
+        /**
+         * 销毁
+         */
         dispose(): void;
     }
 }
@@ -11389,6 +13514,11 @@ declare namespace m4m.framework {
         type: F14TypeEnum;
         effect: f14EffectSystem;
         private element;
+        /**
+         * F14引用元素合批
+         * @param effect 特效系统
+         * @param element F14引用元素
+         */
         constructor(effect: f14EffectSystem, element: F14RefElement);
         unRender(): void;
         getElementCount(): number;
@@ -11416,6 +13546,13 @@ declare namespace m4m.framework {
         startFrame: number;
         endFrame: number;
         effect: f14EffectSystem;
+        /**
+         * F14 引用元素
+         * @param effect 特效系统
+         * @param layer F14 层
+         * @param bundleName 资源包名
+         * @returns F14RefElement
+         */
         constructor(effect: f14EffectSystem, layer: F14Layer, bundleName: string);
         RefEffect: f14EffectSystem;
         reset(): void;
@@ -11449,16 +13586,36 @@ declare namespace m4m.framework {
         private uvArr;
         dataforvbo: Float32Array;
         dataforebo: Uint16Array;
+        /**
+         * f14 单mesh
+         * @param effect 特效系统
+         * @param layer F14层
+         */
         constructor(effect: f14EffectSystem, layer: F14Layer);
+        /**
+         * 刷新开始结束帧
+         */
         refreshStartEndFrame(): void;
         update(deltaTime: number, frame: number, fps: number): void;
         OnEndOnceLoop(): void;
         targetMat: math.matrix;
+        /**
+         * 刷新目标矩阵
+         */
         refreshTargetMatrix(): void;
         private tempos;
         private temColor;
         private temUv;
+        /**
+         * 上传mesh数据
+         */
         uploadMeshdata(): void;
+        /**
+         * 刷新当前纹理 ST
+         * @param curframe  当前帧
+         * @param detalTime 上一帧用时
+         * @param fps 帧率
+         */
         refreshCurTex_ST(curframe: number, detalTime: number, fps: number): void;
         private eulerRot;
         private worldpos;
@@ -11467,6 +13624,9 @@ declare namespace m4m.framework {
         private lookDir;
         private worldDirx;
         private worldDiry;
+        /**
+         * 上传旋转 通过Billboard
+         */
         updateRotByBillboard(): void;
         reset(): void;
         changeColor(value: math.color): void;
@@ -11479,9 +13639,26 @@ declare namespace m4m.framework {
     interface F14Basebatch {
         type: F14TypeEnum;
         effect: f14EffectSystem;
+        /**
+         * 渲染
+         * @param context 引擎渲染上下文
+         * @param assetmgr 资源管理器
+         * @param camera 相机对象
+         * @param Effqueue 特效队列ID
+         */
         render(context: renderContext, assetmgr: assetMgr, camera: camera, Effqueue: number): any;
+        /**
+         * 取消渲染
+         */
         unRender(): any;
+        /**
+         * 销毁
+         */
         dispose(): any;
+        /**
+         * 获取元素数量
+         * @returns
+         */
         getElementCount(): number;
     }
     class F14SingleMeshBath implements F14Basebatch {
@@ -11501,6 +13678,11 @@ declare namespace m4m.framework {
         curVertexcount: number;
         curIndexCount: number;
         vertexLength: number;
+        /**
+         * f14 单mesh 合批
+         * @param mat 材质
+         * @param effect 特效系统
+         */
         constructor(mat: material, effect: f14EffectSystem);
         private noBatch;
         OnEndCollectElement(): void;
@@ -11546,6 +13728,10 @@ declare namespace m4m.framework {
         beBillboard: boolean;
         bindAxis: BindAxis;
         firtstFrame: number;
+        /**
+         * f14 单mesh数据
+         * @param firstFrame 名
+         */
         constructor(firstFrame: number);
         parse(json: any, assetmgr: assetMgr, assetbundle: string): void;
     }
@@ -11572,7 +13758,12 @@ declare namespace m4m.framework {
         update(delta: number): void;
         gameObject: gameObject;
         remove(): void;
+        /** @deprecated [已弃用] */
         clone(): void;
+        /**
+         * 移动到
+         * @param to 到的位置
+         */
         moveTo(to: transform): void;
     }
 }
@@ -11809,6 +14000,11 @@ declare namespace m4m.framework {
          * @param mesh
          */
         static clearMesh(mesh: mesh): void;
+        /**
+         * 上传mesh
+         * @param _mesh mesh对象
+         * @param webgl webgl上下文
+         */
         static uploadMesh(_mesh: mesh, webgl: WebGL2RenderingContext): void;
         /**
          * 计算网格
@@ -12131,6 +14327,10 @@ declare namespace m4m.framework {
         get value(): string;
         set value(v: string);
         private _value;
+        /**
+         * 拖尾渲染数据
+         * @param assetName 资源名
+         */
         constructor(assetName?: string);
         /**
          * @public
@@ -12180,6 +14380,10 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         caclByteLength(): number;
+        /**
+         * 设置数据
+         * @param v 字符串数据
+         */
         setData(v: string): void;
         objectData: any;
     }
@@ -12413,9 +14617,31 @@ declare namespace m4m.event {
 declare namespace m4m.event {
     /** 输入事件 */
     class InputEvent extends AEvent {
+        /**
+         * 接收按键事件回调
+         * @param event 按键事件枚举
+         * @param func 触发回调函数
+         * @param thisArg this对象
+         */
         OnEnum_key(event: KeyEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
+        /**
+         * 发射按键事件
+         * @param event 按键事件枚举
+         * @param args 事件参数
+         */
         EmitEnum_key(event: KeyEventEnum, ...args: Array<any>): void;
+        /**
+         * 接收点击事件回调
+         * @param event 点击事件枚举
+         * @param func 触发回调函数
+         * @param thisArg this对象
+         */
         OnEnum_point(event: PointEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
+        /**
+         * 发射点击事件
+         * @param event 点击事件枚举
+         * @param args 事件参数
+         */
         EmitEnum_point(event: PointEventEnum, ...args: Array<any>): void;
     }
     /** 输入htmlElement 原生事件类型集合 */
@@ -12434,13 +14660,35 @@ declare namespace m4m.event {
     }
     /** 输入htmlElement 原生事件 */
     class inputHtmlNativeEvent extends AEvent {
+        /**
+         * 当接收事件
+         * @param tagName 事件名
+         * @param func 触发回调函数
+         * @param thisArg this对象
+         */
         On<K extends keyof inputHtmlNativeEventMap>(tagName: K, func: (ev: any) => void, thisArg: any): void;
+        /**
+         * 发射事件
+         * @param tagName 事件名
+         * @param ev 事件数据
+         */
         Emit<K extends keyof inputHtmlNativeEventMap>(tagName: K, ev: any): void;
     }
 }
 declare namespace m4m.event {
     class Physic2dEvent extends AEvent {
+        /**
+         * 当接收事件
+         * @param event 物理2d事件类型
+         * @param func 触发回调函数
+         * @param thisArg this对象
+         */
         OnEnum(event: Physic2dEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
+        /**
+         * 发射事件
+         * @param event 物理2d事件类型
+         * @param args 参数数据
+         */
         EmitEnum(event: Physic2dEventEnum, ...args: Array<any>): void;
     }
 }
@@ -12469,7 +14717,18 @@ declare namespace m4m.event {
      * @version m4m 1.0
      */
     class UIEvent extends AEvent {
+        /**
+         * 当接收事件
+         * @param event UI事件类型
+         * @param func 回调函数
+         * @param thisArg this对象
+         */
         OnEnum(event: UIEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
+        /**
+         * 发射事件
+         * @param event UI事件类型
+         * @param args 参数
+         */
         EmitEnum(event: UIEventEnum, ...args: Array<any>): void;
     }
 }
@@ -12489,6 +14748,7 @@ declare namespace m4m.framework {
         selected: transform2D;
         c_x: number;
         c_y: number;
+        multiTouch: boolean;
     }
 }
 declare namespace m4m.framework {
@@ -12533,21 +14793,83 @@ declare namespace m4m.framework {
         };
         private rMtr_90;
         private rMtr_n90;
+        /**
+         * 输入管理器
+         * @param app 引擎app
+         */
         constructor(app: application);
+        /**
+         * 附加到html元素
+         * @param element html元素
+         */
         private attach;
+        /**
+         * 解除所有 附加绑定
+         */
         private detach;
+        /**
+         * 当鼠标点下
+         * @param ev 鼠标事件
+         */
         private _mousedown;
+        /**
+         * 当鼠标点弹起
+         * @param ev 鼠标事件
+         */
         private _mouseup;
+        /**
+         * 当鼠标移动
+         * @param ev 鼠标事件
+         */
         private _mousemove;
+        /**
+         * 当鼠标滚轮滚动
+         * @param ev 鼠标事件
+         */
         private _mousewheel;
+        /**
+         * 尝试添加 触摸点
+         * @param id 触摸ID
+         */
         private tryAddTouchP;
+        /**
+         * 通过所有的触摸状态 同步点
+         */
         private syncPointByTouches;
+        /**
+         * 触摸开始
+         * @param ev    触摸事件
+         */
         private _touchstart;
+        /**
+         * 触摸移动
+         * @param ev 触摸事件
+         */
         private _touchmove;
+        /**
+         * 触摸结束
+         * @param ev 触摸事件
+         */
         private _touchend;
+        /**
+         * 触摸取消
+         * @param ev 触摸事件
+         */
         private _touchcancel;
+        /**
+         * 键盘按下
+         * @param ev 键盘事件
+         */
         private _keydown;
+        /**
+         * 键盘弹起
+         * @param ev 键盘事件
+         */
         private _keyup;
+        /**
+         * 事件失焦
+         * @param ev 事件对象
+         */
         private _blur;
         private readonly moveTolerance;
         private lastTouch;
@@ -12556,6 +14878,10 @@ declare namespace m4m.framework {
         private hasPointMove;
         private downPoint;
         private lastPoint;
+        /**
+         * 执行更新
+         * @param delta dtime
+         */
         update(delta: any): void;
         /**
          * point 刷新检查
@@ -12563,9 +14889,15 @@ declare namespace m4m.framework {
         pointCk(): void;
         private keyDownCode;
         private keyUpCode;
+        /**
+         * 按键码检查
+         */
         private keyCodeCk;
         private hasWheel;
         private lastWheel;
+        /**
+         * 鼠标滚动检查
+         */
         private mouseWheelCk;
         /**
          * 按键是否在按下状态
@@ -12577,6 +14909,10 @@ declare namespace m4m.framework {
          * @param button 按键, 0: 左键；1: 中键；2: 右键
          */
         wasPressed(button: number): boolean;
+        /**
+         * 上下文枚举
+         * @param ev
+         */
         private _contextMenu;
         /**
          * 禁用右键菜单
@@ -12668,88 +15004,420 @@ declare namespace m4m.framework {
 }
 declare namespace m4m.io {
     class converter {
+        /**
+         * 获得应用方法
+         * @param value 值
+         * @returns
+         */
         static getApplyFun(value: any): any;
         private static dataBuffer;
         private static dataView;
+        /**
+         * ULong 类型值 转 Uint8Array
+         * @param value ULong 类型值
+         * @returns Uint8Array
+         */
         static ULongToArray(value: number, target?: Uint8Array, offset?: number): Uint8Array | number[];
+        /**
+         * Long 类型值 转 Uint8Array
+         * @param value Long 类型值
+         * @returns Uint8Array
+         */
         static LongToArray(value: number, t?: Uint8Array | number[], offset?: number): Uint8Array | number[];
+        /**
+         * Float64 类型值 转 Uint8Array
+         * @param value 值
+         * @returns Uint8Array
+         */
         static Float64ToArray(value: number, target?: Uint8Array | number[], offset?: number): Uint8Array | number[];
+        /**
+         * Float32 类型值 转 Uint8Array
+         * @param value 值
+         * @returns Uint8Array
+         */
         static Float32ToArray(value: number, target?: Uint8Array | number[], offset?: number): Uint8Array | number[];
+        /**
+         * Int32 类型值 转 Uint8Array
+         * @param value 值
+         * @returns Uint8Array
+         */
         static Int32ToArray(value: number, target?: Uint8Array | number[], offset?: number): Uint8Array | number[];
+        /**
+         * Int16 类型值 转 Uint8Array
+         * @param value 值
+         * @returns Uint8Array
+         */
         static Int16ToArray(value: number, target?: Uint8Array | number[], offset?: number): Uint8Array | number[];
+        /**
+         * Uint32 类型值 转 Uint8Array
+         * @param value 值
+         * @returns Uint8Array
+         */
         static Uint32toArray(value: number, target?: Uint8Array | number[], offset?: number): Uint8Array | number[];
+        /**
+         * Uint16 类型值 转 Uint8Array
+         * @param value 值
+         * @returns Uint8Array
+         */
         static Uint16ToArray(value: number, target?: Uint8Array | number[], offset?: number): Uint8Array | number[];
+        /**
+         * 字符串 转 Uint8Array
+         * @param str 字符串值
+         * @returns Uint8Array
+         */
         static StringToUtf8Array(str: string): Uint8Array;
+        /**
+         * Uint8Array 转 Long类型值
+         * @param buf Uint8Array
+         * @param offset buffer偏移
+         * @returns Long类型值
+         */
         static ArrayToLong(buf: Uint8Array, offset?: number): number;
+        /**
+         * Uint8Array 转 ULong类型值
+         * @param buf Uint8Array
+         * @param offset buffer偏移
+         * @returns ULong类型值
+         */
         static ArrayToULong(buf: Uint8Array, offset?: number): number;
+        /**
+         * Uint8Array 转 Float64类型值
+         * @param buf Uint8Array
+         * @param offset buffer偏移
+         * @returns Float64类型值
+         */
         static ArrayToFloat64(buf: Uint8Array, offset?: number): number;
+        /**
+         * Uint8Array 转 Float32类型值
+         * @param buf Uint8Array
+         * @param offset buffer偏移
+         * @returns Float32类型值
+         */
         static ArrayToFloat32(buf: Uint8Array, offset?: number): number;
+        /**
+         * Uint8Array 转 Int32类型值
+         * @param buf Uint8Array
+         * @param offset buffer偏移
+         * @returns Int32类型值
+         */
         static ArrayToInt32(buf: Uint8Array, offset?: number): number;
+        /**
+         * Uint8Array 转 Uint32类型值
+         * @param buf Uint8Array
+         * @param offset buffer偏移
+         * @returns Uint32类型值
+         */
         static ArrayToUint32(buf: Uint8Array, offset?: number): number;
+        /**
+         * Uint8Array 转 Int16类型值
+         * @param buf Uint8Array
+         * @param offset buffer偏移
+         * @returns Int16类型值
+         */
         static ArrayToInt16(buf: Uint8Array, offset?: number): number;
+        /**
+         * Uint8Array 转 Uint16类型值
+         * @param buf Uint8Array
+         * @param offset buffer偏移
+         * @returns Uint16类型值
+         */
         static ArrayToUint16(buf: Uint8Array, offset?: number): number;
+        /**
+         * Uint8Array 转 Int8类型值
+         * @param buf Uint8Array
+         * @param offset buffer偏移
+         * @returns Int8类型值
+         */
         static ArrayToInt8(buf: Uint8Array, offset?: number): number;
+        /**
+         * Uint8Array 转 字符串值
+         * @param buf Uint8Array
+         * @param offset buffer偏移
+         * @returns 字符串值
+         */
         static ArrayToString(buf: Uint8Array, offset?: number): string;
     }
     class binTool {
         private buffer;
         r_offset: number;
         w_offset: number;
+        /**
+         * 二进制工具
+         * @param size
+         */
         constructor(size?: number);
+        /** 检查长度 */
         private ckl;
+        /**
+         * 读取 Single值
+         * @returns Single值
+         */
         readSingle(): number;
+        /**
+         * 读取 Long值
+         * @returns Long值
+         */
         readLong(): number;
+        /**
+         * 读取 ULong值
+         * @returns ULong值
+         */
         readULong(): number;
+        /**
+         * 读取 Double值
+         * @returns Double值
+         */
         readDouble(): number;
+        /**
+         * 读取 Int8值
+         * @returns Int8值
+         */
         readInt8(): number;
+        /**
+         * 读取 UInt8值
+         * @returns UInt8值
+         */
         readUInt8(): number;
+        /**
+         * 读取 Int16值
+         * @returns Int16值
+         */
         readInt16(): number;
+        /**
+         * 读取 UInt16值
+         * @returns UInt16值
+         */
         readUInt16(): number;
+        /**
+         * 读取 Int32值
+         * @returns Int32值
+         */
         readInt32(): number;
+        /**
+         * 读取 UInt32值
+         * @returns UInt32值
+         */
         readUInt32(): number;
+        /**
+         * 读取 Boolean值
+         * @returns Boolean值
+         */
         readBoolean(): boolean;
+        /**
+         * 读取 Byte值
+         * @returns Byte值
+         */
         readByte(): number;
+        /**
+         * 读取 UnsignedShort值
+         * @returns UnsignedShort值
+         */
         readUnsignedShort(): number;
+        /**
+         * 读取UnsignedInt值
+         * @returns UnsignedInt值
+         */
         readUnsignedInt(): number;
+        /**
+         * 读取 Float值
+         * @returns Float值
+         */
         readFloat(): number;
+        /**
+         * 读取 有符号 Byte
+         * @returns F有符号 Byte
+         */
         readSymbolByte(): number;
+        /**
+         * 读取 Short值
+         * @returns Short值
+         */
         readShort(): number;
+        /**
+         * 读取 Int值
+         * @returns Int值
+         */
         readInt(): number;
+        /**
+         * 读取 Bytes值
+         * @param length 长度
+         * @returns Bytes值
+         */
         readBytes(length: number): Uint8Array;
+        /**
+         * 读取 StringUtf8值
+         * @returns StringUtf8值
+         */
         readStringUtf8(): string;
+        /**
+         * 读取 UTFBytes值
+         * @returns UTFBytes值
+         */
         readUTFBytes(): string;
+        /**
+         * 读取 UTFByLen值
+         * @param length 长度
+         * @returns UTFByLen值
+         */
         readUTFByLen(length: number): string;
+        /**
+         * 读取 StringUtf8Fix长度
+         * @param length 长度
+         * @returns StringUtf8Fix长度
+         */
         readStringUtf8FixLength(length: number): string;
+        /**
+         * 读取 StringAnsi
+         * @returns StringAnsi
+         */
         readStringAnsi(): string;
+        /**
+         * 获取 长度
+         * @returns 长度
+         */
         getLength(): number;
+        /**
+         * 获取 Bytes是否有效
+         * @returns Bytes是否有效
+         */
         getBytesAvailable(): number;
         get length(): number;
+        /**
+         * 写入 Int8值
+         * @param num Int8值
+         */
         writeInt8(num: number): void;
+        /**
+         * 写入 UInt8值
+         * @param num UInt8值
+         */
         writeUInt8(num: number): void;
+        /**
+         * 写入 Int16值
+         * @param num Int16值
+         */
         writeInt16(num: number): void;
+        /**
+         * 写入 UInt16值
+         * @param num UInt16值
+         */
         writeUInt16(num: number): void;
+        /**
+         * 写入 Int32值
+         * @param num Int32值
+         */
         writeInt32(num: number): void;
+        /**
+         * 写入 UInt32值
+         * @param num UInt32值
+         */
         writeUInt32(num: number): void;
+        /**
+         * 写入 Single值
+         * @param num Single值
+         */
         writeSingle(num: number): void;
+        /**
+         * 写入 Long值
+         * @param num Long值
+         */
         writeLong(num: number): void;
+        /**
+         * 写入 ULong值
+         * @param num ULong值
+         */
         writeULong(num: number): void;
+        /**
+         * 写入 Double值
+         * @param num Double值
+         */
         writeDouble(num: number): void;
+        /**
+         * 写入 字符串Ansi值
+         * @param str 字符串Ansi值
+         */
         writeStringAnsi(str: string): void;
+        /**
+         * 写入 字符串Utf8值
+         * @param str 字符串Utf8值
+         */
         writeStringUtf8(str: string): void;
+        /**
+         * 写入 字符串Utf8DataOnly值
+         * @param str 字符串Utf8DataOnly值
+         */
         writeStringUtf8DataOnly(str: string): void;
+        /**
+         * 写入 Byte值
+         * @param num Byte值
+         */
         writeByte(num: number): void;
+        /**
+         * 写入 Byte值
+         * @param array Byte值
+         * @param offset buffer中的偏移
+         */
         writeBytes(array: Uint8Array | number[] | number, offset?: number, length?: number): void;
+        /**
+         * 写入 Uint8Array值
+         * @param array Uint8Array值
+         * @param offset buffer中的偏移
+         * @param length 长度
+         */
         writeUint8Array(array: Uint8Array | number[] | number, offset?: number, length?: number): void;
+        /**
+         * 写入 UnsignedShort值
+         * @param num UnsignedShort值
+         */
         writeUnsignedShort(num: number): void;
+        /**
+         * 写入 UnsignedInt值
+         * @param num UnsignedInt值
+         */
         writeUnsignedInt(num: number): void;
+        /**
+         * 写入 Float值
+         * @param num Float值
+         */
         writeFloat(num: number): void;
+        /**
+         * 写入 UTFBytes值
+         * @param str UTFBytes值
+         */
         writeUTFBytes(str: string): void;
+        /**
+         * 写入 SymbolByte值
+         * @param num SymbolByte值
+         */
         writeSymbolByte(num: number): void;
+        /**
+         * 写入 Short值
+         * @param num Short值
+         */
         writeShort(num: number): void;
+        /**
+         * 写入 Int值
+         * @param num Int值
+         */
         writeInt(num: number): void;
+        /**
+         * 写入 Uint8Array
+         * @param array Uint8Array数据
+         */
         write(array: Uint8Array | number[] | number | any, offset?: number, length?: number): void;
+        /**
+         * 销毁
+         */
         dispose(): void;
+        /**
+         * 获取缓冲区
+         * @returns Uint8Array数据
+         */
         getBuffer(): Uint8Array;
+        /**
+         * 获取Uint8Array数据
+         * @returns Uint8Array数据
+         */
         getUint8Array(): Uint8Array;
     }
 }
@@ -12765,27 +15433,49 @@ declare namespace m4m.io {
      */
     function cloneObj(instanceObj: any, clonedObj?: any): any;
     /**
-     * @private
+     * 填充克隆节点对象的引用
+     * @param instanceObj 被克隆实例
+     * @param clonedObj 克隆实例
      */
     function fillCloneReference(instanceObj: any, clonedObj: any): any;
     /**
-     * @private
+     * 填充克隆节点对象的引用，类型或数组相关
+     * @param instanceObj 被克隆实例
+     * @param clonedObj 克隆实例
+     * @param key 类型或数组key
      */
     function fillCloneReferenceTypeOrArray(instanceObj: any, clonedObj: any, key: string): void;
     /**
-     * @private
+     * 填充克隆节点对象的引用，类型相关
+     * @param instanceObj 被克隆实例
+     * @param clonedObj 克隆实例
+     * @param key 类型或数组key
+     * @param instanceParent 被克隆实例的父节点
+     * @param clonedParent 克隆实例的父节点
      */
     function fillCloneReferenceType(instanceObj: any, clonedObj: any, key: string, instanceParent?: any, clonedParent?: any, instanceKey?: string): void;
     /**
-     * @private
+     * 克隆节点
+     * @param instanceObj 被克隆实例
+     * @param clonedObj 克隆实例
+     * @returns
      */
     function _cloneObj(instanceObj: any, clonedObj?: any): any;
     /**
-     * @private
+     * 克隆其他节点对象，类型或数组相关
+     * @param instanceObj 被克隆实例
+     * @param clonedObj 克隆实例
+     * @param key 类型或数组key
      */
     function cloneOtherTypeOrArray(instanceObj: any, clonedObj: any, key: string): void;
     /**
-     * @private
+     * 克隆其他节点对象
+     * @param instanceObj 被克隆实例
+     * @param clonedObj 克隆实例
+     * @param key 类型或数组key
+     * @param instanceParent 被克隆实例的父节点
+     * @param clonedParent 被克隆实例的父节点
+     * @param instanceKey 实例key
      */
     function cloneOtherType(instanceObj: any, clonedObj: any, key: string, instanceParent?: any, clonedParent?: any, instanceKey?: string): void;
 }
@@ -12808,6 +15498,13 @@ declare namespace m4m.io {
     function stringToUtf8Array(str: string): number[];
 }
 declare namespace m4m.io {
+    /**
+     * 节点序列化
+     * @param json json数据
+     * @param assetbundle 资源包名
+     * @param useAsset 是否标记被使用的资源？
+     * @returns 实例化的对象
+     */
     function ndeSerialize<T extends framework.transform | framework.transform2D>(json: any, assetbundle: string, useAsset?: boolean): T;
 }
 declare namespace m4m.io {
@@ -12821,94 +15518,55 @@ declare namespace m4m.io {
      */
     class SerializeDependent {
         static resourseDatas: any[];
+        /** @deprecated [已弃用] */
         static GetAssetContent(asset: any): {
             name: string;
             value: string;
             type: SaveAssetType;
         };
+        /** @deprecated [已弃用] */
         static GetAssetUrl(asset: any, assetMgr: any): void;
     }
-    /**
-     * @private
-     */
+    /** @deprecated [已弃用] */
     function SerializeForInspector(obj: any): string;
-    /**
-     * @private
-     */
+    /** @deprecated [已弃用] */
     function serializeObjForInspector(instanceObj: any, beComponent: boolean, serializedObj?: any): any;
-    /**
-     * @private
-     */
+    /** @deprecated [已弃用] */
     function serializeOtherTypeOrArrayForInspector(instanceObj: any, serializedObj: any, key: string, beComponent: boolean): void;
-    /**
-     * @private
-     */
+    /** @deprecated [已弃用] */
     function serializeOtherTypeForInspector(instanceObj: any, serializedObj: any, key: string, beComponent: boolean, arrayInst?: any): void;
-    /**
-     * 序列化
-     */
-    /**
-     * @private
-     */
+    /** @deprecated [已弃用] */
     function Serialize(obj: any, assetMgr?: any): string;
-    /**
-     * @private
-     */
+    /** @deprecated [已弃用] */
     function serializeObj(instanceObj: any, serializedObj?: any, assetMgr?: any): any;
-    /**
-     * @private
-     */
+    /** @deprecated [已弃用] */
     function serializeOtherTypeOrArray(instanceObj: any, serializedObj: any, key: string, assetMgr?: any): void;
-    /**
-     * @private
-     */
+    /** @deprecated [已弃用] */
     function serializeOtherType(instanceObj: any, serializedObj: any, key: string, arrayInst?: any, assetMgr?: any): void;
     /**
      * 反序列化  传入的源数据为json
      */
-    /**
-     * @private
-     */
+    /** @deprecated [已弃用] */
     function deSerialize(serializedObj: string, instanceObj: any, assetMgr: any, bundlename?: string): void;
-    /**
-     * @private
-     */
+    /** @deprecated [已弃用] */
     function fillReference(serializedObj: any, instanceObj: any): void;
-    /**
-     * @private
-     */
+    /** @deprecated [已弃用] */
     function dofillReferenceOrArray(serializedObj: any, instanceObj: any, key: string): void;
-    /**
-     * @private
-     */
+    /** @deprecated [已弃用] */
     function dofillReference(serializedObj: any, instanceObj: any, key: string): void;
-    /**
-     * @private
-     */
+    /** @deprecated [已弃用] */
     function deSerializeObj(serializedObj: any, instanceObj: any, assetMgr: any, bundlename?: string): void;
-    /**
-     * @private
-     */
+    /** @deprecated [已弃用] */
     function deSerializeOtherTypeOrArray(serializedObj: any, instanceObj: any, key: string, assetMgr: any, bundlename?: string): void;
-    /**
-     * @private
-     */
+    /** @deprecated [已弃用] */
     function deSerializeOtherType(serializedObj: any, instanceObj: any, key: string, assetMgr: any, bundlename?: string): void;
-    /**
-     * @private
-     */
+    /** @deprecated [已弃用] */
     function isArray(type: string): boolean;
-    /**
-     * @private
-     */
+    /** @deprecated [已弃用] */
     function isArrayOrDic(type: string): boolean;
-    /**
-     * @private
-     */
+    /** @deprecated [已弃用] */
     function isAsset(type: string): boolean;
-    /**
-     * @private
-     */
+    /** @deprecated [已弃用] */
     function isAssetInspector(type: string): boolean;
     /**
      * @private
@@ -12918,8 +15576,11 @@ declare namespace m4m.io {
             [id: number]: any;
         };
         static regtypelist: string[];
+        /** @deprecated [已弃用] */
         static regDefaultType(): void;
+        /** @deprecated [已弃用] */
         static regType(type: string): void;
+        /** @deprecated [已弃用] */
         static isRegType(type: string): boolean;
     }
     /**
@@ -12937,38 +15598,159 @@ declare namespace m4m.io {
      */
     class binReader {
         private _data;
+        /**
+         * 二进制阅读器
+         * @param buf 二进制数据
+         * @param seek 偏移
+         */
         constructor(buf: ArrayBuffer, seek?: number);
         _seek: number;
+        /**
+         * seek值
+         * @param seek seek值
+         */
         seek(seek: number): void;
+        /** 当前值（seek） */
         peek(): number;
+        /** 数据长度 */
         length(): number;
+        /** 可读？ */
         canread(): number;
+        /** 读取字符串Ansi*/
         readStringAnsi(): string;
+        /**
+         * utf8Array 转 字符串数据
+         * @param array utf8Array数据
+         * @returns 字符串数据
+         */
         static utf8ArrayToString(array: Uint8Array | number[]): string;
+        /**
+         * 读取utf8 字符串
+         * @returns utf8 字符串
+         */
         readStringUtf8(): string;
+        /**
+         * 读取 固定长度的 utf8 字符串
+         * @param length 长度
+         * @returns 固定长度的 utf8 字符串
+         */
         readStringUtf8FixLength(length: number): string;
+        /**
+         * 读取 Single值
+         * @returns Single值
+         */
         readSingle(): number;
+        /**
+         * 读取 Double值
+         * @returns Double值
+         */
         readDouble(): number;
+        /**
+         * 读取 Int8值
+         * @returns Int8值
+         */
         readInt8(): number;
+        /**
+         * 读取 UInt8值
+         * @returns UInt8值
+         */
         readUInt8(): number;
+        /**
+         * 读取 Int16值
+         * @returns Int16值
+         */
         readInt16(): number;
+        /**
+         * 读取 UInt16值
+         * @returns UInt16值
+         */
         readUInt16(): number;
+        /**
+         * 读取 Int32值
+         * @returns Int32值
+         */
         readInt32(): number;
+        /**
+         * 读取 UInt32值
+         * @returns UInt32值
+         */
         readUInt32(): number;
+        /**
+         * 从 Uint8Array 读取 部分Uint8Array
+         * @param target  Uint8Array
+         * @param length  数据长度
+         * @returns Uint8Array
+         */
         readUint8Array(target?: Uint8Array, offset?: number, length?: number): Uint8Array;
+        /**
+         * 从 Uint8Array 读取 部分Uint8Array
+         * @param target  Uint8Array
+         * @param offset  偏移位置
+         * @param length  数据长度
+         * @returns Uint8Array
+         */
         readUint8ArrayByOffset(target: Uint8Array, offset: number, length?: number): Uint8Array;
         set position(value: number);
         get position(): number;
+        /**
+         * 读取 Boolean值
+         * @returns Boolean值
+         */
         readBoolean(): boolean;
+        /**
+         * 读取 Byte值
+         * @returns Byte值
+         */
         readByte(): number;
+        /**
+         * 读取 Byte数组
+         * @param target  Uint8Array
+         * @param offset  偏移位置
+         * @param length  偏移长度
+         * @returns Byte数组
+         */
         readBytes(target?: Uint8Array, offset?: number, length?: number): Uint8Array;
+        /**
+         * 读取 Uint8Array 引用
+         * @param length  长度
+         * @returns Uint8Array
+         */
         readBytesRef(length?: number): Uint8Array;
+        /**
+         * 读取 UnsignedShort值
+         * @returns UnsignedShort值
+         */
         readUnsignedShort(): number;
+        /**
+         * 读取 UnsignedInt值
+         * @returns UnsignedInt值
+         */
         readUnsignedInt(): number;
+        /**
+         * 读取 Float值
+         * @returns Float值
+         */
         readFloat(): number;
+        /**
+         * 读取 UTFBytes值
+         * @param length 长度
+         * @returns 字符串
+         */
         readUTFBytes(length: number): string;
+        /**
+         * 读取 有符号 Byte
+         * @returns Byte值
+         */
         readSymbolByte(): number;
+        /**
+         * 读取 Short值
+         * @returns Short值
+         */
         readShort(): number;
+        /**
+         * 读取 Int值
+         * @returns Int值
+         */
         readInt(): number;
     }
     class binWriter {
@@ -12976,34 +15758,136 @@ declare namespace m4m.io {
         private _data;
         private _length;
         private _seek;
+        /**
+         * 二进制写
+         */
         constructor();
+        /**
+         * 确定数据
+         * @param addlen 数据长度
+         */
         private sureData;
+        /** 获取长度 */
         getLength(): number;
+        /** 获取Buffer */
         getBuffer(): ArrayBuffer;
+        /**
+         * seek值
+         * @param seek seek值
+         */
         seek(seek: number): void;
+        /** 查看  seek值*/
         peek(): number;
+        /**
+         * 写入 Int8值
+         * @param num Int8值
+         */
         writeInt8(num: number): void;
+        /**
+         * 写入 UInt8值
+         * @param num UInt8值
+         */
         writeUInt8(num: number): void;
+        /**
+         * 写入 Int16值
+         * @param num Int16值
+         */
         writeInt16(num: number): void;
+        /**
+         * 写入 UInt16值
+         * @param num UInt16值
+         */
         writeUInt16(num: number): void;
+        /**
+         * 写入 Int32值
+         * @param num Int32值
+         */
         writeInt32(num: number): void;
+        /**
+         * 写入 UInt32值
+         * @param num UInt32值
+         */
         writeUInt32(num: number): void;
+        /**
+         * 写入 Single值
+         * @param num Single值
+         */
         writeSingle(num: number): void;
+        /**
+         * 写入 Double值
+         * @param num Double值
+         */
         writeDouble(num: number): void;
+        /**
+         * 写入 Ansi字符串
+         * @param str Ansi字符串
+         */
         writeStringAnsi(str: string): void;
+        /**
+         * 写入 utf8字符串
+         * @param str utf8字符串
+         */
         writeStringUtf8(str: string): void;
         static stringToUtf8Array(str: string): number[];
+        /**
+         * 写入 字符串仅utf8数据
+         * @param str utf8字符串
+         */
         writeStringUtf8DataOnly(str: string): void;
+        /**
+         * 写入 Uint8Array数据
+         * @param array Uint8Array数据
+         * @param offset 偏移位置
+         * @param length 数据长度
+         */
         writeUint8Array(array: Uint8Array | number[], offset?: number, length?: number): void;
         get length(): number;
+        /**
+         * 写入 byte值
+         * @param num byte值
+         */
         writeByte(num: number): void;
+        /**
+         * 写入 Byte数组
+         * @param array Byte数组
+         * @param offset 数据偏移
+         * @param length 数据长度
+         */
         writeBytes(array: Uint8Array | number[], offset?: number, length?: number): void;
+        /**
+        * 写入 UnsignedShort值
+        * @param num UnsignedShort值
+        */
         writeUnsignedShort(num: number): void;
+        /**
+        * 写入 UnsignedInt值
+        * @param num UnsignedInt值
+        */
         writeUnsignedInt(num: number): void;
+        /**
+         * 写入 Float值
+         * @param num Float值
+         */
         writeFloat(num: number): void;
+        /**
+         * 写入 UTF字符串数据
+         * @param str UTF字符串数据
+         */
         writeUTFBytes(str: string): void;
+        /**
+        * 写入 有符号 Byte
+        * @param num 有符号 Byte
+        */
         writeSymbolByte(num: number): void;
+        /**
+         * 写入 Short值
+         * @param num Short值
+         */
         writeShort(num: number): void;
+        /**
+         * 写入 Int值
+         * @param num Int值
+         */
         writeInt(num: number): void;
     }
 }
@@ -13158,6 +16042,11 @@ declare namespace m4m.framework {
      * len = 2^(n-1) * n
      */
     function createGrad(n: number): number[][];
+    /**
+     * 获取 数据数组
+     * @param n 输入值
+     * @returns 数据数组
+     */
     function getBits(n: number): number[][];
 }
 declare namespace m4m.math {
@@ -13208,14 +16097,65 @@ declare namespace m4m.math {
     var defaultRotationOrder: RotationOrder;
 }
 declare namespace m4m.math {
+    /**
+     * 颜色设置
+     * @param out 输出颜色对象
+     * @param r 红通道值
+     * @param g 绿通道值
+     * @param b 蓝通道值
+     * @param a 透明道值
+     */
     function colorSet(out: color, r: number, g: number, b: number, a: number): void;
+    /**
+     * 设置成白色
+     * @param out 输出颜色对象
+     */
     function colorSet_White(out: color): void;
+    /**
+     * 设置成黑色
+     * @param out 输出颜色对象
+     */
     function colorSet_Black(out: color): void;
+    /**
+     * 设置成灰色
+     * @param out 输出颜色对象
+     */
     function colorSet_Gray(out: color): void;
+    /**
+     * 颜色相乘
+     * @param srca 颜色a
+     * @param srcb 颜色b
+     * @param out 输出颜色对象
+     */
     function colorMultiply(srca: color, srcb: color, out: color): void;
+    /**
+     * 缩放引用
+     * @param src 源颜色
+     * @param scale 缩放值
+     * @param out 输出颜色对象
+     */
     function scaleToRef(src: color, scale: number, out: color): void;
+    /**
+     * 颜色克隆
+     * @param src 源颜色
+     * @param out 输出颜色对象
+     */
     function colorClone(src: color, out: color): void;
+    /**
+     * 颜色差值
+     * @param srca 颜色a
+     * @param srcb 颜色b
+     * @param t 度值
+     * @param out 输出颜色对象
+     */
     function colorLerp(srca: color, srcb: color, t: number, out: color): void;
+    /**
+     * 颜色是否相同判断
+     * @param c 颜色a
+     * @param c1 颜色b
+     * @param threshold 误差范围
+     * @returns 是相同？
+     */
     function colorEqual(c: color, c1: color, threshold?: number): boolean;
     /**
      * 颜色转成 CSS 格式
@@ -13226,13 +16166,33 @@ declare namespace m4m.math {
     function colorToCSS(src: color, hasAlpha?: boolean): string;
 }
 declare namespace m4m.math {
+    /** 计算 线与平面相交点*/
     function calPlaneLineIntersectPoint(planeVector: vector3, planePoint: vector3, lineVector: vector3, linePoint: vector3, out: vector3): void;
+    /** 判断点是否在矩形p1p2p3p4中 */
     function isContain(p1: vector2, p2: vector2, p3: vector2, p4: vector2, mp: vector2): boolean;
+    /** 计算叉乘 |P0P1| × |P0P2|  */
     function Multiply(p1: vector2, p2: vector2, p0: vector2): number;
 }
 declare namespace m4m.math {
+    /**
+     * float 值裁减
+     * @param v 值
+     * @param min 最大值
+     * @param max 最小值
+     * @returns 输出值
+     */
     function floatClamp(v: number, min?: number, max?: number): number;
+    /**
+     * 符号化
+     * @param value 值
+     * @returns 符号值（1 或 -1）
+     */
     function sign(value: number): number;
+    /**
+     * 获取键盘code 的Ascii
+     * @param ev 按键事件
+     * @returns Ascii
+     */
     function getKeyCodeByAscii(ev: KeyboardEvent): number;
     var DEG2RAD: number;
     var RAD2DEG: number;
@@ -13258,9 +16218,31 @@ declare namespace m4m.math {
      * @param b2 第二个区间起始值
      */
     function mapLinear(x: number, a1: number, a2: number, b1: number, b2: number): number;
+    /**
+     * 差值计算
+     * @param fromV 开始值
+     * @param toV 结束值
+     * @param v 差值度
+     * @returns 结果值
+     */
     function numberLerp(fromV: number, toV: number, v: number): number;
+    /**
+     * @deprecated [已弃用]
+     * 标准x轴
+     * @returns
+     */
     function x_AXIS(): vector3;
+    /**
+     * @deprecated [已弃用]
+     * 标准y轴
+     * @returns
+     */
     function y_AXIS(): vector3;
+    /**
+     * @deprecated [已弃用]
+     * 标准z轴
+     * @returns
+     */
     function z_AXIS(): vector3;
     class commonStatic {
         static x_axis: m4m.math.vector3;
@@ -13269,37 +16251,204 @@ declare namespace m4m.math {
     }
 }
 declare namespace m4m.math {
+    /**
+     * 四元数初始化值
+     * @param src 四元数
+     */
     function quatIdentity(src: quaternion): void;
+    /**
+     * 四元数归一化
+     * @param src 四元数
+     * @param out 输出归一化后的四元数
+     */
     function quatNormalize(src: quaternion, out: quaternion): void;
+    /**
+     * 通过四元数变换三维向量
+     * @param src 四元数
+     * @param vector 三维向量
+     * @param out 输出的三维向量
+     */
     function quatTransformVector(src: quaternion, vector: vector3, out: vector3): void;
+    /**
+     * 通过buffer中的四元数数据变换三维向量
+     * @param src buffer
+     * @param srcseek buffer中的偏移
+     * @param vector 三维向量
+     * @param out 输出的三维向量
+     */
     function quatTransformVectorDataAndQuat(src: Float32Array, srcseek: number, vector: vector3, out: vector3): void;
+    /**
+     * 获取四元数的标量值（长度）
+     * @param src 四元数
+     * @returns 标量值（长度）
+     */
     function quatMagnitude(src: quaternion): number;
+    /**
+     * 克隆四元数
+     * @param src 源四元数
+     * @param out 输出的克隆四元数
+     */
     function quatClone(src: quaternion, out: quaternion): void;
+    /**
+     * 判断四元数是否相等
+     * @param quat 四元数a
+     * @param quat2 四元数b
+     * @param threshold 误差范围
+     * @returns 是相等？
+     */
     function quatEqual(quat: quaternion, quat2: quaternion, threshold?: number): boolean;
+    /**
+     * 用四元数构建 旋转矩阵
+     * @param src 四元数
+     * @param out 输出的旋转矩阵
+     */
     function quatToMatrix(src: quaternion, out: matrix): void;
+    /**
+     * 计算四元数的逆
+     * @param src 四元数
+     * @param out 输出的四元数的逆
+     */
     function quatInverse(src: quaternion, out: quaternion): void;
+    /**
+     * 构建四元数通过 偏航角、抛角、滚转角
+     * @param yaw 偏航角
+     * @param pitch 抛角
+     * @param roll 滚转角
+     * @param result 输出的四元数
+     */
     function quatFromYawPitchRoll(yaw: number, pitch: number, roll: number, result: quaternion): void;
+    /**
+     * 计算两个四元数相乘
+     * @param srca 四元数a
+     * @param srcb 四元数b
+     * @param out 输出的四元数
+     */
     function quatMultiply(srca: quaternion, srcb: quaternion, out: quaternion): void;
+    /**
+     * 计算一个buffer中的四元数 与另一个四元数相乘
+     * @param srca 四元数a 的 buffer
+     * @param srcaseek buffer的偏移
+     * @param srcb 四元数b
+     * @param out 输出的四元数
+     */
     function quatMultiplyDataAndQuat(srca: Float32Array, srcaseek: number, srcb: quaternion, out: quaternion): void;
+    /**
+     * 计算一个四元数与一个三维向量相乘
+     * @param vector 三维向量
+     * @param scr 四元数
+     * @param out 输出的四元数
+     */
     function quatMultiplyVector(vector: vector3, scr: quaternion, out: quaternion): void;
+    /**
+     * 通过差值度计算两个四元数的线性差值
+     * @param srca 开始的四元数
+     * @param srcb 结束的四元数
+     * @param out 输出的四元数
+     * @param t 差值度（0-1）
+     */
     function quatLerp(srca: quaternion, srcb: quaternion, out: quaternion, t: number): void;
+    /**
+     * 构建四元数 通过 轴和旋转度
+     * @param axis  轴
+     * @param angle 旋转度
+     * @param out 输出的四元数
+     */
     function quatFromAxisAngle(axis: vector3, angle: number, out: quaternion): void;
+    /**
+     * 通过四元数和指定轴 获取 旋转度
+     * @param src 四元数
+     * @param axis 轴
+     * @returns 旋转度
+     */
     function quatToAxisAngle(src: quaternion, axis: vector3): number;
+    /**
+     * 构建四元数 通过 xyz欧拉角
+     * @param ax x欧拉角
+     * @param ay y欧拉角
+     * @param az z欧拉角
+     * @param out 输出的四元数
+     */
     function quatFromEulerAngles(ax: number, ay: number, az: number, out: quaternion): void;
+    /**
+     * 通过四元数 获取 xyz欧拉角度
+     * @param src 四元数
+     * @param result 输出xyz欧拉角度
+     */
     function quatToEulerAngles(src: quaternion, result: vector3): void;
+    /**
+     * 重置四元数
+     * @param src 四元数
+     */
     function quatReset(src: quaternion): void;
+    /**
+     * 构建四元数 通过 一个点坐标和一个需要看向目标点坐标
+     * @param pos 点坐标
+     * @param targetpos 目标点坐标
+     * @param out 输出的四元数
+     */
     function quatLookat(pos: vector3, targetpos: vector3, out: quaternion): void;
+    /**
+     * 构建四元数 通过 一个点坐标和一个需要看向目标点坐标 以及视窗上方向量
+     * @param pos 点坐标
+     * @param targetpos 目标点坐标
+     * @param out 输出的四元数
+     * @param updir 视窗上方向量
+     */
     function quat2Lookat(pos: vector3, targetpos: vector3, out: quaternion, updir?: m4m.math.vector3): void;
+    /**
+     * 构建四元数 通过 一个点坐标和一个需要看向目标点坐标 以及视窗上方向量
+     * @param pos 点坐标
+     * @param targetpos 目标点坐标
+     * @param upwards 视窗上方向量
+     * @param out 输出的四元数
+     */
     function quat2LookRotation(pos: vector3, targetpos: vector3, upwards: vector3, out: quaternion): void;
+    /**
+     * 构建四元数 通过 一个视线方向向量 和 视窗上方向量
+     * @param dir 视线方向向量
+     * @param upwards 视窗上方向量
+     * @param out 输出的四元数
+     */
     function quatLookRotation(dir: vector3, upwards: vector3, out: quaternion): void;
+    /**
+     * 构建四元数 通过 一个点坐标和一个需要看向目标点坐标 以及视窗上方为单位Y轴
+     * @param pos 点坐标
+     * @param targetpos 目标点坐标
+     * @param out 输出的四元数
+     */
     function quatYAxis(pos: vector3, targetpos: vector3, out: quaternion): void;
-    /** 计算 从 start 到 end 旋转的四元数 */
+    /**
+     * 计算 从 start方向 到 end方向 旋转的四元数
+     * @param start  start方向
+     * @param end end方向
+     * @param out 输出的四元数
+     */
     function quatRotationTo(start: vector3, end: vector3, out: quaternion): void;
+    /**
+     * 构建四元数 通过 一个视线方向向量 以及视窗上方向量
+     * @param dir 视线方向向量
+     * @param out 输出的四元数
+     * @param up 视窗上方向量
+     */
     function myLookRotation(dir: vector3, out: quaternion, up?: vector3): void;
 }
 declare namespace m4m.math {
+    /**
+     * 设置尺寸1 的矩形
+     * @param out 输出的矩形
+     */
     function rectSet_One(out: rect): void;
+    /**
+     * 设置尺寸0 的矩形
+     * @param out 输出的矩形
+     */
     function rectSet_Zero(out: rect): void;
+    /**
+     * 判断 两个矩形是否相等
+     * @param src1 矩形a
+     * @param src2 矩形b
+     * @returns 是相等？
+     */
     function rectEqul(src1: rect, src2: rect): boolean;
     /**
      * 判断点是否在矩形中
@@ -13314,98 +16463,471 @@ declare namespace m4m.math {
      * @param r2 矩形2
      */
     function rectOverlap(r1: rect, r2: rect): boolean;
+    /**
+     * 设置一个矩形的参数
+     * @param out 矩形
+     * @param x 位置x
+     * @param y 位置y
+     * @param w 宽
+     * @param h 高
+     */
     function rectSet(out: rect, x: number, y: number, w: number, h: number): void;
     /**
      * 检测两个矩形是否相碰
-     * @param r1
-     * @param r2
+     * @param r1 矩形1
+     * @param r2 矩形2
      */
     function rectCollided(r1: rect, r2: rect): boolean;
+    /**
+     * 克隆矩形
+     * @param src 源矩形
+     * @param out 输出的被克隆的矩形
+     */
     function rectClone(src: rect, out: rect): void;
 }
 declare namespace m4m.math {
     function caclStringByteLength(value: string): number;
 }
 declare namespace m4m.math {
+    /**
+     * row：图片行数//column:图片列数//index：第几张图片（index从0开始计数）
+     * @param row 行
+     * @param column    列
+     * @param index 索引
+     * @param out 输出的向量
+     */
     function spriteAnimation(row: number, column: number, index: number, out: vector4): void;
+    /**
+     * 沿曲线取点
+     * @param curveStart 曲线开始
+     * @param curveStartHandle 曲线开始控制
+     * @param curveEnd 曲线结束
+     * @param curveEndHandle 曲线结束控制
+     * @param t 进度值
+     * @param out 输出的点
+     * @param crease
+     */
     function GetPointAlongCurve(curveStart: vector3, curveStartHandle: vector3, curveEnd: vector3, curveEndHandle: vector3, t: number, out: vector3, crease?: number): void;
 }
 declare namespace m4m.math {
+    /**
+     * 二维向量相减
+     * @param a 左向量
+     * @param b 右向量
+     * @param out 输出的二维向量
+     */
     function vec2Subtract(a: vector2, b: vector2, out: vector2): void;
+    /**
+     * 二维向量相加
+     * @param a 左向量
+     * @param b 右向量
+     * @param out 输出的二维向量
+     */
     function vec2Add(a: vector2, b: vector2, out: vector2): void;
+    /**
+     * 克隆二维向量
+     * @param from 源二维向量
+     * @param to 输出的二维向量
+     */
     function vec2Clone(from: vector2, to: vector2): void;
+    /**
+     * 计算两向量的坐标距离
+     * @param a 向量a
+     * @param b 向量b
+     * @returns 距离
+     */
     function vec2Distance(a: vector2, b: vector2): number;
+    /**
+     * 通过一个标量 缩放 二维向量
+     * @param from 源二维向量
+     * @param scale 缩放 标量
+     * @param out 输出的二维向量
+     */
     function vec2ScaleByNum(from: vector2, scale: number, out: vector2): void;
+    /**
+     * 通过一个二维向量 缩放 二维向量
+     * @param from 源二维向量
+     * @param scale 缩放 二维向量
+     * @param out 输出的二维向量
+     */
     function vec2ScaleByVec2(from: vector2, scale: vector2, out: vector2): void;
+    /**
+     * 计算一个 二维向量的长度值
+     * @param a 源二维向量
+     * @returns 长度值
+     */
     function vec2Length(a: vector2): number;
+    /**
+     * 计算两个二维向量的线性差值
+     * @param vector 开始向量
+     * @param vector2 结束向量
+     * @param v 差值度（0-1）
+     * @param out 输出的二维向量
+     */
     function vec2SLerp(vector: vector2, vector2: vector2, v: number, out: vector2): void;
+    /**
+     * 计算一个二维向量的归一化
+     * @param from 源二维向量
+     * @param out 输出的二维向量
+     */
     function vec2Normalize(from: vector2, out: vector2): void;
+    /**
+     * 计算两个二维向量的点乘
+     * @param a 向量a
+     * @param b 向量b
+     * @returns 输出标量值
+     */
     function vec2Multiply(a: vector2, b: vector2): number;
+    /**
+     * 计算两个二维向量的点乘
+     * @param lhs 向量a
+     * @param rhs 向量b
+     * @returns 输出标量值
+     */
     function vec2Dot(lhs: vector2, rhs: vector2): number;
+    /**
+     * 判断两个二维向量是否相等
+     * @param vector 向量a
+     * @param vector2 向量b
+     * @param threshold 误差范围
+     * @returns 是相等？
+     */
     function vec2Equal(vector: vector2, vector2: vector2, threshold?: number): boolean;
+    /**
+     * 二维向量的所有维度值（xy） 都 设置为一个标量
+     * @param vector 向量
+     * @param value 标量
+     */
     function vec2SetAll(vector: vector2, value: number): void;
+    /**
+     * 设置 二维向量的各个维度值（xy）
+     * @param vector 向量
+     * @param x x值
+     * @param y y值
+     */
     function vec2Set(vector: vector2, x: number, y: number): void;
 }
 declare namespace m4m.math {
+    /**
+     * 克隆三维向量
+     * @param from 源三维向量
+     * @param to 输出的三维向量
+     */
     function vec3Clone(from: vector3, to: vector3): void;
+    /**
+     * 两三维向量相加
+     * @param a 向量a
+     * @param b 向量b
+     * @param out 输出的三维向量
+     */
     function vec3Add(a: vector3, b: vector3, out: vector3): void;
+    /**
+     * 两三维向量相减
+     * @param a 向量a
+     * @param b 向量b
+     * @param out 输出的三维向量
+     */
     function vec3Subtract(a: vector3, b: vector3, out: vector3): void;
+    /**
+     * 三维向量取反 (等于 * -1)
+     * @param a 向量
+     * @param out 输出的三维向量
+     */
     function vec3Minus(a: vector3, out: vector3): void;
+    /**
+     * 获取三维向量长度标量
+     * @param a 向量
+     * @returns 长度标量
+     */
     function vec3Length(a: vector3): number;
+    /**
+     * 获取三维向量长度平方标量
+     * @param value 向量
+     * @returns 长度平方标量
+     */
     function vec3SqrLength(value: vector3): number;
+    /**
+     * 三维向量 设为 1
+     * @param out 三维向量
+     */
     function vec3Set_One(out: vector3): void;
+    /**
+     * 三维向量 设为标准前方向量
+     * @param out 标准前方向量
+     */
     function vec3Set_Forward(out: vector3): void;
+    /**
+     * 三维向量 设为标准后方向量
+     * @param out 标准后方向量
+     */
     function vec3Set_Back(out: vector3): void;
+    /**
+     * 三维向量 设为标准上方向量
+     * @param out 标准上方向量
+     */
     function vec3Set_Up(out: vector3): void;
+    /**
+     * 三维向量 设为标准下方向量
+     * @param out 标准下方向量
+     */
     function vec3Set_Down(out: vector3): void;
+    /**
+     * 三维向量 设为标准左方向量
+     * @param out 标准左方向量
+     */
     function vec3Set_Left(out: vector3): void;
+    /**
+     * 三维向量 设为标准右方向量
+     * @param out 标准右方向量
+     */
     function vec3Set_Right(out: vector3): void;
+    /**
+     * 三维向量 归一化
+     * @param value 三维向量
+     * @param out 输出的三维向量
+     */
     function vec3Normalize(value: vector3, out: vector3): void;
+    /**
+     * 三维向量 通过 一个三维向量计算缩放
+     * @param from 源三维向量
+     * @param scale 缩放三维向量
+     * @param out 输出的三维向量
+     */
     function vec3ScaleByVec3(from: vector3, scale: vector3, out: vector3): void;
+    /**
+     * 三维向量 通过 一个标量计算缩放
+     * @param from 源三维向量
+     * @param scale 缩放标量
+     * @param out 输出的三维向量
+     */
     function vec3ScaleByNum(from: vector3, scale: number, out: vector3): void;
+    /**
+     * 三维向量 通过 一个另三维向量进行每个维度的积计算
+     * @param a 三维向量a
+     * @param b 三维向量b
+     * @param out 输出的三维向量
+     */
     function vec3Product(a: vector3, b: vector3, out: vector3): void;
+    /**
+     * 两个三维向量 进行 叉乘
+     * @param lhs 三维向量左
+     * @param rhs 三维向量右
+     * @param out 输出的三维向量
+     */
     function vec3Cross(lhs: vector3, rhs: vector3, out: vector3): void;
     /**
-     * 指定两个向量是否平行
-     *
-     * @param lhs 向量
-     * @param rhs 向量
-     * @param precision 精度
+     * 判断指定两个向量是否平行
+     * @param lhs 向量左
+     * @param rhs 向量右
+     * @param precision 误差范围
      */
     function vec3IsParallel(lhs: vector3, rhs: vector3, precision?: number): boolean;
+    /**
+     * 通过指定 法线向量 计算一个方向向量 的 反射方向向量
+     * @param inDirection 方向向量
+     * @param inNormal 法线向量
+     * @param out 反射方向向量
+     */
     function vec3Reflect(inDirection: vector3, inNormal: vector3, out: vector3): void;
+    /**
+     * 两个三维向量 进行 点乘 输出标量结果
+     * @param lhs 向量a
+     * @param rhs 向量b
+     * @returns 标量结果
+     */
     function vec3Dot(lhs: vector3, rhs: vector3): number;
+    /**
+     * @deprecated [已弃用]
+     * 三维向量 Project
+     * @param vector
+     * @param onNormal
+     * @param out
+     */
     function vec3Project(vector: vector3, onNormal: vector3, out: vector3): void;
+    /**
+     * @deprecated [已弃用]
+     * 三维向量 ProjectOnPlane
+     * @param vector
+     * @param planeNormal
+     * @param out
+     */
     function vec3ProjectOnPlane(vector: vector3, planeNormal: vector3, out: vector3): void;
+    /**
+     * @deprecated [已弃用]
+     * 三维向量 Exclude
+     * @param excludeThis
+     * @param fromThat
+     * @param out
+     */
     function vec3Exclude(excludeThis: vector3, fromThat: vector3, out: vector3): void;
+    /**
+     * 计算 一个三维向量的方向 转到  另一个三维向量的方向 的旋转度
+     * @param from 开始向量
+     * @param to 结束向量
+     * @returns 旋转度
+     */
     function vec3Angle(from: vector3, to: vector3): number;
+    /**
+     * 两个三维向量 的距离标量
+     * @param a 向量a
+     * @param b 向量b
+     * @returns 距离标量
+     */
     function vec3Distance(a: vector3, b: vector3): number;
+    /**
+     * 计算三维向量 限制最大长度后的三维向量
+     * @param vector 源三维向量
+     * @param maxLength 最大长度
+     * @param out 输出的三维向量
+     */
     function vec3ClampLength(vector: vector3, maxLength: number, out: vector3): void;
+    /**
+     * 比较两个三维向量 取最小的
+     * @param v0 向量a
+     * @param v1 向量b
+     * @param out 最小的向量
+     */
     function vec3Min(v0: vector3, v1: vector3, out: vector3): void;
+    /**
+     * 比较两个三维向量 取最大的
+     * @param v0 向量a
+     * @param v1 向量b
+     * @param out 最大的向量
+     */
     function vec3Max(v0: vector3, v1: vector3, out: vector3): void;
+    /**
+     * 计算 一个三维向量的方向 转到  另一个三维向量的方向 的旋转度
+     * @param from 开始向量
+     * @param to 结束向量
+     * @returns 旋转度
+     */
     function vec3AngleBetween(from: vector3, to: vector3): number;
+    /**
+     * 三维向量 设为 0
+     * @param out 输出的三维向量
+     */
     function vec3Reset(out: vector3): void;
+    /**
+     * 两个三维向量 线性差值计算
+     * @param vector 开始三维向量
+     * @param vector2 结束三维向量
+     * @param v 差值度（0-1）
+     * @param out 输出的三维向量
+     */
     function vec3SLerp(vector: vector3, vector2: vector3, v: number, out: vector3): void;
+    /**
+     * 通过 各维度值设置 三维向量
+     * @param x x值
+     * @param y y值
+     * @param z z值
+     * @param out 三维向量
+     */
     function vec3SetByFloat(x: number, y: number, z: number, out: vector3): void;
+    /**
+     * @deprecated [已弃用]
+     * 格式化 三维向量 的各维度值
+     * @param vector 向量
+     * @param maxDot
+     * @param out 输出的三维向量
+     */
     function vec3Format(vector: vector3, maxDot: number, out: vector3): void;
+    /**
+     * @deprecated [已弃用]
+     * @param vector
+     * @param maxDot
+     * @param out
+     */
     function quaternionFormat(vector: quaternion, maxDot: number, out: quaternion): void;
+    /**
+     * @deprecated [已弃用]
+     * @param num
+     * @param maxDot
+     * @returns
+     */
     function floatFormat(num: number, maxDot: number): number;
+    /**
+     * 判断两个三维向量是否相等
+     * @param vector 向量a
+     * @param vector2 向量b
+     * @param threshold 误差范围
+     * @returns 是相等？
+     */
     function vec3Equal(vector: vector3, vector2: vector3, threshold?: number): boolean;
+    /**
+     * 将一个三维向量所有维度设置为指定标量
+     * @param vector 向量
+     * @param value 指定标量
+     */
     function vec3SetAll(vector: vector3, value: number): void;
+    /**
+     * 三维向量 设置所有维度 通过指定xyz 标量
+     * @param vector 向量
+     * @param x x值
+     * @param y y值
+     * @param z z值
+     */
     function vec3Set(vector: vector3, x: number, y: number, z: number): void;
-    /** 获取指定 向量的 垂直向量 */
+    /**
+     * 获取指定 三维向量的 垂直向量
+     * @param vector 向量
+     * @param out 输出的垂直向量
+     */
     function vec3Perpendicular(vector: vector3, out: vector3): void;
     function countStart(tag: string): void;
     function count(tag: string): void;
     function countEnd(tag: string): void;
 }
 declare namespace m4m.math {
+    /**
+     * 克隆四维向量
+     * @param from 源四维向量
+     * @param to 输出的四维向量
+     */
     function vec4Clone(from: vector4, to: vector4): void;
+    /**
+     * 两个四维向量 线性差值计算
+     * @param vector 开始四维向量
+     * @param vector2 结束四维向量
+     * @param v 差值度（0-1）
+     * @param out 输出的四维向量
+     */
     function vec4SLerp(vector: vector4, vector2: vector4, v: number, out: vector4): void;
+    /**
+     * 两四维向量相加
+     * @param a 向量a
+     * @param b 向量b
+     * @param out 输出的四维向量
+     */
     function vec4Add(a: m4m.math.vector4, b: m4m.math.vector4, out: m4m.math.vector4): void;
+    /**
+     * 四维向量 通过 一个标量计算缩放
+     * @param from 源四维向量
+     * @param scale 缩放标量
+     * @param out 输出的四维向量
+     */
     function vec4ScaleByNum(from: m4m.math.vector4, scale: number, out: m4m.math.vector4): void;
+    /**
+     * 将一个四维向量所有维度设置为指定标量
+     * @param vector 向量
+     * @param value 指定标量
+     */
     function vec4SetAll(vector: vector4, value: number): void;
+    /**
+    * 四维向量 设置所有维度 通过指定xyz 标量
+    * @param vector 向量
+    * @param x x值
+    * @param y y值
+    * @param z z值
+    * @param w w值
+    */
     function vec4Set(vector: vector4, x: number, y: number, z: number, w: number): void;
+    /**
+     * 判断两个四维向量是否相等
+     * @param vector 向量a
+     * @param vector2 向量b
+     * @param threshold 误差范围
+     * @returns 是相等？
+     */
     function vec4Equal(vector: vector4, vector2: vector4, threshold?: number): boolean;
 }
 declare namespace m4m.framework {
@@ -13414,13 +16936,40 @@ declare namespace m4m.framework {
         y: number;
         z: number;
         realy: number;
+        /**
+         * 克隆
+         * @returns
+         */
         clone(): navVec3;
         static DistAZ(start: navVec3, end: navVec3): number;
+        /**
+         * Normal
+         * @returns
+         */
         static NormalAZ(start: navVec3, end: navVec3): navVec3;
+        /**
+         * 叉乘
+         * @returns
+         */
         static Cross(start: navVec3, end: navVec3): navVec3;
+        /**
+         * 点乘
+         * @returns
+         */
         static DotAZ(start: navVec3, end: navVec3): number;
+        /**
+         * 旋转度
+         * @returns
+         */
         static Angle(start: navVec3, end: navVec3): number;
+        /**
+         * 边界
+         * @returns
+         */
         static Border(start: navVec3, end: navVec3, dist: number): navVec3;
+        /**
+         * 线性差值
+         */
         static lerp(from: navVec3, to: navVec3, lerp: number, out: navVec3): void;
     }
     class navNode {
@@ -13429,9 +16978,24 @@ declare namespace m4m.framework {
         borderByPoly: string[];
         borderByPoint: string[];
         center: navVec3;
+        /**
+         * 生成边界
+         */
         genBorder(): void;
+        /**
+         * 链接到
+         * @returns
+         */
         isLinkTo(info: navMeshInfo, nid: number): string;
+        /**
+         * 获取链接
+         * @returns
+         */
         getLinked(info: navMeshInfo): number[];
+        /**
+         * 生成中心点
+         * @returns
+         */
         genCenter(info: navMeshInfo): void;
     }
     class navBorder {
@@ -13451,10 +17015,27 @@ declare namespace m4m.framework {
         };
         min: navVec3;
         max: navVec3;
+        /**
+         * 计算边界
+         */
         calcBound(): void;
         private static cross;
+        /**
+         * 在多边形中
+         * @param p
+         * @param poly
+         * @returns
+         */
         inPoly(p: navVec3, poly: number[]): boolean;
+        /**
+         * 生成边界
+         */
         genBorder(): void;
+        /**
+         * 加载mesh信息
+         * @param s 字符串数据
+         * @returns 导航mesh信息
+         */
         static LoadMeshInfo(s: string): navMeshInfo;
     }
 }
@@ -13495,12 +17076,37 @@ declare namespace m4m.framework {
          * @param dataStr 寻路网格信息
          */
         private navmeshLoaded;
+        /**
+         * 构建mesh 并返回
+         * @param meshData mesh数据
+         * @param webgl webgl上下文
+         * @returns 输出的mesh
+         */
         private createMesh;
+        /**
+         * 渲染显示 导航网格
+         * @param isshow 是否显示
+         * @param material 渲染材质
+         */
         showNavmesh(isshow: boolean, material?: m4m.framework.material): void;
+        /**
+         * 销毁
+         */
         dispose(): void;
         static get Instance(): NavMeshLoadManager;
+        /**
+         * 计算获取 从开始点 移动到 结束点 的所有路径坐标列表
+         * @param startPos 开始点
+         * @param endPos 结束点
+         * @returns 路径坐标列表
+         */
         moveToPoints(startPos: m4m.math.vector3, endPos: m4m.math.vector3): Array<m4m.math.vector3>;
-        /** 获取指定位置的三角形索引*/
+        /**
+         * 获取指定位置的三角形面索引
+         * @param point 坐标
+         * @param trans 导航网格场景节点对象
+         * @returns 三角形面索引
+         */
         static findtriIndex(point: m4m.math.vector3, trans: m4m.framework.transform): number;
     }
 }
@@ -13510,17 +17116,66 @@ declare namespace m4m.framework {
             [id: number]: number;
         };
         navinfo: navMeshInfo;
+        /**
+         * 导航器
+         * @param navinfo  导航信息
+         * @param navindexmap 导航索引字典
+         */
         constructor(navinfo: m4m.framework.navMeshInfo, navindexmap: any);
+        /**
+         * 通过指定 开始和结束位置 获取所有的路径点
+         * @param start 开始位置
+         * @param end 结束位置
+         * @param startIndex 开始的三角形面索引
+         * @param endIndex 结束的三角形面索引
+         * @returns 所有的路径点
+         */
         pathPoints(start: m4m.math.vector3, end: m4m.math.vector3, startIndex: number, endIndex: number): Array<m4m.math.vector3>;
+        /** 销毁清理 */
         dispose(): void;
     }
 }
 declare namespace m4m.framework {
     class pathFinding {
+        /**
+         * 计算A星多边形路径
+         * @param info 导航网格信息
+         * @param startPoly 开始的多边形
+         * @param endPoly 结束的多边形
+         * @param endPos 结束位置
+         * @param offset 偏移
+         * @returns 输出的多变形路径列表
+         */
         static calcAStarPolyPath(info: navMeshInfo, startPoly: number, endPoly: number, endPos?: navVec3, offset?: number): number[];
+        /** @deprecated [已弃用] */
         private static NearAngle;
+        /**
+         * 找路
+         * @param info 导航网格信息
+         * @param startPos 开始点
+         * @param endPos 结束始点
+         * @param offset 偏移
+         * @returns 输出的路径坐标列表
+         */
         static FindPath(info: navMeshInfo, startPos: navVec3, endPos: navVec3, offset?: number): navVec3[];
+        /**
+         * 计算路点
+         * @param info 导航网格信息
+         * @param startPos 开始点
+         * @param endPos 结束始点
+         * @param polyPath 多边形路径
+         * @param offset 偏移
+         * @returns 输出的路径坐标列表
+         */
         static calcWayPoints(info: navMeshInfo, startPos: navVec3, endPos: navVec3, polyPath: number[], offset?: number): navVec3[];
+        /**
+         * 边界相交
+         * @param a
+         * @param b
+         * @param c
+         * @param d
+         * @returns
+         */
         static intersectBorder(a: navVec3, b: navVec3, c: navVec3, d: navVec3): navVec3;
     }
 }
@@ -13539,21 +17194,40 @@ declare namespace m4m.framework {
         private lastGoal;
         private currMoveDir;
         private _RoadPoints;
+        /**
+         * 设置路点
+         * @param goalQueue 目标点队列
+         */
         setRoadPoints(goalQueue: m4m.math.vector3[]): void;
+        /** 添加代理 */
         addAgent(key: number, transform: m4m.framework.transform, radius: number, attackRanges: number, speed: number): void;
+        /** 移除代理 */
         removeAgent(key: number): void;
+        /** 重编HashMap */
         private reBuildHashMap;
+        /** 通过key获取变换节点 */
         getTransformByKey(key: number): m4m.framework.transform;
+        /** 设置 代理半径 */
         setRadius(id: number, value: number): void;
+        /** 设置代理最大移动速度 */
         setSpeed(id: number, value: number): void;
+        /** 设置搜索区域 */
         setAttackRange(id: number, value: number): void;
+        /** 关闭功能 */
         disable(): void;
+        /** 开启功能 */
         enable(): void;
+        /** 更新 */
         update(): void;
+        /** 是静态？ */
         private isAlmostStatic;
+        /** RVO 系统走一步 */
         private RVO_walking;
+        /** 更新引擎变换节点 */
         private updateTransform;
+        /** RVO 系统检查目标点 */
         private RVO_check;
+        /** 计算2d方向 */
         private cal2dDir;
     }
 }
@@ -13567,7 +17241,9 @@ declare namespace m4m.framework {
         elementDic: {
             [name: string]: EffectElementData;
         };
+        /** 克隆对象 */
         clone(): EffectSystemData;
+        /** 销毁对象 */
         dispose(): void;
     }
     /**
@@ -13592,7 +17268,12 @@ declare namespace m4m.framework {
         actionActive: boolean;
         loopFrame: number;
         active: boolean;
+        /**
+         * 特效元素
+         * @param _data 元素数据
+         */
         constructor(_data: EffectElementData);
+        /** 记录 例子元素 差值属性 */
         private recordElementLerpAttributes;
         /**
          * 录制插值数据
@@ -13608,8 +17289,16 @@ declare namespace m4m.framework {
          * 记录插值
          */
         private recordLerp;
+        /**
+         * 初始化
+         */
         initActions(): void;
+        /** 更新 */
         update(): void;
+        /**
+         * 更新元素旋转
+         * @returns
+         */
         private updateElementRotation;
         /**
          * 当前帧的数据是否有变化，有变化才需要去刷新batcher，否则直接用当前batcher中的数据去提交渲染即可。
@@ -13620,7 +17309,9 @@ declare namespace m4m.framework {
          * @param frameIndex
          */
         isCurFrameNeedRefresh(frameIndex: number): boolean;
+        /** 设置激活 */
         setActive(_active: boolean): void;
+        /** 销毁 */
         dispose(): void;
     }
     /**
@@ -13638,7 +17329,9 @@ declare namespace m4m.framework {
         actionData: EffectActionData[];
         emissionData: Emission;
         initFrameData: EffectFrameData;
+        /** 克隆 */
         clone(): EffectElementData;
+        /** 销毁 */
         dispose(): void;
     }
     /**
@@ -13684,10 +17377,27 @@ declare namespace m4m.framework {
          * @memberof EffectAttrsData
          */
         setLerpAttribute(attribute: string, val: any): void;
+        /**
+         * 获取属性
+         * @param attribute 属性字符串数据
+         * @returns 属性
+         */
         getAttribute(attribute: string): any;
+        /**
+         * 初始化属性
+         * @param attribute 属性字符串数据
+         */
         initAttribute(attribute: string): void;
+        /**
+         * 重置矩阵
+         */
         resetMatrix(): void;
+        /**
+         * 拷贝和初始化
+         * @returns
+         */
         copyandinit(): EffectAttrsData;
+        /** 克隆 */
         clone(): EffectAttrsData;
     }
     /**
@@ -13698,7 +17408,9 @@ declare namespace m4m.framework {
         attrsData: EffectAttrsData;
         lerpDatas: EffectLerpData[];
         delayTime: number;
+        /** 克隆 */
         clone(): EffectFrameData;
+        /** 销毁 */
         dispose(): void;
     }
     /**
@@ -13710,6 +17422,7 @@ declare namespace m4m.framework {
         toFrame: ValueData;
         attrsData: EffectAttrsData;
         attrsList: any[];
+        /** 克隆 */
         clone(): EffectLerpData;
     }
     /**
@@ -13720,6 +17433,7 @@ declare namespace m4m.framework {
         startFrame: number;
         endFrame: number;
         params: any;
+        /** 克隆 */
         clone(): EffectActionData;
     }
     /**
@@ -13730,7 +17444,9 @@ declare namespace m4m.framework {
         diffuseTexture: texture;
         alphaTexture: texture;
         alphaCut: number;
+        /** 是否相等 */
         static beEqual(data0: EffectMatData, data1: EffectMatData): boolean;
+        /** 克隆 */
         clone(): EffectMatData;
     }
     enum EffectBatcherState {
@@ -13771,6 +17487,7 @@ declare namespace m4m.framework {
          * @memberof effect
          */
         resizeVboSize(value: number): void;
+        /** 销毁 */
         dispose(): void;
         /**
          * 顶点大小
@@ -13779,6 +17496,10 @@ declare namespace m4m.framework {
          * @memberof effect
          */
         vertexSize: number;
+        /**
+         * 特效数据
+         * @param formate
+         */
         constructor(formate: number);
     }
     /**
@@ -13846,6 +17567,9 @@ declare namespace m4m.framework {
         *  在发射时间内发射粒子个数
         */
         count: number;
+        /**
+         * 发射数据
+         */
         constructor();
     }
 }
@@ -13967,16 +17691,36 @@ declare namespace m4m.framework {
         mesh: mesh;
         particleStartData: m4m.framework.ParticleStartData;
         private dataForVbo;
+        /**
+         * 获取 vbo 数据
+         * @param vf 顶点格式数据
+         * @returns vbo 数据
+         */
         getVboData(vf: number): Float32Array;
+        /** 克隆 */
         clone(): Emission;
+        /**
+         * 获取世界旋转
+         */
         getworldRotation(): void;
+        /**
+         * 克隆例子节点数组
+         * @param _array 例子节点数组
+         * @returns 输出克隆
+         */
         cloneParticleNodeArray(_array: Array<ParticleNode>): ParticleNode[];
+        /**
+         * 克隆例子节点值数组
+         * @param _array 例子节点值数组
+         * @returns 输出克隆
+         */
         cloneParticleNodeNumberArray(_array: Array<ParticleNodeNumber>): ParticleNodeNumber[];
     }
     class UVSprite {
         row: number;
         column: number;
         totalCount: number;
+        /** 克隆 */
         clone(): UVSprite;
     }
     class UVRoll {
@@ -13985,6 +17729,7 @@ declare namespace m4m.framework {
         */
         uvSpeed: UVSpeedNode;
         uvSpeedNodes: Array<UVSpeedNode>;
+        /** 克隆 */
         clone(): UVRoll;
     }
     enum UVTypeEnum {
@@ -14005,9 +17750,24 @@ declare namespace m4m.framework {
         y: ValueData;
         z: ValueData;
         key: number;
+        /**
+         * 粒子节点
+         */
         constructor();
+        /**
+         * 获取值
+         * @returns 值
+         */
         getValue(): m4m.math.vector3;
+        /**
+         * 获取一个随机值
+         * @returns 一个随机值
+         */
         getValueRandom(): m4m.math.vector3;
+        /**
+         * 克隆
+         * @returns 克隆一个节点
+         */
         clone(): ParticleNode;
     }
     /**
@@ -14016,6 +17776,10 @@ declare namespace m4m.framework {
     class AlphaNode {
         alpha: ValueData;
         key: number;
+        /**
+         * 获取值
+         * @returns 值
+         */
         getValue(): number;
     }
     /**
@@ -14025,8 +17789,20 @@ declare namespace m4m.framework {
         u: ValueData;
         v: ValueData;
         key: number;
+        /**
+         * 获取值
+         * @returns 值
+         */
         getValue(): m4m.math.vector2;
+        /**
+         * 获取随机值
+         * @returns 随机值
+         */
         getValueRandom(): m4m.math.vector2;
+        /**
+         * 克隆
+         * @returns
+         */
         clone(): UVSpeedNode;
     }
     /**
@@ -14036,8 +17812,17 @@ declare namespace m4m.framework {
         x: ValueData;
         y: ValueData;
         key: number;
+        /**
+         * 获取值
+         * @returns 值
+         */
         getValue(): m4m.math.vector2;
+        /**
+         * 获取随机值
+         * @returns 随机值
+         */
         getValueRandom(): m4m.math.vector2;
+        /** 克隆 */
         clone(): ParticleNodeVec2;
     }
     /**
@@ -14046,8 +17831,20 @@ declare namespace m4m.framework {
     class ParticleNodeNumber {
         num: ValueData;
         key: number;
+        /**
+         * 获取值
+         * @returns 值
+         */
         getValue(): number;
+        /**
+         * 获取随机值
+         * @returns 随机值
+         */
         getValueRandom(): number;
+        /**
+         * 克隆
+         * @returns
+         */
         clone(): ParticleNodeNumber;
     }
 }
@@ -14102,7 +17899,16 @@ declare namespace m4m.framework {
         get coneDirection(): m4m.math.vector3;
         get circleDirection(): m4m.math.vector3;
         get edgeDirection(): math.vector3;
+        /**
+         * 获取位置坐标
+         * @param dir 方向向量
+         * @param length    长度
+         */
         private getposition;
+        /**
+         * 克隆
+         * @returns
+         */
         clone(): ParticleStartData;
     }
     /**
@@ -14126,6 +17932,10 @@ declare namespace m4m.framework {
         set value(_v: number);
         set valueLimitMin(_v: number);
         set valueLimitMax(_v: number);
+        /**
+         * 克隆
+         * @returns
+         */
         clone(): ValueData;
         /**
          * 针对随机类型，只要随机过一次就保持这个值不变
@@ -14143,7 +17953,17 @@ declare namespace m4m.framework {
          * @memberof ValueData
          */
         getValueRandom(): number;
+        /**
+         * 值数据
+         */
         constructor();
+        /**
+         * 计算一个随机变量值
+         * @param min 最小数
+         * @param max 最大数
+         * @param isInteger 是Int 类型
+         * @returns 值
+         */
         static RandomRange(min: number, max: number, isInteger?: boolean): number;
     }
 }
@@ -14185,27 +18005,77 @@ declare namespace m4m.framework {
         private sizeNodes;
         private colorNodes;
         private alphaNodes;
+        /**
+         * 根据发射器定义 初始化
+         * @param batcher 发射器合批
+         */
         constructor(batcher: EmissionBatcher_new);
+        /**
+         * 更新数据
+         * @param array 数据
+         */
         uploadData(array: Float32Array): void;
+        /**
+         * 初始化数据
+         */
         initByData(): void;
         actived: boolean;
+        /**
+         * 更新
+         * @param delta
+         */
         update(delta: number): void;
         /**
          * 在emission是在simulate in local space 时候，为matTobathcer
          * 在emission是在simulate in world space 时候，为matToWorld
          */
         private transformVertex;
+        /**
+         * 更新本地矩阵
+         * @param delta
+         */
         private _updateLocalMatrix;
         private matToworld;
+        /**
+         * 刷新粒子发射数据
+         */
         private refreshEmissionData;
+        /**
+         * 更新旋转
+         * @param delta
+         */
         private _updateRotation;
+        /**
+         * 更新位置
+         * @param delta
+         */
         private _updatePos;
+        /**
+         * 更新欧拉旋转
+         * @param delta
+         */
         private _updateEuler;
+        /**
+         * 更新缩放
+         * @param delta
+         */
         private _updateScale;
+        /**
+         * 更新颜色
+         * @param delta
+         */
         private _updateColor;
         private spriteIndex;
+        /**
+         * 更新UV
+         * @param delta
+         */
         private _updateUV;
+        /**
+         * 更新VBO
+         */
         private _updateVBO;
+        /** 销毁 */
         dispose(): void;
     }
 }
@@ -14221,6 +18091,7 @@ declare namespace m4m.framework {
         actions: {
             [frameIndex: number]: IEffectAction[];
         };
+        /** 初始化 */
         init(): any;
     }
     class Vector3AttributeData implements IAttributeData, ILerpAttributeInterface {
@@ -14234,7 +18105,11 @@ declare namespace m4m.framework {
         actions: {
             [frameIndex: number]: IEffectAction[];
         };
+        /**
+         * 三维向量属性数据
+         */
         constructor();
+        /** 初始化 */
         init(): void;
         addFramePoint(data: FrameKeyPointData, func?: Function): void;
         removeFramePoint(frameId: number, data: any, func?: Function): void;
@@ -14251,7 +18126,11 @@ declare namespace m4m.framework {
         actions: {
             [frameIndex: number]: IEffectAction[];
         };
+        /**
+         * 二维向量属性数据
+         */
         constructor();
+        /** 初始化 */
         init(): void;
         addFramePoint(data: FrameKeyPointData, func?: Function): void;
         removeFramePoint(frameId: number, data: m4m.math.vector2, func?: Function): void;
@@ -14271,15 +18150,35 @@ declare namespace m4m.framework {
         actions: {
             [frameIndex: number]: IEffectAction[];
         };
+        /**
+         * 标量属性数据
+         */
         constructor();
+        /** 初始化 */
         init(): void;
         addFramePoint(data: any, func?: Function): void;
         removeFramePoint(frameId: number, data: number, func?: Function): void;
         updateFramePoint(data: any, func?: Function): void;
     }
     interface ILerpAttributeInterface {
+        /**
+         * 添加帧数据
+         * @param data  帧点数据
+         * @param func 回调函数
+         */
         addFramePoint(data: any, func?: Function): any;
+        /**
+         * 移除帧数据
+         * @param frameId 帧ID
+         * @param data 数据
+         * @param func 回调函数
+         */
         removeFramePoint(frameId: number, data: any, func?: Function): any;
+        /**
+         * 更新帧数据
+         * @param data 数据
+         * @param func 回调函数
+         */
         updateFramePoint(data: any, func?: Function): any;
     }
     enum AttributeUIState {
@@ -14301,9 +18200,19 @@ declare namespace m4m.framework {
         frameIndex: number;
         val: any;
         actions: IEffectAction[];
+        /**
+         * 关键帧数据
+         * @param frameIndex 帧索引
+         * @param val 值
+         */
         constructor(frameIndex: number, val: any);
     }
     class AttributeUtil {
+        /**
+         * 添加指定帧数据
+         * @param datas 数据
+         * @param index 帧索引
+         */
         static addFrameIndex(datas: number[], index: number): void;
     }
 }
@@ -14315,7 +18224,9 @@ declare namespace m4m.framework {
         delayTime: number;
         mat: material;
         mesh: mesh;
+        /** 写成josn 数据 */
         writeToJson(obj: any): any;
+        /** 销毁 */
         dispose(): any;
     }
     enum AttributeType {
@@ -14352,11 +18263,27 @@ declare namespace m4m.framework {
         private effectSys;
         rotationByEuler: math.quaternion;
         localRotation: math.quaternion;
+        /**
+         * 特效元素
+         * @param sys test特效系统
+         * @param data 特效元素数据
+         */
         constructor(sys: TestEffectSystem, data?: EffectElementData);
+        /**
+         * 初始化通过元素数据
+         * @param data 特效元素数据
+         */
         private initByElementdata;
+        /**
+         * 初始化默认数据
+         */
         private initByDefData;
         writeToJson(obj: any): any;
+        /** 更新 */
         update(): void;
+        /**
+         * 更新特效元素的旋转
+         */
         private updateElementRotation;
         dispose(): void;
     }
@@ -14424,31 +18351,102 @@ declare namespace m4m.framework {
         private beBurst;
         private numcount;
         private beover;
+        /**
+         * 特效元素发射器
+         * @param sys test特效系统
+         * @param data 特效数据
+         */
         constructor(sys: TestEffectSystem, data?: EffectElementData);
+        /**
+         * 初始化 设置默认值粒子数据
+         */
         private initDefparticleData;
+        /**
+         * 初始化发射数据
+         * @param data 数据
+         */
         private initByEmissonData;
         private worldRotation;
+        /**
+         * 获取世界旋转
+         * @returns 旋转四元数
+         */
         getWorldRotation(): m4m.math.quaternion;
         matToObj: m4m.math.matrix;
         private matToWorld;
+        /**
+         * 计算 转到 Object 空间的 矩阵
+         */
         getmatrixToObj(): void;
+        /**
+         *   计算 转到 世界 空间的 矩阵
+         * @returns 矩阵
+         */
         getmatrixToWorld(): m4m.math.matrix;
+        /** 更新 */
         update(delta: number): void;
+        /**
+         * 更新 合批
+         * @param delta
+         */
         private updateBatcher;
+        /**
+         * 更新 发射粒子生命周期
+         * @param delta
+         * @returns
+         */
         private updateLife;
+        /**
+         * 重新初始化
+         */
         private reInit;
+        /**
+         * 更新粒子发射
+         */
         private updateEmission;
+        /**
+         * 添加粒子
+         * @param count 数量
+         */
         private addParticle;
+        /**
+         * 添加合批
+         */
         private addBatcher;
         private _renderCamera;
         get renderCamera(): camera;
+        /**
+         * 执行渲染
+         * @param context 渲染上下文
+         * @param assetmgr 资源管理器
+         * @param camera 相机
+         */
         render(context: renderContext, assetmgr: assetMgr, camera: m4m.framework.camera): void;
+        /**
+         * 销毁
+         */
         dispose(): void;
         vbo: Float32Array;
         private ebo;
+        /**
+         * 获取mesh
+         * @returns mesh
+         */
         private getMesh;
+        /**
+         * 克隆mesh 的vBO
+         * @returns
+         */
         cloneMeshVBO(): Float32Array;
+        /**
+         * 克隆mesh 的EBO
+         * @returns
+         */
         cloneMeshEBO(): Uint16Array;
+        /**
+         * 写成json数据
+         * @param obj
+         */
         writeToJson(obj: any): void;
     }
 }
@@ -14464,20 +18462,55 @@ declare namespace m4m.framework {
         dataForVbo: Float32Array;
         dataForEbo: Uint16Array;
         particles: Particle_new[];
+        /**
+         * 发射器合批
+         * @param emissionElement 特效发射器元素
+         */
         constructor(emissionElement: EffectElementEmission);
+        /** 初始化mesh */
         private initMesh;
         curVerCount: number;
         curIndexCount: number;
+        /**
+         * 添加 粒子
+         */
         addParticle(): void;
+        /**
+         * 刷新 缓冲区
+         */
         private refreshBuffer;
+        /**
+         * 更新
+         * @param delta
+         */
         update(delta: number): void;
+        /**
+         * 执行渲染
+         * @param context 渲染上下文
+         * @param assetmgr 资源管理器
+         * @param camera 相机
+         */
         render(context: renderContext, assetmgr: assetMgr, camera: m4m.framework.camera): void;
+        /**
+         * 销毁
+         */
         dispose(): void;
     }
 }
 declare namespace m4m.framework {
     class effTools {
+        /**
+         * 获取随机方向和位置 通过 粒子发射器
+         * @param emission 粒子发射器
+         * @param outDir 输出方向
+         * @param outPos 输出位置
+         */
         static getRandomDirAndPosByZEmission(emission: EffectElementEmission, outDir: m4m.math.vector3, outPos: m4m.math.vector3): void;
+        /**
+         * 获取纹理的 ST值
+         * @param emission 特效元素发射
+         * @param out_St 纹理的ST值
+         */
         static getTex_ST(emission: EffectElementEmission, out_St: math.vector4): void;
     }
 }
@@ -14526,6 +18559,11 @@ declare namespace m4m.framework {
          * @param nbPoints
          */
         static CreateCubicBezier(v0: m4m.math.vector3, v1: m4m.math.vector3, v2: m4m.math.vector3, v3: m4m.math.vector3, bezierPointNum: number): Curve3;
+        /**
+         * 曲线
+         * @param points 点列表
+         * @param nbPoints nb点列表
+         */
         constructor(points: m4m.math.vector3[], nbPoints: number);
         /**
          * 贝塞尔曲线上的点
@@ -14543,7 +18581,18 @@ declare namespace m4m.framework {
         startFrame: number;
         endFrame: number;
         elements: EffectElement;
+        /**
+         * 初始化
+         * @param _startFrame 开始帧
+         * @param _endFrame 结束帧
+         * @param _params 参数
+         * @param _elements 特效元素
+         */
         init(_startFrame: number, _endFrame: number, _params: any, _elements: EffectElement): any;
+        /**
+         * 更新
+         * @param frameIndex 帧索引
+         */
         update(frameIndex: number): any;
     }
     /**
@@ -14708,7 +18757,14 @@ declare namespace m4m.framework {
         init(_startFrame: number, _endFrame: number, _params: any, _elements: EffectElement): void;
         curTargetFrame: number;
         update(frameIndex: number): void;
+        /**
+         * 执行交换
+         */
         swap(): void;
+        /**
+         * 获取线性差值
+         * @param frameIndex 帧索引
+         */
         getLerpValue(frameIndex: number): any;
     }
 }
@@ -14743,7 +18799,17 @@ declare namespace m4m.framework {
          * 解析单mesh类型的特效数据
          */
         _parseSingleMeshTypeData(elementData: any, element: EffectElementData): void;
+        /**
+         * 解析发射类型数据
+         * @param elementData 特效元素数据
+         * @param element 特效元素
+         */
         _parseEmissionTypeData(elementData: any, element: EffectElementData): void;
+        /**
+         * 解析发射形状
+         * @param _startdata 开始数据
+         * @param element 特效元素
+         */
         _parseEmissionShape(_startdata: any, element: EffectElementData): void;
         /**
          * 解析属性数据
@@ -14789,20 +18855,108 @@ declare namespace m4m.framework {
      * @private
      */
     class EffectUtil {
+        /**
+         * 通过轴计算注视
+         * @param pos 眼睛的位置
+         * @param xAxis x轴
+         * @param yAxis y轴
+         * @param zAxis z轴
+         * @param targetpos 目标位置
+         * @param quat 四元数
+         */
         static lookatbyXAxis(pos: m4m.math.vector3, xAxis: m4m.math.vector3, yAxis: m4m.math.vector3, zAxis: m4m.math.vector3, targetpos: m4m.math.vector3, quat: m4m.math.quaternion): void;
+        /**
+         * 通过旋转四元素获取欧拉旋转
+         * @param out 输出欧拉旋转
+         * @param q 旋转四元素
+         * @param order 排序方式
+         */
         static eulerFromQuaternion(out: math.vector3, q: math.quaternion, order: any): void;
+        /**
+         * 范围内随机  isInteger是否为整数
+         * @param min 最小值
+         * @param max 最大值
+         * @param isInteger 是Int
+         * @returns 输出值
+         */
         static RandomRange(min: number, max: number, isInteger?: boolean): number;
+        /**
+         * 向量缩放 通过指定标量
+         * @param vec 向量
+         * @param num 指定标量
+         * @returns 输出向量
+         */
         static vecMuliNum(vec: m4m.math.vector3, num: number): m4m.math.vector3;
+        /**
+         * 解析向量
+         * @param value 数据
+         * @returns 向量
+         */
         static parseVector3(value: any): m4m.math.vector3;
+        /**
+         * 解析特效三维向量 粒子节点
+         * @param value 数据
+         * @returns  向量粒子节点
+         */
         static parseEffectVec3(value: any): ParticleNode;
+        /**
+         * 解析特效二维向量粒子节点
+         * @param value 数据
+         * @returns 向量粒子节点
+         */
         static parseEffectVec2(value: any): ParticleNodeVec2;
+        /**
+         * 解析特效 标量粒子节点
+         * @param value 数据
+         * @returns 标量粒子节点
+         */
         static parseEffectNum(value: any): ParticleNodeNumber;
+        /**
+         * 解析特效 标量粒子节点
+         * @param value 数据
+         * @returns 标量粒子节点
+         */
         static parseEffectNumNode(value: any): ParticleNodeNumber;
+        /**
+         * 解析特效 标量粒子节点
+         * @param value 数据
+         * @returns 标量粒子节点
+         */
         static parseEffectValueData(value: any): ValueData;
+        /**
+         * 解析特效 UV节点
+         * @param value 数据
+         * @returns UV节点
+         */
         static parseEffectUVSpeed(value: any): UVSpeedNode;
+        /**
+         * 计算注视
+         * @param eye 眼睛的位置
+         * @param targetpos 目标位置
+         * @param out 输出的四元数旋转
+         * @param up 视窗上方向
+         */
         static lookat(eye: m4m.math.vector3, targetpos: m4m.math.vector3, out: m4m.math.quaternion, up?: m4m.math.vector3): void;
+        /**
+         * 计算一个三维向量朝着 指定方向旋转
+         * @param source 三维向量
+         * @param direction 方向
+         * @param out 输出三维向量
+         */
         static RotateVector3(source: m4m.math.vector3, direction: m4m.math.vector3, out: m4m.math.vector3): void;
+        /**
+         *  计算绑定轴 广告板旋转
+         * @param localAxis 本地轴
+         * @param out 输出旋转
+         */
         static bindAxisBillboard(localAxis: m4m.math.vector3, out: m4m.math.quaternion): void;
+        /**
+         * 计算 注视 垂直 广告板 旋转
+         * @param eye 眼睛位置
+         * @param targetpos 目标位置
+         * @param out 输出旋转
+         * @param up 视窗上方向
+         */
         static lookatVerticalBillboard(eye: m4m.math.vector3, targetpos: m4m.math.vector3, out: m4m.math.quaternion, up?: m4m.math.vector3): void;
         /**
         * 沿Z轴旋转
@@ -14838,14 +18992,40 @@ declare namespace m4m.framework {
         particles: Particle[];
         private vertexSize;
         vf: number;
+        /**
+         * 发射器合批
+         * @param emissionElement 发射器元素
+         */
         constructor(emissionElement: EmissionElement);
+        /**
+         * 初始化mesh
+         */
         initMesh(): void;
         curVerCount: number;
         curIndexCount: number;
+        /**
+         * 添加粒子
+         */
         addParticle(): void;
+        /**
+         * 刷新缓冲区
+         */
         private refreshBuffer;
+        /**
+         * 更新
+         * @param delta
+         */
         update(delta: number): void;
+        /**
+         * 执行渲染
+         * @param context   渲染上下文
+         * @param assetmgr 资源管理器
+         * @param camera 相机
+         */
         render(context: renderContext, assetmgr: assetMgr, camera: m4m.framework.camera): void;
+        /**
+         * 销毁
+         */
         dispose(): void;
     }
 }
@@ -14887,39 +19067,106 @@ declare namespace m4m.framework {
         dataForEbo: Uint16Array;
         private emissionMatToWorld;
         private emissionWorldRotation;
+        /**
+         * 根据发射器定义 初始化
+         * @param batcher 发射器合批
+         */
         constructor(batcher: EmissionBatcher);
+        /**
+         * 更新数据
+         * @param array 数据
+         */
         uploadData(array: Float32Array): void;
+        /**
+         * 初始化
+         */
         initByData(): void;
         actived: boolean;
+        /**
+         * 更新
+         * @param delta
+         */
         update(delta: number): void;
         /**
          * 在emission是在simulate in local space 时候，为matTobathcer
          * 在emission是在simulate in world space 时候，为matToWorld
          */
         private transformVertex;
+        /**
+         * 更新本地矩阵
+         * @param delta
+         */
         private _updateLocalMatrix;
         private matToworld;
+        /**
+         * 刷新粒子发射数据
+         */
         private refreshEmissionData;
+        /**
+         * 更新旋转
+         * @param delta
+         */
         private _updateRotation;
+        /**
+         * 更新元素旋转
+         */
         private _updateElementRotation;
+        /**
+         * 更新位置
+         * @param delta
+         */
         private _updatePos;
+        /**
+         * 更新欧拉旋转
+         * @param delta
+         * @returns
+         */
         private _updateEuler;
         private _startNode;
         private endNode;
+        /**
+         * 更新缩放
+         * @param delta
+         */
         private _updateScale;
+        /**
+         * 更新颜色
+         * @param delta
+         */
         private _updateColor;
         private tempStartNode;
         private tempEndNode;
+        /**
+         * 更新节点
+         * @param nodes 节点列表
+         * @param life 生命时长
+         * @param out 出书数据
+         * @param nodetype 节点类型
+         */
         private _updateNode;
         private _startNodeNum;
         private _curNodeNum;
+        /**
+         * 更新 半透值
+         * @param delta
+         */
         private _updateAlpha;
         private _startUVSpeedNode;
         private _curUVSpeedNode;
         private spriteIndex;
+        /**
+         * 更新UV
+         * @param delta
+         */
         private _updateUV;
         private tex_ST;
+        /**
+         * 更新VBO
+         */
         private _updateVBO;
+        /**
+         * 销毁
+         */
         dispose(): void;
     }
     /**
@@ -14939,11 +19186,36 @@ declare namespace m4m.framework {
         emissionElements: EmissionElement[];
         vf: number;
         effectSys: effectSystem;
+        /**
+         * 粒子发射器
+         * @param sys 粒子系统
+         */
         constructor(sys: effectSystem);
+        /**
+         * 添加粒子发射
+         * @param _emissionNew 特效元素数据
+         */
         addEmission(_emissionNew: EffectElementData): void;
+        /**
+         * 通过发射更新粒子
+         * @param delta
+         */
         updateForEmission(delta: number): void;
+        /**
+         * 更新
+         * @param delta
+         */
         update(delta: number): void;
+        /**
+         * 执行渲染
+         * @param context   渲染上下文
+         * @param assetmgr 资源管理器
+         * @param camera 相机
+         */
         render(context: renderContext, assetmgr: assetMgr, camera: m4m.framework.camera): void;
+        /**
+         * 销毁
+         */
         dispose(): void;
     }
     /**
@@ -14973,6 +19245,12 @@ declare namespace m4m.framework {
         private curTime;
         private numcount;
         private isover;
+        /**
+         * 粒子
+         * @param _emission 发射器数据
+         * @param sys 特效系统
+         * @param mgr 粒子管理器
+         */
         constructor(_emission: EffectElementData, sys: effectSystem, mgr: Particles);
         private worldRotation;
         getWorldRotation(): m4m.math.quaternion;
@@ -15088,6 +19366,12 @@ declare namespace m4m.framework {
      */
     class ParticleSystemEvent extends AEvent {
         On<K extends keyof GameObjectEventMap>(event: K, func: (args: GameObjectEventMap[K]) => void, thisArg: any): void;
+        /**
+         * 移除事件监听者
+         * @param event 事件类型
+         * @param func 事件触发回调方法
+         * @param thisArg 回调方法执行者
+         */
         Off<K extends keyof GameObjectEventMap>(event: K, func: (args: GameObjectEventMap[K]) => void, thisArg: any): void;
         Emit<K extends keyof GameObjectEventMap>(event: K, args: GameObjectEventMap[K]): void;
     }
@@ -15283,6 +19567,9 @@ declare namespace m4m.framework {
         remove(): void;
         clone(): void;
         gameObject: gameObject;
+        /**
+         * 粒子系统
+         */
         constructor();
         update(interval: number): void;
         /**
@@ -15295,7 +19582,7 @@ declare namespace m4m.framework {
         play(): void;
         private _startDelay_rate;
         /**
-         * @private
+         * 更新开始延迟
          */
         updateStartDelay(): void;
         /**
@@ -15308,6 +19595,11 @@ declare namespace m4m.framework {
         continue(): void;
         render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
         private _vbos;
+        /**
+         * 获取VBO
+         * @param gl webgl上下文
+         * @returns webgl buffer
+         */
         private _getVBO;
         private _attributes;
         private _awaked;
@@ -15357,6 +19649,9 @@ declare namespace m4m.framework {
          * @param particle 粒子
          */
         private _updateParticleState;
+        /**
+         * 模拟形状改变
+         */
         _simulationSpaceChanged(): void;
         /**
          * 给指定粒子添加指定空间的位移。
@@ -15449,6 +19744,10 @@ declare namespace m4m.framework {
         get value(): string;
         set value(v: string);
         private _value;
+        /**
+         * 粒子系统数据
+         * @param assetName 资源名
+         */
         constructor(assetName?: string);
         /**
          * @public
@@ -16760,6 +21059,10 @@ declare namespace m4m.framework {
          * @param image 图片数据
          */
         drawImage(image: ImageData): void;
+        /**
+         * 获取绘制纹理强度
+         * @returns
+         */
         private _getDrawImageStrength;
         /**
          * 获取噪音值
@@ -17129,13 +21432,22 @@ declare namespace m4m.framework {
         private _shapeBox;
         private _shapeCircle;
         private _shapeEdge;
+        /**
+         * 粒子形状模块
+         */
         constructor();
         /**
          * 初始化粒子状态
          * @param particle 粒子
          */
         initParticleState(particle: Particle1): void;
+        /**
+         * 当形状类型改变
+         */
         private _onShapeTypeChanged;
+        /**
+         * 当形状改变
+         */
         private _onShapeChanged;
     }
 }
@@ -17581,6 +21893,10 @@ declare namespace m4m.framework {
      */
     class ParticleSystemShapeBase {
         protected _module: ParticleShapeModule;
+        /**
+         * 粒子系统形状
+         * @param module 粒子形状模块
+         */
         constructor(module: ParticleShapeModule);
         /**
          * 计算粒子的发射位置与方向
@@ -17848,6 +22164,12 @@ declare namespace m4m.framework {
         private _physicsMaterials;
         private _fixedTimeStep;
         private static helpv3;
+        /**
+         * Cannon 物理插件
+         * @param _useDeltaForWorldStep
+         * @param iterations 迭代数
+         * @returns
+         */
         constructor(_useDeltaForWorldStep?: boolean, iterations?: number);
         setGravity(gravity: math.vector3): void;
         setTimeStep(timeStep: number): void;
@@ -17859,10 +22181,37 @@ declare namespace m4m.framework {
         removePhysicsBody(impostor: PhysicsImpostor): void;
         generateJoint(impostorJoint: PhysicsImpostorJoint): void;
         removeJoint(impostorJoint: PhysicsImpostorJoint): void;
+        /**
+         * 添加物理材质
+         * @param name 名
+         * @param friction 摩擦力
+         * @param restitution 恢复系数
+         * @returns 物理材质
+         */
         private _addMaterial;
+        /**
+         * 检查最小值
+         * @param value 值
+         * @returns 结果值
+         */
         private _checkWithEpsilon;
+        /**
+         * 创建图形
+         * @param impostor 物理体
+         * @returns 图形对象
+         */
         private _createShape;
+        /**
+         * 向量复制
+         * @param from 源向量
+         * @param to 输出向量
+         */
         private vec3Copy;
+        /**
+         * 四元数复制
+         * @param from 源四元数
+         * @param to 输四元数
+         */
         private QuatCopy;
         setTransformationFromPhysicsBody(impostor: PhysicsImpostor): void;
         setPhysicsBodyTransformation(impostor: PhysicsImpostor, newPosition: math.vector3, newRotation: math.vector3): void;
@@ -17919,6 +22268,11 @@ declare namespace m4m.framework {
         /** 申请 冲量 */
         applyImpulse(impostor: PhysicsImpostor, force: math.vector3, contactPoint: math.vector3): void;
         applyForce(impostor: PhysicsImpostor, force: math.vector3, contactPoint: math.vector3): void;
+        /**
+         * 检查最小值
+         * @param value 值
+         * @returns 结果值
+         */
         private checkWithEpsilon;
         generatePhysicsBody(impostor: PhysicsImpostor): void;
         private _tmpPositionVector;
@@ -18045,37 +22399,184 @@ declare namespace m4m.framework {
     interface IPhysicsEnginePlugin {
         world: any;
         name: string;
+        /**
+         * 设置重力值
+         * @param gravity  重力值
+         */
         setGravity(gravity: math.vector3): void;
+        /**
+         * 设置固定的 一步执行的时间周期
+         * @param timeStep 时间周期
+         */
         setTimeStep(timeStep: number): void;
         getTimeStep(): number;
+        /**
+         * 执行一步计算
+         * @param delta 上一帧的时间间隔值
+         * @param impostors 物理代理列表
+         */
         executeStep(delta: number, impostors: Array<PhysicsImpostor>): void;
+        /**
+         * 应用一个冲量
+         * @param impostor 物理代理
+         * @param force 力向量
+         * @param contactPoint 作用点坐标
+         */
         applyImpulse(impostor: PhysicsImpostor, force: math.vector3, contactPoint: math.vector3): void;
+        /**
+         * 应用一个力
+         * @param impostor 物理代理
+         * @param force 力向量
+         * @param contactPoint 作用点坐标
+         */
         applyForce(impostor: PhysicsImpostor, force: math.vector3, contactPoint: math.vector3): void;
+        /**
+         * 生成物理体
+         * @param impostor 物理代理
+         */
         generatePhysicsBody(impostor: PhysicsImpostor): void;
+        /**
+         * 移除物理体
+         * @param impostor 物理代理
+         */
         removePhysicsBody(impostor: PhysicsImpostor): void;
+        /**
+         * 生成物理连关节
+         * @param joint 物理连关节
+         */
         generateJoint(joint: PhysicsImpostorJoint): void;
+        /**
+         * 移除物理连关节
+         * @param joint 物理连关节
+         */
         removeJoint(joint: PhysicsImpostorJoint): void;
+        /**
+         * 是否支持
+         */
         isSupported(): boolean;
+        /**
+         * 设置同步节点的变换信息 到 物理体
+         * @param impostor 物理体
+         */
         setTransformationFromPhysicsBody(impostor: PhysicsImpostor): void;
+        /**
+         * 设置物理体的变换
+         * @param impostor 物理体
+         * @param newPosition 位置
+         * @param newRotation 旋转
+         */
         setPhysicsBodyTransformation(impostor: PhysicsImpostor, newPosition: math.vector3, newRotation: math.quaternion): void;
+        /**
+         * 设置线性速度
+         * @param impostor 物理体
+         * @param velocity 速度向量
+         */
         setLinearVelocity(impostor: PhysicsImpostor, velocity: math.vector3): void;
+        /**
+         * 设置角速度
+         * @param impostor 物理体
+         * @param velocity 速度向量
+         */
         setAngularVelocity(impostor: PhysicsImpostor, velocity: math.vector3): void;
+        /**
+         * 获取线性速度
+         * @param impostor 物理体
+         * @returns 输出的速度向量
+         */
         getLinearVelocity(impostor: PhysicsImpostor): math.vector3;
+        /**
+         * 获取角速度
+         * @param impostor 物理体
+         * @returns 输出的速度向量
+         */
         getAngularVelocity(impostor: PhysicsImpostor): math.vector3;
+        /**
+         * 设置物理体的质量
+         * @param impostor 物理体
+         * @param mass 质量
+         */
         setBodyMass(impostor: PhysicsImpostor, mass: number): void;
+        /**
+         * 获取物理体的质量
+         * @param impostor 物理体
+         * @returns 质量
+         */
         getBodyMass(impostor: PhysicsImpostor): number;
+        /**
+         * 获取物理体的摩擦力
+         * @param impostor 物理体
+         * @returns 摩擦力
+         */
         getBodyFriction(impostor: PhysicsImpostor): number;
+        /**
+         * 设置物理体的摩擦力
+         * @param impostor 物理体
+         * @param friction 摩擦力
+         */
         setBodyFriction(impostor: PhysicsImpostor, friction: number): void;
+        /**
+         * 获取物理体的恢复系数
+         * @param impostor 物理体
+         * @returns 恢复系数
+         */
         getBodyRestitution(impostor: PhysicsImpostor): number;
+        /**
+         * 设置物理体的恢复系数
+         * @param impostor 物理体
+         * @param restitution 恢复系数
+         */
         setBodyRestitution(impostor: PhysicsImpostor, restitution: number): void;
+        /**
+         * 睡眠物理体
+         * @param impostor 物理体
+         */
         sleepBody(impostor: PhysicsImpostor): void;
+        /**
+         * 是睡眠状态？
+         * @param impostor  物理体
+         * @returns 是睡眠状态？
+         */
         isSleeping(impostor: PhysicsImpostor): boolean;
+        /**
+         * 叫醒物理体
+         * @param impostor 物理体
+         */
         wakeUpBody(impostor: PhysicsImpostor): void;
+        /**
+         * 更新距离关节
+         * @param joint 关节
+         * @param maxDistance 最大距离
+         * @param minDistance 最小距离
+         */
         updateDistanceJoint(joint: PhysicsJoint, maxDistance: number, minDistance?: number): void;
+        /**
+         * 设置 马达转子
+         * @param joint 马达关节
+         * @param speed 速度
+         * @param maxForce 最大力值
+         * @param motorIndex 马达索引
+         */
         setMotor(joint: IMotorEnabledJoint, speed: number, maxForce?: number, motorIndex?: number): void;
+        /**
+         * 设置限制马达关节
+         * @param joint 马达关节
+         * @param upperLimit 上限
+         * @param lowerLimit 下限
+         * @param motorIndex 马达索引
+         */
         setLimit(joint: IMotorEnabledJoint, upperLimit: number, lowerLimit?: number, motorIndex?: number): void;
+        /**
+         * 获取半径
+         * @param impostor  物理体
+         */
         getRadius(impostor: PhysicsImpostor): number;
+        /**
+         * 获取 物理体的 包围盒尺寸
+         * @param impostor 物理体
+         * @param result 包围盒尺寸
+         */
         getBoxSizeToRef(impostor: PhysicsImpostor, result: math.vector3): void;
+        /** 销毁 */
         dispose(): void;
     }
 }
@@ -18117,8 +22618,20 @@ declare namespace m4m.framework {
         scaling: math.vector3;
         rotation?: math.vector3;
         parent?: any;
+        /**
+         * 获取世界矩阵
+         * @returns 矩阵
+         */
         getWorldMatrix?(): math.matrix;
+        /**
+         * 获取绝对位置坐标
+         * @returns 位置坐标向量
+         */
         getAbsolutePosition(): math.vector3;
+        /**
+         * 获取绝对支点坐标
+         * @returns 支点坐标
+         */
         getAbsolutePivotPoint(): math.vector3;
     }
     class PhysicsImpostor {
@@ -18169,11 +22682,19 @@ declare namespace m4m.framework {
          * of the child mesh.
          */
         _init(): void;
+        /**
+         * 获取物理体的父节点
+         * @returns 物理体的父节点
+         */
         private _getPhysicsParent;
         /**
          * Should a new body be generated.
          */
         isBodyInitRequired(): boolean;
+        /**
+         * 设置缩放更新
+         * @param updated 是更新
+         */
         setScalingUpdated(updated: boolean): void;
         /**
          * Force a regeneration of this or the parent's impostor's body.
@@ -18197,60 +22718,104 @@ declare namespace m4m.framework {
          * Set the physics body. Used mainly by the physics engine/plugin
          */
         set physicsBody(physicsBody: any);
+        /**
+         * 重置更新标记
+         */
         resetUpdateFlags(): void;
         private _obb;
+        /**
+         * 获取Obb 有向包围盒
+         * @returns Obb
+         */
         private getObb;
         private _cacheSizeWorld;
         /**
-        * Gets the object extend size
-        * @returns the object extend size
+        * 获取对象扩展大小
+        * @returns 大小
         */
         getObjectExtendSize(): math.vector3;
         /**
-         * Gets the object center
-         * @returns The object center
+         * 获取对象的中心点
+         * @returns 中心点
          */
         getObjectCenter(): math.vector3;
         /**
-         * Get a specific parametes from the options parameter.
+         * 从选项参数中获取特定的参数。
+         * @param paramName 参数名
          */
         getParam(paramName: string): any;
         /**
-         * Sets a specific parameter in the options given to the physics plugin
+         * 在物理插件的选项中设置特定参数
+         * @param paramName 参数名
+         * @param value 值
          */
         setParam(paramName: string, value: number): void;
         /**
          * Specifically change the body's mass option. Won't recreate the physics body object
          */
         setMass(mass: number): void;
+        /**
+         * 获取线性速度
+         * @returns 速度向量
+         */
         getLinearVelocity(): math.vector3;
+        /**
+         * 设置线性速度
+         * @param velocity 速度向量
+         */
         setLinearVelocity(velocity: math.vector3): void;
+        /**
+         * 设置角速度
+         * @returns 速度向量
+         */
         getAngularVelocity(): math.vector3;
+        /**
+         * 设置角速度
+         * @param velocity 速度向量
+         */
         setAngularVelocity(velocity: math.vector3): void;
         /**
-         * Execute a function with the physics plugin native code.
-         * Provide a function the will have two variables - the world object and the physics body object.
+         * 使用物理插件的本地代码执行函数。
+         * 提供一个函数，该函数将有两个变量-世界对象和物理体对象。
+         * @param func 执行函数
          */
         executeNativeFunction(func: (world: any, physicsBody: any) => void): void;
         /**
-         * Register a function that will be executed before the physics world is stepping forward.
+         * 注册一个函数，该函数将在物理世界执行一步之前执行。
+         * @param func 执行函数
          */
         registerBeforePhysicsStep(func: (impostor: PhysicsImpostor) => void): void;
+        /**
+         * 注销，物理世界执行一步之前执行的函数
+         * @param func 执行函数
+         */
         unregisterBeforePhysicsStep(func: (impostor: PhysicsImpostor) => void): void;
         /**
-         * Register a function that will be executed after the physics step
+         * 注册将在物理执行一步骤后执行的函数
+         * @param func 执行函数
          */
         registerAfterPhysicsStep(func: (impostor: PhysicsImpostor) => void): void;
+        /**
+         * 注销，物理世界执行一步之后执行的函数
+         * @param func 执行函数
+         */
         unregisterAfterPhysicsStep(func: (impostor: PhysicsImpostor) => void): void;
         /**
-         * register a function that will be executed when this impostor collides against a different body.
+         * 注册一个函数，该函数将在该物理代理与其他实体碰撞时执行。
+         * @param collideAgainst 物理代理
+         * @param func 执行函数
          */
         registerOnPhysicsCollide(collideAgainst: PhysicsImpostor | Array<PhysicsImpostor>, func: (collider: PhysicsImpostor, collidedAgainst: PhysicsImpostor) => void): void;
+        /**
+         * 注销，在该物理代理与其他实体碰撞时执行函数
+         * @param collideAgainst 物理代理
+         * @param func 执行函数
+         */
         unregisterOnPhysicsCollide(collideAgainst: PhysicsImpostor | Array<PhysicsImpostor>, func: (collider: PhysicsImpostor, collidedAgainst: PhysicsImpostor | Array<PhysicsImpostor>) => void): void;
         private lastObjwPos;
         private lastObjwRot;
         /**
-         * this function is executed by the physics engine.
+         * 之前执行步，该函数由物理引擎执行。
          */
         beforeStep: () => void;
         private _freezeMask;
@@ -18270,49 +22835,89 @@ declare namespace m4m.framework {
         private lastEuler;
         private lastRotMask;
         /**
-         * this function is executed by the physics engine
+         * 之后执行步,该函数由物理引擎执行。
          */
         afterStep: () => void;
         /**
-         * Legacy collision detection event support
+         * 当碰撞事件时触发
+         * 旧版碰撞检测事件支持
          */
         onCollideEvent: (collider: PhysicsImpostor, collidedWith: PhysicsImpostor) => void;
+        /**
+         * 当碰撞触发
+         * @param e 事件对象
+         */
         onCollide: (e: {
             body: any;
         }) => void;
         /**
-         * Apply a force
+         * 应用施加力
+         * @param force 力向量
+         * @param contactPoint 施加位置点
+         * @returns 物理代理
          */
         applyForce(force: math.vector3, contactPoint: math.vector3): PhysicsImpostor;
         /**
-         * Apply an impulse
+         * 应用施加一个冲量
+         * @param force 力向量
+         * @param contactPoint 施加位置点
+         * @returns 物理代理
          */
         applyImpulse(force: math.vector3, contactPoint: math.vector3): PhysicsImpostor;
         /**
-         * A help function to create a joint.
+         * 创建一个关节
+         * @param otherImpostor 物理代理
+         * @param jointType 关节类型
+         * @param jointData 关节数据
+         * @returns 物理代理
          */
         createJoint(otherImpostor: PhysicsImpostor, jointType: number, jointData: PhysicsJointData): PhysicsImpostor;
         /**
-         * Add a joint to this impostor with a different impostor.
+         * 添加一个关节
+         * @param otherImpostor 物理代理
+         * @param joint 关节
+         * @returns 物理代理
          */
         addJoint(otherImpostor: PhysicsImpostor, joint: PhysicsJoint): PhysicsImpostor;
         /**
-         * Will keep this body still, in a sleep mode.
+         * 保持身体静止，处于睡眠状态。
          */
         sleep(): PhysicsImpostor;
         /**
-         * result body is sleeping
+         * 是睡眠状态？
          */
         get isSleeping(): boolean;
         /**
-         * Wake the body up.
+         * 唤醒
          */
         wakeUp(): PhysicsImpostor;
+        /**
+         * 克隆
+         * @param newObject 引擎变换节点
+         * @returns 输出的克隆物理代理对象
+         */
         clone(newObject: transform): PhysicsImpostor;
+        /** 销毁 */
         dispose(): void;
+        /**
+         * 设置 变化的位置
+         * @param position 变化的位置向量
+         */
         setDeltaPosition(position: math.vector3): void;
+        /**
+         * 设置 变化的旋转
+         * @param rotation 旋转四元数
+         */
         setDeltaRotation(rotation: math.quaternion): void;
+        /**
+         * 获取 包围盒尺寸
+         * @param result 输出包围盒尺寸
+         */
         getBoxSizeToRef(result: math.vector3): PhysicsImpostor;
+        /**
+         * 获取半径
+         * @returns
+         */
         getRadius(): number;
         /**
          * 设置动力学的 位置
@@ -18398,14 +23003,18 @@ declare namespace m4m.framework {
         jointData: PhysicsJointData;
         private _physicsJoint;
         protected _physicsPlugin: IPhysicsEnginePlugin;
+        /**
+         * 关节
+         * @param type 类型
+         * @param jointData 关节数据
+         */
         constructor(type: number, jointData: PhysicsJointData);
         get physicsJoint(): any;
         set physicsJoint(newJoint: any);
         set physicsPlugin(physicsPlugin: IPhysicsEnginePlugin);
         /**
-         * Execute a function that is physics-plugin specific.
-         * @param {Function} func the function that will be executed.
-         *                        It accepts two parameters: the physics world and the physics joint.
+         * 执行物理插件特定的函数。
+         * @param  func 执行函数
          */
         executeNativeFunction(func: (world: any, physicsJoint: any) => void): void;
         /**
@@ -18457,9 +23066,15 @@ declare namespace m4m.framework {
      * A class representing a physics distance joint.
      */
     class DistanceJoint extends PhysicsJoint {
+        /**
+         * 距离关节
+         * @param jointData 关节数据
+         */
         constructor(jointData: DistanceJointData);
         /**
-         * Update the predefined distance.
+         * 更新预定义的距离。
+         * @param maxDistance 最大距离
+         * @param minDistance 最小距离
          */
         updateDistance(maxDistance: number, minDistance?: number): void;
     }
@@ -18467,57 +23082,49 @@ declare namespace m4m.framework {
      * Represents a Motor-Enabled Joint
      */
     class MotorEnabledJoint extends PhysicsJoint implements IMotorEnabledJoint {
+        /**
+         * 马达关节
+         * @param type 类型
+         * @param jointData 关节数据
+         */
         constructor(type: number, jointData: PhysicsJointData);
-        /**
-         * Set the motor values.
-         * Attention, this function is plugin specific. Engines won't react 100% the same.
-         * @param {number} force the force to apply
-         * @param {number} maxForce max force for this motor.
-         */
         setMotor(force?: number, maxForce?: number): void;
-        /**
-         * Set the motor's limits.
-         * Attention, this function is plugin specific. Engines won't react 100% the same.
-         */
         setLimit(upperLimit: number, lowerLimit?: number): void;
     }
     /**
      * This class represents a single hinge physics joint
      */
     class HingeJoint extends MotorEnabledJoint {
+        /**
+         * 铰链关节
+         * @param jointData 关节数据
+         */
         constructor(jointData: PhysicsJointData);
-        /**
-         * Set the motor values.
-         * Attention, this function is plugin specific. Engines won't react 100% the same.
-         * @param {number} force the force to apply
-         * @param {number} maxForce max force for this motor.
-         */
         setMotor(force?: number, maxForce?: number): void;
-        /**
-         * Set the motor's limits.
-         * Attention, this function is plugin specific. Engines won't react 100% the same.
-         */
         setLimit(upperLimit: number, lowerLimit?: number): void;
     }
     /**
      * This class represents a dual hinge physics joint (same as wheel joint)
      */
     class Hinge2Joint extends MotorEnabledJoint {
+        /**
+         * 铰链2关节
+         * @param jointData 关节数据
+         */
         constructor(jointData: PhysicsJointData);
         /**
-         * Set the motor values.
-         * Attention, this function is plugin specific. Engines won't react 100% the same.
-         * @param {number} force the force to apply
-         * @param {number} maxForce max force for this motor.
-         * @param {motorIndex} the motor's index, 0 or 1.
+         * 设置马达
+         * 注意，此函数是特定于插件的。发动机的反应不会100%相同。
+         * @param force 设置力
+         * @param maxForce 马达的最大力
+         * @param motorIndex 马达索引
          */
         setMotor(force?: number, maxForce?: number, motorIndex?: number): void;
         /**
-         * Set the motor limits.
-         * Attention, this function is plugin specific. Engines won't react 100% the same.
-         * @param {number} upperLimit the upper limit
-         * @param {number} lowerLimit lower limit
-         * @param {motorIndex} the motor's index, 0 or 1.
+         * 设置马达的限制
+         * @param upperLimit 上限
+         * @param lowerLimit 下限
+         * @param motorIndex 马达索引
          */
         setLimit(upperLimit: number, lowerLimit?: number, motorIndex?: number): void;
     }
@@ -18526,7 +23133,18 @@ declare namespace m4m.framework {
      */
     interface IMotorEnabledJoint {
         physicsJoint: any;
+        /**
+         * 设置马达
+         * 注意，此函数是特定于插件的。发动机的反应不会100%相同。
+         * @param force 设置力
+         * @param maxForce 马达的最大力
+         */
         setMotor(force?: number, maxForce?: number, motorIndex?: number): void;
+        /**
+         * 设置马达的限制
+         * @param upperLimit 上限
+         * @param lowerLimit 下限
+         */
         setLimit(upperLimit: number, lowerLimit?: number, motorIndex?: number): void;
     }
     /**
@@ -18549,12 +23167,50 @@ declare namespace m4m.framework {
      * tool of physic
      */
     class physicTool {
+        /**
+         * 判断两个三维向量是否想等
+         * @param a 向量a
+         * @param b 向量b
+         * @returns 是相等？
+         */
         static Ivec3Equal(a: math.Ivec3, b: math.Ivec3): boolean;
+        /**
+         * 判断两个二维向量是否想等
+         * @param a 向量a
+         * @param b 向量b
+         * @returns 是相等？
+         */
         static Ivec2Equal(a: math.Ivec2, b: math.Ivec2): boolean;
+        /**
+         * 判断两个四元数是否想等
+         * @param a 四元数a
+         * @param b 四元数b
+         * @returns 是相等？
+         */
         static IQuatEqual(a: math.Iquat, b: math.Iquat): boolean;
+        /**
+         * 拷贝三维向量
+         * @param from 源向量
+         * @param to 输出向量
+         */
         static Ivec3Copy(from: math.Ivec3, to: math.Ivec3): void;
+        /**
+         * 拷贝二维向量
+         * @param from 源向量
+         * @param to 输出向量
+         */
         static Ivec2Copy(from: math.Ivec2, to: math.Ivec2): void;
+        /**
+         * 拷贝四元数
+         * @param from 源四元数
+         * @param to 输出四元数
+         */
         static IQuatCopy(from: math.Iquat, to: math.Iquat): void;
+        /**
+         * 三维向量转数组数据
+         * @param vec3 三维向量
+         * @returns 数组数据
+         */
         static vec3AsArray(vec3: math.vector3): any[];
     }
 }
@@ -18612,6 +23268,11 @@ declare namespace m4m.framework {
          * onPlay是否调用过了
          */
         OnPlayed: boolean;
+        /**
+         * 组件节点
+         * @param comp 组件
+         * @param init 初始化
+         */
         constructor(comp: INodeComponent, init?: boolean);
     }
     /**
@@ -18802,6 +23463,12 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         getComponentsInChildren(type: string): INodeComponent[];
+        /**
+         * 获取指定类型的所有组件在子节点中
+         * @param type 组件类型
+         * @param obj go节点
+         * @param array 输出的组件数组
+         */
         private _getComponentsInChildren;
         /**
         * 获取当前节点下及子节点第一个能找到的组件
@@ -18810,8 +23477,8 @@ declare namespace m4m.framework {
         getFirstComponentInChildren(type: string): INodeComponent;
         /**
          * 获取节点的第一个组件
-         * @param node
-         * @param _type
+         * @param node go节点
+         * @param _type 组件类型
          */
         private getNodeFirstComponent;
         /**
@@ -18858,6 +23525,10 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         removeAllComponents(): void;
+        /**
+         * 清理 移除的组件
+         * @param cComp 组件
+         */
         private clearOfCompRemove;
         /**
          * @public
@@ -18874,6 +23545,10 @@ declare namespace m4m.framework {
      * @private
      */
     class renderContext {
+        /**
+         * 渲染上下文
+         * @param webgl webgl上下文
+         */
         constructor(webgl: WebGL2RenderingContext);
         drawtype: string;
         webgl: WebGL2RenderingContext;
@@ -18918,12 +23593,39 @@ declare namespace m4m.framework {
         fog: Fog;
         vec4_bones: Float32Array;
         matrix_bones: Float32Array;
+        /**
+         * 更新相机
+         * @param app 引擎app对象
+         * @param camera 相机
+         */
         updateCamera(app: application, camera: camera): void;
+        /**
+         * 更新光源
+         * @param lights 光源列表
+         */
         updateLights(lights: light[]): void;
+        /**
+         * 更新 渲染后叠加层(UI、后渲染)
+         */
         updateOverlay(): void;
+        /**
+         * 更新模型
+         * @param model 模型节点
+         */
         updateModel(model: transform): void;
+        /**
+         * 通过矩阵更新模型
+         * @param m_matrix 矩阵
+         */
         updateModelByMatrix(m_matrix: m4m.math.matrix): void;
+        /**
+         * 更新模型拖尾
+         */
         updateModeTrail(): void;
+        /**
+         * 更新 光照剔除mask
+         * @param layer 不剔除的Layer mask
+         */
         updateLightMask(layer: number): void;
     }
     /**
@@ -18963,10 +23665,30 @@ declare namespace m4m.framework {
      * @private
      */
     class renderList {
+        /**
+         * 渲染列表
+         */
         constructor();
+        /**
+         * 清理列表
+         */
         clear(): void;
+        /**
+         * 清理合批
+         */
         clearBatcher(): void;
+        /**
+         * 添加渲染节点到列表
+         * @param renderer 渲染节点
+         * @param webgl webgl上下文
+         */
         addRenderer(renderer: IRenderer, webgl: WebGL2RenderingContext): void;
+        /**
+         * 添加静态GPUInstance 渲染节点
+         * @param renderer GPUInstance 渲染节点
+         * @param webgl webgl上下文
+         * @param isStatic 是静态
+         */
         addStaticInstanceRenderer(renderer: IRendererGpuIns, webgl: WebGL2RenderingContext, isStatic: boolean): void;
         renderLayers: renderLayer[];
     }
@@ -18976,6 +23698,10 @@ declare namespace m4m.framework {
     class renderLayer {
         needSort: boolean;
         list: IRenderer[];
+        /**
+         * 渲染层
+         * @param _sort 排序？
+         */
         constructor(_sort?: boolean);
         /** gpu instance map*/
         gpuInstanceMap: {
@@ -18984,11 +23710,24 @@ declare namespace m4m.framework {
         gpuInstanceBatcherMap: {
             [sID: string]: meshGpuInsBatcher;
         };
+        /**
+         * 添加 GPUInstance 渲染节点
+         * @param r GPUInstance 渲染节点
+         */
         addInstance(r: IRendererGpuIns): void;
+        /**
+         * 添加 GPUInstance 渲染节点到合批
+         * @param r GPUInstance 渲染节点
+         */
         addInstanceToBatcher(r: IRendererGpuIns): void;
         private static gpuInsRandererGUID;
         private static gpuInsRandererGUIDMap;
-        /** gpuInstancing 唯一ID */
+        /**
+         * GPUInstance 唯一ID
+         * @param meshGuid meshID
+         * @param materialGuid 材质ID
+         * @returns GPUInstance 唯一ID
+         */
         private static getRandererGUID;
     }
 }
@@ -19020,8 +23759,8 @@ declare namespace m4m.framework {
          */
         webgl: WebGL2RenderingContext;
         /**
-         * @private
-         * @param app
+         * 引擎场景
+         * @param 引擎 app
          */
         constructor(app: application);
         /**
@@ -19105,6 +23844,7 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         fog: Fog;
+        /** 当Late更新 触发函数 */
         onLateUpdate: (delta: number) => any;
         /**
          * @public
@@ -19115,14 +23855,49 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         update(delta: number): void;
+        /**
+         * 渲染场景 2dUI overlay
+         */
         private rendererSceneOverLay;
+        /**
+         * 更新 场景 覆盖层
+         * @param delta 上帧时间变量
+         */
         private updateSceneOverLay;
         private RealCameraNumber;
+        /**
+         * 渲染相机
+         * 这个函数后面还有别的过程，应该留给camera
+         * @param camindex 相机索引
+         */
         private _renderCamera;
+        /**
+         * 给 覆盖层列表 排序
+         * @param lays 覆盖层列表
+         */
         private sortOverLays;
+        /**
+         * 更新场景
+         * @param node 场景节点
+         * @param delta 上帧时间变量
+         */
         private updateScene;
+        /**
+         * 在编辑器模式 节点更新
+         * @param node 节点
+         * @param delta 上帧时间变量
+         */
         private objupdateInEditor;
+        /**
+         * 节点更新
+         * @param node 节点
+         * @param delta 上帧时间变量
+         */
         private objupdate;
+        /**
+         * 收集场景中有效的相机和光源
+         * @param node 节点
+         */
         private collectCameraAndLight;
         /**
          * 添加灯光到场景中（autoCollectlightCamera : false 时  有效 ）
@@ -19222,8 +23997,34 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         pick(ray: ray, outInfo: pickinfo, isPickMesh?: boolean, root?: transform, layermask?: number): boolean;
+        /**
+         * 执行 拾取
+         * @param ray 射线
+         * @param pickall 拾取所有？
+         * @param isPickMesh 拾取Mesh？
+         * @param root 节点
+         * @param out 输出拾取信息
+         * @param layermask 层级遮罩选项
+         * @returns 是拾取到了？
+         */
         private doPick;
+        /**
+         * 执行 拾取Mesh
+         * @param ray 射线
+         * @param tran 节点
+         * @param pickedList 拾取信息列表
+         * @param layermask 层级遮罩选项
+         * @returns 是拾取到了？
+         */
         private pickMesh;
+        /**
+         * 执行 拾取碰撞体
+         * @param ray 射线
+         * @param tran 节点
+         * @param pickedList 拾取信息列表
+         * @param layermask 层级遮罩选项
+         * @returns 是拾取到了？
+         */
         private pickCollider;
         /**
          * @public
@@ -19235,13 +24036,24 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         enablePhysics(gravity: math.vector3, plugin?: IPhysicsEnginePlugin): boolean;
+        /**
+         * 启用2D物理
+         * @param gravity 定义场景物理世界的重力向量
+         * @param physicOption 物理选项
+         * @returns 启用成功？
+         */
         enable2DPhysics(gravity: math.vector2, physicOption?: IEngine2DOP): boolean;
         /**
-         * 刷新 GpuInstancBatcher
+         * 刷新 GpuInstanc合批
          * 被 batcher 条件[isStatic= true , visible = true , needGpuInstancBatcher = true , isGpuInstancing() = true]
          * @param rootNode 指定刷新节点（默认为 场景根节点）
          */
         refreshGpuInstancBatcher(rootNode?: m4m.framework.transform): void;
+        /**
+         * 填充 GpuInstanc合批
+         * @param node 节点
+         * @param isStatic 是静态？
+         */
         private fillGpuInsBatcher;
     }
 }
@@ -19250,6 +24062,9 @@ declare namespace m4m.framework {
         static autoUniformDic: {
             [name: string]: (context: renderContext) => any;
         };
+        /**
+         * 初始化自动 默认 uniform 数据
+         */
         static initAutouniform(): void;
     }
 }
@@ -19262,6 +24077,9 @@ declare namespace m4m.framework {
         error: boolean;
         message: string;
         cancel: boolean;
+        /**
+         * 执行任务
+         */
         taskCall: (taskstate: any, state: taskstate) => void;
         taskInterface: ITask;
     }
@@ -19269,28 +24087,73 @@ declare namespace m4m.framework {
      * @private
      */
     interface ITask {
+        /**
+         * 移动任务
+         * @param delta
+         * @param laststate
+         * @param state
+         */
         move(delta: number, laststate: taskstate, state: taskstate): any;
     }
     /**
-     * @private
+     * 任务管理器
      */
     class taskMgr {
         tasks: taskstate[];
+        /**
+         * 添加任务回调
+         * @param task 任务回调函数
+         */
         addTaskCall(task: (laststate: taskstate, state: taskstate) => void): void;
+        /**
+         * 添加任务
+         * @param task 任务
+         */
         addTask(task: ITask): void;
         laststate: taskstate;
+        /**
+         * 任务移动
+         * @param delta
+         */
         move(delta: number): void;
+        /**
+         * 取消
+         */
         cancel(): void;
     }
 }
 declare namespace m4m.threading {
     class gdPromise<T> {
         private execQueue;
+        /** 异常捕获函数 */
         private catchMethod;
+        /**
+         * 自定义 Promise
+         * @param executor
+         */
         constructor(executor: (resolve: (value?: T) => void, reject: (reason?: any) => void) => void);
+        /**
+         * 执行决定
+         * @param value 数据
+         */
         resolve(value?: T): void;
+        /**
+         * 执行拒绝
+         * @param reason
+         * @returns
+         */
         reject(reason?: any): void;
+        /**
+         * 执行完然后
+         * @param thenCall
+         * @returns
+         */
         then(thenCall: (value?: T) => void): gdPromise<T>;
+        /**
+         * 异常捕获
+         * @param callbcack
+         * @returns
+         */
         catch(callbcack: (val: any) => void): gdPromise<T>;
     }
 }
@@ -19302,8 +24165,21 @@ declare namespace m4m.threading {
         private worker;
         private callID;
         private callMap;
+        /**
+         * 多线程
+         */
         constructor();
+        /**
+         * 当消息接收
+         * @param e
+         */
         OnMessage(e: MessageEvent): void;
+        /**
+         * 执行
+         * @param name
+         * @param data
+         * @param callback
+         */
         Call(name: string, data: any, callback: (result: any) => void): void;
     }
 }
@@ -19416,6 +24292,10 @@ declare namespace m4m.framework {
         * @platform Web,Native
         */
         clone(): aabb;
+        /**
+         * 克隆
+         * @param to 输出的aabb
+         */
         cloneTo(to: aabb): void;
         /**
         * @public
@@ -19465,8 +24345,28 @@ declare namespace m4m.framework {
         static obbVsSphere(a: obb, b: spherestruct): boolean;
         private static helpv2;
         private static helpv2_1;
+        /**
+         * 判断 obb 与 球的重叠
+         * @param axis 轴
+         * @param box0 obb
+         * @param sphere 球
+         * @returns 重叠了？
+         */
         private static obb_SphereOverLap;
+        /**
+         * 判断 obb 与 另一obb重叠
+         * @param axis 轴
+         * @param box0 obb
+         * @param box1 另一obb
+         * @returns 重叠了？
+         */
         private static obbOverLap;
+        /**
+         * 判断两标量区间 重叠
+         * @param a 标量区间a
+         * @param b 标量区间b
+         * @returns 重叠了？
+         */
         private static extentsOverlap;
     }
 }
@@ -19688,8 +24588,29 @@ declare namespace m4m.framework { /**
         * @version m4m 1.0
         */
         intersects(_obb: obb2d): boolean;
+        /**
+         * 通过给定轴 计算 定向包围盒 在轴垂直平面上的 投影 标量区间范围
+         * @param axis 给定轴
+         * @param box 定向包围盒
+         * @returns 标量区间范围
+         */
         private computeBoxExtents;
+        /**
+         * 判断 两定向包围盒 在指定轴 垂直平面上投影是否重叠
+         * @param axis 指定轴
+         * @param box0 定向包围盒a
+         * @param box1 定向包围盒b
+         * @returns 重叠了？
+         */
         private axisOverlap;
+        /**
+         * 判断 两标量区间范围 是否重叠
+         * @param min0 范围a小值
+         * @param max0 范围a大值
+         * @param min1 范围b小值
+         * @param max1 范围b大值
+         * @returns 重叠了？
+         */
         private extentsOverlap;
         /**
         * @public
@@ -19726,8 +24647,21 @@ declare namespace m4m.framework {
         bv: number;
         faceId: number;
         subMeshId: number;
+        /**
+         * 点 拾取信息
+         * @param _bu u
+         * @param _bv v
+         * @param _distance 距离
+         */
         constructor(_bu?: number, _bv?: number, _distance?: number);
+        /**
+         * 初始化
+         */
         init(): void;
+        /**
+         * 重一个对象克隆属性到自己
+         * @param from 克隆的对象
+         */
         cloneFrom(from: pickinfo): void;
     }
 }
@@ -19836,6 +24770,13 @@ declare namespace m4m.framework {
         * @platform Web,Native
         */
         intersectPlaneTransform(tran: transform, outInfo: pickinfo): boolean;
+        /**
+         * 判断 与一个平面 是否相交
+         * @param planePoint 平面上的点
+         * @param planeNormal 平面法向量
+         * @param outHitPoint 输出的碰撞点坐标
+         * @returns 碰撞了？
+         */
         intersectPlane(planePoint: m4m.math.vector3, planeNormal: m4m.math.vector3, outHitPoint: m4m.math.vector3): boolean;
         private static tempMData;
         private static tempVecs;
@@ -20293,7 +25234,17 @@ declare namespace m4m.framework {
      * @version m4m 1.0
      */
     class cullingmaskutil {
+        /**
+         * mask值转 层级ID
+         * @param mask mask值转（二进制位 标记层级的值）
+         * @returns 层级ID
+         */
         static maskTolayer(mask: number): number;
+        /**
+         * 层级ID 转 mask（二进制位 标记层级的值）
+         * @param layer 层级ID
+         * @returns mask值
+         */
         static layerToMask(layer: number): number;
     }
 }
@@ -20306,6 +25257,9 @@ declare namespace m4m.framework {
      * @version m4m 1.0
      */
     class EnumUtil {
+        /**
+         * @deprecated [已弃用]
+         */
         static getEnumObjByType(enumType: string): any;
     }
 }
@@ -20335,7 +25289,15 @@ declare namespace m4m.framework {
         WEBGL_debug_renderer_info: WEBGL_debug_renderer_info;
         WEBGL_debug_shaders: WEBGL_debug_shaders;
         WEBGL_lose_context: any;
+        /**
+         * 引擎 webgl 拓展管理
+         * @param gl webgl 上下文
+         */
         constructor(gl: WebGL2RenderingContext);
+        /**
+         * 初始化 webgl 拓展绑定
+         * @param gl
+         */
         private initExtensions;
         /**
          * 缓存GL查询
@@ -20804,6 +25766,11 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         static firstCharToLowerCase(str: string): string;
+        /**
+         * 判断对象是空或null
+         * @param obj 对象
+         * @returns 是空或null
+         */
         static isNullOrEmptyObject(obj: any): boolean;
         /**
          * 获取文件的 后缀
@@ -20821,6 +25788,9 @@ declare namespace m4m.framework {
 }
 declare namespace m4m.framework {
     class textureutil {
+        /**
+         * @deprecated [已弃用]
+         */
         static loadUtil(path: string): void;
     }
 }
@@ -20868,7 +25838,7 @@ declare namespace m4m.framework {
     }
     /**
      * 判断 函数对象代码实现内容是否是空的
-     * @param fun
+     * @param fun 函数
      */
     function functionIsEmpty(fun: Function): boolean;
     /**
@@ -20904,13 +25874,59 @@ declare namespace m4m.framework {
          * @version m4m 1.0
          */
         static Create2DPrimitive(type: Primitive2DType, app?: application): transform2D;
+        /**
+         * 创建一个2D 节点
+         * @param name 名字
+         * @param parent 父节点
+         * @param lOpt 布局选项
+         * @param w 宽
+         * @param h 高
+         * @param px 坐标x
+         * @param py 坐标y
+         * @returns 2D 节点
+         */
         private static make2DNode;
+        /**
+         * 构建一个 2D rawImage 节点
+         * @param img rawImage节点
+         * @param app 引擎app
+         */
         private static create2D_rawImage;
+        /**
+         * 构建一个 2D image2D 节点
+         * @param img image2D节点
+         * @param app 引擎app
+         */
         private static create2D_image2D;
+        /**
+         * 构建一个 进度条
+         * @param progress 进度条节点
+         * @param app 引擎app
+         */
         private static create2D_progressbar;
+        /**
+         * 构建一个 滑动矩形区
+         * @param scrollrect 滑动矩形区节点
+         * @param app 引擎app
+         */
         private static create2D_scrollRect;
+        /**
+         * 构建一个 文本标签
+         * @param label 文本标签节点
+         * @param app 引擎app
+         */
         private static create2D_label;
+        /**
+         * 构建一个 按钮
+         * @param btn 按钮节点
+         * @param app 引擎app
+         */
         private static create2D_button;
+        /**
+         * 构建一个 输入框
+         * @param ipt 输入框
+         * @param app 引擎app
+         */
         private static create2D_InputField;
     }
 }
@@ -20926,6 +25942,11 @@ declare namespace m4m.framework {
         [P in keyof T]: Lazy<T[P]>;
     };
     var lazy: {
+        /**
+         * 获取值
+         * @param lazyItem
+         * @returns
+         */
         getvalue: <T>(lazyItem: Lazy<T>) => T;
     };
     /**
@@ -21184,7 +26205,16 @@ declare namespace m4m.framework {
          *        console.log with a message.
          */
         makeDebugContext(ctx: WebGL2RenderingContext, opt_onErrorFunc?: (err: any, funcName: any, args: any) => void): WebGL2RenderingContext;
+        /**
+         * 重置到初始化状态
+         * @param ctx webgl上下文
+         */
         private resetToInitialState;
+        /**
+         * 生成丢失的上下文模拟上下文
+         * @param ctx webgl上下文
+         * @returns webgl上下文
+         */
         private makeLostContextSimulatingContext;
     }
 }
@@ -21974,7 +27004,19 @@ declare namespace m4m.io {
      * @version m4m 1.0
      */
     function loadText(url: string, fun: (_txt: string, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
+    /**
+     * 字符串信息 解析成 json 对象
+     * @param text 字符串信息
+     * @returns json 对象
+     */
     function JSONParse(text: string): Promise<any>;
+    /**
+     * 加载JSON
+     * @param url 加载路径
+     * @param fun 加载完回调函数
+     * @param onprocess 加载中进度回调函数
+     * @returns Promise
+     */
     function loadJSON(url: string, fun: (_txt: any, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): Promise<unknown>;
     /**
      * @public
@@ -22055,6 +27097,12 @@ declare namespace m4m.math {
     */
     class pool {
         private static helpDataMap;
+        /**
+         * 生成 help 数据
+         * @param type 类型标记
+         * @param id id
+         * @returns help数据
+         */
         static genHelpData(type: string, id: number): any;
         /**
         * @public
@@ -22491,8 +27539,19 @@ declare namespace m4m.render {
      */
     class webglkit {
         private static _maxVertexAttribArray;
+        /**
+         * @deprecated [已弃用]
+         * 设置最大顶点Attrib数
+         * @param webgl
+         * @param count
+         */
         static SetMaxVertexAttribArray(webgl: WebGL2RenderingContext, count: number): void;
         private static _texNumber;
+        /**
+         * 获取 webgl纹理槽 绑定ID
+         * @param index 索引
+         * @returns 绑定ID
+         */
         static GetTextureNumber(index: number): number;
         static FUNC_ADD: number;
         static FUNC_SUBTRACT: number;
@@ -22514,6 +27573,10 @@ declare namespace m4m.render {
         static ALWAYS: number;
         static NEVER: number;
         static caps: caps;
+        /**
+         * 初始化
+         * @param webgl webgl上下文
+         */
         static initConst(webgl: WebGL2RenderingContext): void;
     }
 }
@@ -22571,7 +27634,16 @@ declare namespace m4m.render {
         mapuniforms: {
             [id: string]: uniform;
         };
+        /**
+         * 设置 当前 引擎着色器 program
+         * @param program 引擎着色器 program
+         * @param uniformDefault 默认uniform？[已弃用]
+         */
         setProgram(program: glProgram, uniformDefault?: boolean): void;
+        /**
+         * 设置半透混合模式
+         * @param mode 半透混合模式
+         */
         setAlphaBlend(mode: BlendModeEnum): void;
         /**
          * 因为ui那边会改变state，所以每次开始渲染场景先将laststatereset。
@@ -22579,6 +27651,11 @@ declare namespace m4m.render {
         static resetLastState(): void;
         private static useStateMap;
         private static lastPassID;
+        /**
+         * 使用pass
+         * @param webgl webgl上下文
+         * @returns
+         */
         use(webgl: WebGL2RenderingContext): void;
     }
 }
@@ -22632,6 +27709,14 @@ declare namespace m4m.render {
         v1: number;
         v2: number;
         v3: number;
+        /**
+         * 设置 数据
+         * @param data  数据
+         * @param _v0   值0
+         * @param _v1   值1
+         * @param _v2   值2
+         * @param _v3   值3
+         */
         static set(data: number4, _v0: number, _v1: number, _v2: number, _v3: number): void;
     }
     /**
@@ -22668,6 +27753,10 @@ declare namespace m4m.render {
         ebo: WebGLBuffer;
         indexCount: number;
         vertexFormat: VertexFormatMask;
+        /**
+         * 引擎 mesh
+         * @param webgl webgl上下文
+         */
         constructor(webgl?: WebGL2RenderingContext);
         /**
          * 获取 顶点着色器中 Attribute (in) 的地址
@@ -22675,23 +27764,103 @@ declare namespace m4m.render {
          * @returns Attribute (in) 的地址
          */
         static getAttributeLocation(vf: VertexFormatMask): number;
+        /**
+         * 初始化 webgl 缓冲区
+         * @param webgl webgl上下文
+         * @param vf 顶点格式
+         * @param vertexCount 顶点数量
+         * @param mode 模式
+         */
         initBuffer(webgl: WebGL2RenderingContext, vf: VertexFormatMask, vertexCount: number, mode?: MeshTypeEnum): void;
+        /**
+         * 通过长度初始化 EBO
+         * @param webgl webgl上下文
+         * @param indexcount 索引数
+         * @returns
+         */
         addIndex(webgl: WebGL2RenderingContext, indexcount: number): number;
+        /**
+         * 重置VBO 尺寸
+         * @param webgl webgl上下文
+         * @param vertexCount 顶点数
+         */
         resetVboSize(webgl: WebGL2RenderingContext, vertexCount: number): void;
+        /**
+         * 重置EBO 尺寸
+         * @param webgl webgl上下文
+         * @param eboindex [已弃用]
+         * @param indexcount 索引数
+         */
         resetEboSize(webgl: WebGL2RenderingContext, eboindex: number, indexcount: number): void;
+        /**
+         * 销毁
+         */
         dispose(): void;
+        /**
+         * 计算内存占用长度
+         * @returns 内存占用长度
+         */
         caclByteLength(): number;
+        /**
+         * 上载顶点子数据 到 webgl API
+         * @param webgl webgl上下文
+         * @param varray 数据
+         * @param offset 偏移
+         */
         uploadVertexSubData(webgl: WebGL2RenderingContext, varray: Float32Array, offset?: number): void;
+        /**
+         * 上载顶点数据 到 webgl API
+         * @param webgl webgl上下文
+         * @param varray 数据
+         */
         uploadVertexData(webgl: WebGL2RenderingContext, varray: Float32Array): void;
+        /**
+         * 上载顶点索引 子数据 到 webgl API
+         * @param webgl webgl上下文
+         * @param eboindex [已弃用]
+         * @param data 数据
+         * @param offset 偏移
+         */
         uploadIndexSubData(webgl: WebGL2RenderingContext, eboindex: number, data: TriIndexTypeArray, offset?: number): void;
-        uploadIndexData(webgl: WebGL2RenderingContext, eboindex: number, data: TriIndexTypeArray, dataType?: 5123): void;
-        /** 顶点数组绘制三角面 */
+        /**
+         * 上载顶点索引 数据 到 webgl API
+         * @param webgl webgl上下文
+         * @param eboindex [已弃用]
+         * @param data 数据
+         * @param dataType 数据类型
+         */
+        uploadIndexData(webgl: WebGL2RenderingContext, eboindex: number, data: TriIndexTypeArray, dataType?: number): void;
+        /**
+         * 顶点数组绘制三角面
+         * @param webgl webgl上下文
+         * @param start buffer中开始位置
+         * @param count 数量
+         * @param instanceCount gpuInstance数量
+         */
         drawArrayTris(webgl: WebGL2RenderingContext, start?: number, count?: number, instanceCount?: number): void;
-        /** 顶点数组绘制线段 */
+        /**
+         * 顶点数组绘制线段
+         * @param webgl webgl上下文
+         * @param start buffer中开始位置
+         * @param count 数量
+         * @param instanceCount gpuInstance数量
+         */
         drawArrayLines(webgl: WebGL2RenderingContext, start?: number, count?: number, instanceCount?: number): void;
-        /** EBO 绘制三角面 */
+        /**
+         * EBO 绘制三角面
+         * @param webgl webgl上下文
+         * @param start buffer中开始位置
+         * @param count 数量
+         * @param instanceCount gpuInstance数量
+         */
         drawElementTris(webgl: WebGL2RenderingContext, start?: number, count?: number, instanceCount?: number): void;
-        /** EBO 绘制线段 */
+        /**
+         * EBO 绘制线段
+         * @param webgl webgl上下文
+         * @param start buffer中开始位置
+         * @param count 数量
+         * @param instanceCount gpuInstance数量
+         */
         drawElementLines(webgl: WebGL2RenderingContext, start?: number, count?: number, instanceCount?: number): void;
         /** 初始化VAO */
         initVAO(): void;
@@ -22752,6 +27921,9 @@ declare namespace m4m.render {
         set vertexBufferData(val: Float32Array);
         /** 三角形索引数据buffer */
         triIndexBufferData: TriIndexTypeArray;
+        /**
+         * 执行生成mesh所有三角形的顶点法线数据
+         */
         AutoGenNormal(): void;
         /**
          * 请使用 vertexBufferData ,为了兼容工具链暂时保留
@@ -22765,28 +27937,128 @@ declare namespace m4m.render {
          */
         private get tmpInxArr();
         private set tmpInxArr(value);
+        /**
+         * 添加 四边形
+         * @param data mesh数据
+         * @param quad 四边形所有顶点
+         */
         static addQuadPos(data: meshData, quad: m4m.math.vector3[]): void;
+        /**
+         * 添加 四边形 (顶点复用模式)
+         * @param data mesh数据
+         * @param quad 四边形所有顶点
+         */
         static addQuadPos_Quad(data: meshData, quad: m4m.math.vector3[]): void;
+        /**
+         * 添加 四边形 顶点数到数组 ，通过统一v3填充
+         * @param array 顶点数到数组
+         * @param value v3
+         */
         static addQuadVec3ByValue(array: m4m.math.vector3[], value: m4m.math.vector3): void;
+        /**
+         * 添加 四边形 顶点数到数组 ，通过 v3 数组
+         * @param array 顶点数到数组
+         * @param quad v3数组
+         */
         static addQuadVec3(array: m4m.math.vector3[], quad: m4m.math.vector3[]): void;
+        /**
+         * 添加 四边形 顶点数到数组 ，通过 v2数组
+         * @param array 顶点数到数组
+         * @param quad v2数组
+         */
         static addQuadVec2(array: m4m.math.vector2[], quad: m4m.math.vector2[]): void;
+        /**
+         * 生成 四边形 mesh数据
+         * @param size 尺寸
+         * @returns mesh数据
+         */
         static genQuad(size: number): meshData;
+        /**
+         * 生成 粒子用 四边形 mesh数据
+         * @param size 尺寸
+         * @returns mesh数据
+         */
         static genQuad_forparticle(size: number): meshData;
+        /**
+         * 生成 地板 mesh数据
+         * @param size 尺寸
+         * @returns mesh数据
+         */
         static genPlaneCCW(size: number): meshData;
+        /**
+         * 生成 圆柱体 mesh数据
+         * @param height 高
+         * @param radius 半径
+         * @param segment 分段
+         * @returns mesh数据
+         */
         static genCylinderCCW(height: number, radius: number, segment?: number): meshData;
+        /**
+         * 生成 椎体 mesh数据
+         * @param height 高
+         * @param halfsize 半尺寸
+         * @returns mesh数据
+         */
         static genPyramid(height: number, halfsize: number): meshData;
+        /**
+         * 生成 球体 mesh数据
+         * @param radius 半径
+         * @param widthSegments 横向分段数
+         * @param heightSegments 纵向分段数
+         * @returns mesh数据
+         */
         static genSphereCCW(radius?: number, widthSegments?: number, heightSegments?: number): meshData;
+        /**
+         * 生成 正方体 mesh数据
+         * @param size 尺寸
+         * @returns mesh数据
+         */
         static genBoxCCW(size: number): meshData;
+        /**
+         * 生成 长方体 mesh数据
+         * @param array 长方体顶点数组
+         * @param outData 输出mesh数据
+         */
         static genBoxByArray(array: m4m.math.vector3[], outData: meshData): void;
+        /**
+         * 生成 长方体 mesh数据
+         * @param array 长方体顶点数组
+         * @returns 输出mesh数据
+         */
         static genBoxByArray_Quad(array: m4m.math.vector3[]): meshData;
+        /**
+         * 生成圆环
+         * @param radius 半径
+         * @param segment 分段
+         * @param wide 宽度
+         * @returns 输出mesh数据
+         */
         static genCircleLineCCW(radius: number, segment?: number, wide?: number): meshData;
+        /**
+         * 计算内存占用长度
+         * @returns 内存占用长度
+         */
         caclByteLength(): number;
+        /**
+         * 计算字节大小
+         * @param vf 顶点格式
+         * @returns 字节大小
+         */
         static calcByteSize(vf: VertexFormatMask): number;
-        /** 获取顶点段落长度 */
+        /**
+         * 获取顶点段落长度
+         * @returns 段落长度
+         */
         private getSegmentSize;
-        /** 获取顶点数量 */
+        /**
+         * 获取顶点数量
+         * @returns 顶点数量
+         */
         getVertexCount(): number;
-        /** 获取三角形索引数量 */
+        /**
+         * 获取三角形索引数量
+         * @returns 三角形索引数量
+         */
         getTriIndexCount(): number;
         /**
          * 获取顶点位置
@@ -22825,16 +28097,28 @@ declare namespace m4m.render {
          */
         genVertexDataArray(vf: VertexFormatMask): Float32Array;
         /**
-         * 生成 三角形索引buffer数据
-         * @returns 三角形索引buffer数据
+         * 生成 三角形面索引buffer数据
+         * @returns 三角形面索引buffer数据
          */
         genIndexDataArray(): TriIndexTypeArray;
+        /**
+         * 生成  三角形线索引buffer数据
+         * @returns 三角形线索引buffer数据
+         */
         genIndexDataArrayTri2Line(): TriIndexTypeArray;
+        /**
+         * 生成  三角形线索引buffer数据
+         * @returns 三角形线索引buffer数据
+         */
         genIndexDataArrayQuad2Line(): TriIndexTypeArray;
+        /**
+         * 克隆
+         * @param target 克隆目标
+         * @returns 输出数据
+         */
         static cloneByObj(target: meshData): meshData;
         /**
          * 获取AABB
-         *
          * @param recalculate 是否重新计算AABB
          */
         getAABB(recalculate?: boolean): framework.aabb;
@@ -22895,6 +28179,13 @@ declare namespace m4m.render {
      * @private
      */
     class glShader {
+        /**
+         * 引擎 着色器
+         * @param name 名
+         * @param type 类型
+         * @param shader webgl 着色器
+         * @param code [已弃用]
+         */
         constructor(name: string, type: ShaderTypeEnum, shader: WebGLShader, code: string);
         name: string;
         type: ShaderTypeEnum;
@@ -22904,6 +28195,12 @@ declare namespace m4m.render {
      * @private
      */
     class glProgram {
+        /**
+         * 引擎 着色器 Program
+         * @param vs 引擎顶点着色器
+         * @param fs 引擎片元着色器
+         * @param program webgl Program
+         */
         constructor(vs: glShader, fs: glShader, program: WebGLProgram);
         /** 全部 attribute 地址 map */
         mapAllAttrLoc: {
@@ -22913,6 +28210,10 @@ declare namespace m4m.render {
         mapAllAttrID: {
             [id: string]: attribute;
         };
+        /**
+         * 初始化 属性 Attribute
+         * @param webgl webgl上下文
+         */
         initAttribute(webgl: WebGL2RenderingContext): void;
         vs: glShader;
         fs: glShader;
@@ -22920,7 +28221,15 @@ declare namespace m4m.render {
         mapUniform: {
             [id: string]: uniform;
         };
+        /**
+         * 使用当前 webgl program
+         * @param webgl webgl上下文
+         */
         use(webgl: WebGL2RenderingContext): void;
+        /**
+         * 初始化 program 使用的 Uniform
+         * @param webgl webgl上下文
+         */
         initUniforms(webgl: WebGL2RenderingContext): void;
     }
     /**
@@ -22936,12 +28245,52 @@ declare namespace m4m.render {
         mapProgram: {
             [id: string]: glProgram;
         };
+        /**
+         * 销毁 指定 webgl顶点着色器
+         * @param webgl webgl上下文
+         * @param id 顶点着色器ID
+         */
         disposeVS(webgl: WebGL2RenderingContext, id: string): void;
+        /**
+         * 销毁 指定 webgl片元着色器
+         * @param webgl webgl上下文
+         * @param id 片元着色器ID
+         */
         disposeFS(webgl: WebGL2RenderingContext, id: string): void;
+        /**
+         * 销毁指定 webgl Program
+         * @param webgl webgl上下文
+         * @param id Program ID
+         */
         disposeProgram(webgl: WebGL2RenderingContext, id: string): void;
+        /**
+         * 销毁所有着色器
+         * @param webgl webgl上下文
+         */
         disposeAll(webgl: WebGL2RenderingContext): void;
+        /**
+         * 编译 顶点着色器 并扫描 attribute 和 uniform
+         * @param webgl webgl上下文
+         * @param name  名字
+         * @param code  着色器代码
+         * @returns webgl 着色器
+         */
         compileVS(webgl: WebGL2RenderingContext, name: string, code: string): glShader;
+        /**
+         * 编译 片元着色器 并扫描 attribute 和 uniform
+         * @param webgl webgl上下文
+         * @param name  名字
+         * @param code  着色器代码
+         * @returns webgl 着色器
+         */
         compileFS(webgl: WebGL2RenderingContext, name: string, code: string): glShader;
+        /**
+         * 链接 一个顶点着色器 、片元着色器 , 为一个webgl Program
+         * @param webgl webgl上下文
+         * @param nameVS 顶点着色器名
+         * @param nameFS 片元着色器名
+         * @returns webgl Program
+         */
         linkProgram(webgl: WebGL2RenderingContext, nameVS: string, nameFS: string): glProgram;
         mapVSString: {
             [id: string]: string;
@@ -22949,6 +28298,16 @@ declare namespace m4m.render {
         mapFSString: {
             [id: string]: string;
         };
+        /**
+         * 通过 type 从shader pass 配置中筛选符合条件的 顶点着色器 、片元着色器
+         * 链接 一个顶点着色器 、片元着色器 , 为一个webgl Program
+         * @param webgl webgl上下文
+         * @param type pass 类型标记
+         * @param nameVS 顶点着色器名
+         * @param nameFS 片元着色器名
+         * @param globalMacros 着色器中 附加全局宏定义
+         * @returns webgl Program
+         */
         linkProgrambyPassType(webgl: WebGL2RenderingContext, type: string, nameVS: string, nameFS: string, globalMacros: string[]): glProgram;
     }
 }
@@ -22988,6 +28347,14 @@ declare namespace m4m.render {
      * @private
      */
     class textureReader {
+        /**
+         *  纹理像素阅读器
+         * @param webgl webgl上下文
+         * @param texRGBA webgl 纹理
+         * @param width 宽
+         * @param height 高
+         * @param gray 是灰模式
+         */
         constructor(webgl: WebGL2RenderingContext, texRGBA: WebGLTexture, width: number, height: number, gray?: boolean);
         private _isDispose;
         private webgl;
@@ -23001,9 +28368,21 @@ declare namespace m4m.render {
         private _gray;
         get gray(): boolean;
         get isDispose(): boolean;
+        /**
+         * 获取纹理上的像素
+         * @param u 纹理坐标u
+         * @param v 纹理坐标v
+         * @returns 输出像素数据（rgba颜色 | 灰度值）
+         */
         getPixel(u: number, v: number): any;
-        /** 刷新data数据 */
+        /**
+         * 刷新data数据
+         * @param texRGBA 需要读取的源纹理
+         */
         refresh(texRGBA: WebGLTexture): void;
+        /**
+         * 销毁
+         */
         dispose(): void;
     }
     /**
@@ -23013,21 +28392,49 @@ declare namespace m4m.render {
         texture: WebGLTexture;
         width: number;
         height: number;
+        /**
+         * 判断是 FBO
+         * @returns 是FBO
+         */
         isFrameBuffer(): boolean;
+        /**
+         * 销毁
+         * @param webgl webgl上下文
+         */
         dispose(webgl: WebGL2RenderingContext): any;
+        /**
+         * 计算字节长度
+         */
         caclByteLength(): number;
     }
     /**
-     * @private
+     * 渲染输出目标纹理
      */
     class glRenderTarget implements ITexture {
         width: number;
         height: number;
+        /**
+         * 渲染目标
+         * @param webgl webgl上下文
+         * @param width 宽
+         * @param height 高
+         * @param depth 使用深度？
+         * @param stencil 使用模板？
+         * @param fbo webgl fbo
+         */
         constructor(webgl: WebGL2RenderingContext, width: number, height: number, depth?: boolean, stencil?: boolean, fbo?: WebGLFramebuffer);
         fbo: WebGLFramebuffer;
         renderbuffer: WebGLRenderbuffer;
         texture: WebGLTexture;
+        /**
+         * 使用
+         * @param webgl webgl上下文
+         */
         use(webgl: WebGL2RenderingContext): void;
+        /**
+         * 渲染输出目使用状态设置为空
+         * @param webgl webgl上下文
+         */
         static useNull(webgl: WebGL2RenderingContext): void;
         dispose(webgl: WebGL2RenderingContext): void;
         caclByteLength(): number;
@@ -23042,8 +28449,39 @@ declare namespace m4m.render {
         private repeat;
         private mirroredU;
         private mirroredV;
+        /**
+         * 2D纹理
+         * @param webgl webgl上下文
+         * @param format 纹理格式
+         * @param mipmap 开启mipmap？
+         * @param linear 线性纹理采样？
+         */
         constructor(webgl: WebGL2RenderingContext, format?: TextureFormatEnum, mipmap?: boolean, linear?: boolean);
+        /**
+         * 上载 纹理像素数据 到webgl API
+         * @param img HTMLImageElement 的纹理像素数据
+         * @param mipmap 开mipmap？
+         * @param linear 开线性纹理采样？
+         * @param premultiply 开alpha 预乘？
+         * @param repeat uv 采样超出重复？
+         * @param mirroredU uv 采样超出 U 镜像翻转
+         * @param mirroredV uv 采样超出 V 镜像翻转
+         */
         uploadImage(img: HTMLImageElement, mipmap: boolean, linear: boolean, premultiply?: boolean, repeat?: boolean, mirroredU?: boolean, mirroredV?: boolean): void;
+        /**
+         * 上载 纹理像素数据 到webgl API
+         * @param mipmap 开mipmap？
+         * @param linear 开线性纹理采样？
+         * @param width 纹理像素宽度
+         * @param height 纹理像素高度
+         * @param data 二进制数据
+         * @param premultiply 开alpha 预乘？
+         * @param repeat uv 采样超出重复？
+         * @param mirroredU uv 采样超出 U 镜像翻转
+         * @param mirroredV uv 采样超出 V 镜像翻转
+         * @param flipY Y 翻转
+         * @param dataType 像素类型
+         */
         uploadByteArray(mipmap: boolean, linear: boolean, width: number, height: number, data: Uint8Array | Uint16Array | Float32Array, repeat?: boolean, mirroredU?: boolean, mirroredV?: boolean, premultiplyAlpha?: boolean, flipY?: boolean, dataType?: number): void;
         webgl: WebGL2RenderingContext;
         loaded: boolean;
@@ -23052,20 +28490,79 @@ declare namespace m4m.render {
         width: number;
         height: number;
         mipmap: boolean;
+        /**
+         * 计算内存占用长度
+         * @returns 内存占用长度
+         */
         caclByteLength(): number;
         reader: textureReader;
+        /**
+         * 获取一个纹理阅读器
+         * @param redOnly 灰色模式（）
+         * @returns 纹理阅读器
+         */
         getReader(redOnly?: boolean): textureReader;
         dispose(webgl: WebGL2RenderingContext): void;
         isFrameBuffer(): boolean;
+        /**
+         * 获取 纹理 GL 格式
+         * @returns
+         */
         private getGLFormat;
         private static mapTexture;
+        /**
+         * 通过 二进制数据 生成一个灰图
+         * @param webgl webgl上下文
+         * @param array 二进制数据
+         * @param width 纹理宽
+         * @param height 纹理高
+         * @returns 灰图纹理
+         */
         static formGrayArray(webgl: WebGL2RenderingContext, array: number[] | Float32Array | Float64Array, width: number, height: number): glTexture2D;
+        /**
+         * 生成 一个 引擎内建样式纹理
+         * @param webgl webgl上下文
+         * @param name 样式名字
+         * @returns 纹理
+         */
         static staticTexture(webgl: WebGL2RenderingContext, name: "grid" | "gray" | "white" | "black" | "normal"): glTexture2D;
+        /**
+         * 生成 一个 引擎内建粒子系统使用样式纹理
+         * @param webgl webgl上下文
+         * @param name 样式名字
+         * @returns 纹理
+         */
         static particleTexture(webgl: WebGL2RenderingContext, name?: string): glTexture2D;
     }
     class glTextureCube implements ITexture {
+        /**
+         * cube 纹理
+         * @param webgl webgl上下文
+         * @param format 纹理格式
+         * @param mipmap 开启mipmap？
+         * @param linear 线性纹理采样？
+         */
         constructor(webgl: WebGL2RenderingContext, format?: TextureFormatEnum, mipmap?: boolean, linear?: boolean);
+        /**
+         * 上载 纹理像素数据 到webgl API
+         * @param Texture_NEGATIVE_X 反面纹理X
+         * @param Texture_NEGATIVE_Y 反面纹理Y
+         * @param Texture_NEGATIVE_Z 反面纹理Z
+         * @param Texture_POSITIVE_X 正面纹理X
+         * @param Texture_POSITIVE_Y 正面纹理Y
+         * @param Texture_POSITIVE_Z 正面纹理Z
+         * @param min 最小值
+         * @param max 最大值
+         * @param mipmap 开启mipmap？
+         */
         uploadImages(Texture_NEGATIVE_X: framework.texture, Texture_NEGATIVE_Y: framework.texture, Texture_NEGATIVE_Z: framework.texture, Texture_POSITIVE_X: framework.texture, Texture_POSITIVE_Y: framework.texture, Texture_POSITIVE_Z: framework.texture, min?: number, max?: number, mipmap?: number): void;
+        /**
+         * 上载 纹理像素数据 到webgl API
+         * @param data 纹理像素数据
+         * @param width 宽
+         * @param height 高
+         * @param TEXTURE_CUBE_MAP_ cube map的索引
+         */
         private upload;
         webgl: WebGL2RenderingContext;
         loaded: boolean;
@@ -23083,13 +28580,39 @@ declare namespace m4m.render {
      * @private
      */
     class WriteableTexture2D implements ITexture {
+        /**
+         * 可写入的 2D纹理
+         * @param webgl webgl上下文
+         * @param format 纹理格式
+         * @param width 宽
+         * @param height 高
+         * @param linear 线性纹理采样？
+         * @param premultiply alpha 预乘？
+         * @param repeat 超出UV后重复？
+         * @param mirroredU 超出UV后U镜像填充？
+         * @param mirroredV 超出UV后V镜像填充？
+         */
         constructor(webgl: WebGL2RenderingContext, format: TextureFormatEnum, width: number, height: number, linear: boolean, premultiply?: boolean, repeat?: boolean, mirroredU?: boolean, mirroredV?: boolean);
         linear: boolean;
         premultiply: boolean;
         repeat: boolean;
         mirroredU: boolean;
         mirroredV: boolean;
+        /**
+         * 更新纹理 指定矩形区域的像素数据
+         * @param data 纹理数据
+         * @param x 坐标x
+         * @param y 坐标y
+         * @param width 宽
+         * @param height 高
+         */
         updateRect(data: Uint8Array | Uint8ClampedArray, x: number, y: number, width: number, height: number): void;
+        /**
+         * 更新纹理 指定矩形区域的像素数据
+         * @param data 纹理数据
+         * @param x 坐标x
+         * @param y 坐标y
+         */
         updateRectImg(data: ImageData | HTMLVideoElement | HTMLImageElement | HTMLCanvasElement, x: number, y: number): void;
         isFrameBuffer(): boolean;
         webgl: WebGL2RenderingContext;
@@ -23117,6 +28640,10 @@ declare namespace m4m.render {
         repeat: boolean;
         mirroredU: boolean;
         mirroredV: boolean;
+        /**
+         * 视频纹理
+         * @param video HTMLVideoElement 视频对象
+         */
         constructor(video: HTMLVideoElement);
         /** 视频对象 */
         get video(): HTMLVideoElement;

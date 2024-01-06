@@ -394,10 +394,16 @@ namespace m4m.framework {
             this.clipPosToCanvasPos(tv2, tv2);
             this.pointEvent.c_x = tv2.x;
             this.pointEvent.c_y = tv2.y;
+            this.pointEvent.multiTouch = multiTouch;
             var skip = false;
             if (!this.pointDown && !touch && !multiTouch && !this.lastMultiTouch)//nothing
             {
-                skip = true;
+                if (this.pointX != this.pointEvent.x || this.pointY != this.pointEvent.y) {
+                    //on move
+                    this.pointEvent.type = event.PointEventEnum.PointMove;
+                } else {
+                    skip = true;
+                }
             }
             else if (this.pointDown == false && touch == true)//pointdown
             {
@@ -416,6 +422,7 @@ namespace m4m.framework {
             {
                 this.pointEvent.type = event.PointEventEnum.PointUp;
             }
+
             //事件走的是flash U型圈
             if (!skip) {
                 if (this.scene.app.bePlay) {
