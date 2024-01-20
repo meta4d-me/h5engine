@@ -3335,6 +3335,18 @@ declare namespace m4m.framework {
          */
         pixelWidth(label: label, screenwidth: number): number;
     }
+    class FontSelector_Fix implements IFontSelector {
+        constructor(overlay: overlay2D, name: string, fontsize: number);
+        get pixelPerfact(): boolean;
+        calcScreenHeight(label: label): number;
+        pixelFit(label: label, vec2: m4m.math.vector2, screenAddX: number, screenAddY: number): void;
+        pixelWidth(label: label, screenwidth: number): number;
+        overlay: overlay2D;
+        fontname: string;
+        fontsize: number;
+        font: IFont;
+        Update(label: label): void;
+    }
     /**
      * 自动大小的 字体选择器
      */
@@ -3823,6 +3835,23 @@ declare namespace m4m.framework {
          * 当前组件的2d节点
          * @version m4m 1.0
          */
+        transform: transform2D;
+        remove(): void;
+    }
+}
+declare namespace m4m.framework {
+    /**
+     * 富文本版 lable
+     * 支持表情字符，自定义样式段落
+     */
+    class richLabel implements IRectRenderer {
+        render(canvas: canvas): void;
+        updateTran(): void;
+        getMaterial(): material;
+        getDrawBounds(): math.rect;
+        onPlay(): void;
+        start(): void;
+        update(delta: number): void;
         transform: transform2D;
         remove(): void;
     }

@@ -31,6 +31,45 @@ namespace m4m.framework {
          */
         pixelWidth(label: label, screenwidth: number): number;
     }
+    export class FontSelector_Fix implements IFontSelector
+    {
+        constructor(overlay: overlay2D, name: string, fontsize:number) {
+
+            this.overlay = overlay;
+      this.fontsize=fontsize;
+
+            this.font = new m4m.framework.font_canvas(m4m.framework.sceneMgr.app.webgl, name, fontsize);
+        }
+        get pixelPerfact(): boolean {
+            return false;
+        }
+        calcScreenHeight(label: label): number {
+            let oldsize = label.srcfontsize;// label.transform.height;// label.transform.height // or this.fontsize;
+
+            return oldsize;
+        }
+        //辅助将顶点对齐到屏幕坐标，能改善清晰度
+        pixelFit(label: label, vec2: m4m.math.vector2, screenAddX: number, screenAddY: number): void {
+     
+        }
+        //辅助计算字符宽度，到屏幕坐标
+        pixelWidth(label: label, screenwidth: number): number {
+ 
+            return screenwidth;
+        }
+        public overlay: overlay2D;
+        public fontname: string;
+         fontsize:number;
+         font:IFont=null;
+        Update(label: label): void {
+   
+         
+            label.font = this.font;
+            label.font.EnsureString(label.text);
+            label.srcfontsize = this.fontsize;
+            label.updateData(this.font);
+        }
+    }
     /**
      * 自动大小的 字体选择器 
      */
@@ -93,9 +132,10 @@ namespace m4m.framework {
 
         static fonts: { [id: string]: IFont } = {};
         Update(label: label): void {
-
+          
             let intnewfontsize = this.calcScreenHeight(label);
-
+            intnewfontsize=32;
+         
             let fontname = this.fontname + "_" + intnewfontsize;
             if (FontSelector_autoSize.fonts == null)
                 FontSelector_autoSize.fonts = {};
@@ -112,7 +152,7 @@ namespace m4m.framework {
                 font = new m4m.framework.font_canvas(m4m.framework.sceneMgr.app.webgl, this.fontname, fontsize);
                 FontSelector_autoSize.fonts[fontname] = font;
             }
-
+           
             label.font = font;
             label.font.EnsureString(label.text);
             label.fontsize = intnewfontsize;
