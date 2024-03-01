@@ -2,3 +2,5 @@
 .vscode
 
 lib/**
+
+.DS_Store
