@@ -4,7 +4,7 @@
 	branch = master
 [submodule "docs"]
 	path = docs
-	url = https://github.com/meta4d-me/h4engine-docs.git
+	url = https://github.com/meta4d-me/h5engine-docs.git
 	branch = master
 [submodule "examples/engineExample"]
 	path = examples/engineExample
