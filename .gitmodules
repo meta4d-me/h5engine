@@ -2,11 +2,11 @@
 	path = examples/wasmBoy
 	url = https://github.com/meta4d-me/h5engine-sample-wasmboy.git
 	branch = master
-[submodule "examples/engineExample"]
-	path = examples/engineExample
-	url = https://github.com/meta4d-me/h5engine-sample.git
-	branch = master
 [submodule "docs"]
 	path = docs
 	url = https://github.com/meta4d-me/h4engine-docs.git
 	branch = master
+[submodule "examples/engineExample"]
+	path = examples/engineExample
+	url = https://github.com/meta4d-me/h5engine-sample.git
+        branch = master
