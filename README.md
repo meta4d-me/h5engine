@@ -1,3 +1,11 @@
+This repo is archived, as M4M H5 engine ver1.0 is published. The new repo is [m4m-engine](https://github.com/meta4d-me/m4m-engine).
+
+Yours,
+
+M4M Team
+
+---
+
 # M4M
 M4M 是一个基于HTML5 技术栈的，多平台3D 游戏引擎库。
 
